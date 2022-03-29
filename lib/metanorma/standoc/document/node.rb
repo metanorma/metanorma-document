@@ -47,7 +47,7 @@ module Metanorma; module Standoc; module Document
         # We represent Text nodes simply as Strings
         return ng_node.content
       elsif ng_node.is_a? Nokogiri::XML::Comment
-        # TODO
+        return Nodes::Comment.new(ng_node.content)
       end
       
       new_node.attributes = ng_node.attribute_nodes.map do |i|

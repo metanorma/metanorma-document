@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Metanorma; module Standoc; module Document; module Nodes
   # A generic kind of node. If no node has been resolved, we end up
   # here. This node tries to be as universal as possible, even to
