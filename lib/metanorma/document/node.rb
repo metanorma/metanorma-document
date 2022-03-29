@@ -35,6 +35,13 @@ module Metanorma; module Document
     def initialize_converted(ng_node)
     end
 
+    # By default we do a deep clone
+    def initialize_copy(other)
+      other.instance_variables.each do |iv|
+        instance_variable_set(iv, other.instance_variable_get(iv).dup)
+      end
+    end
+
     def self.from_ng(ng_node)
       new_node = nil
 
@@ -148,6 +155,10 @@ module Metanorma; module Document
       name = xml_name.first
     end
 
+    def node_children
+      children.select { |i| i.is_a? Node }
+    end
+
     # Traversing API:
     # This can be used via a visitor pattern to replace or find particular nodes.
     #
@@ -184,7 +195,7 @@ module Metanorma; module Document
 
       resp = block.call(self) if matched
 
-      self.children = children.map do |i|
+      children = children.map do |i|
         next i if i.class == String
 
         matched = case filter
@@ -202,6 +213,10 @@ module Metanorma; module Document
 
         (matched && !result.nil? && result != i) ? result : i
       end.flatten.select(&:itself)
+
+      if children != self.children
+        self.children = children
+      end
 
       resp = self if resp.nil?
 

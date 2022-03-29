@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<basic xmlns="https://www.example.com/basic">
+  <!-- This file is a basic document to work with the Generic node -->
+
+  <example type="list">
+    <p>Hello world!</p>
+    <p>Hello world!</p>
+    <p>Hello world!</p>
+    <p>Hello world!</p>
+    <p>Hello world!</p>
+  </example>
+</basic>
