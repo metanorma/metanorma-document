@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "metanorma/standoc/document"
+require "metanorma/document"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

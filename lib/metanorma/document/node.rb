@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Metanorma; module Standoc; module Document
+module Metanorma; module Document
   # The top ancestors of all nodes. It won't ever be created directly.
   # This is so that gems can inherit from it, so that they can create
   # their own API.
@@ -16,7 +16,7 @@ module Metanorma; module Standoc; module Document
     #   end
     # end
     #
-    # class MyList < Metanorma::Standoc::Document::Node
+    # class MyList < Metanorma::Document::Node
     #   register_element "my-list"
     #   def initialize(children)
     #     self.children = children.map do |i|
@@ -74,12 +74,12 @@ module Metanorma; module Standoc; module Document
 
     # Registration DSL:
     # This DSL allows you to create a subclass, that will automatically
-    # register and Metanorma::Standoc::Document will return a correct
+    # register and Metanorma::Document will return a correct
     # class.
     #
     # To do so, you just need to do:
     #
-    # class MyElement < Metanorma::Standoc::Document::Node
+    # class MyElement < Metanorma::Document::Node
     #   register_element "my-element"
     # end
 
@@ -276,4 +276,4 @@ module Metanorma; module Standoc; module Document
       end
     end
   end
-end; end; end
+end; end

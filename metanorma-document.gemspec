@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "lib/metanorma/standoc/document/version"
+require_relative "lib/metanorma/document/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "metanorma-standoc-document"
-  spec.version       = Metanorma::Standoc::Document::VERSION
+  spec.name          = "metanorma-document"
+  spec.version       = Metanorma::Document::VERSION
   spec.authors       = ["TxODO: Write your name"]
   spec.email         = ["TxODO: Write your email address"]
 

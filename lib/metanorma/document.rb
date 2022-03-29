@@ -2,7 +2,7 @@
 
 require "nokogiri"
 
-module Metanorma; module Standoc
+module Metanorma
   module Document
     module_function
 
@@ -15,11 +15,11 @@ module Metanorma; module Standoc
     alias from_ng from_xml
   end
 
-  # Shorthand for Metanorma::Standoc::Document.from_xml
+  # Shorthand for Metanorma::Document.from_xml
   def self.Document(file)
     Document.from_xml(file)
   end
-end; end
+end
 
 require_relative "document/node"
 require_relative "document/top"

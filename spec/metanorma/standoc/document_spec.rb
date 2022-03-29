@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-RSpec.describe Metanorma::Standoc::Document do
+RSpec.describe Metanorma::Document do
   it "has a version number" do
-    expect(Metanorma::Standoc::Document::VERSION).not_to be nil
+    expect(Metanorma::Document::VERSION).not_to be nil
   end
 
   it "does something useful" do

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Metanorma; module Standoc; module Document; module Nodes
+module Metanorma; module Document; module Nodes
   # The XML comment node
   class Comment < Node
     def initialize(content)
@@ -27,4 +27,4 @@ module Metanorma; module Standoc; module Document; module Nodes
       Nokogiri::XML::Comment.new(ng_doc, content)
     end
   end
-end; end; end; end
+end; end; end
