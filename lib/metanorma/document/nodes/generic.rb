@@ -15,25 +15,26 @@ module Metanorma; module Document; module Nodes
       @xml_name = xml_name
       @children = children
       @attributes = attributes
+      super()
     end
 
     # Find an attribute
     def method_missing(name, *args, **kwargs)
-      if name.end_with? '='
+      if name.end_with? "="
         # Dealing with a setter
         super if args.length != 1 || !kwargs.empty?
 
         name = name.to_s[0..-2]
 
         attributes[name] = args.first
-      elsif name.end_with? '?'
+      elsif name.end_with? "?"
         # A checker. Returns true if such an attribute exists.
         super if !args.empty? || !kwargs.empty?
 
         name = name.to_s[0..-2]
 
         attributes.key?(name)
-      elsif name.end_with? '!'
+      elsif name.end_with? "!"
         # Exclaimers are not supported
         super
       else
@@ -42,6 +43,11 @@ module Metanorma; module Document; module Nodes
 
         attributes[name]
       end
+    end
+
+    # We respond to all (most?) missing attributes
+    def respond_to_missing?(*)
+      true
     end
   end
 end; end; end

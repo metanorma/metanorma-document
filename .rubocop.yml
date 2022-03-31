@@ -1,5 +1,6 @@
 AllCops:
   TargetRubyVersion: 2.5
+  NewCops: enable
 
 Style/StringLiterals:
   Enabled: true
@@ -11,3 +12,48 @@ Style/StringLiteralsInInterpolation:
 
 Layout/LineLength:
   Max: 120
+
+# We deliberately want the style of:
+# module A; module B
+#   class C
+#     ...
+#   end
+# end; end
+Style/TrailingBodyOnModule:
+  Enabled: false
+Layout/EndAlignment:
+  Enabled: false
+Layout/IndentationWidth:
+  Enabled: false
+
+# Let's not deal with complexity for now
+Metrics/AbcSize:
+  Enabled: false
+Metrics/MethodLength:
+  Enabled: false
+Metrics/BlockLength:
+  Enabled: false
+Metrics/PerceivedComplexity:
+  Enabled: false
+Metrics/CyclomaticComplexity:
+  Enabled: false
+Metrics/ClassLength:
+  Enabled: false
+
+# We want the methods to be ordered by their usecase,
+# not by the privacy
+Style/AccessModifierDeclarations:
+  Enabled: false
+
+# Since we are dealing a lot with `self` vs `other`,
+# code like `self.xxx` may be more readable
+Style/RedundantSelf:
+  Enabled: false
+
+# We are not documenting the core classes
+Style/Documentation:
+  Exclude: ['**/core_ext.rb']
+
+# Should be handled by the releasing team
+Gemspec/RequireMFA:
+  Enabled: false

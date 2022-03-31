@@ -5,6 +5,7 @@ module Metanorma; module Document; module Nodes
   class Comment < Node
     def initialize(content)
       @content = content
+      super()
     end
 
     attr_accessor :content
@@ -29,7 +30,7 @@ module Metanorma; module Document; module Nodes
 
     def ==(other)
       self.class == other.class &&
-      self.content == other.content
+        self.content == other.content
     end
   end
 end; end; end

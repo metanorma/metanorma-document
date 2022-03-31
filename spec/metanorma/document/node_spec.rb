@@ -44,11 +44,11 @@ RSpec.describe Metanorma::Document::Node do
     let(:example_node) { document.root.node_children.last }
 
     it "example node has 5 'p' children" do
-      example_node.node_children.map(&:xml_tagname).should be == ['p'] * 5
+      example_node.node_children.map(&:xml_tagname).should be == ["p"] * 5
     end
 
     it "example node has type='list' attribute" do
-      example_node.attributes.should be == {"type" => "list"}
+      example_node.attributes.should be == { "type" => "list" }
     end
   end
 
@@ -103,7 +103,7 @@ RSpec.describe Metanorma::Document::Node do
       node5.xml_namespace = "http://example.com"
 
       node6 = node1.dup
-      node6.attributes = {"hello" => "world"}
+      node6.attributes = { "hello" => "world" }
 
       node7 = Metanorma::Document::Nodes::Comment.new("hello world")
 
@@ -121,7 +121,7 @@ RSpec.describe Metanorma::Document::Node do
 
     it "works without a block" do
       ps = document.visit("p")
-      ps.map(&:xml_tagname).should be == ['p'] * 5
+      ps.map(&:xml_tagname).should be == ["p"] * 5
     end
 
     it "doesn't modify the children if block returns nil" do
@@ -133,20 +133,25 @@ RSpec.describe Metanorma::Document::Node do
     it "removes the children if block returns false" do
       doc = document.dup
       removed = false
-      doc.visit("p") { if removed == false; removed = true; next false; end }
+      doc.visit("p") do
+        if removed == false
+          removed = true
+          next false
+        end
+      end
       doc.root.node_children.last.node_children.length.should be 4
     end
 
     it "updates the children" do
       doc = document.dup
       doc.visit("p") { |i| i.children.first }
-      doc.root.node_children.last.children.select { |i| i.strip != '' }.should be == ["Hello world!"] * 5
+      doc.root.node_children.last.children.reject { |i| i.strip == "" }.should be == ["Hello world!"] * 5
     end
   end
 
   describe "subclassing" do
-    def generate_class_and_xml(init: ->{}, init_conv: ->(_){})
-      r = rand(1200000)
+    def generate_class_and_xml(init: -> {}, init_conv: ->(_) {})
+      r = rand(1_200_000)
       klass = Class.new(described_class) do
         register_element "tag-#{r}"
 
@@ -176,9 +181,9 @@ RSpec.describe Metanorma::Document::Node do
     it "correctly calls initialize_converted only upon converting" do
       counter = 0
 
-      xml, klass, tagname = generate_class_and_xml init_conv: ->(_) { counter += 1 }
+      xml, klass = generate_class_and_xml init_conv: ->(_) { counter += 1 }
 
-      obj = klass.new
+      klass.new
       counter.should be 0
       doc = parse(xml)
       counter.should be 1
@@ -189,9 +194,9 @@ RSpec.describe Metanorma::Document::Node do
     it "correctly calls initialize only upon creating" do
       counter = 0
 
-      xml, klass, tagname = generate_class_and_xml init: ->() { counter += 1 }
+      xml, klass = generate_class_and_xml init: -> { counter += 1 }
 
-      obj = klass.new
+      klass.new
       counter.should be 1
       doc = parse(xml)
       counter.should be 1
