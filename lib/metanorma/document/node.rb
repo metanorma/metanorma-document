@@ -37,23 +37,24 @@ module Metanorma; module Document
 
     # By default we do a deep clone
     def initialize_copy(other)
-      other.instance_variables.each do |iv|
-        instance_variable_set(iv, other.instance_variable_get(iv).dup)
-      end
+      @children = @children&.map { |i| i.dup }
+      @xml_name = @xml_name&.map { |i| i.dup }
+      @attributes = @attributes&.dup
     end
 
     def self.from_ng(ng_node)
       new_node = nil
 
-      if ng_node.is_a? Nokogiri::XML::Document
+      case ng_node
+      when Nokogiri::XML::Document
         new_node = Top.allocate
-      elsif ng_node.is_a? Nokogiri::XML::Element
+      when Nokogiri::XML::Element
         name, xmlns = ng_node.name, ng_node.namespace&.href
         new_node = handler_for(name, xmlns).allocate
-      elsif ng_node.is_a? Nokogiri::XML::Text
+      when Nokogiri::XML::Text
         # We represent Text nodes simply as Strings
         return ng_node.content
-      elsif ng_node.is_a? Nokogiri::XML::Comment
+      when Nokogiri::XML::Comment
         return Nodes::Comment.new(ng_node.content)
       end
       
@@ -94,6 +95,7 @@ module Metanorma; module Document
 
     singleton_class.attr_reader :handlers, :xml_name
 
+    # @private
     def self.handler_for(name, xmlns=nil)
       Node.handlers[[name, xmlns]] || Node.handlers[[name, nil]] || Nodes::Generic
     end
@@ -149,10 +151,26 @@ module Metanorma; module Document
 
     attr_accessor :attributes, :children, :xml_name
 
+    def xml_namespace
+      return nil if self.is_a? Top
+      name = xml_name || self.class.xml_name
+      name = name&.dig(1)
+    end
+
     def xml_tagname
       return nil if self.is_a? Top
       name = xml_name || self.class.xml_name
-      name = xml_name.first
+      name = name&.dig(0)
+    end
+
+    def xml_namespace= (name)
+      self.xml_name ||= self.class.xml_name || []
+      self.xml_name[1] = name
+    end
+
+    def xml_tagname= (name)
+      self.xml_name ||= self.class.xml_name || []
+      self.xml_name[0] = name
     end
 
     def node_children
@@ -187,7 +205,7 @@ module Metanorma; module Document
     # # => [<p/>, <p/>]
 
     def visit(filter = nil, matched = false, &block)
-      unless block
+      unless block_given?
         # The default is to return all nodes
         collection = []
         block = proc { |i| collection << i }
@@ -195,7 +213,7 @@ module Metanorma; module Document
 
       resp = block.call(self) if matched
 
-      children = children.map do |i|
+      children = self.children&.map do |i|
         next i if i.class == String
 
         matched = case filter
@@ -212,7 +230,7 @@ module Metanorma; module Document
         result = i.visit(filter, matched, &block)
 
         (matched && !result.nil? && result != i) ? result : i
-      end.flatten.select(&:itself)
+      end&.flatten&.select(&:itself)
 
       if children != self.children
         self.children = children
@@ -226,7 +244,7 @@ module Metanorma; module Document
     # Inspection API:
     # This API is designed to provide nice trees for debugging
 
-    def pretty_xml_name
+    private def pretty_xml_name
       if self.is_a? Nodes::Generic
         name = self.xml_name.first
       else
@@ -234,7 +252,7 @@ module Metanorma; module Document
       end
     end
 
-    def pretty_attributes
+    private def pretty_attributes
       attributes.map do |key,value|
         " #{key}=#{value.inspect}"
       end.join
@@ -254,7 +272,7 @@ module Metanorma; module Document
       out
     end
 
-    def pretty_print_attributes(pp)
+    private def pretty_print_attributes(pp)
       unless attributes.empty?
         pp.group 2 do
           pp.breakable
@@ -290,5 +308,17 @@ module Metanorma; module Document
         pp.text ">"
       end
     end
+
+    # Comparison API
+
+    def ==(other)
+      self.class == other.class &&
+      self.xml_tagname == other.xml_tagname &&
+      self.xml_namespace == other.xml_namespace &&
+      self.attributes == other.attributes &&
+      self.children == other.children
+    end
+
+    alias eql? ==
   end
 end; end

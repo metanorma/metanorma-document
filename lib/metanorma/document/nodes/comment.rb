@@ -26,5 +26,10 @@ module Metanorma; module Document; module Nodes
     def to_ng(ng_doc)
       Nokogiri::XML::Comment.new(ng_doc, content)
     end
+
+    def ==(other)
+      self.class == other.class &&
+      self.content == other.content
+    end
   end
 end; end; end
