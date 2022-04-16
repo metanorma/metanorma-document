@@ -7,7 +7,7 @@ RSpec.describe Metanorma::Document do
 
   describe ".from_xml" do
     let(:basic_path) { fixture_path("basic") }
-    let(:top_class) { Metanorma::Document::Top }
+    let(:top_class) { Metanorma::Document::Core::Top }
 
     it "can parse a simple document from string" do
       Metanorma::Document.from_xml(File.read(basic_path)).class.should be top_class

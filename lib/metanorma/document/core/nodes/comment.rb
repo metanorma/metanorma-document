@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Metanorma; module Document; module Nodes
+module Metanorma; module Document; module Core; module Nodes
   # The XML comment node
   class Comment < Node
     def initialize(content)
@@ -33,4 +33,4 @@ module Metanorma; module Document; module Nodes
         self.content == other.content
     end
   end
-end; end; end
+end; end; end; end

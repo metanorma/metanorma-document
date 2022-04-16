@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Metanorma; module Document; module Nodes
+module Metanorma; module Document; module Core; module Nodes
   # A generic kind of node. If no node has been resolved, we end up
   # here. This node tries to be as universal as possible, even to
   # a point of defining generic method_missing getters and setters for
@@ -50,4 +50,4 @@ module Metanorma; module Document; module Nodes
       true
     end
   end
-end; end; end
+end; end; end; end

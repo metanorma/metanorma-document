@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Metanorma::Document::Node do
+RSpec.describe Metanorma::Document::Core::Node do
   describe "basic convertibility" do
     each_fixture_path_does "parse without exception" do |fixture_path|
       parse_path(fixture_path)
@@ -34,11 +34,11 @@ RSpec.describe Metanorma::Document::Node do
     end
 
     it "first child of 'basic' is a comment" do
-      document.root.node_children.first.class.should be Metanorma::Document::Nodes::Comment
+      document.root.node_children.first.class.should be Metanorma::Document::Core::Nodes::Comment
     end
 
     it "last child of 'basic' is a Generic" do
-      document.root.node_children.last.class.should be Metanorma::Document::Nodes::Generic
+      document.root.node_children.last.class.should be Metanorma::Document::Core::Nodes::Generic
     end
 
     let(:example_node) { document.root.node_children.last }
@@ -105,7 +105,7 @@ RSpec.describe Metanorma::Document::Node do
       node6 = node1.dup
       node6.attributes = { "hello" => "world" }
 
-      node7 = Metanorma::Document::Nodes::Comment.new("hello world")
+      node7 = Metanorma::Document::Core::Nodes::Comment.new("hello world")
 
       node1.should_not be == node2
       node1.should_not be == node3

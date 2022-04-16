@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Metanorma; module Document
+module Metanorma; module Document; module Core
   # The top ancestors of all nodes. It won't ever be created directly.
   # This is so that gems can inherit from it, so that they can create
   # their own API.
@@ -314,4 +314,4 @@ module Metanorma; module Document
 
     alias eql? ==
   end
-end; end
+end; end; end

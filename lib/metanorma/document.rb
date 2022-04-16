@@ -13,7 +13,7 @@ module Metanorma
     def from_xml(file)
       file = Nokogiri::XML(file) unless file.is_a? Nokogiri::XML::Document
 
-      Node.from_ng(file)
+      Core::Node.from_ng(file)
     end
 
     alias from_ng from_xml
@@ -28,9 +28,9 @@ module Metanorma
   # rubocop:enable Naming/MethodName
 end
 
-require_relative "document/node"
-require_relative "document/top"
-require_relative "document/nodes"
-require_relative "document/core_ext"
+require_relative "document/core/node"
+require_relative "document/core/top"
+require_relative "document/core/nodes"
+require_relative "document/core/core_ext"
 
 require_relative "document/version"

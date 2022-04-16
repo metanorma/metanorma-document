@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Metanorma; module Document
+module Metanorma; module Document; module Core
   # The Top class represents the super-top node, that has exactly one
   # child, which is the root document node.
   #
@@ -18,4 +18,4 @@ module Metanorma; module Document
       doc
     end
   end
-end; end
+end; end; end
