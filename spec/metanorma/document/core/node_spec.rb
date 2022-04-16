@@ -153,6 +153,7 @@ RSpec.describe Metanorma::Document::Core::Node do
     def generate_class_and_xml(init: -> {}, init_conv: ->(_) {})
       r = rand(1_200_000)
       klass = Class.new(described_class) do
+        include Metanorma::Document::Core::Node::Custom
         register_element "tag-#{r}"
 
         define_method :initialize, &init

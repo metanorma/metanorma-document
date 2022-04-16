@@ -30,7 +30,6 @@ end
 
 require_relative "document/core/node"
 require_relative "document/core/top"
-require_relative "document/core/nodes"
 require_relative "document/core/core_ext"
 
 require_relative "document/version"

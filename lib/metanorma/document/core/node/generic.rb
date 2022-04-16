@@ -5,9 +5,6 @@ module Metanorma; module Document; module Core; module Nodes
   # here. This node tries to be as universal as possible, even to
   # a point of defining generic method_missing getters and setters for
   # XML properties.
-  #
-  # In the future this can be amended to generate only the properties
-  # based on the RelaxNG definition.
   class Generic < Node
     # Generate a new generic node
     def initialize(xml_name, children = [], **attributes)

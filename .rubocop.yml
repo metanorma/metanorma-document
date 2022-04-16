@@ -39,6 +39,8 @@ Metrics/CyclomaticComplexity:
   Enabled: false
 Metrics/ClassLength:
   Enabled: false
+Metrics/ModuleLength:
+  Enabled: false
 
 # We want the methods to be ordered by their usecase,
 # not by the privacy
