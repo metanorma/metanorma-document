@@ -17,15 +17,15 @@ module Metanorma; module Document; module Core; class Node
     #   include Metanorma::Document::Core::Node::Custom
     #   register_element "p"
     #   def initialize(text)
-    #     self.children = [text]
+    #     self.xml_children = [text]
     #   end
     # end
     #
     # class MyList < Metanorma::Document::Core::Node
     #   include Metanorma::Document::Core::Node::Custom
     #   register_element "my-list"
-    #   def initialize(children)
-    #     self.children = children.map do |i|
+    #   def initialize(xml_children)
+    #     self.xml_children = xml_children.map do |i|
     #       PElement.new(i)
     #     end
     #   end
@@ -42,9 +42,9 @@ module Metanorma; module Document; module Core; class Node
 
     # By default we do a deep clone
     def initialize_copy(_other)
-      @children = @children&.map { |i| i.dup }
+      @xml_children = @xml_children&.map { |i| i.dup }
       @xml_name = @xml_name&.map { |i| i.dup }
-      @attributes = @attributes&.dup
+      @xml_attributes = @xml_attributes&.dup
     end
 
     # Class methods for Metanorma::Document::Core::Node::Mixin
@@ -66,15 +66,15 @@ module Metanorma; module Document; module Core; class Node
           return Nodes::Comment.new(ng_node.content)
         end
 
-        new_node.attributes = ng_node.attribute_nodes.map do |i|
+        new_node.xml_attributes = ng_node.attribute_nodes.map do |i|
           name = i.name
           name = "#{i.namespace.href}:#{i.name}" if i.namespace
           [name, i.value]
         end.to_h
 
-        new_node.attributes.merge! ng_node.namespaces if ng_node.is_a? Nokogiri::XML::Document
+        new_node.xml_attributes.merge! ng_node.namespaces if ng_node.is_a? Nokogiri::XML::Document
 
-        new_node.children = ng_node.children.map do |i|
+        new_node.xml_children = ng_node.children.map do |i|
           Node.from_ng(i)
         end
 
@@ -98,11 +98,11 @@ module Metanorma; module Document; module Core; class Node
 
       ng_node.add_namespace nil, xml_ns if xml_ns
 
-      children.each do |child|
+      xml_children.each do |child|
         ng_node.add_child child.to_ng(ng_document)
       end
 
-      attributes.each do |name, value|
+      xml_attributes.each do |name, value|
         # Extract the namespace
         name = name.split(":")
         last = name.pop
@@ -129,7 +129,7 @@ module Metanorma; module Document; module Core; class Node
 
     # Access API:
 
-    attr_accessor :attributes, :children, :xml_name
+    attr_accessor :xml_attributes, :xml_children, :xml_name
 
     def xml_namespace
       return nil if self.is_a? Top
@@ -155,8 +155,8 @@ module Metanorma; module Document; module Core; class Node
       self.xml_name[0] = name
     end
 
-    def node_children
-      children.select { |i| i.is_a? Node }
+    def xml_node_children
+      xml_children.select { |i| i.is_a? Node }
     end
 
     # Traversing API:
@@ -165,13 +165,13 @@ module Metanorma; module Document; module Core; class Node
     # The following example replaces all "p" nodes with their first children.
     #
     # tree.visit("p") do |i|
-    #   i.children.first
+    #   i.xml_children.first
     # end
     #
     # To not replace a given node, make sure you return nil:
     #
     # tree.visit("p") do |i|
-    #   saved = i.children.first
+    #   saved = i.xml_children.first
     #   nil
     # end
     #
@@ -196,7 +196,7 @@ module Metanorma; module Document; module Core; class Node
 
       resp = block.call(self) if matched
 
-      children = self.children&.map do |i|
+      xml_children = self.xml_children&.map do |i|
         next i if i.instance_of?(String)
 
         matched = case filter
@@ -215,7 +215,7 @@ module Metanorma; module Document; module Core; class Node
         matched && !result.nil? && result != i ? result : i
       end&.flatten&.select(&:itself)
 
-      self.children = children if children != self.children
+      self.xml_children = xml_children if xml_children != self.xml_children
 
       resp = self if resp.nil?
 
@@ -234,30 +234,30 @@ module Metanorma; module Document; module Core; class Node
       end
     end
 
-    private def pretty_attributes
-      attributes.map do |key, value|
+    private def pretty_xml_attributes
+      xml_attributes.map do |key, value|
         " #{key}=#{value.inspect}"
       end.join
     end
 
     def inspect
-      endtag = "/" if children.empty?
-      out = "<#{pretty_xml_name}#{pretty_attributes}#{endtag}>"
+      endtag = "/" if xml_children.empty?
+      out = "<#{pretty_xml_name}#{pretty_xml_attributes}#{endtag}>"
 
-      unless children.empty?
-        out << children.map(&:inspect).join
+      unless xml_children.empty?
+        out << xml_children.map(&:inspect).join
         out << "</#{pretty_xml_name}>"
       end
 
       out
     end
 
-    private def pretty_print_attributes(pp)
-      return if attributes.empty?
+    private def pretty_print_xml_attributes(pp)
+      return if xml_attributes.empty?
 
       pp.group 2 do
         pp.breakable
-        pp.seplist(attributes) do |(key, value)|
+        pp.seplist(xml_attributes) do |(key, value)|
           pp.text key
           pp.text "="
           pp.pp value
@@ -268,14 +268,14 @@ module Metanorma; module Document; module Core; class Node
     def pretty_print(pp)
       pp.text "<"
       pp.text pretty_xml_name
-      pretty_print_attributes(pp)
-      if children.empty?
+      pretty_print_xml_attributes(pp)
+      if xml_children.empty?
         pp.text "/>"
       else
         pp.text ">"
         pp.group 2 do
           pp.breakable
-          pp.seplist(children) do |child|
+          pp.seplist(xml_children) do |child|
             pp.pp child
           end
         end
@@ -292,8 +292,8 @@ module Metanorma; module Document; module Core; class Node
       self.class == other.class &&
         self.xml_tagname == other.xml_tagname &&
         self.xml_namespace == other.xml_namespace &&
-        self.attributes == other.attributes &&
-        self.children == other.children
+        self.xml_attributes == other.xml_attributes &&
+        self.xml_children == other.xml_children
     end
 
     alias eql? ==

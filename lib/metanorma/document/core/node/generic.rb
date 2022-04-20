@@ -7,11 +7,11 @@ module Metanorma; module Document; module Core; module Nodes
   # XML properties.
   class Generic < Node
     # Generate a new generic node
-    def initialize(xml_name, children = [], **attributes)
+    def initialize(xml_name, xml_children = [], **xml_attributes)
       xml_name = [xml_name, nil] unless xml_name.is_a? Array
       @xml_name = xml_name
-      @children = children
-      @attributes = attributes
+      @xml_children = xml_children
+      @xml_attributes = xml_attributes
       super()
     end
 
@@ -23,14 +23,14 @@ module Metanorma; module Document; module Core; module Nodes
 
         name = name.to_s[0..-2]
 
-        attributes[name] = args.first
+        xml_attributes[name] = args.first
       elsif name.end_with? "?"
         # A checker. Returns true if such an attribute exists.
         super if !args.empty? || !kwargs.empty?
 
         name = name.to_s[0..-2]
 
-        attributes.key?(name)
+        xml_attributes.key?(name)
       elsif name.end_with? "!"
         # Exclaimers are not supported
         super
@@ -38,11 +38,11 @@ module Metanorma; module Document; module Core; module Nodes
         # A getter.
         name = name.to_s
 
-        attributes[name]
+        xml_attributes[name]
       end
     end
 
-    # We respond to all (most?) missing attributes
+    # We respond to all (most?) missing xml_attributes
     def respond_to_missing?(*)
       true
     end

@@ -8,7 +8,7 @@ module Metanorma; module Document; module Core
   # `document`.
   class Top < Node
     def root
-      children.first
+      xml_children.first
     end
 
     # Convert to a Nokogiri document

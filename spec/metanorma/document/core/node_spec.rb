@@ -25,30 +25,30 @@ RSpec.describe Metanorma::Document::Core::Node do
       document.root.xml_tagname.should be == "basic"
     end
 
-    it "top element 'basic' has 5 children" do
-      document.root.children.length.should be 5
+    it "top element 'basic' has 5 xml_children" do
+      document.root.xml_children.length.should be 5
     end
 
-    it "top element 'basic' has 2 Node children" do
-      document.root.node_children.length.should be 2
+    it "top element 'basic' has 2 Node xml_children" do
+      document.root.xml_node_children.length.should be 2
     end
 
     it "first child of 'basic' is a comment" do
-      document.root.node_children.first.class.should be Metanorma::Document::Core::Nodes::Comment
+      document.root.xml_node_children.first.class.should be Metanorma::Document::Core::Nodes::Comment
     end
 
     it "last child of 'basic' is a Generic" do
-      document.root.node_children.last.class.should be Metanorma::Document::Core::Nodes::Generic
+      document.root.xml_node_children.last.class.should be Metanorma::Document::Core::Nodes::Generic
     end
 
-    let(:example_node) { document.root.node_children.last }
+    let(:example_node) { document.root.xml_node_children.last }
 
-    it "example node has 5 'p' children" do
-      example_node.node_children.map(&:xml_tagname).should be == ["p"] * 5
+    it "example node has 5 'p' xml_children" do
+      example_node.xml_node_children.map(&:xml_tagname).should be == ["p"] * 5
     end
 
     it "example node has type='list' attribute" do
-      example_node.attributes.should be == { "type" => "list" }
+      example_node.xml_attributes.should be == { "type" => "list" }
     end
   end
 
@@ -61,7 +61,7 @@ RSpec.describe Metanorma::Document::Core::Node do
 
       doc1.__id__.should_not be == doc2.__id__
       doc1.root.__id__.should_not be == doc2.root.__id__
-      doc1.root.node_children.last.__id__.should_not be == doc2.root.node_children.last.__id__
+      doc1.root.xml_node_children.last.__id__.should_not be == doc2.root.xml_node_children.last.__id__
     end
 
     it "creates an equal document" do
@@ -76,11 +76,11 @@ RSpec.describe Metanorma::Document::Core::Node do
     it "equals for similar nodes" do
       node1 = described_class.new
       node1.xml_tagname = "p"
-      node1.children = ["Hello world!"]
+      node1.xml_children = ["Hello world!"]
 
       node2 = described_class.new
       node2.xml_tagname = "p"
-      node2.children = ["Hello world!"]
+      node2.xml_children = ["Hello world!"]
 
       node1.should be == node2
     end
@@ -88,22 +88,22 @@ RSpec.describe Metanorma::Document::Core::Node do
     it "catches differences for dissimilar nodes" do
       node1 = described_class.new
       node1.xml_tagname = "p"
-      node1.children = ["Hello world!"]
+      node1.xml_children = ["Hello world!"]
 
       node2 = node1.dup
       node2.xml_tagname = "P"
 
       node3 = node1.dup
-      node3.children << "asdf"
+      node3.xml_children << "asdf"
 
       node4 = node1.dup
-      node4.children << node3
+      node4.xml_children << node3
 
       node5 = node1.dup
       node5.xml_namespace = "http://example.com"
 
       node6 = node1.dup
-      node6.attributes = { "hello" => "world" }
+      node6.xml_attributes = { "hello" => "world" }
 
       node7 = Metanorma::Document::Core::Nodes::Comment.new("hello world")
 
@@ -124,13 +124,13 @@ RSpec.describe Metanorma::Document::Core::Node do
       ps.map(&:xml_tagname).should be == ["p"] * 5
     end
 
-    it "doesn't modify the children if block returns nil" do
+    it "doesn't modify the xml_children if block returns nil" do
       doc = document.dup
       doc.visit("p") { nil }
       doc.should be == document
     end
 
-    it "removes the children if block returns false" do
+    it "removes the xml_children if block returns false" do
       doc = document.dup
       removed = false
       doc.visit("p") do
@@ -139,13 +139,13 @@ RSpec.describe Metanorma::Document::Core::Node do
           next false
         end
       end
-      doc.root.node_children.last.node_children.length.should be 4
+      doc.root.xml_node_children.last.xml_node_children.length.should be 4
     end
 
-    it "updates the children" do
+    it "updates the xml_children" do
       doc = document.dup
-      doc.visit("p") { |i| i.children.first }
-      doc.root.node_children.last.children.reject { |i| i.strip == "" }.should be == ["Hello world!"] * 5
+      doc.visit("p") { |i| i.xml_children.first }
+      doc.root.xml_node_children.last.xml_children.reject { |i| i.strip == "" }.should be == ["Hello world!"] * 5
     end
   end
 
@@ -168,7 +168,7 @@ RSpec.describe Metanorma::Document::Core::Node do
       xml, klass = generate_class_and_xml
 
       doc = parse(xml)
-      doc.root.children.first.class.should be klass
+      doc.root.xml_children.first.class.should be klass
     end
 
     it "correctly returns xml_tagname for a custom tag" do
