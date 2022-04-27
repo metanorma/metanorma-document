@@ -15,36 +15,12 @@ module Metanorma; module Document; module Core; module Nodes
       super()
     end
 
-    # Find an attribute
-    def method_missing(name, *args, **kwargs)
-      if name.end_with? "="
-        # Dealing with a setter
-        super if args.length != 1 || !kwargs.empty?
-
-        name = name.to_s[0..-2]
-
-        xml_attributes[name] = args.first
-      elsif name.end_with? "?"
-        # A checker. Returns true if such an attribute exists.
-        super if !args.empty? || !kwargs.empty?
-
-        name = name.to_s[0..-2]
-
-        xml_attributes.key?(name)
-      elsif name.end_with? "!"
-        # Exclaimers are not supported
-        super
-      else
-        # A getter.
-        name = name.to_s
-
-        xml_attributes[name]
-      end
+    def [](attr)
+      xml_attributes[attr.to_s]
     end
 
-    # We respond to all (most?) missing xml_attributes
-    def respond_to_missing?(*)
-      true
+    def []=(attr, value)
+      xml_attributes[attr.to_s] = value
     end
   end
 end; end; end; end
