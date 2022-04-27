@@ -63,7 +63,7 @@ module Metanorma; module Document; module Core; class Node
           # We represent Text nodes simply as Strings
           return ng_node.content
         when Nokogiri::XML::Comment
-          return Nodes::Comment.new(ng_node.content)
+          return Comment.new(ng_node.content)
         end
 
         new_node.xml_attributes = ng_node.attribute_nodes.map do |i|
@@ -227,7 +227,7 @@ module Metanorma; module Document; module Core; class Node
     # This API is designed to provide nice trees for debugging
 
     private def pretty_xml_name
-      if self.is_a? Nodes::Generic
+      if self.is_a? Generic
         self.xml_name.first
       else
         self.class.name

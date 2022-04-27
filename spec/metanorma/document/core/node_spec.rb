@@ -34,11 +34,11 @@ RSpec.describe Metanorma::Document::Core::Node do
     end
 
     it "first child of 'basic' is a comment" do
-      document.root.xml_node_children.first.class.should be Metanorma::Document::Core::Nodes::Comment
+      document.root.xml_node_children.first.class.should be Metanorma::Document::Core::Node::Comment
     end
 
     it "last child of 'basic' is a Generic" do
-      document.root.xml_node_children.last.class.should be Metanorma::Document::Core::Nodes::Generic
+      document.root.xml_node_children.last.class.should be Metanorma::Document::Core::Node::Generic
     end
 
     let(:example_node) { document.root.xml_node_children.last }
@@ -105,7 +105,7 @@ RSpec.describe Metanorma::Document::Core::Node do
       node6 = node1.dup
       node6.xml_attributes = { "hello" => "world" }
 
-      node7 = Metanorma::Document::Core::Nodes::Comment.new("hello world")
+      node7 = Metanorma::Document::Core::Node::Comment.new("hello world")
 
       node1.should_not be == node2
       node1.should_not be == node3

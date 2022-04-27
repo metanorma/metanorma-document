@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Metanorma; module Document; module Core; module Nodes
+module Metanorma; module Document; module Core; class Node
   # The XML comment node
   class Comment < Node
     def initialize(content)

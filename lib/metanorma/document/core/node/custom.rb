@@ -26,7 +26,7 @@ module Metanorma; module Document; module Core; class Node
 
     # @private
     def self.handler_for(name, xmlns = nil)
-      Custom.handlers[[name, xmlns]] || Custom.handlers[[name, nil]] || Nodes::Generic
+      Custom.handlers[[name, xmlns]] || Custom.handlers[[name, nil]] || Generic
     end
 
     # DSL for registering custom nodes
