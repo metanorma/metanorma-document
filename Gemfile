@@ -16,3 +16,8 @@ gem "rubocop-rspec"
 gem "rdoc"
 
 gem "pry"
+
+# Dependencies for utilities
+gem "erb"
+gem "lutaml-uml"
+gem "tilt"

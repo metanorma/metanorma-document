@@ -59,3 +59,9 @@ Style/Documentation:
 # Should be handled by the releasing team
 Gemspec/RequireMFA:
   Enabled: false
+
+# Util
+Naming/AccessorMethodName:
+  Exclude: ['**/class_gen.rb', '**/class_gen/**']
+Style/PerlBackrefs:
+  Exclude: ['**/class_gen.rb', '**/class_gen/**']
