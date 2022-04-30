@@ -10,5 +10,9 @@ module Metanorma; module Document; module StandardDocument
   # and requirements of the "Terms and definition" section given in
   # ISO/IEC DIR 2.
   class TermsSection < ClauseSection
+    register_element do
+      # Terms defined in the term section.
+      node :terms, TermCollection
+    end
   end
 end; end; end

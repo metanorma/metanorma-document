@@ -7,5 +7,9 @@ module Metanorma; module Document; module BasicDocument
   # `IdElement` itself acts as a reference point, such as in a `SourcecodeBlock` for callout references
   # (the `IdElement` is the location), and for delimiting `ReviewComment` start/end places.
   class IdElement < BasicElement
+    register_element do
+      # Identifier of BasicElement.
+      attribute :id, String
+    end
   end
 end; end; end

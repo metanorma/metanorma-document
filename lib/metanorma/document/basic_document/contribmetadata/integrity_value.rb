@@ -5,5 +5,7 @@ module Metanorma; module Document; module BasicDocument
   # associated `publicKey`.
   class IntegrityValue < Core::Node
     include Core::Node::Custom
+
+    register_element
   end
 end; end; end

@@ -17,5 +17,15 @@ module Metanorma; module Document; module StandardDocument
   # bibliographical references (as modelled in Relaton), along with
   # any prefatory text.
   class StandardReferencesSection < StandardSection
+    register_element do
+      # Whether the references in the current section are normative or informative for the document.
+      attribute :normative, NormativeType
+
+      # Bibliographic items cited in the document.
+      nodes :references, BasicDocument::BibliographicItem
+
+      # Annotations accompanying bibliographic items.
+      nodes :note, BasicDocument::ParagraphBlock
+    end
   end
 end; end; end

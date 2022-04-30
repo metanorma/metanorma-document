@@ -5,5 +5,12 @@ require "basic_document/lists/unordered_list"
 module Metanorma; module Document; module BasicDocument
   # Ordered list, with numbering applied to the list items.
   class OrderedList < UnorderedList
+    register_element do
+      # Type of numbering to be applied to the list items.
+      attribute :type, OrderedListType
+
+      # Starting value for numbering of the list items.
+      nodes :start, String
+    end
   end
 end; end; end

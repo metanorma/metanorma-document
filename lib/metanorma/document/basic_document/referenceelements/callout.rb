@@ -7,5 +7,11 @@ module Metanorma; module Document; module BasicDocument
   # The target of the callout is understood to be the location of the callout within the source code;
   # the extent of the target is not expressed overtly.
   class Callout < ReferenceToIdElement
+    register_element do
+      node :type, BasicObject # But actually: callout
+
+      # The label of the callout, used to identify its target within the source code.
+      node :text, TextElement
+    end
   end
 end; end; end

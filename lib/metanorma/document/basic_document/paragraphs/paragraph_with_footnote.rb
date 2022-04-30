@@ -8,5 +8,9 @@ module Metanorma; module Document; module BasicDocument
   # footnotes are not appropriate for all instances of paragraph content in a document (e.g. sourcecode
   # annotations).
   class ParagraphWithFootnote < ParagraphBlock
+    register_element do
+      # Footnotes contained in the paragraph.
+      nodes :footnotes, BasicObject # But actually: ReferenceToldWithParagraphElement
+    end
   end
 end; end; end

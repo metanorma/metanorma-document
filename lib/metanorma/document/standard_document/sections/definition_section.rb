@@ -14,5 +14,9 @@ module Metanorma; module Document; module StandardDocument
   # In addition to allowing prefatory text per section, each definition list
   # within each definition section can also be preceded by prefatory text.
   class DefinitionSection < ClauseSection
+    register_element do
+      # Definition list.
+      nodes :definitions, DefinitionCollection
+    end
   end
 end; end; end

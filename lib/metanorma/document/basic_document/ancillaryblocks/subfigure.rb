@@ -5,5 +5,7 @@ module Metanorma; module Document; module BasicDocument
   # Subfigures only occur within figures.
   class Subfigure < Core::Node
     include Core::Node::Custom
+
+    register_element
   end
 end; end; end

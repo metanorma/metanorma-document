@@ -5,5 +5,9 @@ module Metanorma; module Document; module StandardDocument
   # from other schemas, e.g. UnitsML.
   class MiscContainer < Core::Node
     include Core::Node::Custom
+
+    register_element do
+      nodes :element, Object
+    end
   end
 end; end; end

@@ -5,5 +5,7 @@ module Metanorma; module Document; module Relaton
   # organization.
   class Contributor < Core::Node
     include Core::Node::Custom
+
+    register_element
   end
 end; end; end

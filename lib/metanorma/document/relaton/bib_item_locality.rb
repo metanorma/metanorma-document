@@ -13,5 +13,16 @@ module Metanorma; module Document; module Relaton
   # with the same type.
   class BibItemLocality < Core::Node
     include Core::Node::Custom
+
+    register_element do
+      # The type of extent (e.g. section, clause, page).
+      attribute :type, SpecificLocalityType
+
+      # The starting value of the extent, or point location.
+      nodes :reference_from, BasicDocument::LocalizedString
+
+      # The end value of the extent as a range, if applicable.
+      nodes :reference_to, BasicDocument::LocalizedString
+    end
   end
 end; end; end

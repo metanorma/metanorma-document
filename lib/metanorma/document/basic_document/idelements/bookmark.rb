@@ -8,5 +8,6 @@ module Metanorma; module Document; module BasicDocument
   # as point anchors. For that reason, the Review block has a starting reference and an optional ending
   # reference, which can be bookmarks as well as block or section references.
   class Bookmark < IdElement
+    register_element
   end
 end; end; end

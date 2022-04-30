@@ -7,5 +7,9 @@ module Metanorma; module Document; module StandardDocument
   # text
   # are siblings to subclauses.
   class ClauseHierarchicalSection < ClauseSection
+    register_element do
+      # Subclauses which are mutually exclusive with text content.
+      nodes :subsections, ClauseHierarchicalSection
+    end
   end
 end; end; end

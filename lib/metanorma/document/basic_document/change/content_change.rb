@@ -8,5 +8,6 @@ module Metanorma; module Document; module BasicDocument
   # data element.
   # Add text; Delete text; Modify text.
   class ContentChange < Change
+    register_element
   end
 end; end; end

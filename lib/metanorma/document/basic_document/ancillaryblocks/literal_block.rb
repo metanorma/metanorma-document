@@ -8,5 +8,17 @@ module Metanorma; module Document; module BasicDocument
   # semantically.
   class LiteralBlock < Core::Node
     include Core::Node::Custom
+
+    register_element do
+      # Accessible description of the preformatted text.
+      nodes :alt, String
+
+      # The caption of the block.
+      nodes :name, TextElement
+
+      # The pre-formatted text presented in the block, as a single unformatted string. (Whitespace is
+      # treated as significant.)
+      attribute :content, String
+    end
   end
 end; end; end

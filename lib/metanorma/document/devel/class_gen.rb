@@ -139,7 +139,7 @@ module Metanorma; module Document; module Devel
       warn "!!! Models referenced but missing: #{missing.inspect}" unless missing.empty?
     end
 
-    singleton_class.attr_reader :path_by_class, :module_by_class, :associations
+    singleton_class.attr_reader :path_by_class, :module_by_class, :associations, :basic_types
 
     def parse_combined_repo
       @associations = []
@@ -166,6 +166,9 @@ module Metanorma; module Document; module Devel
       enums = enums.to_h { |i| [i.name, i] }.values
       data_types = data_types.to_h { |i| [i.name, i] }.values
       primitives = primitives.to_h { |i| [i.name, i] }.values
+
+      @basic_types = [enums, data_types, primitives].flatten.map(&:name).map(&:to_sym)
+      @basic_types += %i[Boolean Int Integer Float]
 
       combined = "#{@tmp_path}/combined"
 

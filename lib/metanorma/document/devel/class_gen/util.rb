@@ -9,7 +9,11 @@ module Metanorma; module Document; module Devel; module ClassGen
     # - dc: dromedaryCase
     # - cc: CONST_CASE
     def pc2sc(sym)
-      sym.to_s.gsub(/([A-Z])/) { "_#{$1.downcase}" }.sub(/\A_/, "").to_sym
+      sym.to_s
+         .gsub(/([A-Z])/) { "_#{$1.downcase}" }
+         .sub(/\A_/, "")
+         .gsub(/[^A-Za-z0-9]/, "_")
+         .to_sym
     end
 
     def sc2pc(sym)

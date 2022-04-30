@@ -9,5 +9,6 @@ module Metanorma; module Document; module BasicDocument
   # structurally between prefatory sections and sections in the main body of the text; differences
   # between the two may be introduced in the Basic Document model at a later date.)
   class ContentSection < HierarchicalSection
+    register_element
   end
 end; end; end

@@ -5,5 +5,6 @@ require "basic_document/textelements/text_element"
 module Metanorma; module Document; module BasicDocument
   # Strikethrough text. Corresponds to HTML 4 `s`.
   class StrikeElement < TextElement
+    register_element
   end
 end; end; end
