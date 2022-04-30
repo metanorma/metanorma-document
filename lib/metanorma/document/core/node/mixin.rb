@@ -40,9 +40,16 @@ module Metanorma; module Document; module Core; class Node
 
     def initialize_converted(ng_node); end
 
-    # By default we do a deep clone
-    def initialize_copy(_other)
-      @xml_children = @xml_children&.map { |i| i.dup }
+    def deep_dup
+      dup = self.dup
+      dup.initialize_deep_copy(self)
+      dup
+    end
+
+    def initialize_deep_copy(_other)
+      @xml_children = @xml_children&.map do |i|
+        i.respond_to?(:deep_dup) ? i.deep_dup : i.dup
+      end
       @xml_name = @xml_name&.map { |i| i.dup }
       @xml_attributes = @xml_attributes&.dup
     end
@@ -66,13 +73,15 @@ module Metanorma; module Document; module Core; class Node
           return Comment.new(ng_node.content)
         end
 
-        new_node.xml_attributes = ng_node.attribute_nodes.map do |i|
+        attributes = ng_node.attribute_nodes.map do |i|
           name = i.name
           name = "#{i.namespace.href}:#{i.name}" if i.namespace
           [name, i.value]
         end.to_h
 
-        new_node.xml_attributes.merge! ng_node.namespaces if ng_node.is_a? Nokogiri::XML::Document
+        attributes.merge! ng_node.namespaces if ng_node.is_a? Nokogiri::XML::Document
+
+        new_node.xml_attributes = attributes
 
         new_node.xml_children = ng_node.children.map do |i|
           Node.from_ng(i)

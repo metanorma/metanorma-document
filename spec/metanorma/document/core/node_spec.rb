@@ -52,12 +52,12 @@ RSpec.describe Metanorma::Document::Core::Node do
     end
   end
 
-  describe "#dup" do
+  describe "#deep_dup" do
     let(:document) { fixture(:basic) }
 
     it "triggers a deep duplication" do
       doc1 = document
-      doc2 = doc1.dup
+      doc2 = doc1.deep_dup
 
       doc1.__id__.should_not be == doc2.__id__
       doc1.root.__id__.should_not be == doc2.root.__id__
@@ -66,7 +66,7 @@ RSpec.describe Metanorma::Document::Core::Node do
 
     it "creates an equal document" do
       doc1 = document
-      doc2 = doc1.dup
+      doc2 = doc1.deep_dup
 
       doc1.should be == doc2
     end
@@ -90,19 +90,19 @@ RSpec.describe Metanorma::Document::Core::Node do
       node1.xml_tagname = "p"
       node1.xml_children = ["Hello world!"]
 
-      node2 = node1.dup
+      node2 = node1.deep_dup
       node2.xml_tagname = "P"
 
-      node3 = node1.dup
+      node3 = node1.deep_dup
       node3.xml_children << "asdf"
 
-      node4 = node1.dup
+      node4 = node1.deep_dup
       node4.xml_children << node3
 
-      node5 = node1.dup
+      node5 = node1.deep_dup
       node5.xml_namespace = "http://example.com"
 
-      node6 = node1.dup
+      node6 = node1.deep_dup
       node6.xml_attributes = { "hello" => "world" }
 
       node7 = Metanorma::Document::Core::Node::Comment.new("hello world")
@@ -125,13 +125,13 @@ RSpec.describe Metanorma::Document::Core::Node do
     end
 
     it "doesn't modify the xml_children if block returns nil" do
-      doc = document.dup
+      doc = document.deep_dup
       doc.visit("p") { nil }
       doc.should be == document
     end
 
     it "removes the xml_children if block returns false" do
-      doc = document.dup
+      doc = document.deep_dup
       removed = false
       doc.visit("p") do
         if removed == false
@@ -143,7 +143,7 @@ RSpec.describe Metanorma::Document::Core::Node do
     end
 
     it "updates the xml_children" do
-      doc = document.dup
+      doc = document.deep_dup
       doc.visit("p") { |i| i.xml_children.first }
       doc.root.xml_node_children.last.xml_children.reject { |i| i.strip == "" }.should be == ["Hello world!"] * 5
     end
@@ -188,7 +188,7 @@ RSpec.describe Metanorma::Document::Core::Node do
       counter.should be 0
       doc = parse(xml)
       counter.should be 1
-      doc.dup
+      doc.deep_dup
       counter.should be 1
     end
 
@@ -201,7 +201,7 @@ RSpec.describe Metanorma::Document::Core::Node do
       counter.should be 1
       doc = parse(xml)
       counter.should be 1
-      doc.dup
+      doc.deep_dup
       counter.should be 1
     end
   end

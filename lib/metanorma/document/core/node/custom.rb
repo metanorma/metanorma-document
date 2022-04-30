@@ -34,8 +34,10 @@ module Metanorma; module Document; module Core; class Node
       attr_reader :xml_name
 
       def register_element(name, xmlns = nil)
-        Custom.handlers[[name, xmlns]] = self
-        @xml_name = [name, xmlns]
+        @xml_name = [Array(name).first, xmlns]
+        Array(name).each do |subname|
+          Custom.handlers[[subname, xmlns]] = self
+        end
       end
     end
   end
