@@ -5,7 +5,7 @@ module Metanorma; module Document; module StandardDocument
   class TechnicalCommitteeType < Core::Node
     include Core::Node::Custom
 
-    register_element do
+    register_element "technical-committee" do
       # Identifier of the technical committee (typically numeric).
       attribute :number, Integer
 

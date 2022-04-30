@@ -6,7 +6,7 @@ module Metanorma; module Document; module StandardDocument
   class TermDefinition < Core::Node
     include Core::Node::Custom
 
-    register_element do
+    register_element "definition" do
       # The content of the definition of the term applied in the current
       # document.
       node :verbalexpression, VerbalExpression

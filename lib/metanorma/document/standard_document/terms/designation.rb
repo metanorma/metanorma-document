@@ -5,7 +5,7 @@ module Metanorma; module Document; module StandardDocument
   class Designation < Core::Node
     include Core::Node::Custom
 
-    register_element do
+    register_element "absent" do
       # Indication that the term designation is missing.
       attribute :absent, TrueClass
 

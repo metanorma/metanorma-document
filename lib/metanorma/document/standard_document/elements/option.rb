@@ -5,7 +5,7 @@ module Metanorma; module Document; module StandardDocument
   class Option < Core::Node
     include Core::Node::Custom
 
-    register_element do
+    register_element "option" do
       # Option is disabled
       attribute :disabled, TrueClass
 

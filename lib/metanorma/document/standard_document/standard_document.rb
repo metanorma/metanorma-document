@@ -23,7 +23,7 @@ module Metanorma; module Document; module StandardDocument
   # modelling of the document by requiring specific types
   # of sections.
   class StandardDocument < BasicDocument::BasicDocument
-    register_element do
+    register_element "standard-document" do
       # Bibliographic description of the document itself, expressed in the Relaton
       # model.
       node :bibdata, StandardBibData

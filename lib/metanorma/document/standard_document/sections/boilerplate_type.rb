@@ -6,7 +6,7 @@ module Metanorma; module Document; module StandardDocument
   class BoilerplateType < Core::Node
     include Core::Node::Custom
 
-    register_element do
+    register_element "boilerplate" do
       # Preset templated text provided by the standardization body,
       # describing the copyright status of the document.
       node :copyright, BasicDocument::HierarchicalSection

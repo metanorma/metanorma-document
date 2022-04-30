@@ -7,7 +7,7 @@ module Metanorma; module Document; module StandardDocument
   # of a selected
   # attribute on a component option
   class Select < FormInput
-    register_element do
+    register_element "select" do
       # Input is disabled
       attribute :disabled, TrueClass
 

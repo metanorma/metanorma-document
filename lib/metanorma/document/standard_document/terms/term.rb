@@ -9,7 +9,7 @@ module Metanorma; module Document; module StandardDocument
   class Term < Core::Node
     include Core::Node::Custom
 
-    register_element do
+    register_element "term" do
       # The language of the term entry, as an ISO-639 3-letter code.
       attribute :language, BasicDocument::Iso639Code
 

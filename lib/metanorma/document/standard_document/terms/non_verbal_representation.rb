@@ -5,7 +5,7 @@ module Metanorma; module Document; module StandardDocument
   class NonVerbalRepresentation < Core::Node
     include Core::Node::Custom
 
-    register_element do
+    register_element "non-verbal-representation" do
       # Figure representation of the term.
       nodes :figure, BasicDocument::FigureBlock
 
