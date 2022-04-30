@@ -19,7 +19,16 @@ module Metanorma; module Document; module Devel; module ClassGen
     alias dc2sc pc2sc
 
     def dc2cc(sym)
-      dc2sc(sym).to_s.upcase.gsub("-", "_").to_sym
+      # Mixed-case constant names
+      case sym.to_sym
+      when :MathML then return :MATHML
+      when :AsciiML then return :ASCIIML
+      when :LaTeX then return :LATEX
+      end
+
+      sym = dc2sc(sym).to_s.upcase.gsub(/[^0-9A-Za-z]/, "_")
+      sym = "CODE_#{sym}" if sym.start_with?(/[0-9]/)
+      sym.to_sym
     end
   end
 end; end; end; end
