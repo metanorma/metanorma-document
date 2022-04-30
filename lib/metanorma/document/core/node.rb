@@ -4,6 +4,8 @@ require_relative "node/mixin"
 require_relative "node/custom"
 require_relative "node/generic"
 require_relative "node/comment"
+require_relative "node/data_type"
+require_relative "node/enum"
 
 module Metanorma; module Document; module Core
   # The top ancestors of all nodes. It won't ever be created directly.

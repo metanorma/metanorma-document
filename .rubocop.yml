@@ -25,6 +25,8 @@ Layout/EndAlignment:
   Enabled: false
 Layout/IndentationWidth:
   Enabled: false
+Style/TrailingBodyOnClass:
+  Enabled: false
 
 # Let's not deal with complexity for now
 Metrics/AbcSize:

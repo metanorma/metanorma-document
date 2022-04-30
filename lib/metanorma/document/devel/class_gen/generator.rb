@@ -18,7 +18,10 @@ module Metanorma; module Document; module Devel; module ClassGen
       generate_head
       generate_body
 
-      requires = @requires.map { |i| "require #{i.inspect}\n" }.join
+      requires = @requires.map do |i|
+        i = "metanorma/document/#{i}"
+        "require #{i.inspect}\n"
+      end.join
       requires << "\n" unless requires.empty?
       @body = @body.gsub("{{REQUIRES}}", requires)
 

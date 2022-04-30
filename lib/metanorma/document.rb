@@ -32,7 +32,10 @@ module Metanorma
     alias from_ng from_xml
 
     def self.finalize_load
-      # TODO
+      Metanorma::Document::Core::Node::Custom.need_to_initialize.each do |klass|
+        klass.initialize_custom_element(deferred: true)
+      end
+      Metanorma::Document::Core::Node::Custom.need_to_initialize = nil
     end
   end
 
@@ -51,9 +54,9 @@ require_relative "document/core/core_ext"
 
 require_relative "document/version"
 
-# require_relative "document/basic_document"
-# require_relative "document/relaton"
-# require_relative "document/standard_document"
-# require_relative "document/relaton"
+require_relative "document/basic_document"
+require_relative "document/relaton"
+require_relative "document/standard_document"
+require_relative "document/iso_document"
 
 Metanorma::Document.finalize_load
