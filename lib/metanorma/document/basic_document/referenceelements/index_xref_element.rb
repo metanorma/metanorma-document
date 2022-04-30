@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "basic_document/referenceelements/reference_element"
+require "metanorma/document/basic_document/referenceelements/reference_element"
 
 module Metanorma; module Document; module BasicDocument
   # A reference to an index term, cross-referenced within an index as an

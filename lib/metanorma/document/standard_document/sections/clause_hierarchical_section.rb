@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "standard_document/sections/clause_section"
+require "metanorma/document/standard_document/sections/clause_section"
 
 module Metanorma; module Document; module StandardDocument
   # Clauses in which all textual content belongs in a strict clause hierarchy. such that no blocks of

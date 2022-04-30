@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "basic_document/change/content_modify"
+require "metanorma/document/basic_document/change/content_modify"
 
 module Metanorma; module Document; module BasicDocument
   # A container for a multiple _AttributeChangeAction_ data.

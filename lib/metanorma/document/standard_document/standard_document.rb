@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "basic_document/basic_document"
+require "metanorma/document/basic_document/basic_document"
 
 module Metanorma; module Document; module StandardDocument
   # The _StandardDocument_ model is used to represent a standardization

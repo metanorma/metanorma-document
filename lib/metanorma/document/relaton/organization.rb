@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "relaton/contributor"
+require "metanorma/document/relaton/contributor"
 
 module Metanorma; module Document; module Relaton
   # Organization associated with a bibliographic item.

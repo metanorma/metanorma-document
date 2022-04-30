@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "basic_document/blocks/basic_block_no_notes"
+require "metanorma/document/basic_document/blocks/basic_block_no_notes"
 
 module Metanorma; module Document; module BasicDocument
   # Block containing an example illustrating a claim made in the main flow of text.

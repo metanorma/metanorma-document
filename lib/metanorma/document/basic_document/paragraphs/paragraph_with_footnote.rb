@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "basic_document/paragraphs/paragraph_block"
+require "metanorma/document/basic_document/paragraphs/paragraph_block"
 
 module Metanorma; module Document; module BasicDocument
   # A paragraph which may also contain footnotes.

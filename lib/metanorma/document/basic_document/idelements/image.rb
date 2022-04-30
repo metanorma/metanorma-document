@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "basic_document/idelements/media"
+require "metanorma/document/basic_document/idelements/media"
 
 module Metanorma; module Document; module BasicDocument
   # Container for image content.

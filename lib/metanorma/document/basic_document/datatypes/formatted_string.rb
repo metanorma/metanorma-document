@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "basic_document/datatypes/localized_string"
+require "metanorma/document/basic_document/datatypes/localized_string"
 
 module Metanorma; module Document; module BasicDocument
   # String which is formatted according to conventions specified

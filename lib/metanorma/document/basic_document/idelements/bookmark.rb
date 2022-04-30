@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "basic_document/idelements/id_element"
+require "metanorma/document/basic_document/idelements/id_element"
 
 module Metanorma; module Document; module BasicDocument
   # Anchor for cross-references which do not have scope over blocks or sections. Anchors within a block

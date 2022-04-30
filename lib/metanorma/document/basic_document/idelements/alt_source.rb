@@ -14,7 +14,7 @@ module Metanorma; module Document; module BasicDocument
       attribute :source, Uri
 
       # Type of the media file.
-      attribute :type, MediaType, xml_tagname: "mimetype"
+      attribute :type, MediaType, xml_attribute: "mimetype"
     end
   end
 end; end; end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "basic_document/sections/hierarchical_section"
+require "metanorma/document/basic_document/sections/hierarchical_section"
 
 module Metanorma; module Document; module BasicDocument
   # Prefatory sections of text, outside the main flow of text.

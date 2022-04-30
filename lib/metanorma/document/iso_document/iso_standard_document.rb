@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "standard_document/standard_document"
+require "metanorma/document/standard_document/standard_document"
 
 module Metanorma; module Document; module IsoDocument
   # ISO Standards document.

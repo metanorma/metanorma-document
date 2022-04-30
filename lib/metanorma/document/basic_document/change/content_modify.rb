@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "basic_document/change/content_change"
+require "metanorma/document/basic_document/change/content_change"
 
 module Metanorma; module Document; module BasicDocument
   # Container for a multiple _ContentChangeAction_ data

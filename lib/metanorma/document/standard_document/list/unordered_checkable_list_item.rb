@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
-require "basic_document/lists/list_item"
+# require "metanorma/document/basic_document/lists/list_item"
 
 module Metanorma; module Document; module StandardDocument
   # List item for unordered lists for standards documents.
-  class UnorderedCheckableListItem < BasicDocument::ListItem
+  class UnorderedCheckableListItem < Core::Node
+    include Core::Node::Custom
+
     register_element do
       # Include a checkbox for the list item.
       attribute :checkbox, TrueClass

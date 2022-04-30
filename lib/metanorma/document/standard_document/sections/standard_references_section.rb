@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "standard_document/sections/standard_section"
+require "metanorma/document/standard_document/sections/standard_section"
 
 module Metanorma; module Document; module StandardDocument
   # The `StandardReferencesSection` class within _StandardDocument_

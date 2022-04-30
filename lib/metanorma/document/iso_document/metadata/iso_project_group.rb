@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "relaton/organization"
+require "metanorma/document/relaton/organization"
 
 module Metanorma; module Document; module IsoDocument
   # Editorial groups associated with the production of an ISO/IEC document.

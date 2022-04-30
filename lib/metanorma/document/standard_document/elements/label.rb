@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "basic_document/referenceelements/reference_to_id_element"
+require "metanorma/document/basic_document/referenceelements/reference_to_id_element"
 
 module Metanorma; module Document; module StandardDocument
   # Label associated with form input element

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "basic_document/multiparagraphs/admonition_block"
+require "metanorma/document/basic_document/multiparagraphs/admonition_block"
 
 module Metanorma; module Document; module IsoDocument
   class IsoAdmonitionBlock < BasicDocument::AdmonitionBlock

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "basic_document/change/content_change_action"
+require "metanorma/document/basic_document/change/content_change_action"
 
 module Metanorma; module Document; module BasicDocument
   # Possible actions

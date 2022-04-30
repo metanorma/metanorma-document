@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "basic_document/lists/definition_list"
+require "metanorma/document/basic_document/lists/definition_list"
 
 module Metanorma; module Document; module StandardDocument
   class StandardDefinitionList < BasicDocument::DefinitionList

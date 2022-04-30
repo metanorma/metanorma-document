@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "basic_document/multiparagraphs/paragraphs_block"
+require "metanorma/document/basic_document/multiparagraphs/paragraphs_block"
 
 module Metanorma; module Document; module BasicDocument
   # A sidebar block outside of the main flow of text,
