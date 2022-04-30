@@ -5,7 +5,7 @@ module Metanorma; module Document; module StandardDocument
   class ExpressionDesignation < Core::Node
     include Core::Node::Custom
 
-    register_element do
+    register_element "expression" do
       # The language of the designation, as an ISO-639 3-letter code.
       attribute :language, BasicDocument::Iso639Code
 

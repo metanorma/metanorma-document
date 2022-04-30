@@ -6,7 +6,7 @@ module Metanorma; module Document; module StandardDocument
   class TermSource < Core::Node
     include Core::Node::Custom
 
-    register_element do
+    register_element "termsource" do
       # The status of the term as it is used in this document,
       # relative to its definition in the original document.
       attribute :status, TermSourceStatus

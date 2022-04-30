@@ -7,7 +7,7 @@ module Metanorma; module Document; module StandardDocument
   class Concept < Core::Node
     include Core::Node::Custom
 
-    register_element do
+    register_element "concept" do
       # Render the term in the concept in italics.
       attribute :ital, TrueClass
 

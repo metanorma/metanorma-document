@@ -6,7 +6,7 @@ module Metanorma; module Document; module StandardDocument
   class EditorialGroupType < Core::Node
     include Core::Node::Custom
 
-    register_element do
+    register_element "editorialgroup" do
       # A technical committee associated with the production of the standards document.
       nodes :technicalcommittee, TechnicalCommitteeType
     end

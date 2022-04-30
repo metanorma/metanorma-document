@@ -5,7 +5,7 @@ module Metanorma; module Document; module StandardDocument
   class LetterSymbolDesignation < Core::Node
     include Core::Node::Custom
 
-    register_element do
+    register_element "letter-symbol" do
       # The textual form of the designation.
       nodes :text, String
 
@@ -14,7 +14,7 @@ module Metanorma; module Document; module StandardDocument
 
       # Whether the designation (typically an abbreviation) is the same across languages, or
       # language-specific.
-      attribute :is_international, TrueClass
+      attribute :is_international, TrueClass, xml_attribute: "isInternational"
     end
   end
 end; end; end

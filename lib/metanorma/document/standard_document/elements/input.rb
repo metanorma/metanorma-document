@@ -5,7 +5,7 @@ require "standard_document/elements/form_input"
 module Metanorma; module Document; module StandardDocument
   # Indication of text added through editorial intervention.
   class Input < FormInput
-    register_element do
+    register_element "input" do
       # Type of input element
       attribute :type, InputType
 

@@ -6,7 +6,7 @@ module Metanorma; module Document; module StandardDocument
   class StructuredIdentifierType < Core::Node
     include Core::Node::Custom
 
-    register_element do
+    register_element "structuredidentifier" do
       # Representation in the identifier of the type of standard document.
       attribute :type, String
 
