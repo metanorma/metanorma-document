@@ -5,7 +5,7 @@ require "basic_document/idelements/media"
 module Metanorma; module Document; module BasicDocument
   # Container for image content.
   class Image < Media
-    register_element do
+    register_element "image" do
       # Height of image. Can have "auto" as value.
       attribute :height, Integer
 

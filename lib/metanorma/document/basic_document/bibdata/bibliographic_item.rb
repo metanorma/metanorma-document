@@ -5,7 +5,7 @@ module Metanorma; module Document; module BasicDocument
   class BibliographicItem < Core::Node
     include Core::Node::Custom
 
-    register_element do
+    register_element "bibitem" do
       # The type of the bibliographic item.
       attribute :type, Relaton::BibItemType
 

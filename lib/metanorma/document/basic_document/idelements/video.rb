@@ -5,7 +5,7 @@ require "basic_document/idelements/media"
 module Metanorma; module Document; module BasicDocument
   # Container for video content.
   class Video < Media
-    register_element do
+    register_element "video" do
       # Alternative files to use as media.
       nodes :altsource, AltSource
 

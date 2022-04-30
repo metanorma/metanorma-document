@@ -11,10 +11,10 @@ module Metanorma; module Document; module BasicDocument
       attribute :filename, String
 
       # URI of the media file.
-      attribute :source, Uri
+      attribute :source, Uri, xml_attribute: "src"
 
       # Type of the media file.
-      node :type, MediaType
+      attribute :type, MediaType, xml_attribute: "mimetype"
 
       # Alternate text, supplied for accessibility.
       attribute :alt, String

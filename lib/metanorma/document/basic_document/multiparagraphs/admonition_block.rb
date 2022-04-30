@@ -6,7 +6,7 @@ module Metanorma; module Document; module BasicDocument
   # A sidebar block outside of the main flow of text,
   # conveying particular warnings or supplementary text to the reader.
   class AdmonitionBlock < ParagraphsBlock
-    register_element do
+    register_element "admonition" do
       # Subclass of admonition determining how it is to be rendered; e.g.
       # Warning, Note, Tip.
       # Distinct admonition types are often associated with distinct icons or rendering.

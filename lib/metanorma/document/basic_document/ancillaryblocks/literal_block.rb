@@ -9,7 +9,7 @@ module Metanorma; module Document; module BasicDocument
   class LiteralBlock < Core::Node
     include Core::Node::Custom
 
-    register_element do
+    register_element "pre" do
       # Accessible description of the preformatted text.
       attribute :alt, String
 

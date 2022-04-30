@@ -5,7 +5,7 @@ require "basic_document/blocks/basic_block_no_notes"
 module Metanorma; module Document; module BasicDocument
   # Block containing a figure: a visual rather than textual asset, possibly with accompanying text.
   class FigureBlock < BasicBlockNoNotes
-    register_element do
+    register_element "figure" do
       # A URI or other reference intended to link to an externally hosted image (or equivalent).
       attribute :source, String
 
@@ -23,7 +23,7 @@ module Metanorma; module Document; module BasicDocument
 
       # The semantic category of the figure. This is to allow different classes of figure (e.g. _Plate_,
       # _Chart_, _Diagram_) to be auto-numbered and captioned differently.
-      node :class, LocalizedString
+      attribute :class, String # LocalizedString?
 
       # The image file to be included in the figure as its main content.
       node :image, Image

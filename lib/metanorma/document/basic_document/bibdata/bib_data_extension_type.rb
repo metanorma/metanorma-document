@@ -5,9 +5,9 @@ module Metanorma; module Document; module BasicDocument
   class BibDataExtensionType < Core::Node
     include Core::Node::Custom
 
-    register_element do
+    register_element "doctype" do
       # Classification of the BasicDocument, indicating that it is to be rendered in a distinct manner.
-      nodes :doctype, DocumentType
+      node :doctype, DocumentType
     end
   end
 end; end; end

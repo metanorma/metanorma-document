@@ -8,7 +8,7 @@ module Metanorma; module Document; module BasicDocument
   # contain other blocks, such as lists, tables, or figures: they are modelled as a basic building block
   # of text.
   class ParagraphBlock < BasicBlock
-    register_element do
+    register_element "p" do
       # Inline elements constituting the content of the paragraph.
       nodes :contents, BasicElement
 

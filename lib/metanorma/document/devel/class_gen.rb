@@ -212,6 +212,8 @@ module Metanorma; module Document; module Devel
         Generator::Class => classes,
         Generator::DataType => data_types
       }.each do |generator, data|
+        warn "Processing #{data.count} of #{generator}"
+
         data.each do |i|
           name = i.name.to_sym
 

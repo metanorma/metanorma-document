@@ -5,7 +5,7 @@ module Metanorma; module Document; module BasicDocument
   class TextTableRow < Core::Node
     include Core::Node::Custom
 
-    register_element do
+    register_element "tr" do
       # Data cells in a table row.
       nodes :td, TableCell
 

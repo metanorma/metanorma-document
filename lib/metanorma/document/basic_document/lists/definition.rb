@@ -5,7 +5,7 @@ module Metanorma; module Document; module BasicDocument
   class Definition < Core::Node
     include Core::Node::Custom
 
-    register_element do
+    register_element "dd" do
       # Entry being defined in the definition.
       nodes :item, TextElement
 

@@ -5,7 +5,7 @@ require "basic_document/blocks/basic_block_no_notes"
 module Metanorma; module Document; module BasicDocument
   # Block containing a mathematical expression or other formulas.
   class FormulaBlock < BasicBlockNoNotes
-    register_element do
+    register_element "formula" do
       # The content of the formula, as a mathematical expression.
       node :stem, StemElement
 

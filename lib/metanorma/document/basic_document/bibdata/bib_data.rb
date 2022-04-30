@@ -6,7 +6,7 @@ module Metanorma; module Document; module BasicDocument
   class BibData < Core::Node
     include Core::Node::Custom
 
-    register_element do
+    register_element "ext" do
       # The extension point of the bibliographic description of a BasicDocument.
       node :ext, BibDataExtensionType
     end

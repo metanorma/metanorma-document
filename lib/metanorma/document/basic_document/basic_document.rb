@@ -5,12 +5,12 @@ module Metanorma; module Document; module BasicDocument
   class BasicDocument < Core::Node
     include Core::Node::Custom
 
-    register_element do
+    register_element "document" do
       # A globally unique identifier for the document in an agreed identifier schema. The identifier is to
       # be used for tracking interactions with the document without depending on formal document registries;
       # it would be exemplified by a GUID, rather than a document registry identifier such as "`ISO 639`",
       # which belongs to `bibdata`.
-      node :identifier, UniqueIdentifier
+      attribute :identifier, UniqueIdentifier
 
       # A bibliographic description, capturing bibliographic metadata about the document itself, including
       # authors, title, and date of production.
