@@ -1,9 +1,0 @@
-<%= module_path %>
-  <%= module_describe %>
-  module <%= module_name %>
-    <% enum_values.each { |key, value| %>
-    <%= enum_describe(key) %>
-    <%= dc2cc(key) %> = <%= value.inspect %>
-    <% end %>
-  end
-<%= module_end %>

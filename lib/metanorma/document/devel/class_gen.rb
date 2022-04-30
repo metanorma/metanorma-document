@@ -2,15 +2,18 @@
 
 require "fileutils"
 require "lutaml/uml"
-require "tilt"
 
 require_relative "class_gen/util"
+require_relative "class_gen/generator"
 
 module Metanorma; module Document; module Devel
   # Generates the class structure based on their LutaML
   # descriptions.
   #
   # This is called by bin/class_gen
+  #
+  # It is highly recommended to run this on a Linux system.
+  # Other systems may (or may not) yield unexpected results.
   module ClassGen
     module_function
 
@@ -24,13 +27,13 @@ module Metanorma; module Document; module Devel
       # Warning: repos need to be presented in a correct order, the most
       # basic one first.
       add_repo :BasicDocument, "https://github.com/metanorma/basicdoc-models",
-               "models", branch: "webdev778/iso-3166-code"
+               "models", branch: "master"
       add_repo :Relaton, "https://github.com/relaton/relaton-models",
                "models", branch: "main"
-      add_repo :StandardDocument, "https://github.com/metanorma/metanorma-model-standoc",
-               "models/standard_document", branch: "main"
-      add_repo :IsoDocument, "https://github.com/metanorma/metanorma-model-iso",
-               "models/iso_document", branch: "main"
+      add_repo :StandardDocument, "https://github.com/SirMartin1979/metanorma-model-standoc",
+               "models/standard_document", branch: "rename-references"
+      add_repo :IsoDocument, "https://github.com/SirMartin1979/metanorma-model-iso",
+               "models/iso_document", branch: "rename-references"
 
       fetch_repos
       create_combined_repo
@@ -107,7 +110,8 @@ module Metanorma; module Document; module Devel
                 # All ok!
               elsif existing_classes.key? class_name
                 new_f = "#{combined}/models/#{base_f}"
-                warn "!! Different path: #{new_f} => #{existing_classes[class_name]}"
+                warn "!! (#{name}) Different path: models/#{base_f} => " \
+                     "#{existing_classes[class_name][combined.length + 1..-1]}"
                 mkdir_p(File.dirname(new_f))
                 ln_s existing_classes[class_name], new_f
               else
@@ -117,12 +121,129 @@ module Metanorma; module Document; module Devel
           end
         end
       end
+
+      # Ensure all entities are referenced.
+      includes = Dir["#{combined}/views/*.lutaml"].map do |i|
+        File.read(i).scan %r{include ../(.*)$}
+      end
+      includes = includes.flatten.map { |i| i.gsub("\r", "") }.uniq
+
+      files = Dir["#{combined}/models/**/*.lutaml"]
+
+      files = files.map { |i| i[combined.length + 1..-1] }
+
+      missing = files - includes
+      warn "!!! Models unreferenced by views: #{missing.inspect}" unless missing.empty?
+
+      missing = includes - files
+      warn "!!! Models referenced but missing: #{missing.inspect}" unless missing.empty?
     end
 
     def parse_combined_repo
+      associations = []
+      classes = []
+      enums = []
+      data_types = []
+      primitives = []
+      path_by_class = {}
+      module_by_class = {}
+
       Dir["#{@tmp_path}/combined/views/**/*.lutaml"].each do |file|
-        puts "... working on #{file} ..."
-        pp Lutaml::Uml::Parsers::Dsl.parse(File.open(file))
+        warn "... working on #{file} ..."
+        parsed = Lutaml::Uml::Parsers::Dsl.parse(File.open(file))
+
+        associations += parsed.associations || []
+        classes += parsed.classes || []
+        enums += parsed.enums || []
+        data_types += parsed.data_types || []
+        primitives += parsed.primitives || []
+      end
+
+      # Deduplicate things
+      classes = classes.to_h { |i| [i.name, i] }.values
+      enums = enums.to_h { |i| [i.name, i] }.values
+      data_types = data_types.to_h { |i| [i.name, i] }.values
+      primitives = primitives.to_h { |i| [i.name, i] }.values
+
+      combined = "#{@tmp_path}/combined"
+
+      # Build helper hashes
+      Dir["#{combined}/models/**/*.lutaml"].map do |i|
+        %r{/models/(?<source>.*?)/} =~ i
+        klass = File.basename(i, ".lutaml").to_sym
+        path = i["#{combined}/models/".length..-1]
+
+        if module_by_class[klass]
+          warn "!!!!!!! duplicate #{klass} : in #{module_by_class[klass]} and #{source}"
+
+          # !!!!!!! duplicate BibliographicItem : in basic_document and relaton
+          # !!!!!!! duplicate Citation : in basic_document and relaton
+          # !!!!!!! duplicate FormattedString : in basic_document and relaton
+          # !!!!!!! duplicate Iso15924Code : in basic_document and relaton
+          # !!!!!!! duplicate Iso639Code : in basic_document and relaton
+          # !!!!!!! duplicate Iso8601DateTime : in basic_document and relaton
+          # !!!!!!! duplicate LocalizedString : in basic_document and relaton
+          # !!!!!!! duplicate StringFormat : in basic_document and relaton
+          # !!!!!!! duplicate Uri : in basic_document and relaton
+
+          # Let's use BasicDocument's definitions for for now;
+          # perhaps Relaton should extend BasicDocument, or another common parent
+          # should be created?
+          next
+        end
+
+        formatted_path = path.split(".").first.split("/")
+        formatted_path[-1] = pc2sc(formatted_path[-1])
+        formatted_path = formatted_path.join("/")
+
+        path_by_class[klass] = formatted_path
+        module_by_class[klass] = source
+      end
+
+      done = []
+
+      {
+        Generator::Enum => enums,
+        Generator::Class => classes,
+        Generator::DataType => data_types
+      }.each do |generator, data|
+        data.each do |i|
+          name = i.name.to_sym
+
+          unless module_by_class[name]
+            warn "!!!!!!!! #{generator} of #{name} has no equivalent file!"
+            next
+          end
+
+          if done.include? path_by_class[name]
+            warn "!!!!!!!! #{generator} of #{name} was already processed!"
+          else
+            done << path_by_class[name]
+          end
+
+          generator.new(i, path_by_class[name], module_by_class[name], associations).generate
+        end
+      end
+
+      # Generate the require files
+      @repos.each do |name, _|
+        content = <<~RUBY
+          # frozen_string_literal: true
+
+          module Metanorma; module Document
+            # See: https://metanorma.org/
+            module #{name}
+            end
+          end; end
+
+        RUBY
+
+        Dir["#{__dir__}/../#{pc2sc name}/**/*.rb"].each do |i|
+          rel_path = i.split("/../").last.gsub(/\.rb\z/, "")
+          content << "require_relative #{rel_path.inspect}\n"
+        end
+
+        File.write("#{__dir__}/../#{pc2sc name}.rb", content)
       end
     end
   end

@@ -19,7 +19,7 @@ module Metanorma; module Document; module Devel; module ClassGen
     alias dc2sc pc2sc
 
     def dc2cc(sym)
-      dc2sc(sym).to_s.upcase.to_sym
+      dc2sc(sym).to_s.upcase.gsub("-", "_").to_sym
     end
   end
 end; end; end; end

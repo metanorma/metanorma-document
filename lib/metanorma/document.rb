@@ -30,6 +30,10 @@ module Metanorma
     end
 
     alias from_ng from_xml
+
+    def self.finalize_load
+      # TODO
+    end
   end
 
   # Shorthand for Metanorma::Document.from_xml
@@ -46,3 +50,10 @@ require_relative "document/core/top"
 require_relative "document/core/core_ext"
 
 require_relative "document/version"
+
+# require_relative "document/basic_document"
+# require_relative "document/relaton"
+# require_relative "document/standard_document"
+# require_relative "document/relaton"
+
+Metanorma::Document.finalize_load

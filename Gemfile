@@ -17,7 +17,5 @@ gem "rdoc"
 
 gem "pry"
 
-# Dependencies for utilities
-gem "erb"
+# Dependencies for development
 gem "lutaml-uml"
-gem "tilt"

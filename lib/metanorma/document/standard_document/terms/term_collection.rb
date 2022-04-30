@@ -1,0 +1,7 @@
+# frozen_string_literal: true
+
+module Metanorma; module Document; module StandardDocument
+  # A collection of terms, constituting the main body of a Terms Section.
+  class TermCollection < Core::Node
+  end
+end; end; end
