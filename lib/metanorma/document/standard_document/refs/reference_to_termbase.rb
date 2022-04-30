@@ -3,5 +3,6 @@
 module Metanorma; module Document; module StandardDocument
   # Cross-reference to a term defined within a termbase.
   class ReferenceToTermbase < Core::Node
+    include Core::Node::Custom
   end
 end; end; end

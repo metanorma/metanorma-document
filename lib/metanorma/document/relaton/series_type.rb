@@ -5,5 +5,6 @@ module Metanorma; module Document; module Relaton
   # and it includes monograph series, journals, newspapers, and report series within
   # which the bibliographic item has appeared.
   class SeriesType < Core::Node
+    include Core::Node::Custom
   end
 end; end; end

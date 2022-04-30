@@ -6,5 +6,6 @@ module Metanorma; module Document; module Relaton
   # as a string with associated identifiers (controlled vocabulary);
   # or as a hierarchical sequence of strings with associated identifiers (taxonomy).
   class KeywordType < Core::Node
+    include Core::Node::Custom
   end
 end; end; end

@@ -5,5 +5,6 @@ module Metanorma; module Document; module StandardDocument
   # That concept may be defined as a term within the current document, or it may
   # be defined externally.
   class Concept < Core::Node
+    include Core::Node::Custom
   end
 end; end; end

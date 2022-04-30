@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
+require "basic_document/emptyelements/basic_element"
+
 module Metanorma; module Document; module BasicDocument
   # Inline element containing text and associated formatting information,
   # but which does not contain any associated identifiers or references to identifiers.
-  class TextElement < Core::Node
+  class TextElement < BasicElement
   end
 end; end; end

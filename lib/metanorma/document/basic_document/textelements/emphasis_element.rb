@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
+require "basic_document/textelements/text_element"
+
 module Metanorma; module Document; module BasicDocument
   # Emphasised text. Corresponds to HTML `em`, `i`.
-  class EmphasisElement < Core::Node
+  class EmphasisElement < TextElement
   end
 end; end; end

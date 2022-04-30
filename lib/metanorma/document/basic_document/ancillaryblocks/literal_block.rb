@@ -7,5 +7,6 @@ module Metanorma; module Document; module BasicDocument
   # most cases, Sourcecode blocks are more appropriate in markup, as it is more clearly motivated
   # semantically.
   class LiteralBlock < Core::Node
+    include Core::Node::Custom
   end
 end; end; end

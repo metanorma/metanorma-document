@@ -6,5 +6,6 @@ module Metanorma; module Document; module BasicDocument
   # This is used both by the _ContentModify_ and _AttributeModify_ models
   # as their content are treated as pure text.
   class ContentChangeAction < Core::Node
+    include Core::Node::Custom
   end
 end; end; end

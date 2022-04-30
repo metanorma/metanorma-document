@@ -7,5 +7,6 @@ module Metanorma; module Document; module StandardDocument
   # NOTE: The `Term` definition fully aligns with the structure
   # and requirements of terms in ISO/IEC DIR 2, 16.6.
   class Term < Core::Node
+    include Core::Node::Custom
   end
 end; end; end

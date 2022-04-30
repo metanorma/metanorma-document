@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
+require "basic_document/change/change"
+
 module Metanorma; module Document; module BasicDocument
   # Possible actions
   # that involve modification of content within a BasicDocument
   # data element.
   # Add text; Delete text; Modify text.
-  class ContentChange < Core::Node
+  class ContentChange < Change
   end
 end; end; end

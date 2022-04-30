@@ -5,18 +5,22 @@ module Metanorma; module Document; module Devel; module ClassGen
   class Generator
     include Util
 
-    def initialize(item, filename, modul, associations)
+    def initialize(item, filename, modul)
       @item = item
       @filename = filename
       @module = modul
-      @associations = associations
       @body = +""
+      @requires = []
       @indent = 0
     end
 
     def generate
       generate_head
       generate_body
+
+      requires = @requires.map { |i| "require #{i.inspect}\n" }.join
+      requires << "\n" unless requires.empty?
+      @body = @body.gsub("{{REQUIRES}}", requires)
 
       filename = "#{__dir__}/../../#{@filename}.rb"
       FileUtils.mkdir_p(File.dirname(filename))
@@ -26,6 +30,7 @@ module Metanorma; module Document; module Devel; module ClassGen
     def generate_head
       line "# frozen_string_literal: true"
       line
+      push "{{REQUIRES}}"
     end
 
     def push(*strs)
@@ -33,11 +38,20 @@ module Metanorma; module Document; module Devel; module ClassGen
     end
 
     def line(*strs)
+      if @leading_line
+        @leading_line = false
+        push "\n"
+      end
+
       if strs.empty?
         push "\n"
       else
         push " " * @indent, *strs, "\n"
       end
+    end
+
+    def leading_line
+      @leading_line = true
     end
 
     def indent
@@ -49,6 +63,7 @@ module Metanorma; module Document; module Devel; module ClassGen
     def block(*strs, ends: "end", &block)
       line(*strs)
       indent(&block)
+      @leading_line = false
       line ends
     end
 

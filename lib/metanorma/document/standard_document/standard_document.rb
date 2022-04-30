@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "basic_document/basic_document"
+
 module Metanorma; module Document; module StandardDocument
   # The _StandardDocument_ model is used to represent a standardization
   # document.
@@ -20,6 +22,6 @@ module Metanorma; module Document; module StandardDocument
   # The _StandardDocument_ model extends the _BasicDocument_
   # modelling of the document by requiring specific types
   # of sections.
-  class StandardDocument < Core::Node
+  class StandardDocument < BasicDocument::BasicDocument
   end
 end; end; end

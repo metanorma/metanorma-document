@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "standard_document/sections/standard_section"
+
 module Metanorma; module Document; module StandardDocument
   # The `StandardReferencesSection` class within _StandardDocument_
   # is used to represent a bibliography section.
@@ -14,6 +16,6 @@ module Metanorma; module Document; module StandardDocument
   # they are leaf nodes which contain zero or more
   # bibliographical references (as modelled in Relaton), along with
   # any prefatory text.
-  class StandardReferencesSection < Core::Node
+  class StandardReferencesSection < StandardSection
   end
 end; end; end

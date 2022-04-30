@@ -3,5 +3,6 @@
 module Metanorma; module Document; module Relaton
   # The phone number associated with a person or organization.
   class Phone < Core::Node
+    include Core::Node::Custom
   end
 end; end; end

@@ -9,5 +9,6 @@ module Metanorma; module Document; module Relaton
   # A collection may be used for bibliographic exchange but is
   # typically not necesary for citation purposes.
   class RelatonCollection < Core::Node
+    include Core::Node::Custom
   end
 end; end; end

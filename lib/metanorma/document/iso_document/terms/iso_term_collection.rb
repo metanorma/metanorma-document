@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
+require "standard_document/terms/term_collection"
+
 module Metanorma; module Document; module IsoDocument
   # Term collection specific to ISO/IEC documents.
-  class IsoTermCollection < Core::Node
+  class IsoTermCollection < StandardDocument::TermCollection
   end
 end; end; end

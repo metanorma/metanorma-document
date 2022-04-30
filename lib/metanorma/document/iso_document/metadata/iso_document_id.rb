@@ -3,5 +3,6 @@
 module Metanorma; module Document; module IsoDocument
   # Representation of the identifier for an ISO/IEC document, giving its individual semantic components.
   class IsoDocumentId < Core::Node
+    include Core::Node::Custom
   end
 end; end; end

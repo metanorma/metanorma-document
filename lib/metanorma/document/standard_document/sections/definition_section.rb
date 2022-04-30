@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "standard_document/sections/clause_section"
+
 module Metanorma; module Document; module StandardDocument
   # Definition sections consist of one or more definition lists (`DefinitionCollection`),
   # are used to define symbols and
@@ -11,6 +13,6 @@ module Metanorma; module Document; module StandardDocument
   #
   # In addition to allowing prefatory text per section, each definition list
   # within each definition section can also be preceded by prefatory text.
-  class DefinitionSection < Core::Node
+  class DefinitionSection < ClauseSection
   end
 end; end; end

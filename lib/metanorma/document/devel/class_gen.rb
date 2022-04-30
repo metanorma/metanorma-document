@@ -139,20 +139,22 @@ module Metanorma; module Document; module Devel
       warn "!!! Models referenced but missing: #{missing.inspect}" unless missing.empty?
     end
 
+    singleton_class.attr_reader :path_by_class, :module_by_class, :associations
+
     def parse_combined_repo
-      associations = []
+      @associations = []
       classes = []
       enums = []
       data_types = []
       primitives = []
-      path_by_class = {}
-      module_by_class = {}
+      @path_by_class = {}
+      @module_by_class = {}
 
       Dir["#{@tmp_path}/combined/views/**/*.lutaml"].each do |file|
         warn "... working on #{file} ..."
         parsed = Lutaml::Uml::Parsers::Dsl.parse(File.open(file))
 
-        associations += parsed.associations || []
+        @associations += parsed.associations || []
         classes += parsed.classes || []
         enums += parsed.enums || []
         data_types += parsed.data_types || []
@@ -173,8 +175,8 @@ module Metanorma; module Document; module Devel
         klass = File.basename(i, ".lutaml").to_sym
         path = i["#{combined}/models/".length..-1]
 
-        if module_by_class[klass]
-          warn "!!!!!!! duplicate #{klass} : in #{module_by_class[klass]} and #{source}"
+        if @module_by_class[klass]
+          warn "!!!!!!! duplicate #{klass} : in #{@module_by_class[klass]} and #{source}"
 
           # !!!!!!! duplicate BibliographicItem : in basic_document and relaton
           # !!!!!!! duplicate Citation : in basic_document and relaton
@@ -196,8 +198,8 @@ module Metanorma; module Document; module Devel
         formatted_path[-1] = pc2sc(formatted_path[-1])
         formatted_path = formatted_path.join("/")
 
-        path_by_class[klass] = formatted_path
-        module_by_class[klass] = source
+        @path_by_class[klass] = formatted_path
+        @module_by_class[klass] = source
       end
 
       done = []
@@ -210,18 +212,22 @@ module Metanorma; module Document; module Devel
         data.each do |i|
           name = i.name.to_sym
 
-          unless module_by_class[name]
+          unless @module_by_class[name]
             warn "!!!!!!!! #{generator} of #{name} has no equivalent file!"
             next
           end
 
-          if done.include? path_by_class[name]
+          if done.include? @path_by_class[name]
             warn "!!!!!!!! #{generator} of #{name} was already processed!"
           else
-            done << path_by_class[name]
+            done << @path_by_class[name]
           end
 
-          generator.new(i, path_by_class[name], module_by_class[name], associations).generate
+          generator.new(
+            i,
+            @path_by_class[name],
+            @module_by_class[name]
+          ).generate
         end
       end
 

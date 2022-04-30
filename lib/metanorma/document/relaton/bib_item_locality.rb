@@ -12,5 +12,6 @@ module Metanorma; module Document; module Relaton
   # A discontinuous range can be represented by using two adjacent localities
   # with the same type.
   class BibItemLocality < Core::Node
+    include Core::Node::Custom
   end
 end; end; end

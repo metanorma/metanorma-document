@@ -3,5 +3,6 @@
 module Metanorma; module Document; module BasicDocument
   # The extension point of the bibliographic description of a BasicDocument.
   class BibDataExtensionType < Core::Node
+    include Core::Node::Custom
   end
 end; end; end
