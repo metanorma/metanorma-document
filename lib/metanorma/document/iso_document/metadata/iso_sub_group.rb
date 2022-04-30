@@ -7,16 +7,16 @@ module Metanorma; module Document; module IsoDocument
 
     register_element do
       # Type of editorial group.
-      nodes :type, String
+      attribute :type, String
 
       # Number used to identify editorial group.
-      nodes :number, Integer
+      attribute :number, Integer
 
       # Prefix used to differentiate editorial group for others of its class.
-      nodes :prefix, String
+      attribute :prefix, String
 
       # Full identifier used to identify editorial group.
-      nodes :identifier, String
+      attribute :identifier, String
 
       # Name of editorial group.
       attribute :name, String

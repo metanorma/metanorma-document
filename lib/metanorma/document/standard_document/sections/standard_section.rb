@@ -14,10 +14,10 @@ module Metanorma; module Document; module StandardDocument
 
       # Specification of machine-readable change outlined in this section,
       # in a document amendment.
-      nodes :amend, AmendBlock
+      node :amend, AmendBlock
 
       # Value of number to be used for numbering of section, overriding any autonumbering in rendering.
-      nodes :number, String
+      attribute :number, String
     end
   end
 end; end; end

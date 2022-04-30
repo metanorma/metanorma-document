@@ -7,7 +7,7 @@ module Metanorma; module Document; module StandardDocument
   class ClauseSection < StandardSection
     register_element do
       # Semantic class of the numbered clause.
-      nodes :type, String
+      attribute :type, String
     end
   end
 end; end; end

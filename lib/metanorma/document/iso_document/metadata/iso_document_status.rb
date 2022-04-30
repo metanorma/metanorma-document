@@ -10,16 +10,16 @@ module Metanorma; module Document; module IsoDocument
       attribute :stage, IsoDocumentStageCodes
 
       # Standard abbreviation of the publication stage.
-      nodes :stage_abbreviation, String
+      attribute :stage_abbreviation, String
 
       # Substage code for the ISO/IEC document.
-      nodes :substage, IsoDocumentSubstageCodes
+      attribute :substage, IsoDocumentSubstageCodes
 
       # Standard abbreviation of the publication substage.
-      nodes :substage_abbreviation, String
+      attribute :substage_abbreviation, String
 
       # Number of the iteration of the publication stage that the document is in.
-      nodes :iteration, Integer
+      attribute :iteration, Integer
     end
   end
 end; end; end

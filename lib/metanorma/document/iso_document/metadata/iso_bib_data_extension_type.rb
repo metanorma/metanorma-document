@@ -7,19 +7,19 @@ module Metanorma; module Document; module IsoDocument
   class IsoBibDataExtensionType < StandardDocument::StandardBibDataExtensionType
     register_element do
       # The document is a horizontal standard.
-      nodes :horizontal, TrueClass
+      attribute :horizontal, TrueClass
 
       # Editorial groups associated with the production of the document.
       node :editorial_group, IsoProjectGroup
 
       # Name of the publication stage of the document.
-      nodes :stage_name, String
+      attribute :stage_name, String
 
       # Category of IEC Standard applicable.
-      nodes :category, IecDocumentCategory
+      attribute :category, IecDocumentCategory
 
       # Type of document being updated by this document, if it is an amendment or technical corrigendum.
-      nodes :updates_document_type, BasicDocument::DocumentType
+      attribute :updates_document_type, BasicDocument::DocumentType
     end
   end
 end; end; end

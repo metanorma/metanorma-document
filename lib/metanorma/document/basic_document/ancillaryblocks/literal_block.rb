@@ -11,7 +11,7 @@ module Metanorma; module Document; module BasicDocument
 
     register_element do
       # Accessible description of the preformatted text.
-      nodes :alt, String
+      attribute :alt, String
 
       # The caption of the block.
       nodes :name, TextElement

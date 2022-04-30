@@ -10,7 +10,7 @@ module Metanorma; module Document; module BasicDocument
       attribute :type, OrderedListType
 
       # Starting value for numbering of the list items.
-      nodes :start, String
+      node :start, String
     end
   end
 end; end; end

@@ -15,14 +15,14 @@ module Metanorma; module Document; module StandardDocument
 
       # The location within the bibLocality where the change applies to,
       # if bibLocality defines a container larger than the scope of the change.
-      nodes :path, String
+      attribute :path, String
 
       # The end of the span within the bibLocality where the change applies to;
       # applicable to modify or delete.
-      nodes :path_end, String
+      attribute :path_end, String
 
       # Optional caption of this block.
-      nodes :name, String
+      attribute :name, String
 
       # Description of the change described in this block.
       nodes :description, BasicDocument::BasicBlock

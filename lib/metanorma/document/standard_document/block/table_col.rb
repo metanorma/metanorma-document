@@ -6,7 +6,7 @@ module Metanorma; module Document; module StandardDocument
 
     register_element do
       # The width of an individual table column.
-      nodes :width, String
+      attribute :width, String
     end
   end
 end; end; end

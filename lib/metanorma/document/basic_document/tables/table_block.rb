@@ -10,36 +10,36 @@ module Metanorma; module Document; module BasicDocument
       nodes :name, TextElement
 
       # The table should be excluded from any automatic numbering of tables in the document.
-      nodes :unnumbered, TrueClass
+      attribute :unnumbered, TrueClass
 
       # Define a subsequence for numbering of this table; e.g. if this table would be numbered
       # as 7, but it has a subsequence value of XYZ, this table, and all consecutive table
       # with the same subsequence value, will be numbered consecutively
       # with the same number and in a subsequence: 7a, 7b, 7c etc.
-      nodes :subsequence, String
+      attribute :subsequence, String
 
       # Accessible description of the tabular text, in case the table cannot be rendered accessibly.
-      nodes :alt, String
+      attribute :alt, String
 
       # Alternative more extensive summary of table to be provided for accessibility purposes, in case the
       # table cannot be rendered accessibly.
-      nodes :summary, String
+      attribute :summary, String
 
       # Online location of content of table (in case the table is available as a separate external
       # document).
-      nodes :uri, Uri
+      attribute :uri, Uri
 
       # Table rows constituting the table header.
-      nodes :head, TextTableRow
+      node :head, TextTableRow
 
       # Table rows constituting the table body.
       nodes :body, TextTableRow
 
       # Table rows constituting the table footer.
-      nodes :foot, TextTableRow
+      node :foot, TextTableRow
 
       # Definitions list defining any symbols used in the table.
-      nodes :definitions, DefinitionList
+      node :definitions, DefinitionList
     end
   end
 end; end; end

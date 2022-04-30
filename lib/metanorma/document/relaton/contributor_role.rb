@@ -7,7 +7,7 @@ module Metanorma; module Document; module Relaton
 
     register_element do
       # The broad class of role of the contributor.
-      nodes :type, BasicObject # But actually: ContributorRoleType
+      attribute :type, BasicObject # But actually: ContributorRoleType
 
       # A more detailed description of the role of the contributor.
       nodes :description, BasicDocument::FormattedString

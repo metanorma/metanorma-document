@@ -10,7 +10,7 @@ module Metanorma; module Document; module BasicDocument
       attribute :date_time, Iso8601DateTime
 
       # The party who made the contribution, as described through the `contributor` element in Relaton.
-      nodes :contributor, Relaton::Contributor
+      node :contributor, Relaton::Contributor
 
       # A digital signature of the contribution.
       nodes :integrity_value, BasicObject # But actually: integrityValue

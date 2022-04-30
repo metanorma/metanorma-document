@@ -7,13 +7,13 @@ module Metanorma; module Document; module Relaton
 
     register_element do
       # ISO 3166 encoding.
-      nodes :iso, String
+      attribute :iso, String
 
       # Whether the region should be included in rendering of the place, for disambiguation.
-      nodes :recommended, TrueClass
+      attribute :recommended, TrueClass
 
       # Name of the region.
-      nodes :content, String
+      attribute :content, String
     end
   end
 end; end; end

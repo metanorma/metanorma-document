@@ -10,22 +10,22 @@ module Metanorma; module Document; module StandardDocument
       nodes :gender, GrammarGender
 
       # The designation is a preposition.
-      nodes :is_preposition, TrueClass
+      attribute :is_preposition, TrueClass
 
       # The designation is a participle.
-      nodes :is_participle, TrueClass
+      attribute :is_participle, TrueClass
 
       # The designation is an adjective.
-      nodes :is_adjective, TrueClass
+      attribute :is_adjective, TrueClass
 
       # The designation is a verb.
-      nodes :is_verb, TrueClass
+      attribute :is_verb, TrueClass
 
       # The designation is an adverb.
-      nodes :is_adverb, TrueClass
+      attribute :is_adverb, TrueClass
 
       # The designation is a noun.
-      nodes :is_noun, TrueClass
+      attribute :is_noun, TrueClass
     end
   end
 end; end; end

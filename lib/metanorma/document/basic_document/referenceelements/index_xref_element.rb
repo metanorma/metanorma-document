@@ -9,10 +9,10 @@ module Metanorma; module Document; module BasicDocument
   class IndexXrefElement < ReferenceElement
     register_element do
       # The secondary index term to be be cross-referenced.
-      nodes :secondary, String
+      attribute :secondary, String
 
       # The tertiary index term to be be cross-referenced.
-      nodes :tertiary, String
+      attribute :tertiary, String
 
       # The index term to be cross-referenced to.
       attribute :target, String

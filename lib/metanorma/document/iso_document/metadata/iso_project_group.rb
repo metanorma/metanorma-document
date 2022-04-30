@@ -16,7 +16,7 @@ module Metanorma; module Document; module IsoDocument
       nodes :workgroup, IsoSubGroup
 
       # Secretariat.
-      nodes :secretariat, String
+      attribute :secretariat, String
     end
   end
 end; end; end

@@ -13,13 +13,13 @@ module Metanorma; module Document; module StandardDocument
       node :preferred, Designation
 
       # Link to a definition of the term in an element of the current document.
-      nodes :xref, BasicDocument::ReferenceToIdElement
+      node :xref, BasicDocument::ReferenceToIdElement
 
       # Link to a definition of the term in a bibliographic entry.
-      nodes :eref, BasicDocument::ReferenceToCitationElement
+      node :eref, BasicDocument::ReferenceToCitationElement
 
       # Link to a definition of the term in a termbase.
-      nodes :termref, ReferenceToTermbase
+      node :termref, ReferenceToTermbase
     end
   end
 end; end; end

@@ -11,7 +11,7 @@ module Metanorma; module Document; module StandardDocument
       attribute :code, String
 
       # Text string associated with the classification code.
-      nodes :text, String
+      attribute :text, String
     end
   end
 end; end; end

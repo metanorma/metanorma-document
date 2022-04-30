@@ -11,14 +11,14 @@ module Metanorma; module Document; module StandardDocument
       attribute :doctype, String
 
       # Standard abbreviation for the doctype value used by the standards defining organization.
-      nodes :doctype_abbreviation, String
+      attribute :doctype_abbreviation, String
 
       # Subclass of the _StandardDocument_, that is treated or processed differently.
-      nodes :subdoctype, String
+      attribute :subdoctype, String
 
       # Groups associated with the production of the standards document, typically within
       # a standards definition organization.
-      nodes :editorial_group, EditorialGroupType
+      node :editorial_group, EditorialGroupType
 
       # Classifications of the document contents taken from the International Classification of Standards.
       nodes :ics, IcsType

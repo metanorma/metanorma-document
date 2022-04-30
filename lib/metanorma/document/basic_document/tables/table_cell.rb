@@ -7,16 +7,16 @@ module Metanorma; module Document; module BasicDocument
 
     register_element do
       # Number of columns in the underlying table grid which the cell spans.
-      nodes :colspan, Integer
+      attribute :colspan, Integer
 
       # Number of rows in the underlying table grid which the cell spans.
-      nodes :rowspan, Integer
+      attribute :rowspan, Integer
 
       # Horizontal textual alignment of the cell against the underlying table grid.
-      nodes :align, TextAlignmnent
+      attribute :align, TextAlignmnent
 
       # Vertical alignment of the cell against the underlying table grid.
-      nodes :valign, VerticalAlignmnent
+      attribute :valign, VerticalAlignmnent
     end
   end
 end; end; end

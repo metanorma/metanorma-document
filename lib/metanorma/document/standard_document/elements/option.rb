@@ -7,13 +7,13 @@ module Metanorma; module Document; module StandardDocument
 
     register_element do
       # Option is disabled
-      nodes :disabled, TrueClass
+      attribute :disabled, TrueClass
 
       # Value associated with this option
-      nodes :value, String
+      attribute :value, String
 
       # Display text associated with this option
-      nodes :content, String
+      text :content, String
     end
   end
 end; end; end

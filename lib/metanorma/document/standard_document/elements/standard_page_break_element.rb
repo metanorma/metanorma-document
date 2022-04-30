@@ -7,7 +7,7 @@ module Metanorma; module Document; module StandardDocument
     register_element do
       # Orientation of pages following this page break, until the next page break that
       # gives an explicit page orientation.
-      nodes :orientation, OrientationType
+      attribute :orientation, OrientationType
     end
   end
 end; end; end

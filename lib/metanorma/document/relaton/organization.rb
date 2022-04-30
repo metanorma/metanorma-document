@@ -19,7 +19,7 @@ module Metanorma; module Document; module Relaton
       nodes :variant_subdivision, VariantOrgName
 
       # Abbreviation under which the organization is known.
-      nodes :abbreviation, BasicDocument::LocalizedString
+      node :abbreviation, BasicDocument::LocalizedString
 
       # A URI with information about the organization.
       nodes :uri, TypedUri

@@ -10,22 +10,22 @@ module Metanorma; module Document; module Relaton
       #
       # NOTE: `formattedAddress` is mutually exclusive with `street`, `city`, `state`, `country`, and
       # `postcode`.
-      nodes :formatted_address, String
+      attribute :formatted_address, String
 
       # The street and street number or equivalent in the address.
       nodes :street, String
 
       # The settlement or municipality in the address.
-      nodes :city, String
+      attribute :city, String
 
       # The region of the country in the address.
-      nodes :state, String
+      attribute :state, String
 
       # The country in the address.
-      nodes :country, String
+      attribute :country, String
 
       # The postal code or equivalent in the address.
-      nodes :postcode, String
+      attribute :postcode, String
     end
   end
 end; end; end

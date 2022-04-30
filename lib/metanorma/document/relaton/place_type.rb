@@ -9,13 +9,13 @@ module Metanorma; module Document; module Relaton
       # Region or country within which the place is located, given for disambiguation purposes.
       #
       # Using an ISO 3166 code for a country or subnational region is recommended.
-      nodes :region, String
+      attribute :region, String
 
       # URI in a geographical registry identifying the place.
-      nodes :uri, String
+      attribute :uri, String
 
       # Name of the place, not broken down.
-      nodes :content, String
+      attribute :content, String
     end
   end
 end; end; end

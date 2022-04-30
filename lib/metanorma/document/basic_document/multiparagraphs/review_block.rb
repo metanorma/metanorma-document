@@ -7,18 +7,18 @@ module Metanorma; module Document; module BasicDocument
   class ReviewBlock < ParagraphsBlock
     register_element do
       # The party who has offered the comment.
-      nodes :reviewer, String
+      attribute :reviewer, String
 
       # The date when the comment was made.
-      nodes :date, Relaton::DateTime
+      node :date, Relaton::DateTime
 
       # Identifier for the start of the text or point in the text to which the comment applies.
       # If not provided, the comment applies in the vicinity of the place it has been inserted into the
       # text.
-      nodes :applies_from, IdElement
+      node :applies_from, IdElement
 
       # Identifier for the end of the text to which the comment applies.
-      nodes :applies_to, IdElement
+      node :applies_to, IdElement
     end
   end
 end; end; end

@@ -10,7 +10,7 @@ module Metanorma; module Document; module StandardDocument
       attribute :source, String
 
       # Alternate text to be provided for the image file.
-      nodes :alt, String
+      attribute :alt, String
 
       # Areas of the image to be hyperlinked.
       nodes :area, ImageMapAreaType

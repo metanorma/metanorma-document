@@ -10,7 +10,7 @@ module Metanorma; module Document; module StandardDocument
       attribute :x, Float
 
       # Y-coordinate of the center of a circle area within the image map.
-      nodes :y, Float
+      attribute :y, Float
     end
   end
 end; end; end

@@ -7,10 +7,10 @@ module Metanorma; module Document; module BasicDocument
 
     register_element do
       # The type of the bibliographic item.
-      nodes :type, Relaton::BibItemType
+      attribute :type, Relaton::BibItemType
 
       # The date at which the bibliographic item was last updated.
-      nodes :fetched, Relaton::DateTime
+      node :fetched, Relaton::DateTime
 
       # The title(s) of the bibliographic item.
       #
@@ -22,7 +22,7 @@ module Metanorma; module Document; module BasicDocument
       # used to sidestep the rendering of the reference out of its component parts.
       #
       # NOTE: `formattedRef` and `title` are mutually exclusive.
-      nodes :formatted_ref, FormattedString
+      node :formatted_ref, FormattedString
 
       # The URI(s) associated with the bibliographic item.
       nodes :link, Relaton::TypedUri
@@ -32,7 +32,7 @@ module Metanorma; module Document; module BasicDocument
 
       # Unprefixed, preferably numeric version of an identifier of the bibliographic item,
       # intended for sorting of biblio.
-      nodes :docnumber, String
+      attribute :docnumber, String
 
       # One or more date-times associated with the production of or access to the bibliographic item.
       nodes :date, Relaton::BibliographicDate
@@ -41,10 +41,10 @@ module Metanorma; module Document; module BasicDocument
       nodes :contributor, Relaton::ContributionInfo
 
       # The edition of the bibliographic item.
-      nodes :edition, Relaton::Edition
+      node :edition, Relaton::Edition
 
       # The version of the bibliographic item (within an edition). Can be used for drafts.
-      nodes :version, Relaton::VersionInfo
+      node :version, Relaton::VersionInfo
 
       # Note(s) associated with the bibliographic item.
       nodes :note, Relaton::TypedNote
@@ -59,7 +59,7 @@ module Metanorma; module Document; module BasicDocument
       nodes :abstract, FormattedString
 
       # The publication or preparation status of the bibliographic item.
-      nodes :status, Relaton::DocumentStatus
+      node :status, Relaton::DocumentStatus
 
       # The copyright status of the bibliographic item.
       nodes :copyright, Relaton::CopyrightAssociation
@@ -74,7 +74,7 @@ module Metanorma; module Document; module BasicDocument
       #
       # Medium can be used to differentiate between "electronic" and
       # "physical" manifestations of an information resource.
-      nodes :medium, Relaton::MediumType
+      node :medium, Relaton::MediumType
 
       # The geographic location associated with the production of the bibliographic item.
       nodes :place, Relaton::PlaceType
@@ -113,7 +113,7 @@ module Metanorma; module Document; module BasicDocument
       nodes :keyword, Relaton::KeywordType
 
       # Information about how long the current description of the bibliographic item is valid for.
-      nodes :validity, Relaton::ValidityType
+      node :validity, Relaton::ValidityType
     end
   end
 end; end; end

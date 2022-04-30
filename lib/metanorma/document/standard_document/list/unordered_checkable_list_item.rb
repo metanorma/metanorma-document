@@ -7,10 +7,10 @@ module Metanorma; module Document; module StandardDocument
   class UnorderedCheckableListItem < BasicDocument::ListItem
     register_element do
       # Include a checkbox for the list item.
-      nodes :checkbox, TrueClass
+      attribute :checkbox, TrueClass
 
       # Check the checkbox for the list item.
-      nodes :checkedcheckbox, TrueClass
+      attribute :checkedcheckbox, TrueClass
     end
   end
 end; end; end

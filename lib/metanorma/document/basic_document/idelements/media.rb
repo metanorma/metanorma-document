@@ -8,7 +8,7 @@ module Metanorma; module Document; module BasicDocument
     register_element do
       # File name corresponding to the media, to which the media can be extracted if it is represented
       # inline (e.g. in Base64 encoding in the URI).
-      nodes :filename, String
+      attribute :filename, String
 
       # URI of the media file.
       attribute :source, Uri
@@ -17,13 +17,13 @@ module Metanorma; module Document; module BasicDocument
       node :type, MediaType
 
       # Alternate text, supplied for accessibility.
-      nodes :alt, String
+      attribute :alt, String
 
       # Title, supplied for accessibility.
-      nodes :title, String
+      attribute :title, String
 
       # URI pointing to more extensive alternate text description, supplied for accessibility.
-      nodes :longdesc, Uri
+      attribute :longdesc, Uri
     end
   end
 end; end; end

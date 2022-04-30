@@ -10,20 +10,20 @@ module Metanorma; module Document; module BasicDocument
       node :stem, StemElement
 
       # The block should be excluded from any automatic numbering of blocks of this class in the document.
-      nodes :unnumbered, TrueClass
+      attribute :unnumbered, TrueClass
 
       # Define a subsequence for numbering of this block; e.g. if this block would be numbered
       # as 7, but it has a subsequence value of XYZ, this block, and all consecutive blocks
       # of the same class and with the same subsequence value, will be numbered consecutively
       # with the same number and in a subsequence: 7a, 7b, 7c etc.
-      nodes :subsequence, String
+      attribute :subsequence, String
 
       # Indication that the formula is to be labelled as an Inequality, if inequalities are differentiated
       # from equations.
-      nodes :inequality, TrueClass
+      attribute :inequality, TrueClass
 
       # A definitions list defining any symbols used in the formula.
-      nodes :definitions, DefinitionList
+      node :definitions, DefinitionList
     end
   end
 end; end; end

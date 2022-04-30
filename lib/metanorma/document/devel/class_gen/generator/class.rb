@@ -17,7 +17,7 @@ module Metanorma; module Document; module Devel; module ClassGen; class Generato
           block "register_element do" do
             @item.attributes.each do |i|
               comment i.definition
-              type = if !i.cardinality || i.cardinality.max == "1"
+              type = if !i.cardinality || i.cardinality["max"] == "1"
                        "node"
                      else
                        "nodes"

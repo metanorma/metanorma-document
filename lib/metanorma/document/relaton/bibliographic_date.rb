@@ -11,16 +11,16 @@ module Metanorma; module Document; module Relaton
       attribute :type, BibliographicDateType
 
       # An optional textual description of the date, especially when a Gregorian date is not applicable.
-      nodes :text, String
+      attribute :text, String
 
       # The start of the date range described.
-      nodes :from, DateTime
+      node :from, DateTime
 
       # The end of the date range described.
-      nodes :to, DateTime
+      node :to, DateTime
 
       # The point date described (mutually exclusive with date range).
-      nodes :on, DateTime
+      node :on, DateTime
     end
   end
 end; end; end

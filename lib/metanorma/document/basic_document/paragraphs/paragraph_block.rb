@@ -17,7 +17,7 @@ module Metanorma; module Document; module BasicDocument
       # because the application of alignment to paragraphs, while rare, can be unpredictable from paragraph
       # semantics. Other rendering attributes of paragraphs, such as spacing before and after, are
       # considered to be semantically predictable and are relegated to document stylesheets.
-      nodes :alignment, TextAlignment
+      attribute :alignment, TextAlignment
     end
   end
 end; end; end

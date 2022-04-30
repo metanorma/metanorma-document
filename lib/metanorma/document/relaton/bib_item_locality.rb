@@ -19,10 +19,10 @@ module Metanorma; module Document; module Relaton
       attribute :type, SpecificLocalityType
 
       # The starting value of the extent, or point location.
-      nodes :reference_from, BasicDocument::LocalizedString
+      node :reference_from, BasicDocument::LocalizedString
 
       # The end value of the extent as a range, if applicable.
-      nodes :reference_to, BasicDocument::LocalizedString
+      node :reference_to, BasicDocument::LocalizedString
     end
   end
 end; end; end

@@ -10,7 +10,7 @@ module Metanorma; module Document; module BasicDocument
       nodes :name, TextElement
 
       # The block should be excluded from any automatic numbering of blocks of this class in the document.
-      nodes :unnumbered, TrueClass
+      attribute :unnumbered, TrueClass
 
       # Define a subsequence for numbering of this example block.
       #
@@ -19,7 +19,7 @@ module Metanorma; module Document; module BasicDocument
       # this block, and all consecutive blocks of the same class and with the
       # same subsequence value, will be numbered consecutively
       # with the same number and in a subsequence: 7a, 7b, 7c etc.
-      nodes :subsequence, String
+      attribute :subsequence, String
 
       # Formula blocks contributing to example content.
       nodes :formula, StemElement

@@ -30,12 +30,12 @@ module Metanorma; module Document; module StandardDocument
 
       # Extension point for extraneous elements that need to be added to standards document
       # from other schemas, e.g. UnitsML.
-      nodes :misc, MiscContainer
+      node :misc, MiscContainer
 
       # An optional _boilerplate_ section, intended to appear at the
       # front of the document. It consists of content addressing
       # _copyright_, _license_, _legal_, and _feedback_ concerns.
-      nodes :boilerplate, BoilerplateType
+      node :boilerplate, BoilerplateType
 
       # Zero or more optional _preface_ sections.
       nodes :preface, StandardHierarchicalSection

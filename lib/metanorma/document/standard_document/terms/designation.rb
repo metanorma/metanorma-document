@@ -7,7 +7,7 @@ module Metanorma; module Document; module StandardDocument
 
     register_element do
       # Indication that the term designation is missing.
-      nodes :absent, TrueClass
+      attribute :absent, TrueClass
 
       # The geographic area in which the managed term is known under this designation.
       nodes :geographic_area, BasicDocument::Iso3166Code

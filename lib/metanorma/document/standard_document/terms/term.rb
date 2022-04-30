@@ -11,21 +11,21 @@ module Metanorma; module Document; module StandardDocument
 
     register_element do
       # The language of the term entry, as an ISO-639 3-letter code.
-      nodes :language, BasicDocument::Iso639Code
+      attribute :language, BasicDocument::Iso639Code
 
       # The script of the term entry, as an ISO-15924 code.
-      nodes :script, BasicDocument::Iso15924Code
+      attribute :script, BasicDocument::Iso15924Code
 
       # Non-unique identifier within document. Used to align two blocks in different languages in a
       # multilingual document.
-      nodes :tag, String
+      attribute :tag, String
 
       # Specification of how a block element may be rendered in a multilingual document.
-      nodes :multilingual_rendering, MultilingualRenderingType
+      attribute :multilingual_rendering, MultilingualRenderingType
 
       # An optional identifier for the term, to be used in
       # cross-references.
-      nodes :id, String
+      attribute :id, String
 
       # One or more names under which the term being defined
       # is canonically known.
@@ -49,10 +49,10 @@ module Metanorma; module Document; module StandardDocument
 
       # An optional semantic domain for the term being defined,
       # in case the term is ambiguous between several semantic domains.
-      nodes :domain, BasicDocument::LocalizedString
+      node :domain, BasicDocument::LocalizedString
 
       # Subject of the term.
-      nodes :subject, BasicDocument::LocalizedString
+      node :subject, BasicDocument::LocalizedString
 
       # Information about how the term is to be used.
       nodes :usage_info, BasicDocument::BasicBlock

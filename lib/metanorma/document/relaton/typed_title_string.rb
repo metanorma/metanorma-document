@@ -7,7 +7,7 @@ module Metanorma; module Document; module Relaton
 
     register_element do
       # The type for the given title of the bibliographic item.
-      nodes :type, TitleType
+      attribute :type, TitleType
 
       # The title itself.
       node :content, BasicDocument::FormattedString

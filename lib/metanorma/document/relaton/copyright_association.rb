@@ -10,7 +10,7 @@ module Metanorma; module Document; module Relaton
       node :from, DateTime
 
       # The date when the copyright of the bibliographic item expires.
-      nodes :to, DateTime
+      node :to, DateTime
 
       # The copyright owner for the bibliographic item.
       nodes :owner, Contributor
@@ -18,7 +18,7 @@ module Metanorma; module Document; module Relaton
       # The extent of the bibliographic item, or contexts of use, for which this
       # assertion of copyright applies. For example, this description may only apply
       # to the preface of a book.
-      nodes :scope, String
+      attribute :scope, String
     end
   end
 end; end; end

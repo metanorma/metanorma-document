@@ -7,13 +7,13 @@ module Metanorma; module Document; module StandardDocument
 
     register_element do
       # Identifier of input element
-      nodes :id, String
+      attribute :id, String
 
       # Name of value of input element to be submitted
-      nodes :name, String
+      attribute :name, String
 
       # Preset or default of value of input element to be submitted
-      nodes :value, String
+      attribute :value, String
     end
   end
 end; end; end

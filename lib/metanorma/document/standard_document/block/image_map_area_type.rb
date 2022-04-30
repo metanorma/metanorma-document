@@ -16,7 +16,7 @@ module Metanorma; module Document; module StandardDocument
       nodes :coords, ImageMapCoords
 
       # Radius-defined shape of the image map area.
-      nodes :radius, ImageMapRadius
+      node :radius, ImageMapRadius
     end
   end
 end; end; end

@@ -13,7 +13,7 @@ module Metanorma; module Document; module Relaton
 
     register_element do
       # The type of grouping of bibliographic items.
-      nodes :type, String
+      attribute :type, String
 
       # The title given to the grouping of bibliographic items.
       nodes :title, TypedTitleString

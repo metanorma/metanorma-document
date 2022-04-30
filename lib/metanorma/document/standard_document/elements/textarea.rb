@@ -7,10 +7,10 @@ module Metanorma; module Document; module StandardDocument
   class Textarea < FormInput
     register_element do
       # Suggested number of rows for the input area
-      nodes :rows, Integer
+      attribute :rows, Integer
 
       # Suggested number of columns for the input area
-      nodes :cols, Integer
+      attribute :cols, Integer
     end
   end
 end; end; end

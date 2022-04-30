@@ -10,11 +10,11 @@ module Metanorma; module Document; module StandardDocument
       nodes :text, String
 
       # The mathematical form of the designation.
-      nodes :stem, BasicDocument::StemElement
+      node :stem, BasicDocument::StemElement
 
       # Whether the designation (typically an abbreviation) is the same across languages, or
       # language-specific.
-      nodes :is_international, TrueClass
+      attribute :is_international, TrueClass
     end
   end
 end; end; end

@@ -7,7 +7,7 @@ module Metanorma; module Document; module StandardDocument
   class StandardContentSection < StandardHierarchicalSection
     register_element do
       # The type of content provided in the section, used as a semantic classification.
-      nodes :type, String
+      attribute :type, String
     end
   end
 end; end; end

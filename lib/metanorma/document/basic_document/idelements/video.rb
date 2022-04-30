@@ -10,10 +10,10 @@ module Metanorma; module Document; module BasicDocument
       nodes :altsource, AltSource
 
       # Height of video. Can have "auto" as value.
-      nodes :height, Integer
+      attribute :height, Integer
 
       # Width of video. Can have "auto" as value.
-      nodes :width, Integer
+      attribute :width, Integer
     end
   end
 end; end; end

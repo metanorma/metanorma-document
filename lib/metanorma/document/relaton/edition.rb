@@ -10,7 +10,7 @@ module Metanorma; module Document; module Relaton
       #
       # NOTE: The number attribute can be used to represent the numeric equivalent
       # of the edition string.
-      nodes :number, String
+      attribute :number, String
 
       # Formatted edition string for human reading.
       node :content, BasicDocument::FormattedString

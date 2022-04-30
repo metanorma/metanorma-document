@@ -10,16 +10,16 @@ module Metanorma; module Document; module Relaton
       attribute :id, String
 
       # The scheme or namespace of the identifier.
-      nodes :type, String
+      attribute :type, String
 
       # This is a primary identifier for the item, to be used in citation.
-      nodes :primary, TrueClass
+      attribute :primary, TrueClass
 
       # The scope of the identifier, in case the identifier is not for the document
       # but for a superset or subset of entities; or in case the identifier
       # is for a particular instance of the document, e.g. for a particular format or edition of the
       # document.
-      nodes :scope, String
+      attribute :scope, String
     end
   end
 end; end; end

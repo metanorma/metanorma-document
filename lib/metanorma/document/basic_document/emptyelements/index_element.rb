@@ -11,14 +11,14 @@ module Metanorma; module Document; module BasicDocument
       attribute :primary, String
 
       # Secondary index term to be recorded at the current location.
-      nodes :secondary, String
+      attribute :secondary, String
 
       # Tertiary index term to be recorded at the current location.
-      nodes :tertiary, String
+      attribute :tertiary, String
 
       # A reference to an ID element (typically a bookmark),
       # to indicate that the index range covers a range of locations.
-      nodes :to, IdElement
+      node :to, IdElement
     end
   end
 end; end; end

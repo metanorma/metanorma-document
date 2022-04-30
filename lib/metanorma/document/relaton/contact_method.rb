@@ -7,16 +7,16 @@ module Metanorma; module Document; module Relaton
 
     register_element do
       # Address.
-      nodes :address, Address
+      node :address, Address
 
       # Telephone number.
       nodes :phone, Phone
 
       # Email address.
-      nodes :email, String
+      attribute :email, String
 
       # URI.
-      nodes :uri, TypedUri
+      node :uri, TypedUri
     end
   end
 end; end; end

@@ -10,21 +10,21 @@ module Metanorma; module Document; module BasicDocument
       nodes :name, TextElement
 
       # The block should be excluded from any automatic numbering of blocks of this class in the document.
-      nodes :unnumbered, TrueClass
+      attribute :unnumbered, TrueClass
 
       # Define a subsequence for numbering of this block; e.g. if this block would be numbered
       # as 7, but it has a subsequence value of XYZ, this block, and all consecutive blocks
       # of the same class and with the same subsequence value, will be numbered consecutively
       # with the same number and in a subsequence: 7a, 7b, 7c etc.
-      nodes :subsequence, String
+      attribute :subsequence, String
 
       # A file name associated with the source code (and which could be used to extract the source code
       # fragment to from the document, or to populate the source code fragment with from the external file,
       # in automated processing of the document).
-      nodes :filename, String
+      attribute :filename, String
 
       # The computer language or other notational convention that the source code is expressed in.
-      nodes :lang, String
+      attribute :lang, String
 
       # The computer code or other such text presented in the block, as a single unformatted string. (The
       # string should be treated as pre-formatted text, with whitespace treated as significant.)

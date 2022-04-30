@@ -7,7 +7,7 @@ module Metanorma; module Document; module Relaton
 
     register_element do
       # The currency denomination for the price.
-      nodes :currency, Iso4217Code
+      attribute :currency, Iso4217Code
 
       # The currency amount for the price.
       attribute :content, String

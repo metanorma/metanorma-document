@@ -7,10 +7,10 @@ module Metanorma; module Document; module Relaton
 
     register_element do
       # The date at which the current version of the bibliographic item was produced.
-      nodes :revision_date, BasicDocument::Iso8601DateTime
+      attribute :revision_date, BasicDocument::Iso8601DateTime
 
       # The identifier for the current draft of the bibliographic item.
-      nodes :draft, String
+      attribute :draft, String
     end
   end
 end; end; end

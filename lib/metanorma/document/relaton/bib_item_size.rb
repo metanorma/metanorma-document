@@ -13,7 +13,7 @@ module Metanorma; module Document; module Relaton
       attribute :type, BibItemSizeType
 
       # The quantity of the size
-      nodes :value, BasicDocument::LocalizedString
+      node :value, BasicDocument::LocalizedString
     end
   end
 end; end; end

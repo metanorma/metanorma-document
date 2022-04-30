@@ -13,7 +13,7 @@ module Metanorma; module Document; module BasicDocument
       # Identifier for the section, to be used for cross-references within the document. (Citations of
       # references are modelled as cross-references to the corresponding bibliographical item in the
       # References section.)
-      nodes :id, String
+      attribute :id, String
 
       # Language tags for the section, coded as ISO 639 codes.
       nodes :language, Iso639Code

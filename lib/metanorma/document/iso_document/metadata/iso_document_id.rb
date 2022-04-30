@@ -10,24 +10,24 @@ module Metanorma; module Document; module IsoDocument
       nodes :tc_document_number, Integer
 
       # Numerical component uniquely identifying the document.
-      nodes :project_number, Integer
+      attribute :project_number, Integer
 
       # Representation in the identifier of the document part, if this is a document part.
-      nodes :part_number, Integer
+      attribute :part_number, Integer
 
       # Representation in the identifier of the document subpart, if this is a document subpart.
       # Only applicable to IEC documents.
-      nodes :subpart_number, Integer
+      attribute :subpart_number, Integer
 
       # Representation in the identifier of the type of document amendment, if this is a document amendment.
-      nodes :amendment_number, Integer
+      attribute :amendment_number, Integer
 
       # Representation in the identifier of the type of document technical corrigendum, if this is a
       # document technical corrigendum.
-      nodes :corrigendum_number, Integer
+      attribute :corrigendum_number, Integer
 
       # Year of publication of the document in its current version or edition.
-      nodes :originalyear, Integer
+      attribute :originalyear, Integer
     end
   end
 end; end; end

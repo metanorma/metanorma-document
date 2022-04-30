@@ -11,7 +11,7 @@ module Metanorma; module Document; module StandardDocument
 
       # Whether the designation (typically an abbreviation) is the same across languages, or
       # language-specific.
-      nodes :is_international, TrueClass
+      attribute :is_international, TrueClass
     end
   end
 end; end; end

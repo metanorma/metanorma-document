@@ -6,10 +6,10 @@ module Metanorma; module Document; module StandardDocument
   class StandardAdmonitionBlock < BasicDocument::AdmonitionBlock
     register_element do
       # Display the admonition on the document cover page.
-      nodes :cover_page, TrueClass
+      attribute :cover_page, TrueClass
 
       # Do not insert text labelling the type of admonition in rendering.
-      nodes :notag, TrueClass
+      attribute :notag, TrueClass
     end
   end
 end; end; end

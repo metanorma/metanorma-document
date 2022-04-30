@@ -7,13 +7,13 @@ module Metanorma; module Document; module IsoDocument
 
     register_element do
       # Introductory component of title.
-      nodes :title_intro, BasicDocument::FormattedString
+      node :title_intro, BasicDocument::FormattedString
 
       # Main component of title.
       node :title_main, BasicDocument::FormattedString
 
       # Title of document part, if applicable.
-      nodes :title_part, BasicDocument::FormattedString
+      node :title_part, BasicDocument::FormattedString
     end
   end
 end; end; end

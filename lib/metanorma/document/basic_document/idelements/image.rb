@@ -7,10 +7,10 @@ module Metanorma; module Document; module BasicDocument
   class Image < Media
     register_element do
       # Height of image. Can have "auto" as value.
-      nodes :height, Integer
+      attribute :height, Integer
 
       # Width of image. Can have "auto" as value.
-      nodes :width, Integer
+      attribute :width, Integer
     end
   end
 end; end; end

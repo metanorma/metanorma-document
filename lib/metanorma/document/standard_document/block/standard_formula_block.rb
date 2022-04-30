@@ -6,7 +6,7 @@ module Metanorma; module Document; module StandardDocument
   class StandardFormulaBlock < BasicDocument::FormulaBlock
     register_element do
       # Override the numbering of this block in numbering.
-      nodes :number, String
+      attribute :number, String
     end
   end
 end; end; end

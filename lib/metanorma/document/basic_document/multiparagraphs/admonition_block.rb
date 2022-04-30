@@ -18,10 +18,10 @@ module Metanorma; module Document; module BasicDocument
       # Subclass of admonition allowing different runs of admonitions to be labelled
       # and auto-numbered differently, even if they are of the same type.
       # Typically is a subclass of an admonition type.
-      nodes :class, String
+      attribute :class, String
 
       # Location where the content of the admonition is accessible as an external document.
-      nodes :uri, Uri
+      attribute :uri, Uri
     end
   end
 end; end; end

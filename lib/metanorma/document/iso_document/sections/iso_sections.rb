@@ -13,10 +13,10 @@ module Metanorma; module Document; module IsoDocument
       nodes :admonition, BasicDocument::AdmonitionBlock
 
       # Terms & Definitions clause.
-      nodes :terms, StandardDocument::TermsSection
+      node :terms, StandardDocument::TermsSection
 
       # Symbols & Abbreviated Terms clause.
-      nodes :definitions, BasicObject # But actually: DefinitionsSection
+      node :definitions, BasicObject # But actually: DefinitionsSection
 
       # Normal Clauses.
       nodes :clause, StandardDocument::ClauseSection

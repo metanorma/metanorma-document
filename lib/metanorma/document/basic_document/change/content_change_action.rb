@@ -20,12 +20,12 @@ module Metanorma; module Document; module BasicDocument
 
       # In the case of an `insert`, a `String` to be inserted or replace the substring referred to by `from`
       # to `to`.
-      nodes :text, String
+      attribute :text, String
 
       # In the case of a `delete`, an `Integer` to indicate how many characters to be removed from the
       # `from` position.
       # In the case of an `insert`, an `Integer` to indicate the length of the `text` attribute.
-      nodes :length, Integer
+      attribute :length, Integer
     end
   end
 end; end; end

@@ -12,10 +12,10 @@ module Metanorma; module Document; module BasicDocument
 
       # The textual content of the element. The `text` is what we wish to show the link as (e.g., the
       # "content" of `<xx>my link text</xx>`)
-      nodes :text, BasicElement
+      node :text, BasicElement
 
       # Alternate text, used for accessibility.
-      nodes :alt, String
+      attribute :alt, String
     end
   end
 end; end; end

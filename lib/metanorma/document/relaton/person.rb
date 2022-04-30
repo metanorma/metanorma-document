@@ -7,7 +7,7 @@ module Metanorma; module Document; module Relaton
   class Person < Contributor
     register_element do
       # The name of the person.
-      nodes :name, FullName
+      node :name, FullName
 
       # The affiliation of the person within an organization.
       nodes :affiliation, Affiliation

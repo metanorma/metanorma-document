@@ -29,7 +29,7 @@ module Metanorma; module Document; module IsoDocument
       nodes :bibliography, StandardDocument::StandardReferencesSection
 
       # Index of a standards document.
-      nodes :indexsect, BasicDocument::BasicSection
+      node :indexsect, BasicDocument::BasicSection
     end
   end
 end; end; end

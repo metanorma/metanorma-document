@@ -6,7 +6,7 @@ module Metanorma; module Document; module StandardDocument
 
     register_element do
       # Optional identifier for definition term (enabling crossreferencing of definitions).
-      nodes :id, String
+      attribute :id, String
 
       # Entry being defined in the definition.
       nodes :content, BasicDocument::TextElement

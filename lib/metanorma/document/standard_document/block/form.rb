@@ -16,7 +16,7 @@ module Metanorma; module Document; module StandardDocument
       attribute :action, String
 
       # Class of input form.
-      nodes :class, String
+      attribute :class, String
 
       # Text element content of the form
       nodes :text, BasicDocument::TextElement

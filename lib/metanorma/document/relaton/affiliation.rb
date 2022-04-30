@@ -8,7 +8,7 @@ module Metanorma; module Document; module Relaton
     register_element do
       # The name of the affiliation of the person with the organization;
       # typically a position title.
-      nodes :name, BasicDocument::LocalizedString
+      node :name, BasicDocument::LocalizedString
 
       # A more detailed description of the affiliation of the person.
       nodes :description, BasicDocument::FormattedString

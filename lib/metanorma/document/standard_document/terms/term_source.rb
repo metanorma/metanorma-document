@@ -19,7 +19,7 @@ module Metanorma; module Document; module StandardDocument
 
       # Any changes that the definition of the term has undergone relative to the original document,
       # in order to be applicable in this _StandardDocument_.
-      nodes :modification, BasicDocument::ParagraphBlock
+      node :modification, BasicDocument::ParagraphBlock
     end
   end
 end; end; end

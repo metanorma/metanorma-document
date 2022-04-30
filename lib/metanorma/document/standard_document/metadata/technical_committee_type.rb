@@ -7,10 +7,10 @@ module Metanorma; module Document; module StandardDocument
 
     register_element do
       # Identifier of the technical committee (typically numeric).
-      nodes :number, Integer
+      attribute :number, Integer
 
       # Type of the technical committee, used in identifying the technical committee.
-      nodes :type, String
+      attribute :type, String
 
       # Name of the technical committee.
       attribute :text, String

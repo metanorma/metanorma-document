@@ -13,7 +13,7 @@ module Metanorma; module Document; module BasicDocument
       # This date is not intended for disambiguation, since `bibitemid`
       # already identifies the source unambiguously; it is added for ease of processing, in case author-date
       # citations cannot straightforwardly extract the date from the bibliographic source.
-      nodes :date, Iso8601DateTime
+      attribute :date, Iso8601DateTime
 
       # Describes the location of the cited information resource within
       # the subject of the bibliographic item.
@@ -43,7 +43,7 @@ module Metanorma; module Document; module BasicDocument
       # [example]
       # A contiguous or disjoint range of volumes can be represented with an
       # aggregatation of multiple bibliographic items.
-      nodes :bib_item, BibliographicItem
+      node :bib_item, BibliographicItem
     end
   end
 end; end; end

@@ -9,11 +9,11 @@ module Metanorma; module Document; module StandardDocument
     register_element do
       # The content of the definition of the term applied in the current
       # document.
-      nodes :verbalexpression, VerbalExpression
+      node :verbalexpression, VerbalExpression
 
       # Non-verbal representation of the term applied in the current
       # document.
-      nodes :nonverbalrepresentation, NonVerbalRepresentation
+      node :nonverbalrepresentation, NonVerbalRepresentation
 
       # Zero or more bibliographical sources for this definition of the term. These
       # include the `origin` of the term, which is its bibliographical

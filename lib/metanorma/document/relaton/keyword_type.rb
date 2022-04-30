@@ -10,10 +10,10 @@ module Metanorma; module Document; module Relaton
 
     register_element do
       # The keyword as an uncontrolled vocabulary term.
-      nodes :content, String
+      attribute :content, String
 
       # The keyword as an controlled vocabulary term.
-      nodes :vocab, BasicDocument::LocalizedString
+      node :vocab, BasicDocument::LocalizedString
 
       # The keyword as a taxonomy. For example, the sequence of `taxon` elements
       # `pump`, `centrifugal pump`, `line shaft pump` represents a taxonomic

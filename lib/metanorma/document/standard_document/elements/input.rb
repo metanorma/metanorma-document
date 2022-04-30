@@ -10,19 +10,19 @@ module Metanorma; module Document; module StandardDocument
       attribute :type, InputType
 
       # Input element is checkbox, and has checked value
-      nodes :checked, TrueClass
+      attribute :checked, TrueClass
 
       # Input element is disabled
-      nodes :disabled, TrueClass
+      attribute :disabled, TrueClass
 
       # Input element is read-only
-      nodes :readonly, TrueClass
+      attribute :readonly, TrueClass
 
       # Maximum length of input in characters, for character input
-      nodes :maxlength, Integer
+      attribute :maxlength, Integer
 
       # Minimum length of input in characters, for character input
-      nodes :minlength, Integer
+      attribute :minlength, Integer
     end
   end
 end; end; end

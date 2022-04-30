@@ -22,10 +22,10 @@ module Metanorma; module Document; module Relaton
       nodes :addition, BasicDocument::LocalizedString
 
       # A preformatted version of the name of the person, not broken down into its component parts.
-      nodes :complete_name, BasicDocument::LocalizedString
+      node :complete_name, BasicDocument::LocalizedString
 
       # An additional note about the name of the person.
-      nodes :note, BasicDocument::LocalizedString
+      node :note, BasicDocument::LocalizedString
 
       # A variant name of the person.
       nodes :variant, VariantFullName

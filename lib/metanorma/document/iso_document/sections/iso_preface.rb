@@ -7,13 +7,13 @@ module Metanorma; module Document; module IsoDocument
 
     register_element do
       # Abstract.
-      nodes :abstract, BasicDocument::BasicSection
+      node :abstract, BasicDocument::BasicSection
 
       # Foreword.
       node :foreword, BasicDocument::BasicSection
 
       # Introduction.
-      nodes :introduction, StandardDocument::ClauseSection
+      node :introduction, StandardDocument::ClauseSection
     end
   end
 end; end; end

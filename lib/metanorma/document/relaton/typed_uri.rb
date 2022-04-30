@@ -8,7 +8,7 @@ module Metanorma; module Document; module Relaton
     register_element do
       # The types of URI are open-ended, but include
       # the IANA link relations specified in <<rfc8288>>.
-      nodes :type, String
+      attribute :type, String
 
       # URI.
       attribute :content, BasicDocument::Uri

@@ -10,13 +10,13 @@ module Metanorma; module Document; module Relaton
       attribute :type, String
 
       # A URI for the controlled vocabulary item.
-      nodes :uri, BasicDocument::Uri
+      attribute :uri, BasicDocument::Uri
 
       # The code or identifier for the controlled vocabulary item.
-      nodes :code, String
+      attribute :code, String
 
       # The term itself for the controlled vocabulary item.
-      nodes :term, VocabIdType
+      node :term, VocabIdType
     end
   end
 end; end; end

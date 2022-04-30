@@ -14,13 +14,13 @@ module Metanorma; module Document; module Relaton
       # Content attribute of the MARC and Resource Description and Access
       # standards, although its values are not restricted to that
       # vocabulary; see http://www.loc.gov/standards/valuelist/rdacontent.html
-      nodes :content, String
+      attribute :content, String
 
       # The genre of the bibliographic item, as a classification of the
       # type of communication it represents that is more specific than `content` or
       # `BibliographicItem/type`.
       # For example, "statistical dataset".
-      nodes :genre, String
+      attribute :genre, String
 
       # The media type of the bibliographic item, used to access the content
       # of the item, including file format for electronic media.
@@ -30,7 +30,7 @@ module Metanorma; module Document; module Relaton
       # standards, although its values are not restricted to that
       # vocabulary; see http://www.loc.gov/standards/valuelist/rdamedia.html
       # IANA Media Types are recommended for electronic resources.
-      nodes :form, String
+      attribute :form, String
 
       # The storage medium of the physical representation of the bibliographic item.
       #
@@ -38,13 +38,13 @@ module Metanorma; module Document; module Relaton
       # Carrier attribute of the MARC and Resource Description and Access
       # standards, although its values are not restricted to that
       # vocabulary; see https://www.loc.gov/standards/valuelist/rdacarrier.html
-      nodes :carrier, String
+      attribute :carrier, String
 
       # The size of the physical representation of the bibliographic item.
-      nodes :size, String
+      attribute :size, String
 
       # The scale of the cartographic material in the bibliographic item.
-      nodes :scale, String
+      attribute :scale, String
     end
   end
 end; end; end

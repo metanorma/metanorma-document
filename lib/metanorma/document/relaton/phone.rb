@@ -7,7 +7,7 @@ module Metanorma; module Document; module Relaton
 
     register_element do
       # The type of phone number; can include "Fax" and "Mobile".
-      nodes :type, String
+      attribute :type, String
 
       # The phone number itself.
       attribute :content, String

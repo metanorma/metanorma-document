@@ -9,13 +9,13 @@ module Metanorma; module Document; module StandardDocument
   class Select < FormInput
     register_element do
       # Input is disabled
-      nodes :disabled, TrueClass
+      attribute :disabled, TrueClass
 
       # Input can return multiple option values
-      nodes :multiple, TrueClass
+      attribute :multiple, TrueClass
 
       # Suggested number of options to display
-      nodes :size, Integer
+      attribute :size, Integer
 
       # Options to select from as value of the input
       nodes :option, Option

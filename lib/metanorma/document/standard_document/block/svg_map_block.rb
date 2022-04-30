@@ -11,7 +11,7 @@ module Metanorma; module Document; module StandardDocument
       attribute :source, String
 
       # Alternate text to be provided for the SVG file.
-      nodes :alt, String
+      attribute :alt, String
 
       # Specification of the cross-references to update the SVG file with.
       nodes :target, SvgTargetType
