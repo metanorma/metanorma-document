@@ -1,34 +1,48 @@
 # frozen_string_literal: true
 
-require "metanorma/document/relaton/contributor"
+module Metanorma
+  module Document
+    module Relaton
+      # Logo element with arbitrary SVG/image content. Uses map_all_content
+      # to preserve all child XML including <image>, <svg>, <path>, etc.
+      class LogoElement < Lutaml::Model::Serializable
+        attribute :type, :string
+        attribute :content, :string
 
-module Metanorma; module Document; module Relaton
-  # Organization associated with a bibliographic item.
-  class Organization < Contributor
-    register_element do
-      # The name of the organization.
-      nodes :name, BasicDocument::LocalizedString
+        xml do
+          element "logo"
+          map_attribute "type", to: :type
+          map_all_content to: :content
+        end
+      end
 
-      # A variant name of the organization.
-      nodes :variant, VariantOrgName
+      # Organization associated with a bibliographic item.
+      class Organization < Contributor
+        attribute :name, LocalizedName, collection: true
+        attribute :variant, VariantOrgName, collection: true
+        attribute :subdivision, OrgSubdivision, collection: true
+        attribute :variant_subdivision, VariantOrgName, collection: true
+        attribute :abbreviation, :string
+        attribute :uri, TypedUri, collection: true
+        attribute :identifier, OrgIdentifier, collection: true
+        attribute :contact, ContactMethod, collection: true
+        attribute :logo, LogoElement, collection: true
+        attribute :address, Address, collection: true
 
-      # The subdivision of the organization directly involved with the production of the bibliographic item.
-      nodes :subdivision, BasicDocument::LocalizedString
-
-      # A variant name of the subdivision.
-      nodes :variant_subdivision, VariantOrgName
-
-      # Abbreviation under which the organization is known.
-      node :abbreviation, BasicDocument::LocalizedString
-
-      # A URI with information about the organization.
-      nodes :uri, TypedUri
-
-      # An identifier of the organization according to an international identifier scheme.
-      nodes :identifier, OrgIdentifier
-
-      # Contact information for the organization, including address, phone number, and email.
-      nodes :contact, ContactMethod
+        xml do
+          element "organization"
+          map_element "name", to: :name
+          map_element "variant", to: :variant
+          map_element "subdivision", to: :subdivision
+          map_element "variant-subdivision", to: :variant_subdivision
+          map_element "abbreviation", to: :abbreviation
+          map_element "uri", to: :uri
+          map_element "identifier", to: :identifier
+          map_element "contact", to: :contact
+          map_element "logo", to: :logo
+          map_element "address", to: :address
+        end
+      end
     end
   end
-end; end; end
+end

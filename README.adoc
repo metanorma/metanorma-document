@@ -1,0 +1,39 @@
+= metanorma-document
+
+Ruby library for working with Metanorma document XML.
+
+== Installation
+
+ gem install metanorma-document
+
+== Usage
+
+ require 'metanorma/document'
+
+ doc = IO.read('spec/fixtures/rice-amd-en.final.xml')
+ standard = Metanorma::IsoDocument::Root.from_xml(doc)
+ puts standard.to_xml(pretty: true)
+
+ == Document Flavors
+
+ The gem provides a hierarchy of document flavors:
+
+ * BasicDocument - Basic document model
+ * StandardDocument - Standard document model (extends BasicDocument)
+ * IsoDocument - ISO standard document model (extends StandardDocument)
+ * IecDocument - IEC standard document model
+ * IeeeDocument - IEEE standard document model
+ * IetfDocument - IETF standard document model
+ * IhoDocument - IHO standard document model
+ * OimlDocument - OIML standard document model
+ * BipmDocument - BIPM standard document model
+ * ItuDocument - ITU standard document model
+ * OgcDocument - OGC standard document model
+ * CcDocument - CC standard document model
+ * RiboseDocument - Ribose standard document model
+
+ == Supported XML Formats
+
+ This library targets the modern Metanorma XML format which uses `<metanorma>` as the root element.
+
+ Legacy XML formats that use flavor-specific root elements (e.g. `<iso-standard>`, `<m3d-standard>`, `<csa-standard>`, `<un-standard>`) are *not supported*.

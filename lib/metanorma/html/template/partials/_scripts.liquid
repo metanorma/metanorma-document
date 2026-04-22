@@ -1,0 +1,6 @@
+{% comment %}App JS - inline for single_file, linked for directory{% endcomment %}
+{% if assets_inline %}
+<script>{{ app_js }}</script>
+{% else %}
+<script src="{{ base_url }}/assets/app.js"></script>
+{% endif %}

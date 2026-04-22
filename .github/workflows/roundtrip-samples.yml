@@ -1,0 +1,132 @@
+name: Roundtrip Samples
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'  # Monday 6am UTC
+
+jobs:
+  # --- Discover which mn-samples-* GitHub Pages sites exist ---
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Discover mn-samples GitHub Pages sites
+        id: set-matrix
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          # List all public metanorma/mn-samples-* repos
+          REPOS=$(gh repo list metanorma --limit 1000 --json name \
+            --jq '.[].name | select(startswith("mn-samples-")) | sub("^mn-samples-"; "")' \
+            2>/dev/null | sort || true)
+
+          if [ -z "$REPOS" ]; then
+            echo "::warning::Failed to discover repos via API, using fallback list"
+            REPOS="bipm
+          cc
+          csa
+          iec
+          ieee
+          ietf
+          iho
+          iso
+          itu
+          m3aawg
+          ogc
+          oiml
+          ribose
+          standoc
+          un"
+          fi
+
+          # Exclude deprecated flavors
+          EXCLUDED="mpfa"
+
+          # Verify each site is reachable (GitHub Pages)
+          VALID=""
+          for repo in $REPOS; do
+            if echo "$EXCLUDED" | grep -qw "$repo"; then
+              echo "  EXCLUDED: $repo (deprecated)"
+              continue
+            fi
+            url="https://metanorma.github.io/mn-samples-${repo}/"
+            code=$(curl -sL -o /dev/null -w '%{http_code}' "$url" --max-time 15)
+            if [ "$code" = "200" ]; then
+              VALID="${VALID}${repo}
+          "
+              echo "  OK: $repo ($code)"
+            else
+              echo "  SKIP: $repo ($code)"
+            fi
+          done
+
+          MATRIX=$(echo "$VALID" | jq -R -s -c \
+            'split("\n") | map(select(length > 0)) | map({repo: .})')
+          echo "matrix={\"include\":$MATRIX}" >> "$GITHUB_OUTPUT"
+          echo "Valid sites: $MATRIX"
+
+  # --- Round-trip each site in parallel ---
+  roundtrip:
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.discover.outputs.matrix) }}
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Run roundtrip for ${{ matrix.repo }}
+        run: |
+          mkdir -p tmp/roundtrip_reports
+          bundle exec rake "roundtrip:site[https://metanorma.github.io/mn-samples-${{ matrix.repo }},${{ matrix.repo }}]"
+        continue-on-error: true
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: report-${{ matrix.repo }}
+          path: tmp/roundtrip_reports/${{ matrix.repo }}.yml
+          retention-days: 14
+
+  # --- Consolidate all reports ---
+  consolidate:
+    needs: roundtrip
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all reports
+        uses: actions/download-artifact@v4
+        with:
+          path: tmp/roundtrip_reports
+          pattern: report-*
+          merge-multiple: true
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Consolidate reports
+        run: bundle exec rake "roundtrip:consolidate[tmp/roundtrip_reports]"
+        continue-on-error: true
+
+      - name: Upload consolidated report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: roundtrip-consolidated-report
+          path: tmp/roundtrip_consolidated.yml
+          retention-days: 30

@@ -1,22 +1,26 @@
 # frozen_string_literal: true
 
-require "metanorma/document/relaton/contributor"
+module Metanorma
+  module Document
+    module Relaton
+      # Person associated with a bibliographic item.
+      class Person < Contributor
+        attribute :name, FullName
+        attribute :affiliation, Affiliation, collection: true
+        attribute :identifier, PersonIdentifier, collection: true
+        attribute :contact, ContactMethod, collection: true
+        attribute :phone, Phone, collection: true
+        attribute :email, :string, collection: true
 
-module Metanorma; module Document; module Relaton
-  # Person associated with a bibliographic item.
-  class Person < Contributor
-    register_element do
-      # The name of the person.
-      node :name, FullName
-
-      # The affiliation of the person within an organization.
-      nodes :affiliation, Affiliation
-
-      # An identifier of the person according to an international identifier scheme.
-      nodes :identifier, BasicObject # But actually: PersonalIdentifier
-
-      # Contact information for the person, including URI, address, phone number, and email.
-      nodes :contact, ContactMethod
+        xml do
+          map_element "name", to: :name
+          map_element "affiliation", to: :affiliation
+          map_element "identifier", to: :identifier
+          map_element "contact", to: :contact
+          map_element "phone", to: :phone
+          map_element "email", to: :email
+        end
+      end
     end
   end
-end; end; end
+end

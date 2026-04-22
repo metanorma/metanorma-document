@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-require "metanorma/document"
+require_relative "../lib/metanorma/document"
+
+Dir[File.join(__dir__, "support/**/*.rb")].each { |f| require f }
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -9,6 +11,17 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :should
   end
+end
+
+require "nokogiri"
+Lutaml::Model::Config.configure do |config|
+  config.xml_adapter_type = :nokogiri
+end
+
+require "canon"
+Canon::Config.configure do |config|
+  config.xml.match.profile = :spec_friendly
+  config.xml.diff.use_color = true
 end
 
 def fixture_path(name)
@@ -27,13 +40,13 @@ def fixture(name)
   parse_path(fixture_path(name))
 end
 
-def each_fixture_path_does(description, &block)
+def each_fixture_path_does(description, &)
   context description do
     Dir[fixture_path("*")].each do |fixture_path|
       fixture = File.basename(fixture_path, ".xml")
 
       it "for fixture #{fixture}" do
-        self.instance_exec(fixture_path, &block)
+        instance_exec(fixture_path, &)
       end
     end
   end

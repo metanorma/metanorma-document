@@ -1,21 +1,22 @@
 # frozen_string_literal: true
 
-module Metanorma; module Document; module Relaton
-  # The time interval for which a bibliographic item
-  # is determined valid, and the associated revision date.
-  class ValidityType < Core::Node
-    include Core::Node::Custom
+module Metanorma
+  module Document
+    module Relaton
+      # The time interval for which a bibliographic item
+      # is determined valid, and the associated revision date.
+      class ValidityType < Lutaml::Model::Serializable
+        attribute :validity_begins, :string
+        attribute :validity_ends, :string
+        attribute :revision, :string
 
-    register_element do
-      # The date and time when this bibliographic item becomes valid.
-      attribute :validity_begins, BasicDocument::Iso8601DateTime
-
-      # The date and time when this bibliographic item becomes invalid.
-      attribute :validity_ends, BasicDocument::Iso8601DateTime
-
-      # The date and time of issuance of the version of the document
-      # for which this claim of validity is made, if applicable.
-      attribute :revision, BasicDocument::Iso8601DateTime
+        xml do
+          element "validity"
+          map_element "validityBegins", to: :validity_begins
+          map_element "validityEnds", to: :validity_ends
+          map_element "revision", to: :revision
+        end
+      end
     end
   end
-end; end; end
+end

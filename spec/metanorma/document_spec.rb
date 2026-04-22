@@ -2,28 +2,40 @@
 
 RSpec.describe Metanorma::Document do
   it "has a version number" do
-    Metanorma::Document::VERSION.should_not be nil
+    Metanorma::Document::VERSION.should_not be_nil
   end
 
-  describe ".from_xml" do
+  describe ".from_file" do
     let(:basic_path) { fixture_path("basic") }
-    let(:top_class) { Metanorma::Document::Core::Top }
 
-    it "can parse a simple document from string" do
-      Metanorma::Document.from_xml(File.read(basic_path)).class.should be top_class
-      Metanorma::Document(File.read(basic_path)).class.should be top_class
+    it "raises NotImplementedError as BasicDocument cannot parse XML directly" do
+      lambda {
+        described_class.from_file(basic_path)
+      }.should raise_error(NotImplementedError)
+    end
+  end
+end
+
+RSpec.describe "Document flavors" do
+  describe "Document::Root" do
+    it "is defined" do
+      defined?(Metanorma::Document::Root).should be_truthy
     end
 
-    it "can parse a simple document from a File object" do
-      Metanorma::Document.from_xml(File.open(basic_path)).class.should be top_class
-      Metanorma::Document(File.open(basic_path)).class.should be top_class
+    it "is a class" do
+      Metanorma::Document::Root.class.should eq(Class)
     end
+  end
 
-    it "can parse a simple document from a Nokogiri object" do
-      ng = Nokogiri::XML(basic_path)
+  describe "StandardDocument" do
+    it "is defined" do
+      defined?(Metanorma::StandardDocument).should be_truthy
+    end
+  end
 
-      Metanorma::Document.from_xml(ng).class.should be top_class
-      Metanorma::Document(ng).class.should be top_class
+  describe "IsoDocument" do
+    it "has Root" do
+      defined?(Metanorma::IsoDocument::Root).should be_truthy
     end
   end
 end

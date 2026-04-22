@@ -1,26 +1,27 @@
 # frozen_string_literal: true
 
-module Metanorma; module Document; module Relaton
-  # Significant date in the lifecycle of the bibliographic item,
-  # including its production and its access.
-  class BibliographicDate < Core::Node
-    include Core::Node::Custom
+module Metanorma
+  module Document
+    module Relaton
+      # Significant date in the lifecycle of the bibliographic item.
+      class BibliographicDate < Lutaml::Model::Serializable
+        attribute :type, :string
+        attribute :format, :string
+        attribute :text, :string
+        attribute :from, DateTime
+        attribute :to, DateTime
+        attribute :on, DateTime
 
-    register_element do
-      # The phase of the production of or access to a bibliographic item.
-      attribute :type, BibliographicDateType
-
-      # An optional textual description of the date, especially when a Gregorian date is not applicable.
-      attribute :text, String
-
-      # The start of the date range described.
-      node :from, DateTime
-
-      # The end of the date range described.
-      node :to, DateTime
-
-      # The point date described (mutually exclusive with date range).
-      node :on, DateTime
+        xml do
+          element "date"
+          map_attribute "type", to: :type
+          map_attribute "format", to: :format
+          map_content to: :text
+          map_element "from", to: :from
+          map_element "to", to: :to
+          map_element "on", to: :on
+        end
+      end
     end
   end
-end; end; end
+end

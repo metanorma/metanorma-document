@@ -1,19 +1,21 @@
 # frozen_string_literal: true
 
-module Metanorma; module Document; module Relaton
-  # Edition of a bibliographic item.
-  class Edition < Core::Node
-    include Core::Node::Custom
+module Metanorma
+  module Document
+    module Relaton
+      # Edition of a bibliographic item.
+      class Edition < Lutaml::Model::Serializable
+        attribute :number, :string
+        attribute :language, :string
+        attribute :content, :string
 
-    register_element do
-      # Number of edition.
-      #
-      # NOTE: The number attribute can be used to represent the numeric equivalent
-      # of the edition string.
-      attribute :number, String
-
-      # Formatted edition string for human reading.
-      node :content, BasicDocument::FormattedString
+        xml do
+          element "edition"
+          map_attribute "number", to: :number
+          map_attribute "language", to: :language, render_empty: true
+          map_content to: :content
+        end
+      end
     end
   end
-end; end; end
+end

@@ -1,34 +1,34 @@
 # frozen_string_literal: true
 
-module Metanorma; module Document; module Relaton
-  # The name of a person.
-  class FullName < Core::Node
-    include Core::Node::Custom
+module Metanorma
+  module Document
+    module Relaton
+      # The name of a person.
+      class FullName < Lutaml::Model::Serializable
+        attribute :prefix, Metanorma::Document::Components::DataTypes::LocalizedString,
+                  collection: true
+        attribute :forename, Metanorma::Document::Components::DataTypes::LocalizedString,
+                  collection: true
+        attribute :initials, Metanorma::Document::Components::DataTypes::LocalizedString,
+                  collection: true
+        attribute :surname, Metanorma::Document::Components::DataTypes::LocalizedString
+        attribute :addition, Metanorma::Document::Components::DataTypes::LocalizedString,
+                  collection: true
+        attribute :complete_name, Metanorma::Document::Components::DataTypes::LocalizedString
+        attribute :note, Metanorma::Document::Components::DataTypes::LocalizedString
+        attribute :variant, VariantFullName, collection: true
 
-    register_element do
-      # A prefixed addition to the name of the person, such as "Dr".
-      nodes :prefix, BasicDocument::LocalizedString
-
-      # A forename or given name of the person. Includes middle names.
-      nodes :forename, BasicDocument::LocalizedString
-
-      # The initials of the person: can be used instead of forenames.
-      nodes :initials, BasicDocument::LocalizedString
-
-      # The surname, family name, or equivalent of the person.
-      node :surname, BasicDocument::LocalizedString
-
-      # A suffixed addition to the name of the person, such as "Jr".
-      nodes :addition, BasicDocument::LocalizedString
-
-      # A preformatted version of the name of the person, not broken down into its component parts.
-      node :complete_name, BasicDocument::LocalizedString
-
-      # An additional note about the name of the person.
-      node :note, BasicDocument::LocalizedString
-
-      # A variant name of the person.
-      nodes :variant, VariantFullName
+        xml do
+          map_element "prefix", to: :prefix
+          map_element "forename", to: :forename
+          map_element "initials", to: :initials
+          map_element "surname", to: :surname
+          map_element "addition", to: :addition
+          map_element "completename", to: :complete_name
+          map_element "note", to: :note
+          map_element "variant", to: :variant
+        end
+      end
     end
   end
-end; end; end
+end

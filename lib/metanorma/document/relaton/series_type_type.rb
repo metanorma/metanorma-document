@@ -1,12 +1,21 @@
 # frozen_string_literal: true
 
-module Metanorma; module Document; module Relaton
-  # The type of series description given.
-  class SeriesTypeType < Core::Node::Enum
-    # Default type: The current, authoritative series description.
-    MAIN = new("main")
+module Metanorma
+  module Document
+    module Relaton
+      # The type of series description given.
+      class SeriesTypeType < Lutaml::Model::Serializable
+        attribute :value, :string
 
-    # An alternative, potentially historical series description.
-    ALT = new("alt")
+        xml do
+          element "series-type-type"
+          map_content to: :value
+        end
+
+        def self.values
+          %w[main alt]
+        end
+      end
+    end
   end
-end; end; end
+end
