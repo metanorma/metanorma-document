@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require "mml"
+require "mml/v3"
+
 module Metanorma
   module Document
     module Components
@@ -10,7 +13,7 @@ module Metanorma
           attribute :stem_type, :string
           attribute :block_attr, :string
           attribute :number_format, :string
-          attribute :math, Mathml
+          attribute :math, "Mml::V3::Math"
           attribute :asciimath, Asciiml
           attribute :latexmath, LatexmathElement
 
