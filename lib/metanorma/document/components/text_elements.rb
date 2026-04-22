@@ -9,7 +9,7 @@ module Metanorma
         autoload :KeywordElement, "#{__dir__}/text_elements/keyword_element"
         autoload :Latex, "#{__dir__}/text_elements/latex"
         autoload :LatexmathElement, "#{__dir__}/text_elements/latexmath_element"
-        autoload :Mathml, "#{__dir__}/text_elements/mathml"
+
         autoload :MonospaceElement, "#{__dir__}/text_elements/monospace_element"
         autoload :RubyElement, "#{__dir__}/text_elements/ruby_element"
         autoload :SmallCapsElement,

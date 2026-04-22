@@ -9,7 +9,9 @@ module Metanorma
   module Html
     TEMPLATE_PATH = File.join(__dir__, "template", "document.html.liquid")
     TEMPLATES_ROOT = File.join(__dir__, "template")
-    FRONTEND_ROOT = File.expand_path("../../../data/dist/iso_document/frontend", __dir__)
+    FRONTEND_ROOT = File.expand_path(
+      "../../../data/dist/iso_document/frontend", __dir__
+    )
 
     Liquid::Environment.default.file_system = Liquid::LocalFileSystem.new(TEMPLATES_ROOT)
 

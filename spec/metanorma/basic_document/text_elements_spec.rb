@@ -22,8 +22,13 @@ RSpec.describe Metanorma::Document::Components::TextElements do
       defined?(Metanorma::Document::Components::TextElements::Latex).should be_truthy
     end
 
-    it "autoloads Mathml" do
-      defined?(Metanorma::Document::Components::TextElements::Mathml).should be_truthy
+    it "parses math element via mml gem" do
+      xml = <<~XML
+        <stem type="MathML"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math></stem>
+      XML
+      stem = Metanorma::Document::Components::TextElements::StemElement.from_xml(xml)
+      stem.stem_type.should eq("MathML")
+      stem.math.should be_a(Mml::V3::Math)
     end
 
     it "autoloads MonospaceElement" do
