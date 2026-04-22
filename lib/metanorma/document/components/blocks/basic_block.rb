@@ -1,0 +1,19 @@
+# frozen_string_literal: true
+
+module Metanorma
+  module Document
+    module Components
+      module Blocks
+        # Block of textual content in BasicDocument.
+        class BasicBlock < Lutaml::Model::Serializable
+          attribute :notes, NoteBlock, collection: true
+
+          xml do
+            element "basic-block"
+            map_element "notes", to: :notes
+          end
+        end
+      end
+    end
+  end
+end

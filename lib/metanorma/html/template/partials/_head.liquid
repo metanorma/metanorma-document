@@ -1,0 +1,9 @@
+{% comment %}Google Fonts - ISO Theme{% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+{% comment %}App CSS - inline for single_file, linked for directory{% endcomment %}
+{% if assets_inline %}
+<style>{{ app_css }}</style>
+{% else %}
+<link rel="stylesheet" href="{{ base_url }}/assets/app.css">
+{% endif %}

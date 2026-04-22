@@ -1,16 +1,21 @@
 # frozen_string_literal: true
 
-module Metanorma; module Document; module Relaton
-  # Description of a contributor to the production of the bibliographic item.
-  class ContributionInfo < Core::Node
-    include Core::Node::Custom
+module Metanorma
+  module Document
+    module Relaton
+      # Description of a contributor to the production of the bibliographic item.
+      class ContributionInfo < Lutaml::Model::Serializable
+        attribute :role, ContributorRole, collection: true
+        attribute :organization, Organization
+        attribute :person, Person
 
-    register_element do
-      # A description of the role of the contributor in the production of the bibliographic item.
-      nodes :role, ContributorRole
-
-      # The contributor involved in the production of the bibliographic item.
-      node :entity, Contributor
+        xml do
+          element "contributor"
+          map_element "role", to: :role
+          map_element "organization", to: :organization
+          map_element "person", to: :person
+        end
+      end
     end
   end
-end; end; end
+end

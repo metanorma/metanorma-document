@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "nokogiri"
+require "lutaml/model"
 
 # See: https://metanorma.org
 module Metanorma
@@ -8,55 +8,47 @@ module Metanorma
   # It deals with creating a class-based document to be used for handling
   # and converting Metanorma XML documents.
   #
-  # It represents the documents as a single-linked tree structure, always
-  # starting from a Metanorma::Document::Core::Top. This node responds to
-  # a #root property that corresponds to the top XML element.
+  # It uses Lutaml::Model::Serializable as the base for all document elements,
+  # providing XML serialization/deserialization via a declarative DSL.
   #
   # It is intended to replace the current (previous?) system of Metanorma
   # programs communicating with one another with XML files, but also allow
   # for a seamless migration from/to those.
-  #
-  # Under the Core module there is a logic to make all this work. Under
-  # the Devel module there are helper modules, to be used for development of
-  # this system. Other modules represent the class systems for the
-  # individual document types.
   module Document
+    autoload :Components, "metanorma/document/components"
+    autoload :DataTypes, "metanorma/document/data_types"
+    autoload :Relaton, "metanorma/document/relaton"
+    autoload :Root, "metanorma/document/root"
+    autoload :Version, "metanorma/document/version"
+
     module_function
 
-    def from_xml(file)
-      file = Nokogiri::XML(file) unless file.is_a? Nokogiri::XML::Document
-
-      Core::Node.from_ng(file)
-    end
-
-    alias from_ng from_xml
-
-    def self.finalize_load
-      Metanorma::Document::Core::Node::Custom.need_to_initialize.each do |klass|
-        klass.initialize_custom_element(deferred: true)
-      end
-      Metanorma::Document::Core::Node::Custom.need_to_initialize = nil
+    def from_file(file)
+      # For now, we cannot parse arbitrary XML into Lutaml models without knowing
+      # the target class. This will be addressed in a future refactoring.
+      # BasicDocument does not have XML root mapping and cannot be used to parse
+      # documents directly. Use StandardDocument or IsoDocument for specific flavors.
+      raise NotImplementedError,
+            "BasicDocument cannot parse XML directly. " \
+            "Use StandardDocument or IsoDocument for specific document flavors, " \
+            "or implement a custom parser that determines the appropriate document class."
     end
   end
 
-  # Shorthand for Metanorma::Document.from_xml
-
-  # rubocop:disable Naming/MethodName
-  def self.Document(file)
-    Document.from_xml(file)
-  end
-  # rubocop:enable Naming/MethodName
+  autoload :BasicDocument, "#{__dir__}/basic_document"
+  autoload :StandardDocument, "metanorma/standard_document"
+  autoload :IsoDocument, "metanorma/iso_document"
+  autoload :IecDocument, "metanorma/iec_document"
+  autoload :IeeeDocument, "metanorma/ieee_document"
+  autoload :IhoDocument, "metanorma/iho_document"
+  autoload :OimlDocument, "metanorma/oiml_document"
+  autoload :IetfDocument, "metanorma/ietf_document"
+  autoload :CcDocument, "metanorma/cc_document"
+  autoload :BipmDocument, "metanorma/bipm_document"
+  autoload :ItuDocument, "metanorma/itu_document"
+  autoload :OgcDocument, "metanorma/ogc_document"
+  autoload :RiboseDocument, "metanorma/ribose_document"
+  autoload :IetfDocument, "metanorma/ietf_document"
+  autoload :Collection, "metanorma/collection"
+  autoload :Html, "metanorma/html"
 end
-
-require_relative "document/core/node"
-require_relative "document/core/top"
-require_relative "document/core/core_ext"
-
-require_relative "document/version"
-
-require_relative "document/basic_document"
-require_relative "document/relaton"
-require_relative "document/standard_document"
-require_relative "document/iso_document"
-
-Metanorma::Document.finalize_load

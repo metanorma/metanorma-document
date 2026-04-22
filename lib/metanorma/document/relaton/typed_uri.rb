@@ -1,17 +1,18 @@
 # frozen_string_literal: true
 
-require "metanorma/document/basic_document/datatypes/uri"
+module Metanorma
+  module Document
+    module Relaton
+      # URI associated with a type.
+      class TypedUri < Metanorma::Document::Components::DataTypes::Uri
+        attribute :type, :string
+        attribute :content, :string
 
-module Metanorma; module Document; module Relaton
-  # URI associated with a type.
-  class TypedUri < BasicDocument::Uri
-    register_element do
-      # The types of URI are open-ended, but include
-      # the IANA link relations specified in <<rfc8288>>.
-      attribute :type, String
-
-      # URI.
-      attribute :content, BasicDocument::Uri
+        xml do
+          map_attribute "type", to: :type
+          map_content to: :content
+        end
+      end
     end
   end
-end; end; end
+end

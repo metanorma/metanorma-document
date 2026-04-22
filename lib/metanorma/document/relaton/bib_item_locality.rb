@@ -1,28 +1,21 @@
 # frozen_string_literal: true
 
-module Metanorma; module Document; module Relaton
-  # The extent or location of a bibliographic item being referred to.
-  #
-  # A sequence of locality elements is meant to indicate hierarchical ordering,
-  # from greater to smaller.
-  #
-  # [example]
-  # Chapter, then page, then paragraph.
-  #
-  # A discontinuous range can be represented by using two adjacent localities
-  # with the same type.
-  class BibItemLocality < Core::Node
-    include Core::Node::Custom
+module Metanorma
+  module Document
+    module Relaton
+      # The extent or location of a bibliographic item being referred to.
+      class BibItemLocality < Lutaml::Model::Serializable
+        attribute :type, :string
+        attribute :reference_from, :string
+        attribute :reference_to, :string
 
-    register_element do
-      # The type of extent (e.g. section, clause, page).
-      attribute :type, SpecificLocalityType
-
-      # The starting value of the extent, or point location.
-      node :reference_from, BasicDocument::LocalizedString
-
-      # The end value of the extent as a range, if applicable.
-      node :reference_to, BasicDocument::LocalizedString
+        xml do
+          element "locality"
+          map_attribute "type", to: :type
+          map_element "referenceFrom", to: :reference_from
+          map_element "referenceTo", to: :reference_to
+        end
+      end
     end
   end
-end; end; end
+end

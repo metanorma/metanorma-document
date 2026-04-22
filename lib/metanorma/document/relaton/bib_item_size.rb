@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 
-module Metanorma; module Document; module Relaton
-  # The size of a bibliographic item being referred to.
-  #
-  # A sequence of sizes can be used to indicate different numberings, e.g. xii + 40 pp.,
-  # or different kinds of measures, e.g. pages + plates.
-  class BibItemSize < Core::Node
-    include Core::Node::Custom
+module Metanorma
+  module Document
+    module Relaton
+      # The size of a bibliographic item being referred to.
+      class BibItemSize < Lutaml::Model::Serializable
+        attribute :type, :string
+        attribute :value, Metanorma::Document::Components::DataTypes::LocalizedString
 
-    register_element do
-      # The type of size (e.g. volumes, pages, megabytes)
-      attribute :type, BibItemSizeType
-
-      # The quantity of the size
-      node :value, BasicDocument::LocalizedString
+        xml do
+          element "bib-item-size"
+          map_attribute "type", to: :type
+          map_element "value", to: :value
+        end
+      end
     end
   end
-end; end; end
+end

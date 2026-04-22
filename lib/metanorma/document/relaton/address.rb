@@ -1,31 +1,29 @@
 # frozen_string_literal: true
 
-module Metanorma; module Document; module Relaton
-  # An address for a person or organization.
-  class Address < Core::Node
-    include Core::Node::Custom
+module Metanorma
+  module Document
+    module Relaton
+      # An address for a person or organization.
+      class Address < Lutaml::Model::Serializable
+        attribute :formatted_address_attr, :string
+        attribute :formatted_address, :string
+        attribute :street, :string, collection: true
+        attribute :city, :string
+        attribute :state, :string
+        attribute :country, :string
+        attribute :postcode, :string
 
-    register_element do
-      # Preformatted version of the address, not decomposed into its component parts.
-      #
-      # NOTE: `formattedAddress` is mutually exclusive with `street`, `city`, `state`, `country`, and
-      # `postcode`.
-      attribute :formatted_address, String
-
-      # The street and street number or equivalent in the address.
-      nodes :street, String
-
-      # The settlement or municipality in the address.
-      attribute :city, String
-
-      # The region of the country in the address.
-      attribute :state, String
-
-      # The country in the address.
-      attribute :country, String
-
-      # The postal code or equivalent in the address.
-      attribute :postcode, String
+        xml do
+          element "address"
+          map_attribute "formatted-address", to: :formatted_address_attr
+          map_element "formattedAddress", to: :formatted_address
+          map_element "street", to: :street
+          map_element "city", to: :city
+          map_element "state", to: :state
+          map_element "country", to: :country
+          map_element "postcode", to: :postcode
+        end
+      end
     end
   end
-end; end; end
+end

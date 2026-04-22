@@ -1,21 +1,36 @@
 # frozen_string_literal: true
 
-module Metanorma; module Document; module Relaton
-  # Place associated with the production of a bibliographic item.
-  class PlaceType < Core::Node
-    include Core::Node::Custom
+module Metanorma
+  module Document
+    module Relaton
+      # Place associated with the production of a bibliographic item.
+      # Region element with iso attribute.
+      class RegionElement < Lutaml::Model::Serializable
+        attribute :iso, :string
+        attribute :content, :string
 
-    register_element do
-      # Region or country within which the place is located, given for disambiguation purposes.
-      #
-      # Using an ISO 3166 code for a country or subnational region is recommended.
-      attribute :region, String
+        xml do
+          element "region"
+          map_attribute "iso", to: :iso
+          map_content to: :content
+        end
+      end
 
-      # URI in a geographical registry identifying the place.
-      attribute :uri, String
+      class PlaceType < Lutaml::Model::Serializable
+        attribute :region_attr, :string
+        attribute :region, RegionElement
+        attribute :city, :string
+        attribute :uri, :string
+        attribute :content, :string
 
-      # Name of the place, not broken down.
-      attribute :content, String
+        xml do
+          map_attribute "region", to: :region_attr
+          map_attribute "uri", to: :uri
+          map_element "region", to: :region
+          map_element "city", to: :city
+          map_content to: :content
+        end
+      end
     end
   end
-end; end; end
+end

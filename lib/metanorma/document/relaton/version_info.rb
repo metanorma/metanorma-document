@@ -1,16 +1,19 @@
 # frozen_string_literal: true
 
-module Metanorma; module Document; module Relaton
-  # A version of the bibliographic item (within an edition). Can be used for drafts.
-  class VersionInfo < Core::Node
-    include Core::Node::Custom
+module Metanorma
+  module Document
+    module Relaton
+      # A version of the bibliographic item (within an edition). Can be used for drafts.
+      class VersionInfo < Lutaml::Model::Serializable
+        attribute :revision_date, :string
+        attribute :draft, :string
 
-    register_element do
-      # The date at which the current version of the bibliographic item was produced.
-      attribute :revision_date, BasicDocument::Iso8601DateTime
-
-      # The identifier for the current draft of the bibliographic item.
-      attribute :draft, String
+        xml do
+          element "version"
+          map_element "revision-date", to: :revision_date
+          map_element "draft", to: :draft
+        end
+      end
     end
   end
-end; end; end
+end

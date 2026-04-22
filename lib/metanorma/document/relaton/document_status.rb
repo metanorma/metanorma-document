@@ -1,26 +1,26 @@
 # frozen_string_literal: true
 
-module Metanorma; module Document; module Relaton
-  # The publication or preparation status of a document.
-  class DocumentStatus < Core::Node
-    include Core::Node::Custom
+module Metanorma
+  module Document
+    module Relaton
+      # The publication or preparation status of a document.
+      class DocumentStatus < Lutaml::Model::Serializable
+        attribute :stage, Metanorma::Document::Components::DataTypes::FormattedString,
+                  collection: true
+        attribute :stage_abbreviation, Metanorma::Document::Components::DataTypes::LocalizedString
+        attribute :substage, Metanorma::Document::Components::DataTypes::FormattedString,
+                  collection: true
+        attribute :substage_abbreviation, Metanorma::Document::Components::DataTypes::LocalizedString
+        attribute :iteration, Metanorma::Document::Components::DataTypes::LocalizedString
 
-    register_element do
-      # The stage of the document status, e.g. "Published", "Unpublished", "Committee Draft", "Preprint".
-      node :stage, BasicDocument::LocalizedString
-
-      # A canonical abbreviation of the document status.
-      node :stage_abbreviation, BasicDocument::LocalizedString
-
-      # The substage of the document status. These are used particularly in Standards Defining
-      # Organizations.
-      node :substage, BasicDocument::LocalizedString
-
-      # A canonical abbreviation of the document substage.
-      node :substage_abbreviation, BasicDocument::LocalizedString
-
-      # The iteration of the given status that the document is currently in (e.g. "3" for a third draft).
-      node :iteration, BasicDocument::LocalizedString
+        xml do
+          map_element "stage", to: :stage
+          map_element "stage-abbreviation", to: :stage_abbreviation
+          map_element "substage", to: :substage
+          map_element "substage-abbreviation", to: :substage_abbreviation
+          map_element "iteration", to: :iteration
+        end
+      end
     end
   end
-end; end; end
+end

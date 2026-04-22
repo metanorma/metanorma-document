@@ -1,24 +1,32 @@
 # frozen_string_literal: true
 
-module Metanorma; module Document; module Relaton
-  # The copyright status of a bibliographic item.
-  class CopyrightAssociation < Core::Node
-    include Core::Node::Custom
+module Metanorma
+  module Document
+    module Relaton
+      # The copyright status of a bibliographic item.
+      class CopyrightOwner < Lutaml::Model::Serializable
+        attribute :organization, Organization
 
-    register_element do
-      # The copyright date of the bibliographic item.
-      node :from, DateTime
+        xml do
+          element "owner"
+          map_element "organization", to: :organization
+        end
+      end
 
-      # The date when the copyright of the bibliographic item expires.
-      node :to, DateTime
+      class CopyrightAssociation < Lutaml::Model::Serializable
+        attribute :from, Metanorma::Document::Relaton::DateTime
+        attribute :to, Metanorma::Document::Relaton::DateTime
+        attribute :owner, CopyrightOwner, collection: true
+        attribute :scope, :string
 
-      # The copyright owner for the bibliographic item.
-      nodes :owner, Contributor
-
-      # The extent of the bibliographic item, or contexts of use, for which this
-      # assertion of copyright applies. For example, this description may only apply
-      # to the preface of a book.
-      attribute :scope, String
+        xml do
+          element "copyright"
+          map_element "from", to: :from
+          map_element "to", to: :to
+          map_element "owner", to: :owner
+          map_attribute "scope", to: :scope
+        end
+      end
     end
   end
-end; end; end
+end
