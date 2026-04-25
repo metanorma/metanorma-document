@@ -12,5 +12,6 @@
 
 /Gemfile.lock
 TODO*
-/data/
+/data/dist/
 **/output/
+output.html

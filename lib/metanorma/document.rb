@@ -4,7 +4,7 @@ require "lutaml/model"
 
 # See: https://metanorma.org
 module Metanorma
-  # Metanorma::Document is an abstraction between Nokogiri and Metanorma.
+  # Metanorma::Document is a class-based document model for Metanorma.
   # It deals with creating a class-based document to be used for handling
   # and converting Metanorma XML documents.
   #

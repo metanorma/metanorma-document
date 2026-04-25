@@ -47,6 +47,9 @@ module Metanorma
 
           attribute :remove_in_rfc, :string
 
+          attribute :name, Metanorma::Document::Components::Inline::NameWithIdElement,
+                    collection: true
+
           attribute :fmt_xref_label,
                     Metanorma::Document::Components::Inline::FmtXrefLabelElement, collection: true
           attribute :fmt_name, Metanorma::Document::Components::Inline::FmtNameElement
@@ -59,6 +62,7 @@ module Metanorma
             map_attribute "autonum", to: :autonum, render_empty: true
             map_attribute "anchor", to: :anchor
             map_attribute "removeInRFC", to: :remove_in_rfc
+            map_element "name", to: :name
             map_element "p", to: :content
             map_element "formula", to: :formula
             map_element "dl", to: :dl

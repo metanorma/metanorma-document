@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
-require "nokogiri"
 require "metanorma/iso_document"
 
 module Metanorma
   module Html
     class IndexGenerator
-      def initialize(document, nokogiri_doc: nil)
+      def initialize(document)
         @document = document
-        @nokogiri_doc = nokogiri_doc
       end
 
       def generate
@@ -134,23 +132,6 @@ module Metanorma
         # Model has normative attribute on StandardReferencesSection
         norm_ref = refs.find { |r| r.normative == "true" }
         return norm_ref if norm_ref
-
-        # Fallback: use Nokogiri if model doesn't have the data
-        if @nokogiri_doc
-          ref_node = @nokogiri_doc.at_css("references[normative='true']")
-          if ref_node
-            id = ref_node["id"]
-            match = refs.find { |r| r.id == id }
-            return match if match
-
-            title_el = ref_node.at_css("> title")
-            return Struct.new(:id, :title, :normative).new(
-              id,
-              title_el&.text || "Normative references",
-              "true",
-            )
-          end
-        end
 
         nil
       end

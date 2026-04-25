@@ -153,7 +153,16 @@ module Metanorma
         # Returns the title for a given language (defaults to English)
         # Uses consolidation-mapped per_language grouping for efficiency
         def title_for(language = "en")
-          titles&.for_language(language)
+          return nil unless titles
+
+          if titles.is_a?(TitleCollection)
+            titles.for_language(language)
+          elsif titles.is_a?(Array)
+            titles.find { |t|
+              lang = safe_attr(t, :language) || safe_attr(t, :lang)
+              lang == language
+            }
+          end
         end
 
         # Primary title (English by default)

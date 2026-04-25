@@ -39,7 +39,7 @@ module RoundtripHelper
     doc
   end
 
-  # Check for ERROR-level Nokogiri parse errors.
+  # Check for ERROR-level parse errors.
   def self.xml_has_errors?(xml_string)
     doc = Nokogiri::XML(xml_string)
     doc.errors.any? { |e| e.type == Nokogiri::XML::SyntaxError::ERROR }
