@@ -15,6 +15,8 @@ module Metanorma
         attribute :ul, Metanorma::Document::Components::Lists::UnorderedList,
                   collection: true
         attribute :dl, Metanorma::Document::Components::Lists::DefinitionList
+        attribute :name, Metanorma::Document::Components::Inline::NameWithIdElement,
+                  collection: true
         attribute :fmt_xref_label,
                   Metanorma::Document::Components::Inline::FmtXrefLabelElement, collection: true
         attribute :fmt_name, Metanorma::Document::Components::Inline::FmtNameElement
@@ -25,6 +27,7 @@ module Metanorma
           map_attribute "anchor", to: :anchor
           map_attribute "semx-id", to: :semx_id
           map_attribute "autonum", to: :autonum, render_empty: true
+          map_element "name", to: :name
           map_element "p", to: :p
           map_element "ol", to: :ol
           map_element "ul", to: :ul

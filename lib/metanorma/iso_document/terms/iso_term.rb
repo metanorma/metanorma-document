@@ -19,6 +19,7 @@ module Metanorma
       class IsoTerm < Lutaml::Model::Serializable
         attribute :id, :string
         attribute :anchor, :string
+        attribute :term_number, Metanorma::Document::Components::Inline::FmtNameElement
         attribute :preferred, TermDesignation, collection: true
         attribute :admitted, TermDesignation, collection: true
         attribute :deprecates, TermDesignation, collection: true
@@ -54,6 +55,7 @@ module Metanorma
           map_attribute "id", to: :id
           map_attribute "anchor", to: :anchor
           map_attribute "semx-id", to: :semx_id
+          map_element "name", to: :term_number
           map_element "preferred", to: :preferred
           map_element "admitted", to: :admitted
           map_element "deprecates", to: :deprecates
