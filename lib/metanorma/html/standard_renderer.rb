@@ -71,22 +71,33 @@ module Metanorma
 
         @output << "<div class=\"title-section\">"
 
-        # Document identifiers
+        # Document identifiers — show only the iso-reference variant on the cover
         bibdata.doc_identifier&.each do |di|
+          next unless safe_attr(di, :type) == "iso-reference"
           id = extract_text_value(di)
           next if id.to_s.empty?
 
-          @output << "<p class=\"coverpage_docnumber\">#{escape_html(id)}</p>"
+          @output << "<p class=\"cover-doc-id\">#{escape_html(id)}</p>"
         end
 
-        # Title
-        titles = bibdata.respond_to?(:titles) ? bibdata.titles : nil
-        if titles && !titles.empty?
-          en_title = bibdata.respond_to?(:title_for) ? bibdata.title_for("en") : nil
+        # Title — IsoBibliographicItem has titles + title_for; BibData has title
+        if bibdata.is_a?(Metanorma::IsoDocument::Metadata::IsoBibliographicItem)
+          en_title = bibdata.title_for("en")
           if en_title
-            @output << "<div class=\"doctitle-en\"><div>"
+            @output << "<div class=\"cover-title\"><div>"
             @output << "<span class=\"subtitle\">#{escape_html(en_title)}</span>"
             @output << "</div></div>"
+          end
+        elsif bibdata.is_a?(Metanorma::Document::Components::BibData::BibData)
+          titles = bibdata.title
+          if titles && !titles.empty?
+            en_title = titles.find { |t| t.language == "en" }
+            if en_title
+              title_text = extract_text_value(en_title)
+              @output << "<div class=\"cover-title\"><div>"
+              @output << "<span class=\"subtitle\">#{escape_html(title_text)}</span>"
+              @output << "</div></div>"
+            end
           end
         end
 
@@ -97,14 +108,21 @@ module Metanorma
         bibdata = doc.bibdata
         return unless bibdata
 
-        titles = bibdata.respond_to?(:titles) ? bibdata.titles : nil
-        return unless titles && !titles.empty?
+        if bibdata.is_a?(Metanorma::IsoDocument::Metadata::IsoBibliographicItem)
+          en_title = bibdata.title_for("en")
+          return unless en_title
+        elsif bibdata.is_a?(Metanorma::Document::Components::BibData::BibData)
+          titles = bibdata.title
+          return unless titles && !titles.empty?
+          en_title = titles.find { |t| t.language == "en" }
+          return unless en_title
+          en_title = extract_text_value(en_title)
+        else
+          return
+        end
 
-        en_title = bibdata.respond_to?(:title_for) ? bibdata.title_for("en") : nil
-        return unless en_title
-
-        @output << "<p class=\"zzSTDTitle1\">"
-        @output << "<span class=\"boldtitle\">#{escape_html(en_title)}</span>"
+        @output << "<p class=\"doc-title\">"
+        @output << "<span class=\"bold-title\">#{escape_html(en_title)}</span>"
         @output << "</p>"
       end
 
@@ -141,14 +159,14 @@ module Metanorma
         tag("div", attrs) do
           render_standard_title(terms, level)
           render_standard_section_blocks(terms, level)
-          terms.terms&.each { |term| render_term(term) } if terms.respond_to?(:terms)
+          terms.terms&.each { |term| render_term(term) }
         end
       end
 
       def render_abstract_section(section, level: 1, **_opts)
         attrs = element_attrs(id: safe_attr(section, :id))
         tag("div", attrs) do
-          render_standard_title(section, level, default_class: "IntroTitle")
+          render_standard_title(section, level, default_class: "intro-title")
           render_standard_section_blocks(section, level)
         end
       end
@@ -156,7 +174,7 @@ module Metanorma
       def render_foreword_section(section, level: 1, **_opts)
         attrs = element_attrs(id: safe_attr(section, :id))
         tag("div", attrs) do
-          render_standard_title(section, level, default_class: "ForewordTitle")
+          render_standard_title(section, level, default_class: "foreword-title")
           render_standard_section_blocks(section, level)
         end
       end
@@ -164,7 +182,7 @@ module Metanorma
       def render_introduction_section(section, level: 1, **_opts)
         attrs = element_attrs(id: safe_attr(section, :id))
         tag("div", attrs) do
-          render_standard_title(section, level, default_class: "IntroTitle")
+          render_standard_title(section, level, default_class: "intro-title")
           render_standard_section_blocks(section, level)
         end
       end
@@ -179,8 +197,7 @@ module Metanorma
       def render_amend_block(amend, **_opts)
         attrs = element_attrs(id: safe_attr(amend, :id))
         tag("div", attrs) do
-          amend.p&.each { |para| render_paragraph(para) } if amend.respond_to?(:p)
-          amend.blocks&.each { |block| render(block) } if amend.respond_to?(:blocks)
+          render_mixed_inline(amend)
         end
       end
 
@@ -189,66 +206,33 @@ module Metanorma
       def render_term(term, **_opts)
         attrs = element_attrs(id: safe_attr(term, :id))
         tag("div", attrs) do
-          # Preferred designations
-          term.preferred&.each do |designation|
-            render_term_designation(designation, "preferred")
-          end
-
-          # Admitted designations
-          term.admitted&.each do |designation|
-            render_term_designation(designation, "admitted")
-          end
-
-          # Deprecated designations
-          term.deprecates&.each do |designation|
-            render_term_designation(designation, "deprecated")
-          end
+          term.preferred&.each { |d| render_term_designation(d, "preferred") }
+          term.admitted&.each { |d| render_term_designation(d, "admitted") }
+          term.deprecates&.each { |d| render_term_designation(d, "deprecated") }
 
           # Domain
-          if term.respond_to?(:domain) && term.domain
+          if term.domain
             domain_text = term.domain.is_a?(String) ? term.domain : safe_attr(term.domain, :text).to_s
-            @output << "<p class=\"domain\">&lt;#{escape_html(domain_text)}&gt;</p>" unless domain_text.to_s.empty?
+            @output << "<p class=\"term-domain\">&lt;#{escape_html(domain_text)}&gt;</p>" unless domain_text.to_s.empty?
           end
 
-          # Definition paragraphs
-          if term.respond_to?(:p) && term.p && !term.p.empty?
-            term.p.each { |para| render_paragraph(para) }
-          end
+          # Definitions
+          Array(term.definition).each { |defn| render_term_definition(defn) } if term.definition
 
-          # Definitions (structured)
-          if term.respond_to?(:definition) && term.definition
-            Array(term.definition).each { |defn| render_term_definition(defn) }
-          end
-
-          # Term notes
-          if term.respond_to?(:termnote) && term.termnote
-            term.termnote.each { |note| render_term_note(note) }
-          elsif term.respond_to?(:note) && term.note
-            Array(term.note).each_with_index do |note, i|
-              if note.is_a?(String)
-                @output << "<div class=\"Note\"><p><span class=\"termnote_label\">Note #{i + 1} to entry: </span>#{escape_html(note)}</p></div>"
-              else
-                render_note(note)
-              end
+          # Notes (mapped from <termnote>)
+          term.note&.each_with_index do |note, i|
+            if note.is_a?(String)
+              @output << "<div class=\"note-block\"><p><span class=\"term-note-label\">Note #{i + 1} to entry: </span>#{escape_html(note)}</p></div>"
+            else
+              render_note(note)
             end
           end
 
-          # Term examples
-          if term.respond_to?(:termexample) && term.termexample
-            term.termexample.each { |ex| render_term_example(ex) }
-          elsif term.respond_to?(:example) && term.example
-            term.example.each { |ex| render_paragraph(ex) }
-          end
+          # Examples (mapped from <termexample>)
+          term.example&.each { |ex| render_paragraph(ex) }
 
           # Source references
-          if term.respond_to?(:termsource) && term.termsource
-            term.termsource.each { |src| render_term_source_element(src) }
-          elsif term.respond_to?(:source) && term.source
-            term.source.each { |src| render_term_source(src) }
-          end
-
-          # Nested terms
-          term.term&.each { |sub| render_term(sub) } if term.respond_to?(:term)
+          term.source&.each { |src| render_term_source(src) }
         end
       end
 
@@ -256,7 +240,7 @@ module Metanorma
         name = extract_designation_name(designation)
         return unless name
 
-        tag("p", " class=\"Terms\" style=\"text-align:left;\"") do
+        tag("p", " class=\"term-name\" style=\"text-align:left;\"") do
           tag("b") do
             tag("dfn") { @output << escape_html(name) }
           end
@@ -264,35 +248,33 @@ module Metanorma
       end
 
       def extract_designation_name(designation)
-        if designation.respond_to?(:expression) && designation.expression
+        if designation.is_a?(Metanorma::StandardDocument::Terms::Designation) && designation.expression
           expr = designation.expression
-          if expr.respond_to?(:name) && expr.name
+          if expr.is_a?(Metanorma::IsoDocument::Terms::TermExpression) && expr.name
             Array(expr.name).join
-          elsif expr.respond_to?(:text) && expr.text
-            Array(expr.text).join
           end
-        elsif designation.respond_to?(:name) && designation.name
+        elsif designation.is_a?(Metanorma::IsoDocument::Terms::TermExpression) && designation.name
           Array(designation.name).join
-        elsif designation.respond_to?(:text) && designation.text
-          Array(designation.text).join
+        else
+          extract_text_value(designation)
         end
       end
 
       def render_term_definition(definition)
         return unless definition
+        return unless definition.is_a?(Metanorma::StandardDocument::Terms::TermDefinition)
 
-        if definition.respond_to?(:p) && definition.p
-          Array(definition.p).each { |para| render_paragraph(para) }
-        elsif definition.respond_to?(:content)
-          @output << "<p>#{escape_html(definition.content.to_s)}</p>"
-        end
+        ve = definition.verbalexpression
+        return unless ve
+
+        ve.paragraph&.each { |para| render_paragraph(para) }
       end
 
       def render_term_note(note)
-        attrs = element_attrs(id: safe_attr(note, :id), class: "Note")
+        attrs = element_attrs(id: safe_attr(note, :id), class: "note-block")
         tag("div", attrs) do
           label = extract_termnote_label(note)
-          @output << "<p><span class=\"termnote_label\">#{escape_html(label)}: </span>"
+          @output << "<p><span class=\"term-note-label\">#{escape_html(label)}: </span>"
           if note.p && !note.p.empty?
             note.p.each do |para|
               render_mixed_inline(para)
@@ -309,7 +291,7 @@ module Metanorma
         attrs = element_attrs(id: safe_attr(example, :id), class: "example")
         tag("div", attrs) do
           label = extract_block_label(example, "EXAMPLE")
-          @output << "<p><span class=\"example_label\">#{escape_html(label)}</span>&nbsp;"
+          @output << "<p><span class=\"example-label\">#{escape_html(label)}</span>&nbsp;"
           if example.p && !example.p.empty?
             example.p.each do |para|
               render_mixed_inline(para)
@@ -325,18 +307,29 @@ module Metanorma
       def render_term_source(source)
         return unless source
 
-        @output << "<p>[SOURCE: "
-        if source.respond_to?(:termsource) && source.termsource
-          render_mixed_inline(source.termsource)
-        elsif source.respond_to?(:origin) && source.origin
-          origin = source.origin
-          if origin.respond_to?(:citeas)
-            @output << escape_html(origin.citeas.to_s)
+        @output << "<p class=\"term-source\">[SOURCE: "
+        termsource = safe_attr(source, :termsource)
+        origin = safe_attr(source, :origin)
+
+        if termsource
+          render_mixed_inline(termsource)
+        elsif origin
+          citeas = safe_attr(origin, :citeas)
+          bibitemid = safe_attr(origin, :bibitemid)
+
+          if citeas && !citeas.to_s.empty?
+            if bibitemid && !bibitemid.to_s.empty?
+              @output << "<a href=\"##{escape_html(bibitemid.to_s)}\" class=\"bibref\">#{escape_html(citeas.to_s)}</a>"
+            else
+              @output << escape_html(citeas.to_s)
+            end
           else
             render_mixed_inline(origin)
           end
-          if source.respond_to?(:modification) && source.modification
-            @output << ", modified — #{escape_html(source.modification.to_s)}"
+
+          modification = safe_attr(source, :modification)
+          if modification && !modification.to_s.empty?
+            @output << ", modified — #{escape_html(modification.to_s)}"
           end
         else
           render_mixed_inline(source)
@@ -357,7 +350,7 @@ module Metanorma
       def render_bibliography(bib, level: 1, **_opts)
         tag("div", "") do
           bib.references&.each { |ref| render_references_section(ref, level: level) }
-          bib.clause&.each { |cl| render(cl, level: level) } if bib.respond_to?(:clause)
+          bib.clause&.each { |cl| render(cl, level: level) }
         end
       end
 
@@ -365,16 +358,16 @@ module Metanorma
         is_normative = safe_attr(section, :normative) == "true"
         attrs = element_attrs(id: safe_attr(section, :id))
         tag("div", attrs) do
-          render_standard_title(section, level, default_class: is_normative ? "" : "Section3")
+          render_standard_title(section, level, default_class: is_normative ? "" : "section-sub")
           section.p&.each { |para| render_paragraph(para) }
-          section.note&.each { |note| render_paragraph(note) } if section.respond_to?(:note)
+          section.note&.each { |note| render_paragraph(note) }
           section.references&.each_with_index { |bibitem, i| render_bibitem(bibitem, i + 1) }
           section.table&.each { |t| render_table(t) }
         end
       end
 
       def render_bibitem(item, index)
-        attrs = element_attrs(id: safe_attr(item, :id), class: "Biblio")
+        attrs = element_attrs(id: safe_attr(item, :id), class: "biblio-entry")
         tag("p", attrs) do
           # Use biblio-tag from presentation XML if available
           if item.biblio_tag
@@ -406,16 +399,16 @@ module Metanorma
           }
           if primary
             id_val = extract_text_value(primary)
-            @output << "<span class=\"stddocNumber\">#{escape_html(id_val)}</span>" unless id_val.to_s.empty?
+            @output << "<span class=\"std-doc-number\">#{escape_html(id_val)}</span>" unless id_val.to_s.empty?
           end
         end
 
         if item.date && !item.date.empty?
           Array(item.date).each do |date|
-            date_on = date.respond_to?(:on) ? date.on : nil
+            date_on = date.is_a?(Metanorma::Document::Relaton::BibliographicDate) ? date.on : nil
             date_val = extract_text_value(date_on || safe_attr(date, :text))
             if date_val && !date_val.to_s.empty?
-              @output << ":<span class=\"stdyear\">#{escape_html(date_val.to_s)}</span>"
+              @output << ":<span class=\"std-year\">#{escape_html(date_val.to_s)}</span>"
             end
           end
         end
@@ -449,7 +442,7 @@ module Metanorma
       end
 
       def render_standard_section_blocks(section, level)
-        if section.respond_to?(:each_mixed_content)
+        if section.is_a?(Lutaml::Model::Serializable) && section.mixed?
           section.each_mixed_content do |node|
             next if node.is_a?(String)
             next if is_title_element?(node, section)
@@ -463,29 +456,25 @@ module Metanorma
 
       def render_section_block_collections(section, level)
         # Paragraphs
-        paragraphs = section.respond_to?(:paragraphs) ? section.paragraphs : section.p
+        paragraphs = safe_attr(section, :paragraphs) || safe_attr(section, :p)
         Array(paragraphs).each { |p| render_paragraph(p) } if paragraphs
 
         # Lists
-        Array(section.unordered_lists).each { |ul| render_unordered_list(ul) } if section.respond_to?(:unordered_lists)
-        Array(section.ordered_lists).each { |ol| render_ordered_list(ol) } if section.respond_to?(:ordered_lists)
-        Array(section.definition_lists).each { |dl| render_definition_list(dl) } if section.respond_to?(:definition_lists)
+        %i[unordered_lists ordered_lists definition_lists].each do |attr|
+          values = safe_attr(section, attr)
+          Array(values).each { |v| render(v, level: level + 1) } if values
+        end
 
-        # Tables, figures, formulas, examples, etc.
-        Array(section.tables).each { |t| render_table(t) } if section.respond_to?(:tables)
-        Array(section.figures).each { |f| render_figure(f) } if section.respond_to?(:figures)
-        Array(section.formulas).each { |f| render_formula(f) } if section.respond_to?(:formulas)
-        Array(section.examples).each { |e| render_example(e) } if section.respond_to?(:examples)
-        Array(section.notes).each { |n| render_note(n) } if section.respond_to?(:notes)
-        Array(section.admonitions).each { |a| render_admonition(a) } if section.respond_to?(:admonitions)
-        Array(section.sourcecode_blocks).each { |s| render_sourcecode(s) } if section.respond_to?(:sourcecode_blocks)
-        Array(section.quote_blocks).each { |q| render_quote(q) } if section.respond_to?(:quote_blocks)
+        # Block elements
+        %i[tables figures formulas examples notes admonitions sourcecode_blocks quote_blocks].each do |attr|
+          values = safe_attr(section, attr)
+          Array(values).each { |v| render(v, level: level + 1) } if values
+        end
       end
 
       def render_subsections(section, level)
-        return unless section.respond_to?(:clause)
-
-        Array(section.clause).each { |cl| render(cl, level: level + 1) }
+        clauses = safe_attr(section, :clause) || safe_attr(section, :subsections)
+        Array(clauses).each { |cl| render(cl, level: level + 1) } if clauses
       end
 
       def is_title_element?(node, section)

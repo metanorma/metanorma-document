@@ -4,7 +4,7 @@ module Metanorma
   module BasicDocument
     module TextElements
       # Mathematical text formatted in AsciiMath.
-      class AsciiML < Metanorma::BasicDocument::TextElements::StemValue
+      class Asciiml < Metanorma::BasicDocument::TextElements::StemValue
         attribute :value, :string
 
         xml do

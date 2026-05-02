@@ -3,10 +3,6 @@
 module Metanorma
   module BasicDocument
     module Paragraphs
-      # Default block of textual content.
-      # Unlike the case for other document models, paragraphs _cannot_
-      # contain other blocks, such as lists, tables, or figures: they are modelled as a basic building block
-      # of text.
       class ParagraphBlock < Metanorma::BasicDocument::Blocks::BasicBlock
         # Inline elements constituting the content of the paragraph.
         attribute :contents,

@@ -3,10 +3,20 @@
 module Metanorma
   module Document
     module Relaton
+      # Model for formattedAddress element which may contain mixed content with <br/> tags.
+      class FormattedAddress < Lutaml::Model::Serializable
+        attribute :content, :string, collection: true
+
+        xml do
+          element "formattedAddress"
+          map_content to: :content
+        end
+      end
+
       # An address for a person or organization.
       class Address < Lutaml::Model::Serializable
         attribute :formatted_address_attr, :string
-        attribute :formatted_address, :string
+        attribute :formatted_address, FormattedAddress
         attribute :street, :string, collection: true
         attribute :city, :string
         attribute :state, :string

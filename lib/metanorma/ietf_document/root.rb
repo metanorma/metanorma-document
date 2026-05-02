@@ -2,6 +2,8 @@
 
 require "metanorma/standard_document"
 require "metanorma/iso_document"
+require_relative "metadata"
+require_relative "sections"
 
 module Metanorma
   module IetfDocument
@@ -12,14 +14,14 @@ module Metanorma
       attribute :flavor, :string
 
       attribute :bibdata,
-                Metanorma::IsoDocument::Metadata::IsoBibliographicItem
+                Metanorma::IetfDocument::Metadata::IetfBibliographicItem
 
       attribute :term_sources,
                 Metanorma::Document::Components::ReferenceElements::Citation,
                 collection: true
 
       attribute :preface, Metanorma::IsoDocument::Sections::IsoPreface
-      attribute :sections, Metanorma::IsoDocument::Sections::IsoSections
+      attribute :sections, Metanorma::IetfDocument::Sections::IetfSections
       attribute :annex, Metanorma::IsoDocument::Sections::IsoAnnexSection,
                 collection: true
       attribute :bibliography,
@@ -30,8 +32,6 @@ module Metanorma
       attribute :annotation_container, Metanorma::IsoDocument::AnnotationContainer
       attribute :indexsect,
                 Metanorma::Document::Components::Sections::BasicSection
-      attribute :autonum, :string
-      attribute :fmt_xref_label, :string
       attribute :localized_strings,
                 Metanorma::Document::Components::Inline::LocalizedStringsElement
       attribute :fmt_footnote_container,

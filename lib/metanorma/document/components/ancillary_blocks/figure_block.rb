@@ -48,6 +48,9 @@ module Metanorma
           # An optional definitions list defining any symbols used in the figure.
           attribute :dl, Metanorma::Document::Components::Lists::DefinitionList
 
+          # Pre-formatted text content within the figure (e.g., ASCII art).
+          attribute :pre, Metanorma::Document::Components::AncillaryBlocks::LiteralBlock
+
           # Key definitions for figure
           attribute :key, KeyElement
 
@@ -96,6 +99,7 @@ module Metanorma
             map_element "audio", to: :audio
             map_element "figure", to: :figure
             map_element "dl", to: :dl
+            map_element "pre", to: :pre
             map_element "key", to: :key
             map_element "fn", to: :footnotes
             map_element "note", to: :note

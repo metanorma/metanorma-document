@@ -5,7 +5,7 @@ module Metanorma
     module Components
       module TextElements
         # Mathematical text formatted in LaTeX.
-        class LaTeX < StemValue
+        class Latex < StemValue
           attribute :value, :string
 
           xml do

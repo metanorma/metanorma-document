@@ -12,6 +12,7 @@ module Metanorma
                     collection: true
           attribute :bibitemid, :string
           attribute :citeas, :string
+          attribute :uri, :string
           attribute :locality_stack, Metanorma::Document::Relaton::LocalityStack,
                     collection: true
 
@@ -22,6 +23,7 @@ module Metanorma
             map_element "cite-as", to: :cite_as
             map_attribute "bibitemid", to: :bibitemid
             map_attribute "citeas", to: :citeas
+            map_attribute "uri", to: :uri
             map_element "localityStack", to: :locality_stack
           end
         end

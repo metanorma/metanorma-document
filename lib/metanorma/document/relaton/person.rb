@@ -11,6 +11,7 @@ module Metanorma
         attribute :contact, ContactMethod, collection: true
         attribute :phone, Phone, collection: true
         attribute :email, :string, collection: true
+        attribute :uri, TypedUri
 
         xml do
           map_element "name", to: :name
@@ -19,6 +20,7 @@ module Metanorma
           map_element "contact", to: :contact
           map_element "phone", to: :phone
           map_element "email", to: :email
+          map_element "uri", to: :uri
         end
       end
     end
