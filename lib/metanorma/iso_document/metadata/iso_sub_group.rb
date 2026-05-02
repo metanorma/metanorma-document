@@ -20,6 +20,7 @@ module Metanorma
         # Name of editorial group.
         attribute :name, :string
         attribute :semx_id, :string
+        attribute :text, :string
 
         xml do
           element "subgroup"
@@ -29,6 +30,7 @@ module Metanorma
           map_attribute "identifier", to: :identifier
           map_attribute "name", to: :name
           map_attribute "semx-id", to: :semx_id
+          map_content to: :text
         end
       end
     end

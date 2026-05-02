@@ -69,6 +69,10 @@ module Metanorma
                     Metanorma::Document::Components::Inline::FmtConceptElement, collection: true
           attribute :bookmark, Metanorma::Document::Components::IdElements::Bookmark,
                     collection: true
+          attribute :bcp14, Metanorma::Document::Components::Inline::Bcp14Element,
+                    collection: true
+          attribute :index, Metanorma::Document::Components::EmptyElements::IndexElement,
+                    collection: true
           attribute :image, Metanorma::Document::Components::IdElements::Image,
                     collection: true
           attribute :add, "Metanorma::StandardDocument::Elements::Add",
@@ -125,6 +129,8 @@ module Metanorma
             map_element "fmt-fn-label", to: :fmt_fn_label
             map_element "fmt-concept", to: :fmt_concept
             map_element "bookmark", to: :bookmark
+            map_element "bcp14", to: :bcp14
+            map_element "index", to: :index
             map_element "image", to: :image
             map_element "add", to: :add
             map_element "del", to: :del

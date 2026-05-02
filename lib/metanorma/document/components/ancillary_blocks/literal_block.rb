@@ -10,14 +10,18 @@ module Metanorma
         # most cases, Sourcecode blocks are more appropriate in markup, as it is more clearly motivated
         # semantically.
         class LiteralBlock < Lutaml::Model::Serializable
+          attribute :id, :string
           attribute :alt, :string
+          attribute :align, :string
           attribute :name, Metanorma::Document::Components::TextElements::TextElement,
                     collection: true
           attribute :content, :string
 
           xml do
             element "pre"
+            map_attribute "id", to: :id
             map_attribute "alt", to: :alt
+            map_attribute "align", to: :align
             map_element "name", to: :name
             map_content to: :content
           end

@@ -4,7 +4,7 @@ module Metanorma
   module BasicDocument
     module TextElements
       # Mathematical text formatted in LaTeX.
-      class LaTeX < Metanorma::BasicDocument::TextElements::StemValue
+      class Latex < Metanorma::BasicDocument::TextElements::StemValue
         attribute :value, :string
 
         xml do

@@ -5,6 +5,7 @@ module Metanorma
     module BibData
       # Description of a bibliographic resource.
       class BibliographicItem < Lutaml::Model::Serializable
+        attribute :id, :string
         attribute :type, Metanorma::Document::Relaton::BibItemType
         attribute :fetched, Metanorma::Document::Relaton::DateTime
         attribute :title, Metanorma::Document::Relaton::TypedTitleString,
@@ -55,6 +56,7 @@ module Metanorma
 
         xml do
           element "bibitem"
+          map_attribute "id", to: :id
           map_element "type", to: :type
           map_element "fetched", to: :fetched
           map_element "title", to: :title

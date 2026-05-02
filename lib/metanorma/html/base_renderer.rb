@@ -4,11 +4,62 @@ module Metanorma
   module Html
     # Renders BasicDocument components to HTML.
     # Subclassed by StandardRenderer and flavor-specific renderers.
+    # Owns the full HTML document generation pipeline: body content, header,
+    # footer, ToC sidebar, CSS (via Theme), and JavaScript.
     class BaseRenderer
+      STYLESHEET_DIR = File.expand_path("../../../data/stylesheets", __dir__)
+      JAVASCRIPT_DIR = File.expand_path("../../../data/javascripts", __dir__)
+      LOGO_DIR = File.expand_path("../../../data/logos", __dir__)
+
+      # Map legacy XML class names to clean, semantic names.
+      CLASS_MAP = {
+        "zzSTDTitle1" => "doc-title",
+        "coverpage_docnumber" => "cover-doc-id",
+        "coverpage_docstage" => "cover-stage",
+        "doctitle-en" => "cover-title",
+        "ForewordTitle" => "foreword-title",
+        "IntroTitle" => "intro-title",
+        "Annex" => "annex-title",
+        "Section3" => "section-sub",
+        "TermNum" => "term-number",
+        "Terms" => "term-name",
+        "DeprecatedTerms" => "term-deprecated",
+        "domain" => "term-domain",
+        "boldtitle" => "bold-title",
+        "note_label" => "note-label",
+        "termnote_label" => "term-note-label",
+        "example_label" => "example-label",
+        "stddocNumber" => "std-doc-number",
+        "stdyear" => "std-year",
+        "sourcecode-name" => "code-name",
+        "fmt-caption-label" => "caption-label",
+        "fmt-autonum-delim" => "autonum-delim",
+        "fmt-element-name" => "element-name",
+        "fmt-caption-delim" => "caption-delim",
+        "smallcap" => "small-caps",
+        "obligation" => "obligation-text",
+        "tableblock" => "table-block",
+        "Biblio" => "biblio-entry",
+        "Note" => "note-block",
+        "source" => "term-source",
+        "nonboldtitle" => "doc-subtitle",
+        "stddocPartNumber" => "doc-part-number",
+        "stddocTitle" => "doc-part-title",
+        "std_publisher" => "doc-publisher",
+        "stdpublisher" => "doc-publisher-name",
+        "fmt-xref-label" => "xref-label",
+      }.freeze
+
+      METANORMA_LOGO = "metanorma-logo.svg"
+
       def initialize
         @output = +""
         @toc_entries = []
+        @figure_entries = []
+        @table_entries = []
       end
+
+      # --- Public API ---
 
       def to_html
         @output
@@ -18,8 +69,355 @@ module Metanorma
         @toc_entries
       end
 
+      # Generate a complete HTML document from a presentation XML document.
+      def generate_full_document(document)
+        @document = document
+        validate_presentation_xml!
+
+        # First pass: render body content (collects ToC entries as side effect)
+        render(@document)
+        body = @output
+
+        assemble_document(body)
+      end
+
+      # --- Flavor configuration hooks (override in subclasses) ---
+
+      def theme
+        @theme ||= Theme.new
+      end
+
+      def flavor_publishers(_doc_id)
+        []
+      end
+
+      def flavor_publisher_name
+        pubs = flavor_publishers(extract_primary_doc_id)
+        pubs.empty? ? nil : pubs.join("/")
+      end
+
+      # Map of publisher name => logo filename. Override in flavor renderers.
+      def publisher_logo_map
+        {}
+      end
+
+      def flavor_font_url
+        theme.font_url
+      end
+
+      # --- Document Assembly ---
+
+      def assemble_document(body)
+        toc_html = build_toc_html(@toc_entries)
+        header = build_header
+        footer = build_footer
+
+        <<~HTML
+          <!DOCTYPE html>
+          <html lang="#{language}">
+          <head>
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <title>#{html_title}</title>
+            <link rel="preconnect" href="https://fonts.googleapis.com" />
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+            <link href="#{flavor_font_url}" rel="stylesheet" />
+            <style>
+          #{theme.to_css_root}
+          #{base_css_without_root}
+          #{theme.to_css_extras}
+            </style>
+          </head>
+          <body lang="#{language}">
+          #{header}
+          <div class="reading-progress" id="reading-progress"></div>
+          <div class="doc-layout">
+            <aside class="toc-sidebar" id="toc-sidebar">
+              <div class="toc-header">
+                <h2 class="toc-heading">Contents</h2>
+                <button class="toc-close-btn" id="toc-close-btn" aria-label="Close menu">&times;</button>
+              </div>
+              <nav class="toc-nav">
+                <ul class="toc-list">
+          #{toc_html}
+                </ul>
+              </nav>
+            </aside>
+            <div class="toc-overlay" id="toc-overlay"></div>
+            <div class="doc-content" id="doc-content">
+          #{body}
+            </div>
+          #{footer}
+          </div>
+          <button class="toc-hamburger" id="toc-hamburger" aria-label="Open table of contents">&#9776;</button>
+          <button class="back-to-top" id="back-to-top" aria-label="Back to top"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3,8 6,4 9,8"/></svg></button>
+          #{build_scripts}
+          </body>
+          </html>
+        HTML
+      end
+
+      # --- Header and Footer ---
+
+      def build_header
+        doc_id = extract_primary_doc_id
+        pub_logos = build_publisher_logos
+        pub_name = flavor_publisher_name
+        # Combine publisher name with doc ID for a single display: "OGC 00-027"
+        display_id = if pub_name && doc_id && !doc_id.start_with?(pub_name)
+                       "#{pub_name} #{doc_id}"
+                     else
+                       doc_id
+                     end
+        <<~HTML
+          <header class="doc-header">
+            <div class="header-brand">
+              #{pub_logos}
+            </div>
+            #{"<div class=\"header-doc-id\">#{escape_html(display_id)}</div>" if display_id}
+            #{build_reader_controls}
+          </header>
+        HTML
+      end
+
+      # Reader controls: dark mode, font size, serif/sans-serif toggles.
+      # Any flavor's build_header should include this via `#{build_reader_controls}`.
+      def build_reader_controls
+        <<~HTML
+          <div class="header-actions">
+            <button class="reader-btn search-trigger" id="search-trigger" aria-label="Search document" title="Search (/)">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="6.5" cy="6.5" r="5"/><line x1="10.2" y1="10.2" x2="14.5" y2="14.5"/></svg>
+            </button>
+            <span class="header-divider"></span>
+            <button class="reader-btn font-decrease" id="font-decrease" aria-label="Decrease font size" title="Smaller text">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 12h12"/><path d="M6 4h4"/></svg>
+            </button>
+            <button class="reader-btn font-increase" id="font-increase" aria-label="Increase font size" title="Larger text">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 12h12"/><path d="M6 4h4"/><path d="M8 1v3"/><path d="M8 12v3"/></svg>
+            </button>
+            <button class="reader-btn serif-toggle" id="serif-toggle" aria-label="Toggle serif/sans-serif" title="Toggle serif">
+              <svg viewBox="0 0 16 16" fill="currentColor"><text x="2" y="13" font-size="13" font-family="serif" font-weight="700">T</text></svg>
+            </button>
+            <button class="reader-btn theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+              <svg class="icon-sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <circle cx="8" cy="8" r="3"/><line x1="8" y1="1" x2="8" y2="3"/><line x1="8" y1="13" x2="8" y2="15"/><line x1="1" y1="8" x2="3" y2="8"/><line x1="13" y1="8" x2="15" y2="8"/><line x1="3.05" y1="3.05" x2="4.46" y2="4.46"/><line x1="11.54" y1="11.54" x2="12.95" y2="12.95"/><line x1="3.05" y1="12.95" x2="4.46" y2="11.54"/><line x1="11.54" y1="4.46" x2="12.95" y2="3.05"/>
+              </svg>
+              <svg class="icon-moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <path d="M13.5 9.5A6 6 0 0 1 6.5 2.5 6 6 0 1 0 13.5 9.5z"/>
+              </svg>
+            </button>
+          </div>
+        HTML
+      end
+
+      def build_publisher_logos
+        publishers = flavor_publishers(extract_primary_doc_id)
+        logo_map = publisher_logo_map
+        return "" if publishers.empty? && logo_map.empty?
+
+        # Use flavor-declared publishers; fall back to logo map keys
+        display_pubs = publishers.empty? ? logo_map.keys : publishers
+
+        display_pubs.filter_map do |pub|
+          filename = logo_map[pub]
+          next unless filename
+
+          svg = load_logo_svg(filename, height: 26)
+          next unless svg
+
+          "<span class=\"brand-logo\" aria-label=\"#{pub} logo\">#{svg}</span>"
+        end.join("\n")
+      end
+
+      def detect_publishers
+        flavor_publishers(extract_primary_doc_id)
+      end
+
+      def load_logo_svg(filename, height: 32)
+        path = File.join(LOGO_DIR, filename)
+        return nil unless File.exist?(path)
+
+        svg = File.read(path)
+        svg = svg.sub(/\A<\?xml[^?]*\?>\s*/, "")
+        svg = svg.sub(/\A\s*<!--.*?-->\s*/m, "")
+        svg = svg.sub(/<path[^>]*style="fill:#e3000f[^"]*"[^>]*\/>/, "")
+        svg = svg.sub(/<svg\s/, '<svg class="header-logo" ')
+        if svg.match?(/<svg[^>]*\sheight="[^"]*"/)
+          svg = svg.sub(/(<svg[^>]*?)(\sheight="[^"]*")/, "\\1 height=\"#{height}\"")
+        else
+          svg = svg.sub(/(<svg\b)/, "\\1 height=\"#{height}\"")
+        end
+        svg = svg.sub(/(<svg[^>]*?)\swidth="[^"]*"/, '\1')
+        svg
+      rescue StandardError
+        nil
+      end
+
+      def build_footer
+        mn_logo = load_logo_svg(METANORMA_LOGO, height: 20)
+        <<~HTML
+          <footer class="doc-footer">
+            <div class="footer-brand">
+              #{mn_logo ? "<span class=\"footer-mn-logo\">#{mn_logo}</span>" : ""}
+              <span class="footer-text">Generated by <strong>Metanorma</strong> &mdash; #{Time.now.strftime('%Y-%m-%d %H:%M')}</span>
+            </div>
+          </footer>
+        HTML
+      end
+
+      # --- ToC generation ---
+
+      def build_toc_html(entries)
+        top_lines = []
+        main_lines = if entries.empty?
+                       ["<li class=\"toc-empty\">No entries</li>"]
+                     else
+                       entries.map { |e|
+                         id = e[:id].to_s
+                         text = escape_html(e[:text].to_s)
+                         lvl = e[:level]
+                         "<li class=\"toc-level-#{lvl}\"><a href=\"##{id}\" class=\"toc-link\" data-target=\"#{id}\">#{text}</a></li>"
+                       }
+                     end
+
+        # List of Figures — at top of sidebar
+        unless @figure_entries.empty?
+          top_lines << "<li class=\"toc-list-header\" data-list=\"figures\"><button class=\"toc-list-toggle\" aria-expanded=\"false\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><rect x=\"1\" y=\"2\" width=\"14\" height=\"12\" rx=\"1\"/><circle cx=\"5\" cy=\"6.5\" r=\"1.5\"/><path d=\"M1 12l4-4 2 2 3-3 5 5\"/></svg> Figures <span class=\"toc-list-count\">(#{@figure_entries.size})</span></button></li>"
+          @figure_entries.each { |f|
+            id = f[:id].to_s
+            text = escape_html(f[:text].to_s)
+            top_lines << "<li class=\"toc-list-item toc-figures\" style=\"display:none\"><a href=\"##{id}\" class=\"toc-link\" data-target=\"#{id}\">#{text}</a></li>"
+          }
+        end
+
+        # List of Tables — at top of sidebar
+        unless @table_entries.empty?
+          top_lines << "<li class=\"toc-list-header\" data-list=\"tables\"><button class=\"toc-list-toggle\" aria-expanded=\"false\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><rect x=\"1\" y=\"2\" width=\"14\" height=\"12\" rx=\"1\"/><line x1=\"1\" y1=\"6\" x2=\"15\" y2=\"6\"/><line x1=\"1\" y1=\"10\" x2=\"15\" y2=\"10\"/><line x1=\"7\" y1=\"2\" x2=\"7\" y2=\"14\"/></svg> Tables <span class=\"toc-list-count\">(#{@table_entries.size})</span></button></li>"
+          @table_entries.each { |t|
+            id = t[:id].to_s
+            text = escape_html(t[:text].to_s)
+            top_lines << "<li class=\"toc-list-item toc-tables\" style=\"display:none\"><a href=\"##{id}\" class=\"toc-link\" data-target=\"#{id}\">#{text}</a></li>"
+          }
+        end
+
+        top_lines << "<li class=\"toc-divider\"></li>" unless top_lines.empty?
+
+        (top_lines + main_lines).join("\n")
+      end
+
+      # --- Scripts ---
+
+      def build_scripts
+        toc_js = File.read(File.join(JAVASCRIPT_DIR, 'toc.js'))
+        search_js = File.read(File.join(JAVASCRIPT_DIR, 'search.js'))
+        "<script>\n#{toc_js}\n</script>\n<script>\n#{search_js}\n</script>"
+      end
+
+      # --- Validation ---
+
+      def validate_presentation_xml!
+        has_presentation = check_presentation_markers(@document)
+        return if has_presentation
+
+        raise ArgumentError,
+              "HTML generation requires Presentation XML input. " \
+              "Semantic XML does not contain formatting data needed for HTML. " \
+              "Use a '.presentation.xml' file instead."
+      end
+
+      def check_presentation_markers(node)
+        return false unless node
+        return false if node.is_a?(String)
+
+        if node.is_a?(Metanorma::Document::Root) && node.type == "presentation"
+          return true
+        end
+
+        if node.is_a?(Lutaml::Model::Serializable)
+          return true if (node.public_send(:fmt_title) rescue nil)
+          return true if (node.public_send(:displayorder) rescue nil)
+
+          %i[preface sections annex bibliography].each do |attr|
+            val = node.public_send(attr) rescue nil
+            next unless val
+            Array(val).each { |v| return true if check_presentation_markers(v) }
+          end
+
+          node.each_mixed_content do |child|
+            next if child.is_a?(String)
+            return true if check_presentation_markers(child)
+          end
+        end
+
+        false
+      end
+
+      # --- Metadata extraction ---
+
+      def language
+        bibdata = @document.bibdata
+        return "en" unless bibdata
+
+        langs = bibdata.language
+        if langs && !langs.empty?
+          lang = langs.find { |l| l.current == "true" } || langs.first
+          lang.value || lang.to_s
+        else
+          "en"
+        end
+      end
+
+      def html_title
+        bibdata = @document.bibdata
+        return "Document" unless bibdata
+
+        titles = bibdata.titles
+        if titles
+          title = bibdata.title_for("en")
+          title.to_s
+        else
+          "Document"
+        end
+      end
+
+      def extract_primary_doc_id
+        bibdata = @document.bibdata
+        return nil unless bibdata
+
+        identifiers = bibdata.doc_identifier
+        return nil unless identifiers && !identifiers.empty?
+
+        first_id = identifiers.first
+        text = if first_id.is_a?(String)
+                 first_id
+               elsif first_id.is_a?(Lutaml::Model::Serializable)
+                 Array(first_id.value).join
+               else
+                 first_id.to_s
+               end
+        text.strip.empty? ? nil : text.strip
+      end
+
+      # --- CSS loader ---
+
+      def base_css_without_root
+        @base_css_without_root_cache ||= begin
+          css = File.read(File.join(STYLESHEET_DIR, "base.css"))
+          # Strip the static :root block — Theme#to_css_root generates it dynamically
+          css.sub(/\/\*\s*===\s*(?:1\.\s*Custom|Base\s*CSS)[^*]*\*\/.*?\n:root\s*\{[^}]*\}/m, "")
+        end
+      end
+
       def register_toc_entry(id:, level:, text:)
         @toc_entries << { id: id, level: level, text: text }
+      end
+
+      def register_figure_entry(id:, text:)
+        @figure_entries << { id: id, text: text }
+      end
+
+      def register_table_entry(id:, text:)
+        @table_entries << { id: id, text: text }
       end
 
       def extract_plain_text(node)
@@ -43,7 +441,7 @@ module Metanorma
             if el.text?
               parts << el.text_content.to_s
             elsif el.name == "tab"
-              parts << "  "
+              parts << "\u00A0\u00A0"
             elsif el.name == "br"
               parts << " "
             elsif el.element?
@@ -64,12 +462,12 @@ module Metanorma
         end
 
         # Fallback: try .text
-        if parts.join.strip.empty? && node.respond_to?(:text)
-          t = node.text
-          parts << (t.is_a?(Array) ? t.join : t.to_s)
+        if parts.join.strip.empty?
+          t = safe_attr(node, :text)
+          parts << (t.is_a?(Array) ? t.join : t.to_s) if t
         end
 
-        parts.join.strip
+        parts.join.strip.gsub(/\u00A0/, " ")
       end
 
       # Dispatch to the appropriate render method based on node class.
@@ -126,7 +524,13 @@ module Metanorma
       end
 
       def render_table(table, **_opts)
-        attrs = element_attrs(id: safe_attr(table, :id), class: "tableblock")
+        attrs = element_attrs(id: safe_attr(table, :id), class: "table-block")
+        table_id = safe_attr(table, :id)
+        name_el = safe_attr(table, :fmt_name) || safe_attr(table, :name)
+        if table_id && name_el
+          register_table_entry(id: table_id, text: extract_plain_text(name_el))
+        end
+        @output << "<div class=\"table-scroll-wrapper\">"
         tag("table", attrs) do
           # Table name/caption — use fmt_name (presentation) or name (semantic)
           # This contains the display text like "Table 1 — Some Title"
@@ -145,6 +549,7 @@ module Metanorma
           table.note&.each { |n| render_note(n) }
           table.dl&.then { |dl| render_definition_list(dl) }
         end
+        @output << "</div>"
       end
 
       def render_table_colgroup(colgroup)
@@ -158,29 +563,15 @@ module Metanorma
         @output << "<#{tag_name}>"
         section.tr&.each do |tr|
           @output << "<tr>"
-          # Render th cells (header cells)
-          Array(tr.th).each do |th|
-            attrs = element_attrs(
-              colspan: safe_attr(th, :colspan),
-              rowspan: safe_attr(th, :rowspan),
-              align: safe_attr(th, :alignment),
-              valign: safe_attr(th, :vertical_alignment),
-            )
-            @output << "<th#{attrs}>"
-            render_mixed_inline(th)
-            @output << "</th>"
+          # Use walk_ordered to preserve document order of th/td cells
+          walked = walk_ordered(tr) do |type, obj|
+            next unless type == :element
+            render_table_cell(obj)
           end
-          # Render td cells (data cells)
-          Array(tr.td).each do |td|
-            attrs = element_attrs(
-              colspan: safe_attr(td, :colspan),
-              rowspan: safe_attr(td, :rowspan),
-              align: safe_attr(td, :alignment),
-              valign: safe_attr(td, :vertical_alignment),
-            )
-            @output << "<td#{attrs}>"
-            render_mixed_inline(td)
-            @output << "</td>"
+          unless walked
+            # Fallback: th then td (original behavior)
+            Array(tr.th).each { |th| render_table_cell(th, "th") }
+            Array(tr.td).each { |td| render_table_cell(td, "td") }
           end
           @output << "</tr>"
         end
@@ -192,6 +583,19 @@ module Metanorma
         tag("ul", attrs) do
           ul.listitem&.each { |li| render_list_item(li) }
         end
+      end
+
+      def render_table_cell(cell, force_tag = nil)
+        tag_name = force_tag || (cell.is_a?(Metanorma::Document::Components::Tables::HeaderTableCell) ? "th" : "td")
+        attrs = element_attrs(
+          colspan: safe_attr(cell, :colspan),
+          rowspan: safe_attr(cell, :rowspan),
+          align: safe_attr(cell, :alignment),
+          valign: safe_attr(cell, :vertical_alignment),
+        )
+        @output << "<#{tag_name}#{attrs}>"
+        render_cell_content(cell)
+        @output << "</#{tag_name}>"
       end
 
       def render_ordered_list(ol, **_opts)
@@ -217,8 +621,57 @@ module Metanorma
           when String
             @output << escape_html(child)
           else
-            render(child)
+            if block_element?(child)
+              render(child)
+            else
+              render_inline_element(child)
+            end
           end
+        end
+      end
+
+      # Collect all renderable children from a node in document order,
+      # sorted by displayorder when available. Uses walk_ordered to traverse
+      # element_order, and also gathers typed attributes that may not appear
+      # in element_order (e.g. terms, definitions on section models).
+      def collect_ordered_children(section)
+        children = []
+
+        walk_ordered(section) do |type, obj|
+          next if type == :text || type == :tab
+          children << obj
+        end
+
+        # Gather typed attributes that may not appear in element_order
+        supplementary_attrs = %i[terms definitions]
+        supplementary_attrs.each do |attr|
+          val = safe_attr(section, attr)
+          next if val.nil?
+          Array(val).each do |v|
+            children << v unless children.include?(v)
+          end
+        end
+
+        children.compact!
+        sort_by_displayorder(children)
+      end
+
+      # Render children of a section in displayorder, skipping title elements.
+      def render_ordered_content(section, level = 1)
+        children = collect_ordered_children(section)
+        children.each do |node|
+          next if node.is_a?(String)
+          next if is_title_element?(node, section)
+
+          render(node, level: level + 1)
+        end
+      end
+
+      def sort_by_displayorder(children)
+        children.sort_by do |node|
+          order = node.displayorder rescue nil
+          order &&= order.to_i
+          order || Float::INFINITY
         end
       end
 
@@ -241,6 +694,11 @@ module Metanorma
 
       def render_figure(figure, **_opts)
         attrs = element_attrs(id: safe_attr(figure, :id), class: "figure")
+        fig_id = safe_attr(figure, :id)
+        fig_name = safe_attr(figure, :fmt_name) || safe_attr(figure, :name)
+        if fig_id && fig_name
+          register_figure_entry(id: fig_id, text: extract_plain_text(fig_name))
+        end
         tag("figure", attrs) do
           if figure.image
             render_image(figure.image)
@@ -289,10 +747,10 @@ module Metanorma
       end
 
       def render_note(note, **_opts)
-        attrs = element_attrs(id: safe_attr(note, :id), class: "Note")
+        attrs = element_attrs(id: safe_attr(note, :id), class: "note-block")
         tag("div", attrs) do
           label = extract_block_label(note, "NOTE")
-          @output << %(<span class="note_label">#{escape_html(label)}</span>&nbsp;)
+          @output << %(<span class="note-label">#{escape_html(label)}</span>&nbsp;)
           if note.content && !note.content.empty?
             note.content.each { |para| render_paragraph(para) }
           else
@@ -308,7 +766,7 @@ module Metanorma
         attrs = element_attrs(id: safe_attr(example, :id), class: "example")
         tag("div", attrs) do
           label = extract_block_label(example, "EXAMPLE")
-          @output << %(<span class="example_label">#{escape_html(label)}</span>&nbsp;)
+          @output << %(<span class="example-label">#{escape_html(label)}</span>&nbsp;)
           if example.paragraphs && !example.paragraphs.empty?
             example.paragraphs.each { |para| render_paragraph(para) }
           end
@@ -328,7 +786,7 @@ module Metanorma
         lang = safe_attr(sc, :lang)
         tag("div", attrs) do
           if sc.name
-            @output << "<p class=\"sourcecode-name\">"
+            @output << "<p class=\"code-name\">"
             render_inline_element(sc.name)
             @output << "</p>"
           end
@@ -342,7 +800,11 @@ module Metanorma
                       else
                         ""
                       end
-          @output << escape_html(code_text)
+          # body.content from map_all_content may contain pre-escaped HTML
+          # entities (&lt; etc); decode first to get raw text, then escape
+          # for HTML output.
+          raw_text = code_text.gsub("&lt;", "<").gsub("&gt;", ">").gsub("&amp;", "&").gsub("&quot;", "\"")
+          @output << escape_html(raw_text)
           @output << "</code></pre>"
         end
       end
@@ -350,10 +812,15 @@ module Metanorma
       def render_formula(formula, **_opts)
         attrs = element_attrs(id: safe_attr(formula, :id), class: "formula")
         tag("div", attrs) do
-          if formula.stem
-            @output << render_stem_content(formula.stem)
-          end
+          @output << render_stem_content(formula.stem) if formula.stem
           formula.dl&.then { |dl| render_definition_list(dl) }
+
+          name_el = safe_attr(formula, :fmt_name) || safe_attr(formula, :name)
+          if name_el
+            @output << "<span class=\"formula-number\">"
+            render_inline_element(name_el)
+            @output << "</span>"
+          end
         end
       end
 
@@ -424,6 +891,105 @@ module Metanorma
 
       # --- Inline content rendering ---
 
+      # Walk element_order in document order, resolving each element to its
+      # Ruby object via the XML mapping, and yielding (element_order_entry, resolved_object)
+      # to the given block. Handles tab elements as nbsp. Skips elements not in the mapping.
+      #
+      # This is the single ordered-walk primitive used by all mixed content renderers:
+      # - render_mixed_inline (inline-only)
+      # - render_cell_content (mixed block/inline)
+      # - render_semx_content (filtered display attrs only)
+      def walk_ordered(node, allow_filter: nil)
+        return false unless node.is_a?(Lutaml::Model::Serializable)
+        return false unless node.element_order.is_a?(Array) && !node.element_order.empty?
+
+        xml_mapping = node.class.mappings_for(:xml, node.lutaml_register)
+        return false unless xml_mapping
+
+        element_to_attr = {}
+        xml_mapping.mapping_elements_hash.each_value do |rule_or_array|
+          Array(rule_or_array).each do |rule|
+            element_to_attr[rule.name] = rule.to
+            element_to_attr[rule.name.to_s] = rule.to if rule.name.is_a?(Symbol)
+          end
+        end
+
+        # Build skip set: semantic elements that have a following <semx> wrapper
+        # in presentation XML, avoiding duplicate rendering (link+semx, xref+semx)
+        skip_indices = build_semx_skip_set(node)
+
+        indices = Hash.new(0)
+
+        node.element_order.each_with_index do |el, i|
+          next if skip_indices.include?(i)
+
+          if el.text?
+            text = el.text_content
+            yield :text, text if text && block_given?
+          elsif el.element?
+            # Handle <tab/> elements
+            if el.name == "tab"
+              yield :tab, nil if block_given?
+              next
+            end
+
+            attr_name = element_to_attr[el.name]
+            next unless attr_name
+
+            # Apply optional filter (used by semx to skip semantic attrs)
+            next if allow_filter && !allow_filter.include?(attr_name)
+
+            coll = node.send(attr_name)
+            obj = if coll.is_a?(Array)
+                    idx = indices[attr_name]
+                    indices[attr_name] += 1
+                    coll[idx]
+                  else
+                    coll
+                  end
+            yield :element, obj if obj && block_given?
+          end
+        end
+        true
+      end
+
+      # In presentation XML, semantic elements are followed by <semx> wrappers
+      # containing formatted display content. When both are present, skip the
+      # semantic element to avoid duplicating output (e.g. link+semx → two URLs).
+      def build_semx_skip_set(node)
+        semantic_names = %w[link xref eref]
+        skip = {}
+        node.element_order.each_with_index do |el, i|
+          next_el = node.element_order[i + 1]
+          next unless el.element? && semantic_names.include?(el.name)
+          next unless next_el && next_el.element? && next_el.name == "semx"
+          skip[i] = true
+        end
+        skip
+      end
+
+      # Table cells can contain both block-level content (p, ul, ol, dl)
+      # and inline content (text, em, strong, etc.) in document order.
+      def render_cell_content(cell)
+        walked = walk_ordered(cell) do |type, obj|
+          case type
+          when :text
+            @output << escape_html(obj)
+          when :tab
+            @output << "\u00a0\u00a0"
+          when :element
+            if block_element?(obj)
+              render(obj)
+            else
+              render_inline_element(obj)
+            end
+          end
+        end
+        unless walked
+          render_mixed_content_in_order(cell)
+        end
+      end
+
       def render_mixed_inline(node)
         if node.is_a?(Lutaml::Model::Serializable) && node.element_order && !node.element_order.empty?
           render_ordered_inline(node)
@@ -444,8 +1010,17 @@ module Metanorma
       # Iterate element_order directly, preserving whitespace text nodes
       # that each_mixed_content drops (it skips text where text.strip.empty?)
       def render_ordered_inline(node)
-        xml_mapping = node.class.mappings_for(:xml, node.lutaml_register)
-        unless xml_mapping
+        walked = walk_ordered(node) do |type, obj|
+          case type
+          when :text
+            @output << escape_html(obj)
+          when :tab
+            @output << "\u00a0\u00a0"
+          when :element
+            render_inline_element(obj)
+          end
+        end
+        unless walked
           node.each_mixed_content do |child|
             case child
             when String
@@ -453,42 +1028,6 @@ module Metanorma
             else
               render_inline_element(child)
             end
-          end
-          return
-        end
-
-        element_to_attr = {}
-        xml_mapping.mapping_elements_hash.each_value do |rule_or_array|
-          Array(rule_or_array).each do |rule|
-            element_to_attr[rule.name] = rule.to
-            element_to_attr[rule.name.to_s] = rule.to if rule.name.is_a?(Symbol)
-          end
-        end
-
-        indices = Hash.new(0)
-
-        node.element_order.each do |el|
-          if el.text?
-            @output << escape_html(el.text_content) if el.text_content
-          elsif el.element?
-            # Handle <tab/> elements that aren't mapped to attributes
-            if el.name == "tab"
-              @output << "\u00a0\u00a0"
-              next
-            end
-
-            attr_name = element_to_attr[el.name]
-            next unless attr_name
-
-            coll = node.send(attr_name)
-            obj = if coll.is_a?(Array)
-                    idx = indices[attr_name]
-                    indices[attr_name] += 1
-                    coll[idx]
-                  else
-                    coll
-                  end
-            render_inline_element(obj) if obj
           end
         end
       rescue StandardError
@@ -519,7 +1058,7 @@ module Metanorma
         when Metanorma::Document::Components::Inline::SupElement
           render_inline_tag("sup", element)
         when Metanorma::Document::Components::Inline::SmallCapElement
-          render_inline_tag("span", element, class: "smallcap")
+          render_inline_tag("span", element, class: "small-caps")
         when Metanorma::Document::Components::TextElements::UnderlineElement
           render_inline_tag("u", element)
         when Metanorma::Document::Components::TextElements::StrikeElement
@@ -568,8 +1107,16 @@ module Metanorma
              Metanorma::Document::Components::Inline::FmtTermsourceElement,
              Metanorma::Document::Components::Inline::FmtAdmittedElement,
              Metanorma::Document::Components::Inline::FmtIdentifierElement,
-             Metanorma::Document::Components::Inline::FmtXrefElement,
              Metanorma::Document::Components::Inline::FmtSourcecodeElement
+          render_mixed_inline(element)
+        when Metanorma::Document::Components::Inline::FmtXrefElement
+          target = safe_attr(element, :target) || safe_attr(element, :to_attr)
+          if target
+            attrs = element_attrs(href: "##{escape_html(target)}", class: "xref")
+            tag("a", attrs) { render_mixed_inline(element) }
+          else
+            render_mixed_inline(element)
+          end
           render_mixed_inline(element)
         when Metanorma::Document::Components::Inline::FmtStemElement
           @output << render_stem_content(element)
@@ -588,7 +1135,7 @@ module Metanorma
           render_note(element)
         else
           # Attempt generic mixed content rendering for unknown inline types
-          if element.respond_to?(:each_mixed_content)
+          if element.is_a?(Lutaml::Model::Serializable) && element.mixed?
             render_mixed_inline(element)
           end
         end
@@ -617,9 +1164,7 @@ module Metanorma
                           fmt_stem fmt_fn_label fmt_concept
                           bookmark image semx fmt_xref_label]
         inline_attrs.each do |attr|
-          next unless node.respond_to?(attr)
-
-          values = node.send(attr)
+          values = safe_attr(node, attr)
           next if values.nil?
 
           Array(values).each { |v| render_inline_element(v) }
@@ -630,58 +1175,30 @@ module Metanorma
       # semx wraps both semantic data (origin, xref, source, etc.) and
       # display content (fmt-xref, span, strong, etc.). Only render display.
       def render_semx_content(element)
-        # Display-only attribute names in SemxElement
         display_attrs = %i[text fmt_xref fmt_link span strong em sup p semx
                            asciimath math sub_child tt_child br_child tab_child
                            stem_child figure_child formula_child sourcecode_child]
 
-        # If element_order is available, use it to preserve order
-        if element.element_order && !element.element_order.empty?
-          xml_mapping = element.class.mappings_for(:xml, element.lutaml_register)
-          if xml_mapping
-            element_to_attr = {}
-            xml_mapping.mapping_elements_hash.each_value do |rule_or_array|
-              Array(rule_or_array).each do |rule|
-                element_to_attr[rule.name] = rule.to
-                element_to_attr[rule.name.to_s] = rule.to if rule.name.is_a?(Symbol)
-              end
-            end
-
-            indices = Hash.new(0)
-            element.element_order.each do |el|
-              if el.text?
-                @output << escape_html(el.text_content) if el.text_content
-              elsif el.element?
-                attr_name = element_to_attr[el.name]
-                next unless attr_name
-                next unless display_attrs.include?(attr_name)
-
-                coll = element.send(attr_name)
-                obj = if coll.is_a?(Array)
-                        idx = indices[attr_name]
-                        indices[attr_name] += 1
-                        coll[idx]
-                      else
-                        coll
-                      end
-                render_inline_element(obj) if obj
-              end
-            end
-            return
+        walked = walk_ordered(element, allow_filter: display_attrs) do |type, obj|
+          case type
+          when :text
+            @output << escape_html(obj)
+          when :element
+            render_inline_element(obj)
           end
         end
 
-        # Fallback: render display attributes sequentially
-        display_attrs.each do |attr|
-          next unless element.class.method_defined?(attr)
-          val = element.send(attr)
-          next if val.nil?
-          if val.is_a?(Array)
-            val.each { |v| render_inline_element(v) }
-          elsif val.is_a?(String)
-            @output << escape_html(val)
-          else
-            render_inline_element(val)
+        unless walked
+          display_attrs.each do |attr|
+            val = safe_attr(element, attr)
+            next if val.nil?
+            if val.is_a?(Array)
+              val.each { |v| render_inline_element(v) }
+            elsif val.is_a?(String)
+              @output << escape_html(val)
+            else
+              render_inline_element(val)
+            end
           end
         end
       end
@@ -719,7 +1236,7 @@ module Metanorma
       end
 
       def render_fn(fn)
-        attrs = element_attrs(id: safe_attr(fn, :id), class: "footnote")
+        attrs = element_attrs(id: safe_attr(fn, :id), class: "fn-marker")
         tag("span", attrs) do
           label = safe_attr(fn, :fn_label) || safe_attr(fn, :reference)
           @output << "<sup>#{escape_html(label.to_s)}</sup>" if label
@@ -735,28 +1252,22 @@ module Metanorma
       def render_stem_content(stem)
         return "" if stem.nil?
 
-        if stem.respond_to?(:math) && stem.math
+        if stem.is_a?(Metanorma::Document::Components::TextElements::StemElement) && stem.math
           math_items = Array(stem.math)
           if math_items.first.is_a?(Metanorma::Document::Components::Inline::MathElement)
             math_items.map { |m| m.content.to_s }.join
-          elsif math_items.first.respond_to?(:to_xml)
-            math_items.map(&:to_xml).join
           else
             escape_html(math_items.map(&:to_s).join)
           end
-        elsif stem.respond_to?(:asciimath) && stem.asciimath
-          am = stem.asciimath
-          text = am.respond_to?(:text) ? Array(am.text).join : am.to_s
+        elsif stem.is_a?(Metanorma::Document::Components::TextElements::StemElement) && stem.asciimath
+          text = extract_text_value(stem.asciimath)
           %(<span class="stem">#{escape_html(text)}</span>)
-        elsif stem.respond_to?(:latexmath) && stem.latexmath
-          lm = stem.latexmath
-          text = lm.respond_to?(:text) ? Array(lm.text).join : lm.to_s
-          %(<span class="stem">#{escape_html(text)}</span>)
-        elsif stem.respond_to?(:text) && stem.text
-          text = Array(stem.text).join
+        elsif stem.is_a?(Metanorma::Document::Components::TextElements::StemElement) && stem.latexmath
+          text = extract_text_value(stem.latexmath)
           %(<span class="stem">#{escape_html(text)}</span>)
         else
-          ""
+          text = extract_text_value(stem)
+          text.empty? ? "" : %(<span class="stem">#{escape_html(text)}</span>)
         end
       end
 
@@ -771,11 +1282,34 @@ module Metanorma
       def element_attrs(**attrs)
         parts = []
         attrs.each do |k, v|
-          next if v.nil? || v == false || (v.respond_to?(:empty?) && v.empty?)
+          next if v.nil? || v == false || (v.is_a?(String) && v.empty?)
 
-          parts << %( #{k}="#{escape_html(v.to_s)}")
+          val = k == :class ? translate_class(v.to_s) : v.to_s
+          parts << %( #{k}="#{escape_html(val)}")
         end
         parts.join
+      end
+
+      def translate_class(class_str)
+        class_str.split(/\s+/).map { |c| CLASS_MAP[c] || c }.join(" ")
+      end
+
+      def block_element?(obj)
+        obj.is_a?(Metanorma::Document::Components::Paragraphs::ParagraphBlock) ||
+          obj.is_a?(Metanorma::Document::Components::Tables::TableBlock) ||
+          obj.is_a?(Metanorma::Document::Components::Lists::UnorderedList) ||
+          obj.is_a?(Metanorma::Document::Components::Lists::OrderedList) ||
+          obj.is_a?(Metanorma::Document::Components::Lists::DefinitionList) ||
+          obj.is_a?(Metanorma::Document::Components::AncillaryBlocks::FigureBlock) ||
+          obj.is_a?(Metanorma::Document::Components::Blocks::NoteBlock) ||
+          obj.is_a?(Metanorma::Document::Components::AncillaryBlocks::ExampleBlock) ||
+          obj.is_a?(Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock) ||
+          obj.is_a?(Metanorma::Document::Components::AncillaryBlocks::FormulaBlock) ||
+          obj.is_a?(Metanorma::Document::Components::MultiParagraph::QuoteBlock) ||
+          obj.is_a?(Metanorma::Document::Components::MultiParagraph::AdmonitionBlock) ||
+          obj.is_a?(Metanorma::Document::Components::Sections::HierarchicalSection) ||
+          obj.is_a?(Metanorma::Document::Components::Sections::BasicSection) ||
+          obj.is_a?(Metanorma::Document::Components::Sections::ContentSection)
       end
 
       def safe_attr(obj, method_name)
@@ -816,15 +1350,7 @@ module Metanorma
 
         titles = Array(titles)
         title = titles.first
-        if title.respond_to?(:content)
-          title.content.to_s
-        elsif title.respond_to?(:text)
-          Array(title.text).join
-        elsif title.is_a?(String)
-          title
-        else
-          title.to_s
-        end
+        extract_text_value(title).to_s
       end
 
       def escape_html(text)
@@ -838,25 +1364,29 @@ module Metanorma
           .gsub('"', "&quot;")
       end
 
-      # Extract a plain text string from a value that may be a model object, array, or string.
       def extract_text_value(val)
         return nil if val.nil?
         return val if val.is_a?(String)
 
         if val.is_a?(Array)
           val.map { |v| extract_text_value(v) }.join
-        elsif val.respond_to?(:content)
-          c = val.content
-          c = nil if c.equal?(val) # avoid self-referential
-          c ? extract_text_value(c) : nil
-        elsif val.respond_to?(:text)
-          t = val.text
-          t ? extract_text_value(t) : nil
-        elsif val.respond_to?(:value)
-          v = val.value
-          v ? extract_text_value(v) : nil
-        elsif val.respond_to?(:id) && val.id.is_a?(String)
-          val.id
+        elsif val.is_a?(Lutaml::Model::Serializable)
+          c = safe_attr(val, :content)
+          if c && !c.equal?(val)
+            extract_text_value(c)
+          else
+            t = safe_attr(val, :text)
+            if t
+              extract_text_value(t)
+            else
+              v = safe_attr(val, :value)
+              if v
+                extract_text_value(v)
+              else
+                val.to_s
+              end
+            end
+          end
         else
           val.to_s
         end

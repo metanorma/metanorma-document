@@ -8,6 +8,8 @@ module Metanorma
           attribute :text, :string, collection: true
           attribute :semx, SemxElement, collection: true
           attribute :span, SpanElement, collection: true
+          attribute :strong, "Metanorma::Document::Components::Inline::StrongRawElement",
+                    collection: true
           attribute :tab, TabElement, collection: true
           attribute :sup, SupElement, collection: true
           attribute :br, BrElement, collection: true
@@ -22,6 +24,7 @@ module Metanorma
             map_content to: :text
             map_element "semx", to: :semx
             map_element "span", to: :span
+            map_element "strong", to: :strong
             map_element "tab", to: :tab
             map_element "sup", to: :sup
             map_element "br", to: :br

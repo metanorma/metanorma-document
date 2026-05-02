@@ -4,7 +4,7 @@ module Metanorma
   module BasicDocument
     module TextElements
       # Mathematical text formatted in MathML.
-      class MathML < Metanorma::BasicDocument::TextElements::StemValue
+      class Mathml < Metanorma::BasicDocument::TextElements::StemValue
         attribute :value, BasicObject
 
         xml do

@@ -92,6 +92,8 @@ module Metanorma
                  "metanorma/document/components/inline/title_with_annotation_element"
         autoload :DisplayTextElement,
                  "metanorma/document/components/inline/display_text_element"
+        autoload :Bcp14Element,
+                 "metanorma/document/components/inline/bcp14_element"
       end
     end
   end

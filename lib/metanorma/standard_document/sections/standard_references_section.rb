@@ -22,6 +22,8 @@ module Metanorma
         attribute :hidden, :string
         attribute :references, Metanorma::Document::Components::BibData::BibliographicItem,
                   collection: true
+        attribute :passthrough, Metanorma::StandardDocument::Blocks::Passthrough,
+                  collection: true
         attribute :note,
                   Metanorma::Document::Components::Paragraphs::ParagraphBlock, collection: true
         attribute :p,
@@ -59,6 +61,7 @@ module Metanorma
           map_element "p", to: :p
           map_element "note", to: :note
           map_element "bibitem", to: :references
+          map_element "passthrough", to: :passthrough
           map_element "table", to: :table
           map_element "fmt-title", to: :fmt_title
           map_element "fmt-xref-label", to: :fmt_xref_label

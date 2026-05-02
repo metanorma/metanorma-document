@@ -24,6 +24,7 @@ module Metanorma
             dispatch_by :_type do
               route "main" => :title_full
               route "title-intro" => :title_intro
+              route "intro" => :title_intro
               route "title-main" => :title_main
               route "title-part" => :title_part
               route "title-part-prefix" => :title_part_prefix
