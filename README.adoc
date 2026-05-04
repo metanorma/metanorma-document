@@ -14,6 +14,143 @@ Ruby library for working with Metanorma document XML.
  standard = Metanorma::IsoDocument::Root.from_xml(doc)
  puts standard.to_xml(pretty: true)
 
+=== HTML Generation
+
+The `Metanorma::Html::Generator` produces a complete, self-contained HTML document from a presentation XML document model. It handles body content rendering, table of contents, CSS theming, JavaScript interactivity, and responsive layout.
+
+==== Quick Start
+
+[source,ruby]
+require "metanorma/document"
+require "metanorma/html/generator"
+
+# Parse presentation XML into a document model
+xml = File.read("spec/fixtures/iso/is/document-en.presentation.xml")
+doc = Metanorma::IsoDocument::Root.from_xml(xml)
+
+# Generate a complete HTML document
+html = Metanorma::Html::Generator.generate(doc)
+File.write("output.html", html)
+
+==== Renderer Selection
+
+The `Generator` automatically selects the correct renderer based on the document model class:
+
+[horizontal]
+`Metanorma::Document::Root` :: `BaseRenderer` (generic documents)
+`Metanorma::StandardDocument::Root` :: `StandardRenderer` (standards with terms, annexes)
+`Metanorma::IsoDocument::Root` :: `IsoRenderer` (ISO-specific formatting)
+
+For publisher-based dispatch within the same model (e.g., ICC documents published through ISO), use _taste_ registration:
+
+[source,ruby]
+# ICC documents are IsoDocument::Root but use IccRenderer
+Metanorma::Html::Generator.register_taste(
+  Metanorma::IsoDocument::Root,
+  "ICC",
+  Metanorma::Html::IccRenderer
+)
+
+The lookup order is: taste match (publisher) → model class (most specific last) → `BaseRenderer`.
+
+==== Renderer Architecture
+
+The renderer hierarchy follows the open/closed principle:
+
+....
+BaseRenderer                  # Core HTML rendering, document assembly, CSS/JS pipeline
+└── StandardRenderer          # Terms, definitions, annexes, bibliography
+    ├── IsoRenderer           # ISO cover page, copyright, title formatting
+    │   ├── IccRenderer       # ICC publisher styling
+    │   └── PdfaRenderer      # PDF Association publisher styling
+    ├── IecRenderer           # IEC-specific formatting
+    ├── IeeeRenderer          # IEEE-specific formatting
+    ├── IetfRenderer          # IETF-specific formatting
+    ├── IhoRenderer           # IHO-specific formatting
+    ├── ItuRenderer           # ITU-specific formatting
+    ├── OgcRenderer           # OGC-specific formatting
+    ├── OimlRenderer          # OIML-specific formatting
+    ├── BipmRenderer          # BIPM-specific formatting
+    ├── CcRenderer            # CC-specific formatting
+    └── RiboseRenderer        # Ribose-specific formatting
+....
+
+==== Presentation XML
+
+The HTML renderer expects **presentation XML** (not source XML). Presentation XML contains `fmt-*` display elements (`fmt-title`, `fmt-xref`, `fmt-link`, `fmt-concept`, `fmt-definition`, `fmt-preferred`, etc.) alongside semantic elements. The renderer prioritizes `fmt-*` elements for rendering, falling back to semantic elements when display elements are absent.
+
+==== Theming
+
+Each renderer has a `Theme` object controlling colors, typography, and layout. Override theme properties in subclasses:
+
+[source,ruby]
+class MyRenderer < Metanorma::Html::StandardRenderer
+  def theme
+    @theme ||= begin
+      t = Theme.new
+      t.primary = "#1a5276"
+      t.accent = "#2e86c1"
+      t.font_body = '"Charter", serif'
+      t
+    end
+  end
+end
+
+Theme properties are emitted as CSS custom properties (`--mn-primary`, `--font-body`, etc.) for runtime customization.
+
+==== Liquid Templates
+
+HTML structure is defined in `.liquid` templates under `lib/metanorma/html/templates/`:
+
+[horizontal]
+`document.html.liquid` :: Full document shell (`<html>`, `<head>`, `<body>`)
+`_header.html.liquid` :: Sticky header with publisher logos
+`_footer.html.liquid` :: Footer with copyright
+`_cover.html.liquid` :: Cover page layout
+`_footnotes.html.liquid` :: Footnotes section
+`_doc_title.html.liquid` :: Document title rendering
+
+Templates use `Liquid::LocalFileSystem` for partials (prefixed with `_`). The `render_liquid` method handles template caching via `TEMPLATE_CACHE`.
+
+==== Asset Pipeline
+
+The `AssetPipeline` compiles CSS and JavaScript from modular source files:
+
+[horizontal]
+CSS :: `data/stylesheets/base/` (reset, typography, layout, dark mode, print) + `data/stylesheets/components/` (21 component stylesheets)
+JS  :: `data/javascripts/core/` (reader, theme, scroll, navigation, reveal) + `data/javascripts/components/` (ToC, search, lightbox, code copy, glossary, etc.)
+
+All assets are compiled into inline `<style>` and `<script>` blocks for self-contained output.
+
+==== CLI Usage
+
+From the command line:
+
+[source,bash]
+# Generate HTML from presentation XML
+bundle exec ruby -e '
+  require "metanorma/document"
+  require "metanorma/html/generator"
+  doc = Metanorma::IsoDocument::Root.from_xml(ARGF.read)
+  puts Metanorma::Html::Generator.generate(doc)
+' < document.presentation.xml > output.html
+
+==== API Reference
+
+[horizontal]
+`Generator.generate(document, **options)` :: Returns a complete HTML string. Auto-selects the renderer.
+`Generator.register(model_class, renderer_class)` :: Register a model-to-renderer mapping.
+`Generator.register_taste(model_class, publisher_abbrev, renderer_class)` :: Register a publisher-based override.
+`Generator.renderer_for(document)` :: Returns the renderer class that would be used.
+
+Renderer instance methods:
+
+[horizontal]
+`generate_full_document(document)` :: Full HTML document (body + assembly).
+`to_html` :: Returns the rendered body content after `generate_full_document`.
+`theme` :: Returns the `Theme` instance (override in subclasses).
+`render_liquid(template_name, assigns)` :: Renders a Liquid template with caching.
+
  == Document Flavors
 
  The gem provides a hierarchy of document flavors:
