@@ -1,0 +1,25 @@
+/* === Formulas — rules instead of boxes === */
+.formula {
+  margin: 1.5em 0;
+  padding: 1.2em 0;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  background: none;
+  box-shadow: none;
+  display: block;
+  text-align: center;
+  overflow-x: auto;
+}
+.formula .stem { font-style: italic; font-size: 1.05em; }
+.formula-number {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.92em;
+  color: var(--mn-primary);
+  white-space: nowrap;
+  float: right;
+}
+
+@media (max-width: 767px) {
+  .formula .formula-number { float: none; display: block; text-align: center; margin-top: 0.5em; }
+}

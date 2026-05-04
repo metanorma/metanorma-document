@@ -1,0 +1,112 @@
+/* === Layout — CSS Grid === */
+.doc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr auto;
+  min-height: calc(100vh - var(--header-height));
+}
+.toc-sidebar  { grid-column: 1; grid-row: 1 / 3; }
+.toc-overlay  { grid-column: 1; grid-row: 1 / 3; }
+.doc-content  { grid-column: 1; grid-row: 1; }
+.doc-footer   { grid-column: 1; grid-row: 3; }
+
+.doc-content {
+  padding: 1.4em;
+  max-width: var(--content-max-width);
+  width: 100%;
+  margin: 0 auto;
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .doc-content { padding: 1em 0.8em; }
+}
+
+/* Tablet+ */
+@media (min-width: 768px) {
+  .doc-layout {
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+    grid-template-rows: 1fr auto;
+  }
+  .toc-sidebar {
+    grid-column: 1; grid-row: 1;
+    transform: none;
+    position: sticky;
+    top: var(--header-height);
+    width: var(--sidebar-width);
+    height: calc(100vh - var(--header-height));
+    height: calc(100dvh - var(--header-height));
+    box-shadow: none;
+    background: var(--color-sidebar-bg);
+    border-right: 1px solid var(--color-border);
+    overflow-y: auto;
+  }
+  .toc-sidebar.toc-open { transform: none; box-shadow: none; }
+  .toc-overlay { display: none !important; grid-column: 1; grid-row: 1; }
+  .doc-content {
+    grid-column: 2; grid-row: 1;
+    padding: 2.5em 3em;
+    max-width: var(--content-max-width);
+  }
+  .doc-footer { grid-column: 2; grid-row: 2; }
+}
+
+/* Desktop+ */
+@media (min-width: 1024px) {
+  :root { --sidebar-width: 280px; --content-max-width: 54em; }
+}
+
+/* Reading mode — distraction-free */
+.reading-mode .toc-sidebar,
+.reading-mode .toc-hamburger,
+.reading-mode .reading-progress,
+.reading-mode .back-to-top {
+  display: none !important;
+}
+.reading-mode .doc-header {
+  height: 40px !important;
+  padding: 0 1em;
+}
+.reading-mode .header-brand,
+.reading-mode .header-doc-id,
+.reading-mode .header-settings,
+.reading-mode .settings-dropdown {
+  display: none !important;
+}
+.reading-mode .header-doc-title {
+  opacity: 0.9; border-left: none; padding-left: 0; margin-left: 0;
+  font-weight: 600; flex: 1; text-align: center;
+}
+.reading-mode .header-actions { margin-left: 0; }
+.reading-mode .doc-layout {
+  grid-template-columns: 1fr !important;
+}
+.reading-mode .doc-content {
+  grid-column: 1 !important;
+  max-width: 38em;
+  padding: 2em 1em;
+  margin: 0 auto;
+}
+.reading-mode .title-section {
+  min-height: auto;
+  background: var(--mn-primary) !important;
+  padding: 2em 1em;
+}
+.reading-mode .title-section::before,
+.reading-mode .title-section::after {
+  display: none;
+}
+.reading-mode .cover-title {
+  font-size: 1.6em;
+  animation: none;
+}
+.reading-mode .cover-doc-id {
+  animation: none;
+  font-size: 0.9em;
+}
+.reading-mode .cover-stage {
+  animation: none;
+}
+

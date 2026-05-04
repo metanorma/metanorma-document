@@ -1,0 +1,46 @@
+/* === Print === */
+@media print {
+  .toc-sidebar, .doc-header, .toc-hamburger, .toc-overlay,
+  .doc-footer, .reading-progress, .back-to-top, .search-panel,
+  .code-copy-btn, .toc-toggle, .toc-list-header, .toc-list-item { display: none !important; }
+  .doc-layout { display: block; }
+  .doc-content { max-width: 100%; padding: 0 2.5cm; }
+  .title-section {
+    background: none; color: #000; min-height: auto; padding: 1em 0;
+  }
+  .title-section::before, .title-section::after { display: none; }
+  .cover-doc-id, .cover-title, .cover-date { color: #000; text-shadow: none; }
+  .cover-stage p { background: none; color: #000; border: 1px solid #999; }
+  .cover-grid { display: block; }
+  .cover-meta { border-right: none; padding-right: 0; }
+  body { font-size: 11pt; color: #000; line-height: 1.6; }
+  a { color: #000; text-decoration: underline; }
+  .note-block, .example, .admonition { background: none; }
+  .note-block, .example { border-left-color: #999; }
+  .formula { background: none; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc; }
+  .formula-number { color: #000; }
+  .sourcecode pre { background: #f5f5f5; color: #000; border-color: #ddd; max-width: none; }
+  table { max-width: none; }
+  th { background: #f0f0f0; color: #000; }
+  .prefatory-section { border-top-color: #ccc; }
+  h1, h2, h3, h4, h5, h6 { page-break-after: avoid; break-after: avoid; }
+  .note-block, .example, .admonition, .formula, figure, table { page-break-inside: avoid; break-inside: avoid; }
+  .caption-label, .fmt-caption-label { color: #000; padding: 0; }
+  .term-number { color: #000; padding: 0; }
+  div[id^="term-"] { border-top: 2px solid #666; background: none; box-shadow: none; }
+  .formula-number { background: none; border: none; color: #000; padding: 0; }
+  .doc-title::after { display: none; }
+  h1 { border-bottom-color: #ccc; }
+  h1::after { display: none; }
+  .scroll-reveal-ready .doc-content > div[id],
+  .scroll-reveal-ready .doc-content > div.section-sub,
+  .scroll-reveal-ready .doc-content > div[id] > div[id],
+  .scroll-reveal-ready .doc-content > .main-section > div[id],
+  .scroll-reveal-ready .doc-content > p.doc-title {
+    opacity: 1; transform: none;
+  }
+  /* Index print */
+  .index-section { page-break-before: always; }
+  .index-letter { position: static; background: none; }
+  .index-quicknav { display: none; }
+}

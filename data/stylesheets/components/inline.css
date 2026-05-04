@@ -1,0 +1,88 @@
+/* === Inline Elements === */
+.fn-marker { vertical-align: super; font-size: 0.78em; color: var(--mn-primary); font-family: var(--font-sans); }
+.small-caps { font-variant: small-caps; letter-spacing: 0.03em; }
+.obligation { font-style: italic; color: var(--mn-accent); }
+.bold-title { font-weight: 700; }
+
+/* Math container — hover dropdown for source formats */
+.math-container { position: relative; display: inline; }
+.math-container math { font-style: normal; }
+.stem-dropdown {
+  display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+  background: var(--color-bg); border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm); box-shadow: var(--shadow-md);
+  padding: 0.4em 0; z-index: 100; min-width: 180px;
+  font-size: 0.82em; white-space: nowrap;
+}
+.math-container:hover .stem-dropdown { display: block; }
+.stem-dropdown-label {
+  padding: 0.15em 0.7em; font-family: var(--font-sans); font-size: 0.9em;
+  color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.04em;
+}
+.stem-dropdown-row {
+  display: flex; align-items: center; gap: 0.5em; padding: 0.2em 0.7em;
+  font-family: var(--font-mono); color: var(--color-text);
+}
+.stem-dropdown-row:hover { background: var(--color-bg-light); }
+.stem-copy-btn {
+  background: none; border: none; cursor: pointer; font-size: 0.85em;
+  color: var(--color-text-muted); padding: 0.1em 0.3em;
+  border-radius: 2px; transition: background 0.15s, color 0.15s;
+}
+.stem-copy-btn:hover { background: var(--mn-primary-light); color: var(--mn-primary); }
+.nonboldtitle { font-weight: 400; }
+
+.citesec, .citefig, .citetbl, .citeapp {
+  color: var(--mn-primary);
+  text-decoration: underline;
+  text-decoration-color: rgba(40,56,138,0.2);
+  cursor: pointer;
+}
+.citesec:hover, .citefig:hover, .citetbl:hover, .citeapp:hover {
+  color: var(--mn-accent);
+}
+
+.doc-subtitle { font-weight: 400; }
+.doc-part-number { font-weight: 500; }
+.doc-part-title { font-style: italic; }
+.doc-publisher, .doc-publisher-name { font-weight: 500; }
+.std-doc-number { font-weight: 500; }
+.std-year { font-weight: 500; }
+.xref-label { font-weight: 600; }
+a.xref { color: var(--mn-primary); text-decoration: none; border-bottom: 1px solid var(--mn-primary-light); }
+a.xref:hover { border-bottom-color: var(--mn-primary); }
+.doc-content a.xref .element-name { font-style: italic; }
+
+.kbd-hint {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 0.75em;
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  padding: 0.1em 0.4em;
+  color: var(--color-text-muted);
+  vertical-align: middle;
+}
+
+/* Quote */
+.quote {
+  margin: 1.4em 0; padding: 0.8em 1.4em;
+  border-left: 3px solid var(--mn-accent);
+  color: var(--color-text-light);
+  background: var(--color-bg-light);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+/* Definition lists */
+dd > p:first-child { margin-top: 0.2em; }
+dd > p:last-child { margin-bottom: 0; }
+dt { color: var(--mn-primary); padding: 0.3em 0; }
+dd { margin-left: 2em; padding-bottom: 0.4em; border-bottom: 1px solid transparent; }
+dd + dt { margin-top: 1em; }
+dl { border-left: 2px solid var(--color-border); padding-left: 1em; margin: 1em 0 1.5em; }
+
+@media (max-width: 767px) {
+  dl { padding-left: 0.5em; }
+  dd { margin-left: 1em; }
+}

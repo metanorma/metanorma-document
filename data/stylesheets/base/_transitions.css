@@ -1,0 +1,77 @@
+/* === Transitions & Animations === */
+
+/* Cover animations */
+@keyframes coverFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes coverTitleIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Section arrival highlight */
+.section-arrival-highlight {
+  animation: arrival-highlight 1.5s ease-out;
+}
+@keyframes arrival-highlight {
+  0% { background: rgba(156,96,193,0.12); }
+  100% { background: transparent; }
+}
+
+/* Lightbox animations */
+@keyframes lightboxIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes lightboxImgIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Scroll reveal */
+.scroll-reveal-ready .doc-content > div[id],
+.scroll-reveal-ready .doc-content > div.section-sub,
+.scroll-reveal-ready .doc-content > div[id] > div[id],
+.scroll-reveal-ready .doc-content > .main-section > div[id],
+.scroll-reveal-ready .doc-content > p.doc-title {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity var(--reveal-duration) var(--reveal-easing),
+              transform var(--reveal-duration) var(--reveal-easing);
+}
+.scroll-reveal-ready .doc-content > div[id].revealed,
+.scroll-reveal-ready .doc-content > div.section-sub.revealed,
+.scroll-reveal-ready .doc-content > div[id] > div[id].revealed,
+.scroll-reveal-ready .doc-content > .main-section > div[id].revealed,
+.scroll-reveal-ready .doc-content > p.doc-title.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* Staggered delay */
+.scroll-reveal-ready .doc-content > div[id]:nth-child(2),
+.scroll-reveal-ready .doc-content > div.section-sub:nth-child(2) { transition-delay: 0.05s; }
+.scroll-reveal-ready .doc-content > div[id]:nth-child(3),
+.scroll-reveal-ready .doc-content > div.section-sub:nth-child(3) { transition-delay: 0.1s; }
+.scroll-reveal-ready .doc-content > div[id]:nth-child(4),
+.scroll-reveal-ready .doc-content > div.section-sub:nth-child(4) { transition-delay: 0.15s; }
+.scroll-reveal-ready .doc-content > div[id]:nth-child(5),
+.scroll-reveal-ready .doc-content > div.section-sub:nth-child(5) { transition-delay: 0.2s; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  html { scroll-behavior: auto; }
+  .toc-sidebar { transition: none; }
+  .toc-overlay { transition: none; }
+  .reading-progress { transition: none; }
+  .search-panel { transition: none; }
+  .back-to-top { transition: none; }
+  .scroll-reveal-ready .doc-content > div[id],
+  .scroll-reveal-ready .doc-content > div.section-sub,
+  .scroll-reveal-ready .doc-content > div[id] > div[id],
+  .scroll-reveal-ready .doc-content > .main-section > div[id],
+  .scroll-reveal-ready .doc-content > p.doc-title {
+    opacity: 1; transform: none; transition: none;
+  }
+}

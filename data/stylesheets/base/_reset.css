@@ -1,0 +1,55 @@
+/* === Reset & Base === */
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-height) + 16px);
+}
+body {
+  font-family: var(--font-body);
+  margin: 0; padding: 0;
+  color: var(--color-text);
+  line-height: 1.8;
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-wrap: break-word;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1;
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+/* Font size scaling — applied to doc-content only, not header/sidebar */
+.doc-content { font-size: calc(1em * var(--reader-font-scale)); }
+
+/* Serif mode override — swaps font-body to a serif stack */
+.reader-serif {
+  --font-body: "Source Serif 4", "Noto Serif", Georgia, "Times New Roman", serif;
+}
+
+/* Skip navigation link */
+.skip-nav {
+  position: absolute; top: -100%; left: 0;
+  background: var(--mn-primary); color: #fff;
+  padding: 0.5em 1em; z-index: 10000;
+  font-family: var(--font-sans); font-size: 0.9em;
+  text-decoration: none; border-radius: 0 0 var(--radius-sm) 0;
+}
+.skip-nav:focus { top: 0; }
+
+/* Non-theme custom properties */
+:root {
+  --radius-lg: 12px;
+  --shadow-lg: 0 8px 32px rgba(40,56,138,0.15);
+  --transition-fast: 0.15s ease;
+  --transition-smooth: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --reveal-duration: 0.6s;
+  --reveal-easing: cubic-bezier(0.16, 1, 0.3, 1);
+  --reader-font-scale: 1;
+  --spacing-xs: 0.25em;
+  --spacing-sm: 0.5em;
+  --spacing-md: 1em;
+  --spacing-lg: 1.5em;
+  --spacing-xl: 2.5em;
+  --spacing-2xl: 4em;
+}

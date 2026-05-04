@@ -1,0 +1,26 @@
+/* === Section Headings === */
+.foreword-title, .intro-title {
+  font-family: var(--font-sans); font-size: 1.4em; font-weight: 600;
+  padding-bottom: 0.5em;
+  border-bottom: 2px solid var(--mn-accent);
+  color: var(--mn-primary);
+  margin-bottom: 0.8em;
+}
+.annex-title {
+  font-family: var(--font-sans); font-weight: 600;
+  font-size: 1.2em; line-height: 1.4; color: var(--mn-primary);
+  margin-bottom: 0.6em;
+}
+.section-sub { margin-top: 2em; }
+
+h1[id]:hover .heading-anchor,
+h2[id]:hover .heading-anchor,
+h3[id]:hover .heading-anchor { opacity: 1; }
+.heading-anchor {
+  opacity: 0;
+  font-size: 0.6em;
+  vertical-align: middle;
+  margin-left: 0.4em;
+  color: var(--mn-accent);
+  transition: opacity var(--transition-fast);
+}
