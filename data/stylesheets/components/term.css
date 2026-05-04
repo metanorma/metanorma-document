@@ -1,0 +1,45 @@
+/* === Terms — top-border editorial === */
+div[id^="term-"] {
+  margin: 2em 0;
+  padding: 1em 0;
+  border-top: 2px solid var(--mn-primary);
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+div[id^="term-"] + div[id^="term-"] { margin-top: 0; }
+
+.term-number {
+  font-variant: small-caps;
+  font-weight: 600;
+  color: var(--mn-primary);
+  background: none;
+  padding: 0;
+  font-size: 0.88em;
+}
+.term-name { font-size: 1.1em; color: var(--mn-primary); font-weight: 500; }
+.term-name dfn { font-style: normal; }
+.term-deprecated { text-decoration: line-through; color: var(--color-text-muted); }
+.term-domain { font-style: italic; color: var(--mn-accent); font-size: 0.92em; margin-top: 0.3em; }
+.term-source {
+  font-size: 0.85em;
+  text-align: right;
+  color: var(--color-text-muted);
+  margin-top: 0.8em;
+  border-top: none;
+  line-height: 1.6;
+}
+div[id^="term-"] .note-block {
+  margin-top: 0.8em;
+  margin-bottom: 0.4em;
+  font-size: 0.92em;
+}
+div[id^="term-"] .example {
+  margin-top: 0.8em;
+  margin-bottom: 0.4em;
+  font-size: 0.92em;
+}
+
+@media (max-width: 767px) {
+  div[id^="term-"] { padding: 0.8em 0; }
+}

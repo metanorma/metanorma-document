@@ -1,0 +1,118 @@
+/* === Index Section === */
+.index-section {
+  margin-top: 3em;
+  padding-top: 2em;
+  border-top: 2px solid var(--mn-primary);
+}
+
+.index-section h2 {
+  font-family: var(--font-sans);
+  font-size: 1.5em;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: var(--mn-primary);
+  margin-bottom: 1em;
+}
+
+.index-letter-group {
+  margin-bottom: 1.5em;
+}
+
+.index-letter {
+  font-family: var(--font-sans);
+  font-size: 1.2em;
+  font-weight: 700;
+  color: var(--mn-primary);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.3em;
+  margin-bottom: 0.5em;
+  position: sticky;
+  top: calc(var(--header-height) + 8px);
+  background: var(--color-bg);
+  z-index: 1;
+}
+
+.index-entry {
+  padding-left: 0;
+  margin: 0.3em 0;
+  line-height: 1.6;
+}
+
+.index-entry--secondary {
+  padding-left: 1.5em;
+}
+
+.index-entry--tertiary {
+  padding-left: 3em;
+}
+
+.index-term {
+  color: var(--color-text);
+}
+
+.index-locator {
+  margin-left: 0.5em;
+}
+
+.index-locator a {
+  color: var(--mn-primary);
+  text-decoration: none;
+  border-bottom: 1px solid var(--mn-primary-light);
+  transition: border-color 0.15s;
+}
+
+.index-locator a:hover {
+  border-bottom-color: var(--mn-primary);
+}
+
+.index-see,
+.index-see-also {
+  font-size: 0.9em;
+  color: var(--color-text-muted);
+  font-style: italic;
+  padding-left: 1.5em;
+}
+
+.index-see em,
+.index-see-also em {
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* Index quick-nav (letter bar at top) */
+.index-quicknav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3em;
+  margin-bottom: 1.5em;
+  padding: 0.5em;
+  background: var(--color-bg-light);
+  border-radius: var(--radius-md);
+  position: sticky;
+  top: calc(var(--header-height) + 8px);
+  z-index: 2;
+}
+
+.index-quicknav a {
+  display: inline-flex;
+  width: 2em;
+  height: 2em;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.85em;
+  color: var(--mn-primary);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s;
+}
+
+.index-quicknav a:hover {
+  background: var(--mn-primary-light);
+}
+
+.index-quicknav a.active {
+  background: var(--mn-primary);
+  color: #fff;
+}

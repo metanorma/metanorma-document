@@ -1,0 +1,24 @@
+/* === Notes — theme variable driven === */
+.note-block {
+  background: var(--note-bg);
+  border-left: 3px solid var(--note-border);
+  padding: 0.8em 1em 0.8em 2.6em;
+  margin: 1.2em 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  position: relative;
+  font-size: 0.93em;
+}
+.note-block::before {
+  content: "";
+  position: absolute; left: 0.8em; top: 1em;
+  width: 16px; height: 16px;
+  background: var(--note-border);
+  opacity: 0.6;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='currentColor'%3E%3Cpath d='M8 1a7 7 0 100 14A7 7 0 008 1zm.75 10.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM8 3.5c.69 0 1.25.56 1.25 1.25v3.5a1.25 1.25 0 01-2.5 0v-3.5C6.75 4.06 7.31 3.5 8 3.5z'/%3E%3C/svg%3E") center/contain no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='currentColor'%3E%3Cpath d='M8 1a7 7 0 100 14A7 7 0 008 1zm.75 10.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM8 3.5c.69 0 1.25.56 1.25 1.25v3.5a1.25 1.25 0 01-2.5 0v-3.5C6.75 4.06 7.31 3.5 8 3.5z'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+.note-label, .term-note-label {
+  font-weight: 600;
+  color: var(--note-color);
+  font-family: var(--font-sans);
+}

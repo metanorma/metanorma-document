@@ -1,0 +1,19 @@
+/* === Admonitions — theme variable driven === */
+.admonition {
+  background: var(--admonition-bg);
+  border-left: 4px solid var(--admonition-border);
+  padding: 0.9em 1.2em 0.9em 2.8em; margin: 1.2em 0;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  position: relative;
+  font-size: 0.95em;
+}
+.admonition::before {
+  content: "";
+  position: absolute; left: 0.8em; top: 1em;
+  width: 16px; height: 16px;
+  background: var(--admonition-border);
+  opacity: 0.7;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='currentColor'%3E%3Cpath d='M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 000 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 00.01-1.002L8.893 1.5zm.133 11.497H6.984v-2.003h2.042v2.003zm0-3.004H6.984V5.99h2.042v3.997z'/%3E%3C/svg%3E") center/contain no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='currentColor'%3E%3Cpath d='M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 000 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 00.01-1.002L8.893 1.5zm.133 11.497H6.984v-2.003h2.042v2.003zm0-3.004H6.984V5.99h2.042v3.997z'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+.admonition-title { font-weight: 600; margin-bottom: 0.5em; color: var(--admonition-color); font-family: var(--font-sans); }

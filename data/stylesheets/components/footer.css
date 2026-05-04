@@ -1,0 +1,24 @@
+/* === Footer === */
+.doc-footer {
+  text-align: center; padding: 2.5em 1.2em;
+  font-size: 0.82em; color: var(--color-text-muted);
+  border-top: 2px solid var(--mn-footer-border, var(--color-border));
+  margin-top: 4em; background: var(--color-bg-light);
+  font-family: var(--font-sans);
+  position: relative;
+  transition: background-color 0.35s ease, border-color 0.35s ease;
+}
+.doc-footer::before {
+  content: ""; position: absolute; top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 4em; height: 2px;
+  background: var(--mn-accent); opacity: 0.4;
+  border-radius: 1px;
+}
+.footer-brand {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0.5em; flex-wrap: wrap;
+}
+.footer-mn-logo svg path { fill: var(--color-text-muted); }
+.footer-text { font-family: var(--font-sans); }
+.doc-footer p { margin: 0.3em 0; }

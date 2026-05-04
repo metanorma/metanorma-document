@@ -1,0 +1,18 @@
+/* === Bibliography — structured references === */
+.biblio-entry {
+  padding: 0.5em 0 0.5em 2.5em;
+  text-indent: -2.5em;
+  font-size: 0.93em; line-height: 1.7;
+  border-bottom: 1px solid var(--color-border);
+}
+.biblio-entry:last-child { border-bottom-color: transparent; }
+.norm-ref-entry {
+  padding: 0.5em 0;
+  font-size: 0.93em; line-height: 1.7;
+  border-bottom: 1px solid var(--color-border);
+}
+.norm-ref-entry:last-child { border-bottom-color: transparent; }
+.std-doc-number { font-weight: 500; color: var(--mn-primary); font-family: var(--font-sans); }
+.std-year { font-weight: 500; }
+.biblio-link { color: inherit; text-decoration: none; }
+.biblio-link:hover { color: var(--mn-primary); text-decoration: underline; }

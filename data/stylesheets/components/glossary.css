@@ -1,0 +1,61 @@
+/* === Glossary Panel === */
+.glossary-panel {
+  position: fixed; inset: 0;
+  background: rgba(26, 26, 46, 0.35);
+  z-index: 1000; opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding-top: 12vh;
+  backdrop-filter: blur(4px);
+}
+.glossary-panel.glossary-visible { opacity: 1; pointer-events: auto; }
+.glossary-inner {
+  background: var(--color-bg); border: 1px solid var(--color-border);
+  border-radius: var(--radius-md); box-shadow: var(--shadow-md);
+  width: min(480px, 90vw); max-height: 70vh;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.glossary-header {
+  display: flex; align-items: center; gap: 0.6em;
+  padding: 0.7em 1em; border-bottom: 1px solid var(--color-border);
+  background: var(--mn-primary-light);
+}
+.glossary-title {
+  font-family: var(--font-sans); font-size: 0.85em;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--mn-primary);
+}
+.glossary-count {
+  font-family: var(--font-sans); font-size: 0.75em;
+  color: var(--color-text-muted); margin-left: auto;
+}
+.glossary-close {
+  background: none; border: none; font-size: 1.2em;
+  cursor: pointer; color: var(--color-text-muted); padding: 0; line-height: 1;
+}
+.glossary-close:hover { color: var(--mn-primary); }
+.glossary-search {
+  margin: 0.6em 1em; padding: 0.4em 0.7em;
+  border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+  font-size: 0.88em; font-family: var(--font-sans);
+  background: var(--color-bg-light); color: var(--color-text);
+  outline: none;
+}
+.glossary-search:focus { border-color: var(--mn-primary); }
+.glossary-list {
+  overflow-y: auto; padding: 0.4em 0; flex: 1;
+}
+.glossary-entry {
+  padding: 0.4em 1em; border-bottom: 1px solid var(--color-border);
+}
+.glossary-entry:last-child { border-bottom: none; }
+.glossary-term {
+  font-family: var(--font-sans); font-weight: 600; font-size: 0.9em;
+  color: var(--mn-primary); text-decoration: none;
+}
+.glossary-term:hover { text-decoration: underline; }
+.glossary-def {
+  font-size: 0.82em; color: var(--color-text-light); margin: 0.2em 0 0;
+  line-height: 1.5;
+}

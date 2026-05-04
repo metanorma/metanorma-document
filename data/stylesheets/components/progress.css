@@ -1,0 +1,40 @@
+/* === Reading Progress Bar === */
+.reading-progress {
+  position: fixed; top: var(--header-height); left: 0;
+  margin-top: -3px;
+  width: 0%; height: 3px;
+  background: var(--mn-progress-color, var(--mn-gradient));
+  z-index: 200;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 8px rgba(156, 96, 193, 0.25);
+  contain: layout style;
+}
+
+/* === Back-to-Top Button === */
+.back-to-top {
+  position: fixed; bottom: 1.4em; right: 1.4em;
+  width: 40px; height: 40px;
+  background: var(--color-bg);
+  color: var(--mn-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-md);
+  z-index: 80;
+  opacity: 0; pointer-events: none;
+  transform: translateY(16px);
+  transition: opacity var(--transition-smooth), transform var(--transition-smooth),
+              background var(--transition-fast), border-color var(--transition-fast);
+}
+.back-to-top.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.back-to-top:hover { background: var(--mn-primary); color: #fff; border-color: var(--mn-primary); }
+.back-to-top svg { width: 18px; height: 18px; }
+
+@media (max-width: 767px) {
+  .toc-hamburger { bottom: 0.8em; right: 0.8em; width: 46px; height: 46px; font-size: 1.2em; }
+  .back-to-top { bottom: 0.8em; right: 0.8em; width: 36px; height: 36px; }
+  .note-block, .example { padding-left: 1.8em; }
+  .note-block::before, .example::before { left: 0.5em; }
+  .sourcecode pre { font-size: 0.8em; padding: 0.9em; }
+}
