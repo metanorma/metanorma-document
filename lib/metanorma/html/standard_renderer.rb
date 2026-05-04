@@ -62,6 +62,20 @@ module Metanorma
         # Bibliography
         render(doc.bibliography) if doc.bibliography
 
+        # Index section (from collected index terms)
+        unless @index_term_collector.empty?
+          index_component = Component::IndexSection.new(self)
+          index_component.render(@index_term_collector)
+        end
+
+        # Index section from indexsect element (presentation XML)
+        if doc.respond_to?(:indexsect) && doc.indexsect
+          render(doc.indexsect)
+        end
+
+        # Footnotes section
+        render_footnotes_section
+
         @output << "</main>"
       end
 
@@ -69,39 +83,31 @@ module Metanorma
         bibdata = doc.bibdata
         return unless bibdata
 
-        @output << "<div class=\"title-section\">"
-
-        # Document identifiers — show only the iso-reference variant on the cover
+        cover_id = nil
         bibdata.doc_identifier&.each do |di|
           next unless safe_attr(di, :type) == "iso-reference"
           id = extract_text_value(di)
           next if id.to_s.empty?
-
-          @output << "<p class=\"cover-doc-id\">#{escape_html(id)}</p>"
+          cover_id = id
+          break
         end
 
-        # Title — IsoBibliographicItem has titles + title_for; BibData has title
+        title_text = nil
         if bibdata.is_a?(Metanorma::IsoDocument::Metadata::IsoBibliographicItem)
           en_title = bibdata.title_for("en")
-          if en_title
-            @output << "<div class=\"cover-title\"><div>"
-            @output << "<span class=\"subtitle\">#{escape_html(en_title)}</span>"
-            @output << "</div></div>"
-          end
+          title_text = en_title.to_s if en_title
         elsif bibdata.is_a?(Metanorma::Document::Components::BibData::BibData)
           titles = bibdata.title
           if titles && !titles.empty?
             en_title = titles.find { |t| t.language == "en" }
-            if en_title
-              title_text = extract_text_value(en_title)
-              @output << "<div class=\"cover-title\"><div>"
-              @output << "<span class=\"subtitle\">#{escape_html(title_text)}</span>"
-              @output << "</div></div>"
-            end
+            title_text = extract_text_value(en_title) if en_title
           end
         end
 
-        @output << "</div><hr class=\"cover-separator\" />"
+        @output << render_liquid("_cover.html.liquid", {
+          "doc_id" => cover_id,
+          "title" => title_text,
+        })
       end
 
       def render_doc_title(doc)
@@ -121,9 +127,9 @@ module Metanorma
           return
         end
 
-        @output << "<p class=\"doc-title\">"
-        @output << "<span class=\"bold-title\">#{escape_html(en_title)}</span>"
-        @output << "</p>"
+        @output << render_liquid("_doc_title.html.liquid", {
+          "title" => en_title,
+        })
       end
 
       # --- Section rendering ---
@@ -361,14 +367,21 @@ module Metanorma
           render_standard_title(section, level, default_class: is_normative ? "" : "section-sub")
           section.p&.each { |para| render_paragraph(para) }
           section.note&.each { |note| render_paragraph(note) }
-          section.references&.each_with_index { |bibitem, i| render_bibitem(bibitem, i + 1) }
+          section.references&.each_with_index { |bibitem, i| render_bibitem(bibitem, i + 1, normative: is_normative) }
           section.table&.each { |t| render_table(t) }
         end
       end
 
-      def render_bibitem(item, index)
-        attrs = element_attrs(id: safe_attr(item, :id), class: "biblio-entry")
+      def render_bibitem(item, index, normative: false)
+        css_class = normative ? "norm-ref-entry" : "biblio-entry"
+        attrs = element_attrs(id: safe_attr(item, :id), class: css_class)
+        url = bibitem_url(item)
+
         tag("p", attrs) do
+          if url
+            @output << "<a href=\"#{escape_html(url)}\" target=\"_blank\" rel=\"noopener\" class=\"biblio-link\">"
+          end
+
           # Use biblio-tag from presentation XML if available
           if item.biblio_tag
             render_mixed_inline(item.biblio_tag)
@@ -378,7 +391,22 @@ module Metanorma
           end
 
           render_bibitem_content(item)
+
+          if url
+            @output << "</a>"
+          end
         end
+      end
+
+      def bibitem_url(item)
+        links = Array(item.link)
+        return nil if links.empty?
+        # Prefer src or citation type, skip RSS feeds
+        preferred = links.find { |l| l.type == "src" || l.type == "citation" }
+        return preferred.content.to_s if preferred && !preferred.content.to_s.empty?
+        # Fallback: first non-RSS link
+        non_rss = links.find { |l| !l.content.to_s.include?(".rss") && !l.content.to_s.empty? }
+        non_rss&.content&.to_s
       end
 
       def render_bibitem_content(item)
@@ -433,6 +461,9 @@ module Metanorma
         section_id = safe_attr(section, :id)
         title_text = extract_plain_text(title_element)
         register_toc_entry(id: section_id, level: level, text: title_text)
+
+        @current_section_id = section_id
+        @current_section_number = title_text
 
         h = "h#{[[level, 6].min, 1].max}"
         title_class = default_class.empty? ? "" : " class=\"#{default_class}\""

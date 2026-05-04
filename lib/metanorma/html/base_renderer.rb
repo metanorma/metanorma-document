@@ -1,14 +1,20 @@
 # frozen_string_literal: true
 
+require "liquid"
+require "nokogiri"
+require_relative "drops/footnote_drop"
+
 module Metanorma
   module Html
+    TEMPLATES_ROOT = File.join(__dir__, "templates")
+
+    Liquid::Environment.default.file_system = Liquid::LocalFileSystem.new(TEMPLATES_ROOT, "_%s.html.liquid")
+
     # Renders BasicDocument components to HTML.
     # Subclassed by StandardRenderer and flavor-specific renderers.
     # Owns the full HTML document generation pipeline: body content, header,
     # footer, ToC sidebar, CSS (via Theme), and JavaScript.
     class BaseRenderer
-      STYLESHEET_DIR = File.expand_path("../../../data/stylesheets", __dir__)
-      JAVASCRIPT_DIR = File.expand_path("../../../data/javascripts", __dir__)
       LOGO_DIR = File.expand_path("../../../data/logos", __dir__)
 
       # Map legacy XML class names to clean, semantic names.
@@ -57,6 +63,10 @@ module Metanorma
         @toc_entries = []
         @figure_entries = []
         @table_entries = []
+        @index_term_collector = Component::IndexTermCollector.new
+        @footnote_collector = Component::FootnoteCollector.new
+        @current_section_id = nil
+        @current_section_number = nil
       end
 
       # --- Public API ---
@@ -107,54 +117,31 @@ module Metanorma
 
       # --- Document Assembly ---
 
+      TEMPLATE_CACHE = Hash.new { |h, k| h[k] = Liquid::Template.parse(File.read(k)) }
+
+      def render_liquid(template_name, assigns)
+        template_path = File.join(TEMPLATES_ROOT, template_name)
+        template = TEMPLATE_CACHE[template_path]
+        assigns = assigns.transform_keys(&:to_s) if assigns.is_a?(Hash)
+        template.render(assigns)
+      end
+
       def assemble_document(body)
         toc_html = build_toc_html(@toc_entries)
         header = build_header
         footer = build_footer
 
-        <<~HTML
-          <!DOCTYPE html>
-          <html lang="#{language}">
-          <head>
-            <meta charset="UTF-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <title>#{html_title}</title>
-            <link rel="preconnect" href="https://fonts.googleapis.com" />
-            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-            <link href="#{flavor_font_url}" rel="stylesheet" />
-            <style>
-          #{theme.to_css_root}
-          #{base_css_without_root}
-          #{theme.to_css_extras}
-            </style>
-          </head>
-          <body lang="#{language}">
-          #{header}
-          <div class="reading-progress" id="reading-progress"></div>
-          <div class="doc-layout">
-            <aside class="toc-sidebar" id="toc-sidebar">
-              <div class="toc-header">
-                <h2 class="toc-heading">Contents</h2>
-                <button class="toc-close-btn" id="toc-close-btn" aria-label="Close menu">&times;</button>
-              </div>
-              <nav class="toc-nav">
-                <ul class="toc-list">
-          #{toc_html}
-                </ul>
-              </nav>
-            </aside>
-            <div class="toc-overlay" id="toc-overlay"></div>
-            <div class="doc-content" id="doc-content">
-          #{body}
-            </div>
-          #{footer}
-          </div>
-          <button class="toc-hamburger" id="toc-hamburger" aria-label="Open table of contents">&#9776;</button>
-          <button class="back-to-top" id="back-to-top" aria-label="Back to top"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3,8 6,4 9,8"/></svg></button>
-          #{build_scripts}
-          </body>
-          </html>
-        HTML
+        render_liquid("document.html.liquid", {
+          "lang" => language,
+          "title" => html_title,
+          "font_url" => flavor_font_url,
+          "styles" => build_styles,
+          "header" => header,
+          "toc" => toc_html,
+          "body" => body,
+          "footer" => footer,
+          "scripts" => build_scripts,
+        })
       end
 
       # --- Header and Footer ---
@@ -163,51 +150,27 @@ module Metanorma
         doc_id = extract_primary_doc_id
         pub_logos = build_publisher_logos
         pub_name = flavor_publisher_name
-        # Combine publisher name with doc ID for a single display: "OGC 00-027"
         display_id = if pub_name && doc_id && !doc_id.start_with?(pub_name)
                        "#{pub_name} #{doc_id}"
                      else
                        doc_id
                      end
-        <<~HTML
-          <header class="doc-header">
-            <div class="header-brand">
-              #{pub_logos}
-            </div>
-            #{"<div class=\"header-doc-id\">#{escape_html(display_id)}</div>" if display_id}
-            #{build_reader_controls}
-          </header>
-        HTML
+
+        render_liquid("_header.html.liquid", {
+          "publisher_logos" => pub_logos,
+          "doc_id" => display_id,
+          "doc_title" => header_title_text,
+        })
       end
 
-      # Reader controls: dark mode, font size, serif/sans-serif toggles.
-      # Any flavor's build_header should include this via `#{build_reader_controls}`.
+      def header_title_text
+        raw = html_title.to_s.split(" — ").first.to_s.gsub(/<[^>]+>/, "")
+        raw.length > 60 ? raw[0, 57] + "..." : raw
+      end
+
+      # Reader controls — kept for backward compat with flavor renderers
       def build_reader_controls
-        <<~HTML
-          <div class="header-actions">
-            <button class="reader-btn search-trigger" id="search-trigger" aria-label="Search document" title="Search (/)">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="6.5" cy="6.5" r="5"/><line x1="10.2" y1="10.2" x2="14.5" y2="14.5"/></svg>
-            </button>
-            <span class="header-divider"></span>
-            <button class="reader-btn font-decrease" id="font-decrease" aria-label="Decrease font size" title="Smaller text">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 12h12"/><path d="M6 4h4"/></svg>
-            </button>
-            <button class="reader-btn font-increase" id="font-increase" aria-label="Increase font size" title="Larger text">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 12h12"/><path d="M6 4h4"/><path d="M8 1v3"/><path d="M8 12v3"/></svg>
-            </button>
-            <button class="reader-btn serif-toggle" id="serif-toggle" aria-label="Toggle serif/sans-serif" title="Toggle serif">
-              <svg viewBox="0 0 16 16" fill="currentColor"><text x="2" y="13" font-size="13" font-family="serif" font-weight="700">T</text></svg>
-            </button>
-            <button class="reader-btn theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
-              <svg class="icon-sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                <circle cx="8" cy="8" r="3"/><line x1="8" y1="1" x2="8" y2="3"/><line x1="8" y1="13" x2="8" y2="15"/><line x1="1" y1="8" x2="3" y2="8"/><line x1="13" y1="8" x2="15" y2="8"/><line x1="3.05" y1="3.05" x2="4.46" y2="4.46"/><line x1="11.54" y1="11.54" x2="12.95" y2="12.95"/><line x1="3.05" y1="12.95" x2="4.46" y2="11.54"/><line x1="11.54" y1="4.46" x2="12.95" y2="3.05"/>
-              </svg>
-              <svg class="icon-moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                <path d="M13.5 9.5A6 6 0 0 1 6.5 2.5 6 6 0 1 0 13.5 9.5z"/>
-              </svg>
-            </button>
-          </div>
-        HTML
+        ""
       end
 
       def build_publisher_logos
@@ -255,14 +218,10 @@ module Metanorma
 
       def build_footer
         mn_logo = load_logo_svg(METANORMA_LOGO, height: 20)
-        <<~HTML
-          <footer class="doc-footer">
-            <div class="footer-brand">
-              #{mn_logo ? "<span class=\"footer-mn-logo\">#{mn_logo}</span>" : ""}
-              <span class="footer-text">Generated by <strong>Metanorma</strong> &mdash; #{Time.now.strftime('%Y-%m-%d %H:%M')}</span>
-            </div>
-          </footer>
-        HTML
+        render_liquid("_footer.html.liquid", {
+          "mn_logo" => mn_logo,
+          "generated_at" => Time.now.strftime('%Y-%m-%d %H:%M'),
+        })
       end
 
       # --- ToC generation ---
@@ -308,9 +267,23 @@ module Metanorma
       # --- Scripts ---
 
       def build_scripts
-        toc_js = File.read(File.join(JAVASCRIPT_DIR, 'toc.js'))
-        search_js = File.read(File.join(JAVASCRIPT_DIR, 'search.js'))
-        "<script>\n#{toc_js}\n</script>\n<script>\n#{search_js}\n</script>"
+        pipeline = AssetPipeline.new
+        compiled = pipeline.compile_js(flavor_js: flavor_js_module)
+        "<script>\n#{compiled}\n</script>"
+      end
+
+      def flavor_js_module
+        nil
+      end
+
+      def flavor_css_module
+        nil
+      end
+
+      def build_styles
+        pipeline = AssetPipeline.new
+        css = pipeline.compile_css(flavor_css: flavor_css_module)
+        "#{theme.to_css_root}\n#{css}\n#{theme.to_css_extras}"
       end
 
       # --- Validation ---
@@ -400,14 +373,6 @@ module Metanorma
 
       # --- CSS loader ---
 
-      def base_css_without_root
-        @base_css_without_root_cache ||= begin
-          css = File.read(File.join(STYLESHEET_DIR, "base.css"))
-          # Strip the static :root block — Theme#to_css_root generates it dynamically
-          css.sub(/\/\*\s*===\s*(?:1\.\s*Custom|Base\s*CSS)[^*]*\*\/.*?\n:root\s*\{[^}]*\}/m, "")
-        end
-      end
-
       def register_toc_entry(id:, level:, text:)
         @toc_entries << { id: id, level: level, text: text }
       end
@@ -419,6 +384,8 @@ module Metanorma
       def register_table_entry(id:, text:)
         @table_entries << { id: id, text: text }
       end
+
+      attr_reader :index_term_collector, :footnote_collector
 
       def extract_plain_text(node)
         return node.to_s if node.is_a?(String)
@@ -507,6 +474,8 @@ module Metanorma
           ""
         when Metanorma::Document::Components::IdElements::Bookmark
           render_bookmark(node)
+        when Metanorma::Document::Components::Inline::SemxElement
+          render_semx_content(node)
         when String
           escape_html(node)
         else
@@ -530,10 +499,9 @@ module Metanorma
         if table_id && name_el
           register_table_entry(id: table_id, text: extract_plain_text(name_el))
         end
+        col_count = table_column_count(table)
         @output << "<div class=\"table-scroll-wrapper\">"
         tag("table", attrs) do
-          # Table name/caption — use fmt_name (presentation) or name (semantic)
-          # This contains the display text like "Table 1 — Some Title"
           name_el = safe_attr(table, :fmt_name) || safe_attr(table, :name)
           if name_el
             @output << "<caption>"
@@ -545,11 +513,37 @@ module Metanorma
           @output << "</colgroup>" if table.colgroup
           render_table_section(table.thead, "thead") if table.thead
           render_table_section(table.tbody, "tbody") if table.tbody
-          render_table_section(table.tfoot, "tfoot") if table.tfoot
-          table.note&.each { |n| render_note(n) }
-          table.dl&.then { |dl| render_definition_list(dl) }
+          if table.tfoot || (table.note && !table.note.empty?)
+            @output << "<tfoot>"
+            render_table_section_rows(table.tfoot) if table.tfoot
+            if table.note && !table.note.empty?
+              @output << "<tr><td colspan=\"#{col_count}\" class=\"table-notes\">"
+              table.note.each { |n| render_note(n) }
+              @output << "</td></tr>"
+            end
+            @output << "</tfoot>"
+          end
         end
         @output << "</div>"
+      end
+
+      def table_column_count(table)
+        if table.colgroup&.col && !table.colgroup.col.empty?
+          return table.colgroup.col.size
+        end
+        # Walk all rows to find max column count, accounting for colspan
+        max_cols = 0
+        [:thead, :tbody, :tfoot].each do |section|
+          sec = table.public_send(section)
+          next unless sec&.tr
+          sec.tr.each do |tr|
+            cols = 0
+            Array(tr.th).each { |th| cols += (th.colspan && th.colspan > 1) ? th.colspan : 1 }
+            Array(tr.td).each { |td| cols += (td.colspan && td.colspan > 1) ? td.colspan : 1 }
+            max_cols = cols if cols > max_cols
+          end
+        end
+        max_cols > 0 ? max_cols : 1
       end
 
       def render_table_colgroup(colgroup)
@@ -561,21 +555,23 @@ module Metanorma
 
       def render_table_section(section, tag_name)
         @output << "<#{tag_name}>"
+        render_table_section_rows(section)
+        @output << "</#{tag_name}>"
+      end
+
+      def render_table_section_rows(section)
         section.tr&.each do |tr|
           @output << "<tr>"
-          # Use walk_ordered to preserve document order of th/td cells
           walked = walk_ordered(tr) do |type, obj|
             next unless type == :element
             render_table_cell(obj)
           end
           unless walked
-            # Fallback: th then td (original behavior)
             Array(tr.th).each { |th| render_table_cell(th, "th") }
             Array(tr.td).each { |td| render_table_cell(td, "td") }
           end
           @output << "</tr>"
         end
-        @output << "</#{tag_name}>"
       end
 
       def render_unordered_list(ul, **_opts)
@@ -813,6 +809,16 @@ module Metanorma
         attrs = element_attrs(id: safe_attr(formula, :id), class: "formula")
         tag("div", attrs) do
           @output << render_stem_content(formula.stem) if formula.stem
+
+          # Render "where" clause from key element (non-presentation XML)
+          if formula.key
+            if formula.key.dl
+              @output << "<p class=\"formula-where\">where</p>"
+              render_definition_list(formula.key.dl)
+            end
+            formula.key.p&.each { |para| render_paragraph(para) }
+          end
+
           formula.dl&.then { |dl| render_definition_list(dl) }
 
           name_el = safe_attr(formula, :fmt_name) || safe_attr(formula, :name)
@@ -914,8 +920,6 @@ module Metanorma
           end
         end
 
-        # Build skip set: semantic elements that have a following <semx> wrapper
-        # in presentation XML, avoiding duplicate rendering (link+semx, xref+semx)
         skip_indices = build_semx_skip_set(node)
 
         indices = Hash.new(0)
@@ -954,16 +958,30 @@ module Metanorma
       end
 
       # In presentation XML, semantic elements are followed by <semx> wrappers
-      # containing formatted display content. When both are present, skip the
-      # semantic element to avoid duplicating output (e.g. link+semx → two URLs).
+      # or <fmt-*> display elements. Skip source elements to avoid duplicates.
       def build_semx_skip_set(node)
-        semantic_names = %w[link xref eref]
+        skip_after = {
+          "link" => "semx",
+          "xref" => "semx",
+          "eref" => "semx",
+          "stem" => nil,
+          "concept" => "fmt-concept",
+          "refterm" => nil,
+          "renderterm" => nil,
+          "origin" => "semx",
+        }
         skip = {}
         node.element_order.each_with_index do |el, i|
+          next unless el.element?
+          next_tag = skip_after[el.name]
+          next unless next_tag
+
           next_el = node.element_order[i + 1]
-          next unless el.element? && semantic_names.include?(el.name)
-          next unless next_el && next_el.element? && next_el.name == "semx"
-          skip[i] = true
+          if next_tag.nil?
+            skip[i] = true
+          elsif next_el && next_el.element? && next_el.name == next_tag
+            skip[i] = true
+          end
         end
         skip
       end
@@ -991,6 +1009,15 @@ module Metanorma
       end
 
       def render_mixed_inline(node)
+        # Models using map_all_content (e.g. RawParagraph): raw XML in content
+        if raw_content_node?(node)
+          raw = node.content
+          if raw.is_a?(String) && !raw.strip.empty?
+            @output << render_raw_content(raw)
+            return
+          end
+        end
+
         if node.is_a?(Lutaml::Model::Serializable) && node.element_order && !node.element_order.empty?
           render_ordered_inline(node)
         elsif node.is_a?(Lutaml::Model::Serializable)
@@ -1005,6 +1032,10 @@ module Metanorma
         else
           render_inline_collections(node)
         end
+      end
+
+      def raw_content_node?(node)
+        node.is_a?(Metanorma::IsoDocument::RawParagraph)
       end
 
       # Iterate element_order directly, preserving whitespace text nodes
@@ -1070,9 +1101,11 @@ module Metanorma
         when Metanorma::Document::Components::Inline::LinkElement
           render_link(element)
         when Metanorma::Document::Components::Inline::XrefElement
-          render_xref(element)
+          # Source element — skip; rendered via fmt-xref in semx wrapper
+          nil
         when Metanorma::Document::Components::Inline::ErefElement
-          render_eref(element)
+          # Source element — skip; rendered via fmt-xref in semx wrapper
+          nil
         when Metanorma::Document::Components::Inline::SpanElement
           attrs = element_attrs(style: safe_attr(element, :style), class: safe_attr(element, :class_attr))
           tag("span", attrs) { render_mixed_inline(element) }
@@ -1081,7 +1114,8 @@ module Metanorma
         when Metanorma::Document::Components::Inline::ConceptElement
           render_concept(element)
         when Metanorma::Document::Components::Inline::StemInlineElement
-          @output << render_stem_content(element)
+          # Source element — skip; rendered via FmtStemElement
+          nil
         when Metanorma::Document::Components::TextElements::StemElement
           @output << render_stem_content(element)
         when Metanorma::Document::Components::Inline::SemxElement
@@ -1117,9 +1151,8 @@ module Metanorma
           else
             render_mixed_inline(element)
           end
-          render_mixed_inline(element)
         when Metanorma::Document::Components::Inline::FmtStemElement
-          @output << render_stem_content(element)
+          render_fmt_stem(element)
         when Metanorma::Document::Components::Inline::CommaElement,
              Metanorma::Document::Components::Inline::EnumCommaElement
           @output << ", "
@@ -1131,6 +1164,10 @@ module Metanorma
           @output << element.content.to_s
         when Metanorma::Document::Components::Inline::AsciimathElement
           @output << %(<span class="stem">#{escape_html(Array(element.text).join)}</span>)
+        when Metanorma::Document::Components::EmptyElements::IndexElement,
+             Metanorma::Document::Components::ReferenceElements::IndexXrefElement
+          collect_index_term(element)
+          ""
         when Metanorma::Document::Components::Blocks::NoteBlock
           render_note(element)
         else
@@ -1175,16 +1212,26 @@ module Metanorma
       # semx wraps both semantic data (origin, xref, source, etc.) and
       # display content (fmt-xref, span, strong, etc.). Only render display.
       def render_semx_content(element)
-        display_attrs = %i[text fmt_xref fmt_link span strong em sup p semx
+        display_attrs = %i[text fmt_xref fmt_link fmt_concept span strong em sup p semx
                            asciimath math sub_child tt_child br_child tab_child
                            stem_child figure_child formula_child sourcecode_child]
+        label_stripped = false
 
         walked = walk_ordered(element, allow_filter: display_attrs) do |type, obj|
           case type
           when :text
-            @output << escape_html(obj)
+            text = obj
+            if !label_stripped
+              text = deduplicate_semx_text(text, @output)
+              label_stripped = true
+            end
+            @output << escape_html(text)
           when :element
-            render_inline_element(obj)
+            if obj.is_a?(Metanorma::Document::Components::Paragraphs::ParagraphBlock)
+              render_paragraph(obj)
+            else
+              render_inline_element(obj)
+            end
           end
         end
 
@@ -1193,7 +1240,13 @@ module Metanorma
             val = safe_attr(element, attr)
             next if val.nil?
             if val.is_a?(Array)
-              val.each { |v| render_inline_element(v) }
+              val.each do |v|
+                if v.is_a?(Metanorma::Document::Components::Paragraphs::ParagraphBlock)
+                  render_paragraph(v)
+                else
+                  render_inline_element(v)
+                end
+              end
             elsif val.is_a?(String)
               @output << escape_html(val)
             else
@@ -1203,8 +1256,74 @@ module Metanorma
         end
       end
 
+      def deduplicate_semx_text(semx_text, output)
+        first_word = semx_text[/\A\s*(\S+)/, 1]
+        return semx_text unless first_word
+
+        tail = output[-200..]
+        return semx_text unless tail && tail.rstrip.end_with?(first_word)
+
+        semx_text.sub(/\A\s*#{Regexp.escape(first_word)}\s*/, "")
+      end
+
       def render_inline_tag(tag_name, element, **extra_attrs)
         tag(tag_name, element_attrs(**extra_attrs)) { render_mixed_inline(element) }
+      end
+
+      # Process raw XML content from map_all_content models (e.g. RawParagraph).
+      # Strips source elements (xref, eref, stem) that have a following <semx>
+      # wrapper, keeping only the semx display content.
+      def render_raw_content(raw_xml)
+        doc = Nokogiri::XML.fragment(raw_xml)
+        # Convert fmt-link elements to HTML <a> tags before stripping wrappers
+        doc.css("fmt-link").each do |el|
+          target = el["target"] || el["href"]
+          if target
+            display_text = target.sub(/\Amailto:/, "")
+            a = doc.document.create_element("a", display_text, "href" => target)
+            el.replace(a)
+          else
+            el.replace(el.children)
+          end
+        end
+        # Remove source elements that precede a <semx> sibling,
+        # deduplicating any label text that appears in both the source
+        # paragraph and the semx display content.
+        doc.traverse do |node|
+          next unless node.element?
+          next unless %w[xref eref stem link].include?(node.name)
+          next_sib = node.next_sibling
+          while next_sib.is_a?(Nokogiri::XML::Text) && next_sib.text.strip.empty?
+            next_sib = next_sib.next_sibling
+          end
+          next unless next_sib && next_sib.element? && next_sib.name == "semx"
+
+          deduplicate_semx_label(node, next_sib)
+          node.remove
+        end
+        # Strip presentation wrappers, keeping inner content
+        %w[semx fmt-xref].each do |tag|
+          doc.css(tag).each { |el| el.replace(el.children) }
+        end
+        doc.inner_html
+      end
+
+      def deduplicate_semx_label(source_node, semx_node)
+        first_text = semx_node.children.find { |c| c.text? && !c.text.strip.empty? }
+        return unless first_text
+
+        semx_prefix = first_text.text[/\A(\s*\S+)/, 1]
+        return unless semx_prefix && !semx_prefix.strip.empty?
+
+        prev = source_node.previous_sibling
+        return unless prev.is_a?(Nokogiri::XML::Text)
+
+        label = semx_prefix.strip
+        prev_text = prev.text.rstrip
+        return unless prev_text.end_with?(label)
+
+        prev.content = prev_text.sub(/#{Regexp.escape(label)}\s*\z/, "")
+        first_text.content = first_text.text.sub(/\A\s*#{Regexp.escape(label)}\s*/, "")
       end
 
       def render_link(link)
@@ -1215,7 +1334,8 @@ module Metanorma
           if content && !Array(content).join.strip.empty?
             render_mixed_inline(link)
           else
-            @output << escape_html(target.to_s)
+            display_text = target.to_s.sub(/\Amailto:/, "")
+            @output << escape_html(display_text)
           end
         end
       end
@@ -1236,10 +1356,17 @@ module Metanorma
       end
 
       def render_fn(fn)
-        attrs = element_attrs(id: safe_attr(fn, :id), class: "fn-marker")
+        fn_id = safe_attr(fn, :id)
+        number = @footnote_collector.register(fn)
+
+        attrs = element_attrs(id: fn_id, class: "fn-marker")
         tag("span", attrs) do
           label = safe_attr(fn, :fn_label) || safe_attr(fn, :reference)
-          @output << "<sup>#{escape_html(label.to_s)}</sup>" if label
+          if label
+            @output << "<sup><a href=\"##{escape_html("footnote-#{number}")}\" " \
+                       "class=\"fn-link\" id=\"#{escape_html("fnref-#{number}")}\">" \
+                       "#{escape_html(label.to_s)}</a></sup>"
+          end
         end
       end
 
@@ -1249,26 +1376,75 @@ module Metanorma
 
       # --- Stem/math rendering ---
 
+      def render_fmt_stem(fmt_stem)
+        semx_items = Array(fmt_stem.semx)
+        return if semx_items.empty?
+
+        semx = semx_items.first
+        math_items = Array(semx.math)
+        ascii_items = Array(semx.asciimath)
+
+        # Collect source formats for interactive copy dropdown
+        source_formats = {}
+        if ascii_items.any?
+          ascii_text = ascii_items.map { |a| a.text.to_s.strip }.join
+          source_formats["asciimath"] = ascii_text unless ascii_text.empty?
+        end
+
+        data_attrs = ""
+        unless source_formats.empty?
+          data_attrs = " data-stem-formats='#{escape_html(source_formats.to_json)}'"
+        end
+
+        if math_items.any?
+          content = math_items.map { |m| m.content.to_s }.join
+          unless content.empty?
+            @output << "<span class=\"math-container\"#{data_attrs}>"
+            @output << "<math xmlns=\"http://www.w3.org/1998/Math/MathML\">#{content}</math>"
+            @output << "</span>"
+          end
+        elsif ascii_items.any?
+          # No MathML — render asciimath as fallback
+          text = ascii_items.map { |a| a.text.to_s.strip }.join
+          @output << "<span class=\"stem\"#{data_attrs}>#{escape_html(text)}</span>"
+        end
+      end
+
       def render_stem_content(stem)
         return "" if stem.nil?
 
-        if stem.is_a?(Metanorma::Document::Components::TextElements::StemElement) && stem.math
-          math_items = Array(stem.math)
-          if math_items.first.is_a?(Metanorma::Document::Components::Inline::MathElement)
-            math_items.map { |m| m.content.to_s }.join
-          else
-            escape_html(math_items.map(&:to_s).join)
-          end
-        elsif stem.is_a?(Metanorma::Document::Components::TextElements::StemElement) && stem.asciimath
-          text = extract_text_value(stem.asciimath)
-          %(<span class="stem">#{escape_html(text)}</span>)
-        elsif stem.is_a?(Metanorma::Document::Components::TextElements::StemElement) && stem.latexmath
-          text = extract_text_value(stem.latexmath)
-          %(<span class="stem">#{escape_html(text)}</span>)
-        else
-          text = extract_text_value(stem)
-          text.empty? ? "" : %(<span class="stem">#{escape_html(text)}</span>)
+        # StemInlineElement — source element, skip (rendered via FmtStemElement)
+        if stem.is_a?(Metanorma::Document::Components::Inline::StemInlineElement)
+          return ""
         end
+
+        # FmtStemElement — already handled by render_fmt_stem
+        if stem.is_a?(Metanorma::Document::Components::Inline::FmtStemElement)
+          return ""
+        end
+
+        # TextElements::StemElement — block math (no fmt- counterpart for display formulas)
+        if stem.is_a?(Metanorma::Document::Components::TextElements::StemElement)
+          if stem.math
+            begin
+              return stem.math.to_xml
+            rescue StandardError
+              math_items = Array(stem.math)
+              return math_items.map { |m| m.respond_to?(:content) ? m.content.to_s : m.to_s }.join
+            end
+          end
+          if stem.asciimath
+            text = extract_text_value(stem.asciimath)
+            return %(<span class="stem">#{escape_html(text)}</span>)
+          end
+          if stem.latexmath
+            text = extract_text_value(stem.latexmath)
+            return %(<span class="stem">#{escape_html(text)}</span>)
+          end
+        end
+
+        text = extract_text_value(stem)
+        text.empty? ? "" : %(<span class="stem">#{escape_html(text)}</span>)
       end
 
       # --- Helper methods ---
@@ -1318,8 +1494,21 @@ module Metanorma
         nil
       end
 
-      # Extract the display label for a block (note, example, etc.)
-      # Priority: <name> element text > autonum attribute > default fallback
+      def collect_index_term(element)
+        primary = safe_attr(element, :primary)
+        return unless primary && !primary.to_s.strip.empty?
+
+        @index_term_collector.add(
+          primary: primary.to_s.strip,
+          secondary: safe_attr(element, :secondary)&.to_s&.strip,
+          tertiary: safe_attr(element, :tertiary)&.to_s&.strip,
+          target_id: @current_section_id,
+          target_text: @current_section_number
+        )
+      rescue StandardError
+        nil
+      end
+
       def extract_block_label(block, default)
         # Presentation XML puts label in <name> child element
         names = safe_attr(block, :name)
@@ -1390,6 +1579,31 @@ module Metanorma
         else
           val.to_s
         end
+      end
+
+      def render_footnotes_section
+        return if @footnote_collector.empty?
+
+        drops = @footnote_collector.to_a.map do |entry|
+          content_html = ""
+          if entry.content && !entry.content.empty?
+            content_html = capture_output do
+              Array(entry.content).each { |p| render_paragraph(p) }
+            end
+          end
+          Drops::FootnoteDrop.new(entry, content_html)
+        end
+
+        @output << render_liquid("_footnotes.html.liquid", { "footnotes" => drops })
+      end
+
+      def capture_output
+        old_output = @output
+        @output = +""
+        yield
+        result = @output
+        @output = old_output
+        result
       end
     end
   end

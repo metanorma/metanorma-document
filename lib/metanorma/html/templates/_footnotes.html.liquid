@@ -1,0 +1,11 @@
+<section class="footnotes-section" aria-label="Footnotes">
+<h2 class="footnotes-title">Footnotes</h2>
+<ol class="footnotes">
+{% for entry in footnotes %}
+<li id="footnote-{{ entry.number }}" class="footnote">
+<a href="#fnref-{{ entry.number }}" class="footnote-backref">
+<sup>{{ entry.reference | escape }}</sup></a> {{ entry.content_html }}
+</li>
+{% endfor %}
+</ol>
+</section>

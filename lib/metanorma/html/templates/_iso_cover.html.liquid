@@ -1,0 +1,31 @@
+<div class="title-section">
+<div class="cover-grid">
+<div class="cover-meta">
+{% if publisher_logos %}
+  <div class="cover-publishers">
+  {% for logo in publisher_logos %}
+    <span class="cover-logo">{{ logo }}</span>
+  {% endfor %}
+  </div>
+{% endif %}
+{% if doc_id %}
+  <p class="cover-doc-id">{{ doc_id | escape }}</p>
+{% endif %}
+{% if pub_date %}
+  <p class="cover-date">{{ pub_date | escape }}</p>
+{% endif %}
+</div>
+<div class="cover-body">
+{% if doctype %}
+  <p class="cover-doctype">{{ doctype | escape }}</p>
+{% endif %}
+{% if title %}
+  <div class="cover-title"><span>{{ title | escape }}</span></div>
+{% endif %}
+{% if stage %}
+  <div class="cover-stage"><p>{{ stage | escape }}</p></div>
+{% endif %}
+</div>
+</div>
+</div>
+<hr class="cover-separator" />

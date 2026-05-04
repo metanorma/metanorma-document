@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ title | escape }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="{{ font_url }}" rel="stylesheet" />
+  <style>
+{{ styles }}
+  </style>
+</head>
+<body lang="{{ lang }}">
+<a href="#doc-content" class="skip-nav">Skip to content</a>
+{{ header }}
+<div class="reading-progress" id="reading-progress"></div>
+<div class="doc-layout">
+  <aside class="toc-sidebar" id="toc-sidebar" role="navigation" aria-label="Table of contents">
+    <div class="toc-header">
+      <h2 class="toc-heading">Contents</h2>
+      <button class="toc-close-btn" id="toc-close-btn" aria-label="Close menu">&times;</button>
+    </div>
+    <nav class="toc-nav">
+      <ul class="toc-list">
+{{ toc }}
+      </ul>
+    </nav>
+  </aside>
+  <div class="toc-overlay" id="toc-overlay"></div>
+  <main class="doc-content" id="doc-content" role="main">
+{{ body }}
+  </main>
+{{ footer }}
+</div>
+<button class="toc-hamburger" id="toc-hamburger" aria-label="Open table of contents">&#9776;</button>
+<button class="back-to-top" id="back-to-top" aria-label="Back to top"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3,8 6,4 9,8"/></svg></button>
+{{ scripts }}
+</body>
+</html>
