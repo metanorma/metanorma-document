@@ -15,3 +15,5 @@ TODO*
 /data/dist/
 **/output/
 output.html
+output-*.html
+/private-do-not-commit/
