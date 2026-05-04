@@ -1,0 +1,65 @@
+<header class="doc-header">
+  <div class="header-brand">
+    {{ publisher_logos }}
+  </div>
+  {% if doc_id %}
+  <div class="header-doc-id">{{ doc_id | escape }}</div>
+  {% endif %}
+  <span class="header-doc-title" id="header-doc-title">{{ doc_title | escape }}</span>
+  <div class="header-actions">
+    <button class="reader-btn search-trigger" id="search-trigger" aria-label="Search document" title="Search (/)">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="6.5" cy="6.5" r="5"/><line x1="10.2" y1="10.2" x2="14.5" y2="14.5"/></svg>
+    </button>
+    <div class="header-settings">
+      <button class="reader-btn settings-toggle" id="settings-toggle" aria-label="Reader settings" title="Settings">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="1.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41"/></svg>
+      </button>
+      <div class="settings-dropdown" id="settings-dropdown">
+        <button class="reader-btn font-decrease" id="font-decrease" aria-label="Decrease font size" title="Smaller text">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 12h12"/><path d="M6 4h4"/></svg>
+          <span class="settings-label">Smaller</span>
+        </button>
+        <button class="reader-btn font-increase" id="font-increase" aria-label="Increase font size" title="Larger text">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 12h12"/><path d="M6 4h4"/><path d="M8 1v3"/><path d="M8 12v3"/></svg>
+          <span class="settings-label">Larger</span>
+        </button>
+        <button class="reader-btn serif-toggle" id="serif-toggle" aria-label="Toggle serif" title="Toggle serif">
+          <svg viewBox="0 0 16 16" fill="currentColor"><text x="2" y="13" font-size="13" font-family="serif" font-weight="700">T</text></svg>
+          <span class="settings-label">Serif</span>
+        </button>
+        <button class="reader-btn theme-toggle" id="theme-toggle" aria-label="Cycle theme" title="Theme">
+          <svg class="icon-light" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <circle cx="8" cy="8" r="3"/><line x1="8" y1="1" x2="8" y2="3"/><line x1="8" y1="13" x2="8" y2="15"/><line x1="1" y1="8" x2="3" y2="8"/><line x1="13" y1="8" x2="15" y2="8"/><line x1="3.05" y1="3.05" x2="4.46" y2="4.46"/><line x1="11.54" y1="11.54" x2="12.95" y2="12.95"/><line x1="3.05" y1="12.95" x2="4.46" y2="11.54"/><line x1="11.54" y1="4.46" x2="12.95" y2="3.05"/>
+          </svg>
+          <svg class="icon-sepia" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <circle cx="8" cy="8" r="3"/><line x1="8" y1="1" x2="8" y2="3"/><line x1="8" y1="13" x2="8" y2="15"/><line x1="1" y1="8" x2="3" y2="8"/><line x1="13" y1="8" x2="15" y2="8"/>
+          </svg>
+          <svg class="icon-dark" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M13.5 9.5A6 6 0 0 1 6.5 2.5 6 6 0 1 0 13.5 9.5z"/>
+          </svg>
+          <svg class="icon-oled" viewBox="0 0 16 16" fill="currentColor">
+            <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="8" cy="8" r="2"/>
+          </svg>
+          <span class="settings-label">Theme</span>
+        </button>
+        <button class="reader-btn reading-mode-btn" id="reading-mode-btn" aria-label="Reading mode" title="Reading mode (r)">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="1" width="12" height="14" rx="1.5"/><line x1="5" y1="5" x2="11" y2="5"/><line x1="5" y1="8" x2="9" y2="8"/></svg>
+          <span class="settings-label">Reading</span>
+        </button>
+        <button class="reader-btn glossary-btn" id="glossary-btn" aria-label="Glossary" title="Glossary (g)">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="1" width="8" height="14" rx="1"/><path d="M10 3h3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-3"/><line x1="4" y1="5" x2="8" y2="5"/><line x1="4" y1="8" x2="8" y2="8"/></svg>
+          <span class="settings-label">Glossary</span>
+        </button>
+        <div class="settings-divider"></div>
+        <button class="reader-btn shortcuts-btn" id="shortcuts-btn" aria-label="Keyboard shortcuts" title="Shortcuts (?)">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="5" width="14" height="8" rx="2"/><line x1="4" y1="8" x2="4" y2="8"/><line x1="7" y1="8" x2="7" y2="8"/><line x1="10" y1="8" x2="10" y2="8"/><line x1="13" y1="8" x2="13" y2="8"/></svg>
+          <span class="settings-label">Shortcuts</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="reading-mode-banner" id="reading-mode-banner" style="display:none">
+  Reader mode — press <kbd>R</kbd> or click <button class="exit-reading-btn" id="exit-reading-btn">Exit</button>
+</div>

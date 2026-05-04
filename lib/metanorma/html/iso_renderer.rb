@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "stringio"
+
 module Metanorma
   module Html
     # Renders IsoDocument components to HTML.
@@ -213,8 +215,12 @@ module Metanorma
 
         all_items.each do |node|
           next if node.is_a?(String)
+          next if is_title_element?(node, doc.sections)
+          next if is_doc_title_paragraph?(node)
           render(node)
         end
+
+        render_footnotes_section
 
         @output << "</main>"
       end
@@ -225,57 +231,36 @@ module Metanorma
         bibdata = doc.bibdata
         return unless bibdata
 
-        @output << "<div class=\"title-section\">"
-        @output << "<div class=\"cover-grid\">"
-        @output << "<div class=\"cover-meta\">"
-
-        # Publisher logos
-        logos = publisher_logos_html(doc)
-        if logos && !logos.empty?
-          @output << "<div class=\"cover-publishers\">"
-          logos.each { |svg| @output << "<span class=\"cover-logo\">#{svg}</span>" }
-          @output << "</div>"
-        end
-
-        # Document identifiers — format with publisher prefix
+        logos = publisher_logos_html(doc) || []
         doc_id = formatted_doc_id(bibdata)
-        @output << "<p class=\"cover-doc-id\">#{escape_html(doc_id)}</p>" if doc_id
 
-        # Published date
+        pub_date = nil
         bibdata.date&.each do |date|
           date_type = extract_text_value(safe_attr(date, :type_attr) || safe_attr(date, :type))
           date_val = extract_text_value(date.is_a?(Metanorma::Document::Relaton::BibliographicDate) ? date.on : safe_attr(date, :text))
           if date_type == "published" && date_val
-            @output << "<p class=\"cover-date\">#{escape_html(date_val)}</p>"
+            pub_date = date_val
           end
         end
 
-        @output << "</div>"
-        @output << "<div class=\"cover-body\">"
-
-        # Doctype badge
         doctype = extract_doctype(bibdata)
-        if doctype
-          @output << "<p class=\"cover-doctype\">#{escape_html(doctype)}</p>"
-        end
 
-        # Title
+        title_text = nil
         if bibdata.titles
           en_title = bibdata.title_for("en")
-          if en_title
-            @output << "<div class=\"cover-title\"><span>#{escape_html(en_title)}</span></div>"
-          end
+          title_text = en_title.to_s if en_title
         end
 
-        # Status/stage — prefer English, deduplicate
         stage_text = extract_stage(bibdata)
-        if stage_text
-          @output << "<div class=\"cover-stage\"><p>#{escape_html(stage_text)}</p></div>"
-        end
 
-        @output << "</div>"
-        @output << "</div>"
-        @output << "</div><hr class=\"cover-separator\" />"
+        @output << render_liquid("_iso_cover.html.liquid", {
+          "publisher_logos" => logos,
+          "doc_id" => doc_id,
+          "pub_date" => pub_date,
+          "doctype" => doctype,
+          "title" => title_text,
+          "stage" => stage_text,
+        })
       end
 
       def render_doc_title(doc)
@@ -288,9 +273,9 @@ module Metanorma
         en_title = bibdata.title_for("en")
         return unless en_title
 
-        @output << "<p class=\"zzSTDTitle1\">"
-        @output << "<span class=\"boldtitle\">#{escape_html(en_title)}</span>"
-        @output << "</p>"
+        @output << render_liquid("_iso_doc_title.html.liquid", {
+          "title" => en_title.to_s,
+        })
       end
 
       def render_boilerplate_section(doc)
@@ -403,7 +388,12 @@ module Metanorma
       # --- ISO Term rendering ---
 
       def render_term(term, **_opts)
-        attrs = element_attrs(id: safe_attr(term, :id))
+        term_name = extract_term_name(term)
+        term_def = extract_term_definition(term)
+        data_attrs = {}
+        data_attrs["data-term-name"] = term_name if term_name && !term_name.empty?
+        data_attrs["data-term-definition"] = term_def if term_def && !term_def.empty?
+        attrs = element_attrs(id: safe_attr(term, :id), **data_attrs)
         tag("div", attrs) do
           # In presentation mode, use fmt_* elements
           if term.fmt_name
@@ -442,8 +432,9 @@ module Metanorma
             term.deprecates&.each { |designation| render_term_designation(designation, "deprecated") }
           end
 
-          # Domain
-          if term.domain
+          # Domain — only render separately when fmt-definition is absent
+          # (fmt-definition already includes domain text in its content)
+          if term.domain && !term.fmt_definition
             domain_text = safe_attr(term.domain, :text)
             @output << "<p class=\"domain\">&lt;#{escape_html(domain_text)}&gt;</p>" if domain_text
           end
@@ -482,6 +473,36 @@ module Metanorma
           # Nested terms
           term.term&.each { |sub| render_term(sub) }
         end
+      end
+
+      def extract_term_name(term)
+        if term.fmt_preferred && !term.fmt_preferred.empty?
+          fp = term.fmt_preferred.first
+          if fp.p && !fp.p.empty?
+            return extract_plain_text(fp.p.first)
+          end
+        end
+        if term.preferred && !term.preferred.empty?
+          return extract_designation_name(term.preferred.first).to_s
+        end
+        safe_attr(term, :id).to_s.sub(/\Aterm-/, "")
+      end
+
+      def extract_term_definition(term)
+        if term.fmt_definition
+          rendered = capture_output { render_ordered_content(term.fmt_definition) }
+          return strip_html(rendered).gsub(/\s+/, " ").strip
+        end
+        if term.p && !term.p.empty?
+          rendered = capture_output { term.p.each { |para| render_paragraph(para) } }
+          return strip_html(rendered).gsub(/\s+/, " ").strip
+        end
+        nil
+      end
+
+      def strip_html(html)
+        html.gsub(/<[^>]+>/, "").gsub("&lt;", "<").gsub("&gt;", ">")
+            .gsub("&amp;", "&").gsub("&nbsp;", " ")
       end
 
       def render_term_designation(designation, type)
@@ -598,20 +619,45 @@ module Metanorma
         @output << "<div class=\"boilerplate-copyright\">"
 
         raw = content.to_s
-        # Strip presentation-only XML elements
-        clean = raw
+        clean = convert_boilerplate_links(raw)
           .gsub(/<fmt-title[^>]*>.*?<\/fmt-title>/m, "")
           .gsub(/<semx[^>]*>.*?<\/semx>/m, "")
           .gsub(/<title[^>]*>.*?<\/title>/m, "")
           .gsub(/<fmt-xref-label[^>]*>.*?<\/fmt-xref-label>/m, "")
           .gsub(/<variant-title[^>]*>.*?<\/variant-title>/m, "")
-          .gsub(/<link[^>]*\/>/, "")
-          .gsub(/<fmt-link[^>]*\/>/, "")
           .gsub(/<\/?(?:copyright-statement|clause)[^>]*>/, "")
 
         @output << clean.strip
 
         @output << "</div>"
+      end
+
+      def convert_boilerplate_links(raw)
+        doc = Nokogiri::XML.fragment(raw)
+        doc.css("link").each do |link|
+          target = link["target"] || link["href"]
+          next_sib = link.next_sibling
+          while next_sib.is_a?(Nokogiri::XML::Text) && next_sib.text.strip.empty?
+            next_sib = next_sib.next_sibling
+          end
+
+          display_text = if next_sib && next_sib.element? && next_sib.name == "semx"
+            fmt_link = next_sib.at_css("fmt-link")
+            if fmt_link
+              fmt_target = fmt_link["target"] || fmt_link["href"] || target
+              display_text = fmt_target.to_s.sub(/\Amailto:/, "")
+              next_sib.remove
+              display_text
+            end
+          end
+
+          display_text ||= target.to_s.sub(/\Amailto:/, "")
+          a_tag = Nokogiri::HTML::DocumentFragment.parse(
+            "<a href=\"#{CGI.escapeHTML(target.to_s)}\">#{CGI.escapeHTML(display_text)}</a>"
+          )
+          link.replace(a_tag)
+        end
+        doc.inner_html
       end
 
       # --- Helpers ---
@@ -665,6 +711,12 @@ module Metanorma
       end
 
       private
+
+      # Filter document title paragraphs that are rendered by render_doc_title
+      def is_doc_title_paragraph?(node)
+        return false unless node.respond_to?(:class_attr)
+        ["zzSTDTitle1", "zzSTDTitle2"].include?(node.class_attr)
+      end
 
       # Collect all document-level children (sections, normative refs, annexes,
       # bibliography) sorted by displayorder for correct document order.

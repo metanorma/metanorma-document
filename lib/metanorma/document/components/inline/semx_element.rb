@@ -8,6 +8,8 @@ module Metanorma
           attribute :text, :string, collection: true
           attribute :fmt_xref, "Metanorma::Document::Components::Inline::FmtXrefElement",
                     collection: true
+          attribute :fmt_concept, "Metanorma::Document::Components::Inline::FmtConceptElement",
+                    collection: true
           attribute :asciimath, AsciimathElement, collection: true
           attribute :math, MathElement, collection: true
           attribute :p, "Metanorma::Document::Components::Paragraphs::ParagraphBlock",
@@ -66,6 +68,7 @@ module Metanorma
             map_attribute "source", to: :source
             map_content to: :text
             map_element "fmt-xref", to: :fmt_xref
+            map_element "fmt-concept", to: :fmt_concept
             map_element "asciimath", to: :asciimath
             map_element "math", to: :math
             map_element "p", to: :p

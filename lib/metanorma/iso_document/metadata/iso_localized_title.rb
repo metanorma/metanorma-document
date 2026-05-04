@@ -38,7 +38,16 @@ module Metanorma
           parts << title_intro&.value if title_intro
           parts << title_main&.value if title_main
           parts << title_full&.value if title_full && !title_main
-          parts << title_part&.value if title_part
+          if title_part
+            prefix = title_part_prefix&.value.to_s.strip
+            part_val = title_part.value
+            if !prefix.empty?
+              sep = prefix.end_with?(":") ? " " : ": "
+              parts << "#{prefix}#{sep}#{part_val}"
+            else
+              parts << part_val
+            end
+          end
           return parts.join(" — ") unless parts.empty?
           ""
         end

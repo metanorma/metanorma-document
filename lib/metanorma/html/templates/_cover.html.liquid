@@ -1,0 +1,11 @@
+<div class="title-section">
+{% if doc_id %}
+  <p class="cover-doc-id">{{ doc_id | escape }}</p>
+{% endif %}
+{% if title %}
+  <div class="cover-title"><div>
+    <span class="subtitle">{{ title | escape }}</span>
+  </div></div>
+{% endif %}
+</div>
+<hr class="cover-separator" />
