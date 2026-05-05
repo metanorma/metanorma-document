@@ -1,0 +1,6 @@
+<figure{% if block.id %} id="{{ block.id }}"{% endif %} class="{{ block.css_class }}">
+{{ block.image_html }}
+{{ block.sub_figures_html }}
+{% if block.caption_html %}<figcaption>{{ block.caption_html }}</figcaption>{% endif %}
+{{ block.key_html }}
+</figure>

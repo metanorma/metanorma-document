@@ -1,0 +1,4 @@
+<div{% if block.id %} id="{{ block.id }}"{% endif %} class="{{ block.css_class }}">
+{% if block.name_html %}<p class="code-name">{{ block.name_html }}</p>{% endif %}
+<pre><code{% if block.lang %} lang="{{ block.lang }}"{% endif %}>{{ block.code_html }}</code></pre>
+</div>

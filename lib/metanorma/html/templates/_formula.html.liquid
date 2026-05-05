@@ -1,0 +1,6 @@
+<div{% if block.id %} id="{{ block.id }}"{% endif %} class="{{ block.css_class }}">
+{{ block.stem_html }}
+{% if block.where_html %}<p class="formula-where">where</p>{% endif %}
+{{ block.where_html }}
+{% if block.number_html %}<span class="formula-number">{{ block.number_html }}</span>{% endif %}
+</div>
