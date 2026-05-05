@@ -17,43 +17,33 @@ module Metanorma
     class BaseRenderer
       LOGO_DIR = File.expand_path("../../../data/logos", __dir__)
 
-      # Map legacy XML class names to clean, semantic names.
-      CLASS_MAP = {
-        "zzSTDTitle1" => "doc-title",
-        "coverpage_docnumber" => "cover-doc-id",
-        "coverpage_docstage" => "cover-stage",
-        "doctitle-en" => "cover-title",
-        "ForewordTitle" => "foreword-title",
-        "IntroTitle" => "intro-title",
-        "Annex" => "annex-title",
-        "Section3" => "section-sub",
-        "TermNum" => "term-number",
-        "Terms" => "term-name",
-        "DeprecatedTerms" => "term-deprecated",
-        "domain" => "term-domain",
-        "boldtitle" => "bold-title",
-        "note_label" => "note-label",
-        "termnote_label" => "term-note-label",
-        "example_label" => "example-label",
-        "stddocNumber" => "std-doc-number",
-        "stdyear" => "std-year",
-        "sourcecode-name" => "code-name",
+      # HTML-specific class names for inline spans, keyed by the XML span role.
+      # The XML class_attr is INPUT only — we never emit it in HTML.
+      SPAN_ROLE_CLASSES = {
+        "boldtitle" => "title-text",
+        "nonboldtitle" => "subtitle-text",
+        "citeapp" => "xref-app",
+        "citefig" => "xref-fig",
+        "citesec" => "xref-section",
+        "citetbl" => "xref-table",
+        "fmt-autonum-delim" => "number-delim",
         "fmt-caption-label" => "caption-label",
-        "fmt-autonum-delim" => "autonum-delim",
-        "fmt-element-name" => "element-name",
         "fmt-caption-delim" => "caption-delim",
-        "smallcap" => "small-caps",
-        "obligation" => "obligation-text",
-        "tableblock" => "table-block",
-        "Biblio" => "biblio-entry",
-        "Note" => "note-block",
-        "source" => "term-source",
-        "nonboldtitle" => "doc-subtitle",
-        "stddocPartNumber" => "doc-part-number",
-        "stddocTitle" => "doc-part-title",
-        "std_publisher" => "doc-publisher",
-        "stdpublisher" => "doc-publisher-name",
+        "fmt-element-name" => "element-label",
+        "fmt-comma" => "comma",
+        "fmt-conn" => "connector",
+        "fmt-label-delim" => "label-delim",
+        "fmt-obligation" => "obligation-text",
+        "fmt-xref-container" => "xref-container",
         "fmt-xref-label" => "xref-label",
+        "std_publisher" => "ref-publisher",
+        "stdpublisher" => "ref-publisher-name",
+        "stddocNumber" => "ref-doc-number",
+        "stddocTitle" => "ref-title",
+        "stddocPartNumber" => "ref-part-number",
+        "stdyear" => "ref-year",
+        "date" => "date",
+        "smallcap" => "small-caps",
       }.freeze
 
       METANORMA_LOGO = "metanorma-logo.svg"
@@ -70,6 +60,40 @@ module Metanorma
       end
 
       # --- Public API ---
+
+      # Facade object for Drops to call renderer methods without exposing
+      # the full private interface. Delegates to the renderer internally.
+      class RendererContext
+        def initialize(renderer)
+          @renderer = renderer
+        end
+
+        def safe_attr(obj, method_name) = @renderer.send(:safe_attr, obj, method_name)
+        def escape_html(text) = @renderer.send(:escape_html, text)
+        def extract_block_label(block, default) = @renderer.send(:extract_block_label, block, default)
+        def extract_plain_text(node) = @renderer.send(:extract_plain_text, node)
+        def capture_output(&) = @renderer.send(:capture_output, &)
+        def render_paragraph(p) = @renderer.send(:render_paragraph, p)
+        def render_mixed_inline(node) = @renderer.send(:render_mixed_inline, node)
+        def render_inline_element(el) = @renderer.send(:render_inline_element, el)
+        def render_unordered_list(ul) = @renderer.send(:render_unordered_list, ul)
+        def render_ordered_list(ol) = @renderer.send(:render_ordered_list, ol)
+        def render_definition_list(dl) = @renderer.send(:render_definition_list, dl)
+        def render_sourcecode(sc) = @renderer.send(:render_sourcecode, sc)
+        def render_table(t) = @renderer.send(:render_table, t)
+        def render_figure(f) = @renderer.send(:render_figure, f)
+        def render_quote(q) = @renderer.send(:render_quote, q)
+        def render_formula(f) = @renderer.send(:render_formula, f)
+        def render_note(n) = @renderer.send(:render_note, n)
+        def render_image(img) = @renderer.send(:render_image, img)
+        def render_stem_content(stem) = @renderer.send(:render_stem_content, stem)
+        def register_figure_entry(...) = @renderer.send(:register_figure_entry, ...)
+        def render_liquid(template_name, assigns) = @renderer.send(:render_liquid, template_name, assigns)
+      end
+
+      def renderer_context
+        @renderer_context ||= RendererContext.new(self)
+      end
 
       def to_html
         @output
@@ -132,16 +156,16 @@ module Metanorma
         footer = build_footer
 
         render_liquid("document.html.liquid", {
-          "lang" => language,
-          "title" => html_title,
-          "font_url" => flavor_font_url,
-          "styles" => build_styles,
-          "header" => header,
-          "toc" => toc_html,
-          "body" => body,
-          "footer" => footer,
-          "scripts" => build_scripts,
-        })
+                        "lang" => language,
+                        "title" => html_title,
+                        "font_url" => flavor_font_url,
+                        "styles" => build_styles,
+                        "header" => header,
+                        "toc" => toc_html,
+                        "body" => body,
+                        "footer" => footer,
+                        "scripts" => build_scripts,
+                      })
       end
 
       # --- Header and Footer ---
@@ -157,15 +181,15 @@ module Metanorma
                      end
 
         render_liquid("_header.html.liquid", {
-          "publisher_logos" => pub_logos,
-          "doc_id" => display_id,
-          "doc_title" => header_title_text,
-        })
+                        "publisher_logos" => pub_logos,
+                        "doc_id" => display_id,
+                        "doc_title" => header_title_text,
+                      })
       end
 
       def header_title_text
         raw = html_title.to_s.split(" — ").first.to_s.gsub(/<[^>]+>/, "")
-        raw.length > 60 ? raw[0, 57] + "..." : raw
+        raw.length > 60 ? "#{raw[0, 57]}..." : raw
       end
 
       # Reader controls — kept for backward compat with flavor renderers
@@ -205,13 +229,12 @@ module Metanorma
         svg = svg.sub(/\A\s*<!--.*?-->\s*/m, "")
         svg = svg.sub(/<path[^>]*style="fill:#e3000f[^"]*"[^>]*\/>/, "")
         svg = svg.sub(/<svg\s/, '<svg class="header-logo" ')
-        if svg.match?(/<svg[^>]*\sheight="[^"]*"/)
-          svg = svg.sub(/(<svg[^>]*?)(\sheight="[^"]*")/, "\\1 height=\"#{height}\"")
-        else
-          svg = svg.sub(/(<svg\b)/, "\\1 height=\"#{height}\"")
-        end
-        svg = svg.sub(/(<svg[^>]*?)\swidth="[^"]*"/, '\1')
-        svg
+        svg = if svg.match?(/<svg[^>]*\sheight="[^"]*"/)
+                svg.sub(/(<svg[^>]*?)(\sheight="[^"]*")/, "\\1 height=\"#{height}\"")
+              else
+                svg.sub(/(<svg\b)/, "\\1 height=\"#{height}\"")
+              end
+        svg.sub(/(<svg[^>]*?)\swidth="[^"]*"/, '\1')
       rescue StandardError
         nil
       end
@@ -219,9 +242,9 @@ module Metanorma
       def build_footer
         mn_logo = load_logo_svg(METANORMA_LOGO, height: 20)
         render_liquid("_footer.html.liquid", {
-          "mn_logo" => mn_logo,
-          "generated_at" => Time.now.strftime('%Y-%m-%d %H:%M'),
-        })
+                        "mn_logo" => mn_logo,
+                        "generated_at" => Time.now.strftime("%Y-%m-%d %H:%M"),
+                      })
       end
 
       # --- ToC generation ---
@@ -231,32 +254,32 @@ module Metanorma
         main_lines = if entries.empty?
                        ["<li class=\"toc-empty\">No entries</li>"]
                      else
-                       entries.map { |e|
+                       entries.map do |e|
                          id = e[:id].to_s
                          text = escape_html(e[:text].to_s)
                          lvl = e[:level]
                          "<li class=\"toc-level-#{lvl}\"><a href=\"##{id}\" class=\"toc-link\" data-target=\"#{id}\">#{text}</a></li>"
-                       }
+                       end
                      end
 
         # List of Figures — at top of sidebar
         unless @figure_entries.empty?
           top_lines << "<li class=\"toc-list-header\" data-list=\"figures\"><button class=\"toc-list-toggle\" aria-expanded=\"false\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><rect x=\"1\" y=\"2\" width=\"14\" height=\"12\" rx=\"1\"/><circle cx=\"5\" cy=\"6.5\" r=\"1.5\"/><path d=\"M1 12l4-4 2 2 3-3 5 5\"/></svg> Figures <span class=\"toc-list-count\">(#{@figure_entries.size})</span></button></li>"
-          @figure_entries.each { |f|
+          @figure_entries.each do |f|
             id = f[:id].to_s
             text = escape_html(f[:text].to_s)
             top_lines << "<li class=\"toc-list-item toc-figures\" style=\"display:none\"><a href=\"##{id}\" class=\"toc-link\" data-target=\"#{id}\">#{text}</a></li>"
-          }
+          end
         end
 
         # List of Tables — at top of sidebar
         unless @table_entries.empty?
           top_lines << "<li class=\"toc-list-header\" data-list=\"tables\"><button class=\"toc-list-toggle\" aria-expanded=\"false\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><rect x=\"1\" y=\"2\" width=\"14\" height=\"12\" rx=\"1\"/><line x1=\"1\" y1=\"6\" x2=\"15\" y2=\"6\"/><line x1=\"1\" y1=\"10\" x2=\"15\" y2=\"10\"/><line x1=\"7\" y1=\"2\" x2=\"7\" y2=\"14\"/></svg> Tables <span class=\"toc-list-count\">(#{@table_entries.size})</span></button></li>"
-          @table_entries.each { |t|
+          @table_entries.each do |t|
             id = t[:id].to_s
             text = escape_html(t[:text].to_s)
             top_lines << "<li class=\"toc-list-item toc-tables\" style=\"display:none\"><a href=\"##{id}\" class=\"toc-link\" data-target=\"#{id}\">#{text}</a></li>"
-          }
+          end
         end
 
         top_lines << "<li class=\"toc-divider\"></li>" unless top_lines.empty?
@@ -307,12 +330,25 @@ module Metanorma
         end
 
         if node.is_a?(Lutaml::Model::Serializable)
-          return true if (node.public_send(:fmt_title) rescue nil)
-          return true if (node.public_send(:displayorder) rescue nil)
+          return true if begin
+            node.fmt_title
+          rescue StandardError
+            nil
+          end
+          return true if begin
+            node.displayorder
+          rescue StandardError
+            nil
+          end
 
           %i[preface sections annex bibliography].each do |attr|
-            val = node.public_send(attr) rescue nil
+            val = begin
+              node.public_send(attr)
+            rescue StandardError
+              nil
+            end
             next unless val
+
             Array(val).each { |v| return true if check_presentation_markers(v) }
           end
 
@@ -405,6 +441,7 @@ module Metanorma
           indices = Hash.new(0)
           node.element_order.each do |el|
             next unless el.is_a?(Lutaml::Xml::Element)
+
             if el.text?
               parts << el.text_content.to_s
             elsif el.name == "tab"
@@ -434,42 +471,42 @@ module Metanorma
           parts << (t.is_a?(Array) ? t.join : t.to_s) if t
         end
 
-        parts.join.strip.gsub(/\u00A0/, " ")
+        parts.join.strip.gsub("\u00A0", " ")
       end
 
       # Dispatch to the appropriate render method based on node class.
-      def render(node, **opts)
+      def render(node, **)
         case node
         when Metanorma::Document::Components::Paragraphs::ParagraphBlock
-          render_paragraph(node, **opts)
+          render_paragraph(node, **)
         when Metanorma::Document::Components::Tables::TableBlock
-          render_table(node, **opts)
+          render_table(node, **)
         when Metanorma::Document::Components::Lists::UnorderedList
-          render_unordered_list(node, **opts)
+          render_unordered_list(node, **)
         when Metanorma::Document::Components::Lists::OrderedList
-          render_ordered_list(node, **opts)
+          render_ordered_list(node, **)
         when Metanorma::Document::Components::Lists::DefinitionList
-          render_definition_list(node, **opts)
+          render_definition_list(node, **)
         when Metanorma::Document::Components::AncillaryBlocks::FigureBlock
-          render_figure(node, **opts)
+          render_figure(node, **)
         when Metanorma::Document::Components::Blocks::NoteBlock
-          render_note(node, **opts)
+          render_note(node, **)
         when Metanorma::Document::Components::AncillaryBlocks::ExampleBlock
-          render_example(node, **opts)
+          render_example(node, **)
         when Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock
-          render_sourcecode(node, **opts)
+          render_sourcecode(node, **)
         when Metanorma::Document::Components::AncillaryBlocks::FormulaBlock
-          render_formula(node, **opts)
+          render_formula(node, **)
         when Metanorma::Document::Components::MultiParagraph::QuoteBlock
-          render_quote(node, **opts)
+          render_quote(node, **)
         when Metanorma::Document::Components::MultiParagraph::AdmonitionBlock
-          render_admonition(node, **opts)
+          render_admonition(node, **)
         when Metanorma::Document::Components::Sections::HierarchicalSection
-          render_hierarchical_section(node, **opts)
+          render_hierarchical_section(node, **)
         when Metanorma::Document::Components::Sections::BasicSection
-          render_basic_section(node, **opts)
+          render_basic_section(node, **)
         when Metanorma::Document::Components::Sections::ContentSection
-          render_content_section(node, **opts)
+          render_content_section(node, **)
         when Metanorma::Document::Components::EmptyElements::PageBreakElement
           ""
         when Metanorma::Document::Components::IdElements::Bookmark
@@ -488,7 +525,7 @@ module Metanorma
       # --- Block-level rendering ---
 
       def render_paragraph(p, **_opts)
-        attrs = element_attrs(id: safe_attr(p, :id), class: safe_attr(p, :class_attr), style: alignment_style(safe_attr(p, :alignment)))
+        attrs = element_attrs(id: safe_attr(p, :id), style: alignment_style(safe_attr(p, :alignment)))
         tag("p", attrs) { render_mixed_inline(p) }
       end
 
@@ -531,19 +568,21 @@ module Metanorma
         if table.colgroup&.col && !table.colgroup.col.empty?
           return table.colgroup.col.size
         end
+
         # Walk all rows to find max column count, accounting for colspan
         max_cols = 0
-        [:thead, :tbody, :tfoot].each do |section|
+        %i[thead tbody tfoot].each do |section|
           sec = table.public_send(section)
           next unless sec&.tr
+
           sec.tr.each do |tr|
             cols = 0
-            Array(tr.th).each { |th| cols += (th.colspan && th.colspan > 1) ? th.colspan : 1 }
-            Array(tr.td).each { |td| cols += (td.colspan && td.colspan > 1) ? td.colspan : 1 }
+            Array(tr.th).each { |th| cols += th.colspan && th.colspan > 1 ? th.colspan : 1 }
+            Array(tr.td).each { |td| cols += td.colspan && td.colspan > 1 ? td.colspan : 1 }
             max_cols = cols if cols > max_cols
           end
         end
-        max_cols > 0 ? max_cols : 1
+        max_cols.positive? ? max_cols : 1
       end
 
       def render_table_colgroup(colgroup)
@@ -564,6 +603,7 @@ module Metanorma
           @output << "<tr>"
           walked = walk_ordered(tr) do |type, obj|
             next unless type == :element
+
             render_table_cell(obj)
           end
           unless walked
@@ -575,7 +615,7 @@ module Metanorma
       end
 
       def render_unordered_list(ul, **_opts)
-        attrs = element_attrs(id: safe_attr(ul, :id), class: safe_attr(ul, :class_attr))
+        attrs = element_attrs(id: safe_attr(ul, :id))
         tag("ul", attrs) do
           ul.listitem&.each { |li| render_list_item(li) }
         end
@@ -595,7 +635,7 @@ module Metanorma
       end
 
       def render_ordered_list(ol, **_opts)
-        attrs = element_attrs(id: safe_attr(ol, :id), class: safe_attr(ol, :class_attr), start: safe_attr(ol, :start), type: safe_attr(ol, :type_attr))
+        attrs = element_attrs(id: safe_attr(ol, :id), start: safe_attr(ol, :start), type: safe_attr(ol, :type_attr))
         tag("ol", attrs) do
           ol.listitem&.each { |li| render_list_item(li) }
         end
@@ -634,7 +674,8 @@ module Metanorma
         children = []
 
         walk_ordered(section) do |type, obj|
-          next if type == :text || type == :tab
+          next if %i[text tab].include?(type)
+
           children << obj
         end
 
@@ -643,6 +684,7 @@ module Metanorma
         supplementary_attrs.each do |attr|
           val = safe_attr(section, attr)
           next if val.nil?
+
           Array(val).each do |v|
             children << v unless children.include?(v)
           end
@@ -665,7 +707,11 @@ module Metanorma
 
       def sort_by_displayorder(children)
         children.sort_by do |node|
-          order = node.displayorder rescue nil
+          order = begin
+            node.displayorder
+          rescue StandardError
+            nil
+          end
           order &&= order.to_i
           order || Float::INFINITY
         end
@@ -689,29 +735,8 @@ module Metanorma
       end
 
       def render_figure(figure, **_opts)
-        attrs = element_attrs(id: safe_attr(figure, :id), class: "figure")
-        fig_id = safe_attr(figure, :id)
-        fig_name = safe_attr(figure, :fmt_name) || safe_attr(figure, :name)
-        if fig_id && fig_name
-          register_figure_entry(id: fig_id, text: extract_plain_text(fig_name))
-        end
-        tag("figure", attrs) do
-          if figure.image
-            render_image(figure.image)
-          elsif safe_attr(figure, :source)
-            @output << %(<img src="#{escape_html(figure.source)}" />)
-          end
-          render_video(figure.video) if safe_attr(figure, :video)
-          render_audio(figure.audio) if safe_attr(figure, :audio)
-          figure.figure&.each { |sub| render_figure(sub) }
-          if safe_attr(figure, :name) || safe_attr(figure, :fmt_name)
-            @output << "<figcaption>"
-            render_inline_element(safe_attr(figure, :fmt_name) || figure.name)
-            @output << "</figcaption>"
-          end
-          safe_attr(figure, :note)&.each { |n| render_note(n) }
-          safe_attr(figure, :dl)&.then { |dl| render_definition_list(dl) }
-        end
+        drop = Drops::FigureDrop.from_model(figure, renderer: renderer_context)
+        @output << render_liquid("_figure.html.liquid", { "block" => drop })
       end
 
       def render_image(image)
@@ -743,91 +768,23 @@ module Metanorma
       end
 
       def render_note(note, **_opts)
-        attrs = element_attrs(id: safe_attr(note, :id), class: "note-block")
-        tag("div", attrs) do
-          label = extract_block_label(note, "NOTE")
-          @output << %(<span class="note-label">#{escape_html(label)}</span>&nbsp;)
-          if note.content && !note.content.empty?
-            note.content.each { |para| render_paragraph(para) }
-          else
-            render_mixed_inline(note)
-          end
-          note.ul&.each { |ul| render_unordered_list(ul) }
-          note.ol&.each { |ol| render_ordered_list(ol) }
-          note.dl&.then { |dl| render_definition_list(dl) }
-        end
+        drop = Drops::NoteDrop.from_model(note, renderer: renderer_context)
+        @output << render_liquid("_note.html.liquid", { "block" => drop })
       end
 
       def render_example(example, **_opts)
-        attrs = element_attrs(id: safe_attr(example, :id), class: "example")
-        tag("div", attrs) do
-          label = extract_block_label(example, "EXAMPLE")
-          @output << %(<span class="example-label">#{escape_html(label)}</span>&nbsp;)
-          if example.paragraphs && !example.paragraphs.empty?
-            example.paragraphs.each { |para| render_paragraph(para) }
-          end
-          example.ul&.each { |ul| render_unordered_list(ul) }
-          example.ol&.each { |ol| render_ordered_list(ol) }
-          example.dl&.each { |dl| render_definition_list(dl) } if example.dl
-          example.sourcecode&.each { |sc| render_sourcecode(sc) }
-          example.table&.each { |t| render_table(t) }
-          example.figure&.each { |f| render_figure(f) }
-          example.quote&.each { |q| render_quote(q) }
-          example.formula&.each { |f| render_formula(f) }
-        end
+        drop = Drops::ExampleDrop.from_model(example, renderer: renderer_context)
+        @output << render_liquid("_example.html.liquid", { "block" => drop })
       end
 
       def render_sourcecode(sc, **_opts)
-        attrs = element_attrs(id: safe_attr(sc, :id), class: "sourcecode")
-        lang = safe_attr(sc, :lang)
-        tag("div", attrs) do
-          if sc.name
-            @output << "<p class=\"code-name\">"
-            render_inline_element(sc.name)
-            @output << "</p>"
-          end
-          code_attrs = lang ? %( lang="#{escape_html(lang)}") : ""
-          @output << "<pre><code#{code_attrs}>"
-          # Use body.content if available, else content, else text
-          code_text = if sc.body && sc.body.content
-                        sc.body.content
-                      elsif sc.content
-                        sc.content
-                      else
-                        ""
-                      end
-          # body.content from map_all_content may contain pre-escaped HTML
-          # entities (&lt; etc); decode first to get raw text, then escape
-          # for HTML output.
-          raw_text = code_text.gsub("&lt;", "<").gsub("&gt;", ">").gsub("&amp;", "&").gsub("&quot;", "\"")
-          @output << escape_html(raw_text)
-          @output << "</code></pre>"
-        end
+        drop = Drops::SourcecodeDrop.from_model(sc, renderer: renderer_context)
+        @output << render_liquid("_sourcecode.html.liquid", { "block" => drop })
       end
 
       def render_formula(formula, **_opts)
-        attrs = element_attrs(id: safe_attr(formula, :id), class: "formula")
-        tag("div", attrs) do
-          @output << render_stem_content(formula.stem) if formula.stem
-
-          # Render "where" clause from key element (non-presentation XML)
-          if formula.key
-            if formula.key.dl
-              @output << "<p class=\"formula-where\">where</p>"
-              render_definition_list(formula.key.dl)
-            end
-            formula.key.p&.each { |para| render_paragraph(para) }
-          end
-
-          formula.dl&.then { |dl| render_definition_list(dl) }
-
-          name_el = safe_attr(formula, :fmt_name) || safe_attr(formula, :name)
-          if name_el
-            @output << "<span class=\"formula-number\">"
-            render_inline_element(name_el)
-            @output << "</span>"
-          end
-        end
+        drop = Drops::FormulaDrop.from_model(formula, renderer: renderer_context)
+        @output << render_liquid("_formula.html.liquid", { "block" => drop })
       end
 
       def render_quote(quote, **_opts)
@@ -845,12 +802,8 @@ module Metanorma
       end
 
       def render_admonition(admonition, **_opts)
-        type = safe_attr(admonition, :type) || "note"
-        attrs = element_attrs(id: safe_attr(admonition, :id), class: "admonition #{type}")
-        tag("div", attrs) do
-          @output << "<p class=\"admonition-title\">#{escape_html(type.capitalize)}</p>"
-          admonition.paragraphs&.each { |para| render_paragraph(para) }
-        end
+        drop = Drops::AdmonitionDrop.from_model(admonition, renderer: renderer_context)
+        @output << render_liquid("_admonition.html.liquid", { "block" => drop })
       end
 
       def render_bookmark(bookmark)
@@ -973,13 +926,14 @@ module Metanorma
         skip = {}
         node.element_order.each_with_index do |el, i|
           next unless el.element?
+
           next_tag = skip_after[el.name]
           next unless next_tag
 
           next_el = node.element_order[i + 1]
           if next_tag.nil?
             skip[i] = true
-          elsif next_el && next_el.element? && next_el.name == next_tag
+          elsif next_el&.element? && next_el.name == next_tag
             skip[i] = true
           end
         end
@@ -1107,7 +1061,9 @@ module Metanorma
           # Source element — skip; rendered via fmt-xref in semx wrapper
           nil
         when Metanorma::Document::Components::Inline::SpanElement
-          attrs = element_attrs(style: safe_attr(element, :style), class: safe_attr(element, :class_attr))
+          xml_class = safe_attr(element, :class_attr).to_s
+          html_class = html_class_for_span(xml_class) unless xml_class.empty?
+          attrs = element_attrs(style: safe_attr(element, :style), class: html_class)
           tag("span", attrs) { render_mixed_inline(element) }
         when Metanorma::Document::Components::Inline::FnElement
           render_fn(element)
@@ -1183,13 +1139,13 @@ module Metanorma
         texts = node.text
         if texts.is_a?(Array)
           texts.each do |t|
-            if t.is_a?(Metanorma::Document::Components::Inline::MathElement)
-              @output << t.content.to_s
-            elsif t.is_a?(Metanorma::Document::Components::Inline::AsciimathElement)
-              @output << %(<span class="stem">#{escape_html(Array(t.text).join)}</span>)
-            else
-              @output << escape_html(t.to_s)
-            end
+            @output << if t.is_a?(Metanorma::Document::Components::Inline::MathElement)
+                         t.content.to_s
+                       elsif t.is_a?(Metanorma::Document::Components::Inline::AsciimathElement)
+                         %(<span class="stem">#{escape_html(Array(t.text).join)}</span>)
+                       else
+                         escape_html(t.to_s)
+                       end
           end
         elsif texts.is_a?(String)
           @output << escape_html(texts)
@@ -1239,6 +1195,7 @@ module Metanorma
           display_attrs.each do |attr|
             val = safe_attr(element, attr)
             next if val.nil?
+
             if val.is_a?(Array)
               val.each do |v|
                 if v.is_a?(Metanorma::Document::Components::Paragraphs::ParagraphBlock)
@@ -1261,7 +1218,7 @@ module Metanorma
         return semx_text unless first_word
 
         tail = output[-200..]
-        return semx_text unless tail && tail.rstrip.end_with?(first_word)
+        return semx_text unless tail&.rstrip&.end_with?(first_word)
 
         semx_text.sub(/\A\s*#{Regexp.escape(first_word)}\s*/, "")
       end
@@ -1279,7 +1236,7 @@ module Metanorma
         doc.css("fmt-link").each do |el|
           target = el["target"] || el["href"]
           if target
-            display_text = target.sub(/\Amailto:/, "")
+            display_text = target.delete_prefix("mailto:")
             a = doc.document.create_element("a", display_text, "href" => target)
             el.replace(a)
           else
@@ -1292,11 +1249,12 @@ module Metanorma
         doc.traverse do |node|
           next unless node.element?
           next unless %w[xref eref stem link].include?(node.name)
+
           next_sib = node.next_sibling
           while next_sib.is_a?(Nokogiri::XML::Text) && next_sib.text.strip.empty?
             next_sib = next_sib.next_sibling
           end
-          next unless next_sib && next_sib.element? && next_sib.name == "semx"
+          next unless next_sib&.element? && next_sib.name == "semx"
 
           deduplicate_semx_label(node, next_sib)
           node.remove
@@ -1304,6 +1262,10 @@ module Metanorma
         # Strip presentation wrappers, keeping inner content
         %w[semx fmt-xref].each do |tag|
           doc.css(tag).each { |el| el.replace(el.children) }
+        end
+        # Remap XML class names to HTML-specific class names
+        doc.css("[class]").each do |el|
+          el["class"] = el["class"].split(/\s+/).map { |c| html_class_for_span(c) }.join(" ")
         end
         doc.inner_html
       end
@@ -1328,13 +1290,13 @@ module Metanorma
 
       def render_link(link)
         target = safe_attr(link, :target) || safe_attr(link, :href)
-        attrs = element_attrs(href: target, id: safe_attr(link, :id), class: safe_attr(link, :class_attr))
+        attrs = element_attrs(href: target, id: safe_attr(link, :id))
         tag("a", attrs) do
           content = safe_attr(link, :content)
           if content && !Array(content).join.strip.empty?
             render_mixed_inline(link)
           else
-            display_text = target.to_s.sub(/\Amailto:/, "")
+            display_text = target.to_s.delete_prefix("mailto:")
             @output << escape_html(display_text)
           end
         end
@@ -1342,7 +1304,7 @@ module Metanorma
 
       def render_xref(xref)
         target = safe_attr(xref, :target) || safe_attr(xref, :to_attr)
-        attrs = element_attrs(href: "##{escape_html(target)}", id: safe_attr(xref, :id), class: safe_attr(xref, :class_attr))
+        attrs = element_attrs(href: "##{escape_html(target)}", id: safe_attr(xref, :id))
         tag("a", attrs) { render_mixed_inline(xref) }
       end
 
@@ -1460,14 +1422,13 @@ module Metanorma
         attrs.each do |k, v|
           next if v.nil? || v == false || (v.is_a?(String) && v.empty?)
 
-          val = k == :class ? translate_class(v.to_s) : v.to_s
-          parts << %( #{k}="#{escape_html(val)}")
+          parts << %( #{k}="#{escape_html(v.to_s)}")
         end
         parts.join
       end
 
-      def translate_class(class_str)
-        class_str.split(/\s+/).map { |c| CLASS_MAP[c] || c }.join(" ")
+      def html_class_for_span(xml_class)
+        SPAN_ROLE_CLASSES[xml_class] || "span-#{xml_class}"
       end
 
       def block_element?(obj)
@@ -1503,7 +1464,7 @@ module Metanorma
           secondary: safe_attr(element, :secondary)&.to_s&.strip,
           tertiary: safe_attr(element, :tertiary)&.to_s&.strip,
           target_id: @current_section_id,
-          target_text: @current_section_number
+          target_text: @current_section_number,
         )
       rescue StandardError
         nil
