@@ -5,34 +5,34 @@ module Metanorma
     # Renders StandardDocument components to HTML.
     # Extends BaseRenderer with terms, bibliography, and standard sections.
     class StandardRenderer < BaseRenderer
-      def render(node, **opts)
+      def render(node, **)
         case node
         when Metanorma::StandardDocument::Root
-          render_standard_document(node, **opts)
+          render_standard_document(node, **)
         when Metanorma::StandardDocument::Terms::Term
-          render_term(node, **opts)
+          render_term(node, **)
         when Metanorma::StandardDocument::Sections::TermsSection
-          render_terms_section(node, **opts)
+          render_terms_section(node, **)
         when Metanorma::StandardDocument::Sections::StandardReferencesSection
-          render_references_section(node, **opts)
+          render_references_section(node, **)
         when Metanorma::StandardDocument::Sections::BibliographySection
-          render_bibliography(node, **opts)
+          render_bibliography(node, **)
         when Metanorma::StandardDocument::Sections::ClauseSection
-          render_clause_section(node, **opts)
+          render_clause_section(node, **)
         when Metanorma::StandardDocument::Sections::AnnexSection
-          render_annex_section(node, **opts)
+          render_annex_section(node, **)
         when Metanorma::StandardDocument::Sections::StandardSection
-          render_standard_section(node, **opts)
+          render_standard_section(node, **)
         when Metanorma::StandardDocument::Sections::Abstract
-          render_abstract_section(node, **opts)
+          render_abstract_section(node, **)
         when Metanorma::StandardDocument::Sections::Foreword
-          render_foreword_section(node, **opts)
+          render_foreword_section(node, **)
         when Metanorma::StandardDocument::Sections::Introduction
-          render_introduction_section(node, **opts)
+          render_introduction_section(node, **)
         when Metanorma::StandardDocument::Sections::FloatingTitle
-          render_floating_title(node, **opts)
+          render_floating_title(node, **)
         when Metanorma::StandardDocument::Blocks::AmendBlock
-          render_amend_block(node, **opts)
+          render_amend_block(node, **)
         else
           super
         end
@@ -86,8 +86,10 @@ module Metanorma
         cover_id = nil
         bibdata.doc_identifier&.each do |di|
           next unless safe_attr(di, :type) == "iso-reference"
+
           id = extract_text_value(di)
           next if id.to_s.empty?
+
           cover_id = id
           break
         end
@@ -105,9 +107,9 @@ module Metanorma
         end
 
         @output << render_liquid("_cover.html.liquid", {
-          "doc_id" => cover_id,
-          "title" => title_text,
-        })
+                                   "doc_id" => cover_id,
+                                   "title" => title_text,
+                                 })
       end
 
       def render_doc_title(doc)
@@ -120,22 +122,24 @@ module Metanorma
         elsif bibdata.is_a?(Metanorma::Document::Components::BibData::BibData)
           titles = bibdata.title
           return unless titles && !titles.empty?
+
           en_title = titles.find { |t| t.language == "en" }
           return unless en_title
+
           en_title = extract_text_value(en_title)
         else
           return
         end
 
         @output << render_liquid("_doc_title.html.liquid", {
-          "title" => en_title,
-        })
+                                   "title" => en_title,
+                                 })
       end
 
       # --- Section rendering ---
 
       def render_clause_section(clause, level: 1, **_opts)
-        attrs = element_attrs(id: safe_attr(clause, :id), class: safe_attr(clause, :class_attr))
+        attrs = element_attrs(id: safe_attr(clause, :id))
         tag("div", attrs) do
           render_standard_title(clause, level)
           render_standard_section_blocks(clause, level)
@@ -324,11 +328,11 @@ module Metanorma
           bibitemid = safe_attr(origin, :bibitemid)
 
           if citeas && !citeas.to_s.empty?
-            if bibitemid && !bibitemid.to_s.empty?
-              @output << "<a href=\"##{escape_html(bibitemid.to_s)}\" class=\"bibref\">#{escape_html(citeas.to_s)}</a>"
-            else
-              @output << escape_html(citeas.to_s)
-            end
+            @output << if bibitemid && !bibitemid.to_s.empty?
+                         "<a href=\"##{escape_html(bibitemid.to_s)}\" class=\"bibref\">#{escape_html(citeas.to_s)}</a>"
+                       else
+                         escape_html(citeas.to_s)
+                       end
           else
             render_mixed_inline(origin)
           end
@@ -401,9 +405,11 @@ module Metanorma
       def bibitem_url(item)
         links = Array(item.link)
         return nil if links.empty?
+
         # Prefer src or citation type, skip RSS feeds
-        preferred = links.find { |l| l.type == "src" || l.type == "citation" }
+        preferred = links.find { |l| ["src", "citation"].include?(l.type) }
         return preferred.content.to_s if preferred && !preferred.content.to_s.empty?
+
         # Fallback: first non-RSS link
         non_rss = links.find { |l| !l.content.to_s.include?(".rss") && !l.content.to_s.empty? }
         non_rss&.content&.to_s
@@ -421,10 +427,10 @@ module Metanorma
           docids = Array(item.docidentifier)
           # Skip bracket-number identifiers (e.g. "[1]") and iso-reference/URN variants;
           # render only the primary doc identifier
-          primary = docids.find { |di|
+          primary = docids.find do |di|
             val = extract_text_value(di).to_s
             val.match?(/\A\[?\d+\]?\z/) ? false : !val.match?(/\A(?:iso-reference|URN)\s/)
-          }
+          end
           if primary
             id_val = extract_text_value(primary)
             @output << "<span class=\"std-doc-number\">#{escape_html(id_val)}</span>" unless id_val.to_s.empty?

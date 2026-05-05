@@ -67,32 +67,32 @@ module Metanorma
         end
       end
 
-      def render(node, **opts)
+      def render(node, **)
         case node
         when Metanorma::IsoDocument::Root
-          render_document(node, **opts)
+          render_document(node, **)
         when Metanorma::IsoDocument::Sections::IsoPreface
-          render_preface(node, **opts)
+          render_preface(node, **)
         when Metanorma::IsoDocument::Sections::IsoSections
-          render_sections(node, **opts)
+          render_sections(node, **)
         when Metanorma::IsoDocument::Sections::IsoClauseSection
-          render_clause(node, **opts)
+          render_clause(node, **)
         when Metanorma::IsoDocument::Sections::IsoAnnexSection
-          render_annex(node, **opts)
+          render_annex(node, **)
         when Metanorma::IsoDocument::Sections::IsoTermsSection
-          render_terms_section(node, **opts)
+          render_terms_section(node, **)
         when Metanorma::IsoDocument::Sections::IsoForewordSection
-          render_foreword(node, **opts)
+          render_foreword(node, **)
         when Metanorma::IsoDocument::Sections::IsoAbstractSection
-          render_abstract(node, **opts)
+          render_abstract(node, **)
         when Metanorma::IsoDocument::Terms::IsoTerm
-          render_term(node, **opts)
+          render_term(node, **)
         when Metanorma::IsoDocument::Terms::TermNote
-          render_term_note(node, **opts)
+          render_term_note(node, **)
         when Metanorma::IsoDocument::Terms::TermExample
-          render_term_example(node, **opts)
+          render_term_example(node, **)
         when Metanorma::IsoDocument::Boilerplate
-          render_boilerplate(node, **opts)
+          render_boilerplate(node, **)
         else
           super
         end
@@ -147,33 +147,35 @@ module Metanorma
 
       # Extract English stage text, deduplicating duplicate language variants.
       def extract_stage(bibdata)
-        return nil unless bibdata.status && bibdata.status.stage
+        return nil unless bibdata.status&.stage
 
         stages = Array(bibdata.status.stage)
         return nil if stages.empty?
 
         # Prefer English-language stage
-        en_stage = stages.find { |s|
+        en_stage = stages.find do |s|
           lang = safe_attr(s, :language)
           lang == "en" if lang
-        }
-        return Array(en_stage.value).join.strip if en_stage && en_stage.value
+        end
+        return Array(en_stage.value).join.strip if en_stage&.value
 
         # Fallback: first non-empty, deduplicated
         seen = Set.new
-        stage_text = stages.filter_map { |s|
+        stage_text = stages.filter_map do |s|
           val = Array(s.value).join.strip
           down = val.downcase
           next if seen.include?(down)
+
           seen << down
           val.empty? ? nil : val
-        }.compact.join(" ")
+        end.compact.join(" ")
         stage_text.empty? ? nil : stage_text
       end
 
       # Extract document type from ext.doctype.
       def extract_doctype(bibdata)
         return nil unless bibdata.respond_to?(:ext)
+
         ext = bibdata.ext
         return nil unless ext
 
@@ -181,11 +183,11 @@ module Metanorma
         return nil unless doctypes && !doctypes.empty?
 
         # Prefer English-language doctype
-        en_dt = doctypes.find { |d|
+        en_dt = doctypes.find do |d|
           lang = safe_attr(d, :language)
           lang == "en" if lang
-        }
-        return en_dt.value.to_s if en_dt && en_dt.value
+        end
+        return en_dt.value.to_s if en_dt&.value
 
         # Fallback: first doctype
         dt = doctypes.first
@@ -216,7 +218,7 @@ module Metanorma
         all_items.each do |node|
           next if node.is_a?(String)
           next if is_title_element?(node, doc.sections)
-          next if is_doc_title_paragraph?(node)
+
           render(node)
         end
 
@@ -254,13 +256,13 @@ module Metanorma
         stage_text = extract_stage(bibdata)
 
         @output << render_liquid("_iso_cover.html.liquid", {
-          "publisher_logos" => logos,
-          "doc_id" => doc_id,
-          "pub_date" => pub_date,
-          "doctype" => doctype,
-          "title" => title_text,
-          "stage" => stage_text,
-        })
+                                   "publisher_logos" => logos,
+                                   "doc_id" => doc_id,
+                                   "pub_date" => pub_date,
+                                   "doctype" => doctype,
+                                   "title" => title_text,
+                                   "stage" => stage_text,
+                                 })
       end
 
       def render_doc_title(doc)
@@ -274,8 +276,8 @@ module Metanorma
         return unless en_title
 
         @output << render_liquid("_iso_doc_title.html.liquid", {
-          "title" => en_title.to_s,
-        })
+                                   "title" => en_title.to_s,
+                                 })
       end
 
       def render_boilerplate_section(doc)
@@ -303,7 +305,7 @@ module Metanorma
             fw_id = safe_attr(fw, :id)
             title_text = extract_plain_text(title)
             register_toc_entry(id: fw_id, level: level, text: title_text)
-            @output << "<h1 class=\"ForewordTitle\">"
+            @output << "<h1 class=\"foreword-title\">"
             render_mixed_inline(title)
             @output << "</h1>"
           end
@@ -319,7 +321,7 @@ module Metanorma
             sec_id = safe_attr(section, :id)
             title_text = extract_plain_text(title)
             register_toc_entry(id: sec_id, level: level, text: title_text)
-            @output << "<h1 class=\"IntroTitle\">"
+            @output << "<h1 class=\"intro-title\">"
             render_mixed_inline(title)
             @output << "</h1>"
           end
@@ -344,7 +346,7 @@ module Metanorma
       # --- Clause rendering ---
 
       def render_clause(clause, level: 1, **_opts)
-        attrs = element_attrs(id: safe_attr(clause, :id), class: safe_attr(clause, :class_attr))
+        attrs = element_attrs(id: safe_attr(clause, :id))
         tag("div", attrs) do
           render_title(clause, level)
           render_ordered_content(clause, level)
@@ -354,7 +356,7 @@ module Metanorma
       # --- Annex rendering ---
 
       def render_annex(annex, level: 1, **_opts)
-        attrs = element_attrs(id: safe_attr(annex, :id), class: "Section3")
+        attrs = element_attrs(id: safe_attr(annex, :id), class: "section-sub")
         tag("div", attrs) do
           render_annex_title(annex, level)
           render_ordered_content(annex, level)
@@ -370,7 +372,7 @@ module Metanorma
         register_toc_entry(id: annex_id, level: level, text: title_text)
 
         h = "h#{[[level, 6].min, 1].max}"
-        @output << "<#{h} class=\"Annex\">"
+        @output << "<#{h} class=\"annex-title\">"
         render_mixed_inline(title_element)
         @output << "</#{h}>"
       end
@@ -398,7 +400,7 @@ module Metanorma
           # In presentation mode, use fmt_* elements
           if term.fmt_name
             # Render term number (e.g. "3.1")
-            @output << "<p class=\"TermNum\">"
+            @output << "<p class=\"term-number\">"
             render_inline_element(term.fmt_name)
             @output << "</p>"
           elsif term.term_number
@@ -408,7 +410,7 @@ module Metanorma
                       else
                         extract_text_value(tn)
                       end
-            @output << "<p class=\"TermNum\">#{escape_html(tn_text)}</p>"
+            @output << "<p class=\"term-number\">#{escape_html(tn_text)}</p>"
           end
 
           # Preferred designations — use fmt-preferred if available
@@ -436,7 +438,7 @@ module Metanorma
           # (fmt-definition already includes domain text in its content)
           if term.domain && !term.fmt_definition
             domain_text = safe_attr(term.domain, :text)
-            @output << "<p class=\"domain\">&lt;#{escape_html(domain_text)}&gt;</p>" if domain_text
+            @output << "<p class=\"term-domain\">&lt;#{escape_html(domain_text)}&gt;</p>" if domain_text
           end
 
           # Definition — use fmt-definition if available
@@ -458,7 +460,7 @@ module Metanorma
           # Source references — use fmt-termsource if available
           if term.fmt_termsource && !term.fmt_termsource.empty?
             term.fmt_termsource.each do |fts|
-              @output << "<p class=\"source\">"
+              @output << "<p class=\"term-source\">"
               render_mixed_inline(fts)
               @output << "</p>"
             end
@@ -485,7 +487,8 @@ module Metanorma
         if term.preferred && !term.preferred.empty?
           return extract_designation_name(term.preferred.first).to_s
         end
-        safe_attr(term, :id).to_s.sub(/\Aterm-/, "")
+
+        safe_attr(term, :id).to_s.delete_prefix("term-")
       end
 
       def extract_term_definition(term)
@@ -502,11 +505,11 @@ module Metanorma
 
       def strip_html(html)
         html.gsub(/<[^>]+>/, "").gsub("&lt;", "<").gsub("&gt;", ">")
-            .gsub("&amp;", "&").gsub("&nbsp;", " ")
+          .gsub("&amp;", "&").gsub("&nbsp;", " ")
       end
 
       def render_term_designation(designation, type)
-        css_class = type == "deprecated" ? "DeprecatedTerms" : "Terms"
+        css_class = type == "deprecated" ? "term-deprecated" : "term-name"
         @output << "<p class=\"#{css_class}\" style=\"text-align:left;\">"
         @output << "<del>" if type == "deprecated"
         @output << "<b><dfn>"
@@ -583,10 +586,10 @@ module Metanorma
       end
 
       def render_term_note(note)
-        attrs = element_attrs(id: safe_attr(note, :id), class: "Note")
+        attrs = element_attrs(id: safe_attr(note, :id), class: "note-block")
         tag("div", attrs) do
           label = extract_termnote_label(note)
-          @output << "<p><span class=\"termnote_label\">#{escape_html(label)}: </span>"
+          @output << "<p><span class=\"term-note-label\">#{escape_html(label)}: </span>"
           note.p&.each { |para| render_mixed_inline(para) }
           @output << "</p>"
           note.ul&.each { |ul| render_unordered_list(ul) }
@@ -599,7 +602,7 @@ module Metanorma
         attrs = element_attrs(id: safe_attr(example, :id), class: "example")
         tag("div", attrs) do
           label = extract_block_label(example, "EXAMPLE")
-          @output << "<p><span class=\"example_label\">#{escape_html(label)}</span>&nbsp;"
+          @output << "<p><span class=\"example-label\">#{escape_html(label)}</span>&nbsp;"
           example.p&.each { |para| render_mixed_inline(para) }
           @output << "</p>"
           example.ul&.each { |ul| render_unordered_list(ul) }
@@ -627,7 +630,13 @@ module Metanorma
           .gsub(/<variant-title[^>]*>.*?<\/variant-title>/m, "")
           .gsub(/<\/?(?:copyright-statement|clause)[^>]*>/, "")
 
-        @output << clean.strip
+        # Remap XML class names to HTML-specific class names
+        boilerplate_doc = Nokogiri::HTML::DocumentFragment.parse(clean)
+        boilerplate_doc.css("[class]").each do |el|
+          el["class"] = el["class"].split(/\s+/).map { |c| html_class_for_span(c) }.join(" ")
+        end
+
+        @output << boilerplate_doc.inner_html.strip
 
         @output << "</div>"
       end
@@ -641,19 +650,19 @@ module Metanorma
             next_sib = next_sib.next_sibling
           end
 
-          display_text = if next_sib && next_sib.element? && next_sib.name == "semx"
-            fmt_link = next_sib.at_css("fmt-link")
-            if fmt_link
-              fmt_target = fmt_link["target"] || fmt_link["href"] || target
-              display_text = fmt_target.to_s.sub(/\Amailto:/, "")
-              next_sib.remove
-              display_text
-            end
-          end
+          display_text = if next_sib&.element? && next_sib.name == "semx"
+                           fmt_link = next_sib.at_css("fmt-link")
+                           if fmt_link
+                             fmt_target = fmt_link["target"] || fmt_link["href"] || target
+                             display_text = fmt_target.to_s.delete_prefix("mailto:")
+                             next_sib.remove
+                             display_text
+                           end
+                         end
 
-          display_text ||= target.to_s.sub(/\Amailto:/, "")
+          display_text ||= target.to_s.delete_prefix("mailto:")
           a_tag = Nokogiri::HTML::DocumentFragment.parse(
-            "<a href=\"#{CGI.escapeHTML(target.to_s)}\">#{CGI.escapeHTML(display_text)}</a>"
+            "<a href=\"#{CGI.escapeHTML(target.to_s)}\">#{CGI.escapeHTML(display_text)}</a>",
           )
           link.replace(a_tag)
         end
@@ -686,15 +695,20 @@ module Metanorma
         %i[terms definitions].each do |attr|
           val = safe_attr(section, attr)
           next if val.nil?
+
           Array(val).each do |v|
             children << v unless children.include?(v)
           end
         end
 
         # Sort by displayorder (non-nil first, then nil at end)
-        children.reject!(&:nil?)
+        children.compact!
         children.sort_by do |node|
-          order = node.displayorder rescue nil
+          order = begin
+            node.displayorder
+          rescue StandardError
+            nil
+          end
           order &&= order.to_i
           order || Float::INFINITY
         end
@@ -710,46 +724,49 @@ module Metanorma
         end
       end
 
-      private
-
-      # Filter document title paragraphs that are rendered by render_doc_title
-      def is_doc_title_paragraph?(node)
-        return false unless node.respond_to?(:class_attr)
-        ["zzSTDTitle1", "zzSTDTitle2"].include?(node.class_attr)
-      end
-
       # Collect all document-level children (sections, normative refs, annexes,
       # bibliography) sorted by displayorder for correct document order.
+      # Top-level paragraphs in sections (title paragraphs) are excluded —
+      # they are rendered separately by render_doc_title.
       def collect_document_children(doc)
         items = []
 
         # Main sections children (clauses, terms, etc.)
         if doc.sections
-          items.concat(gather_element_order_children(doc.sections))
+          section_children = gather_element_order_children(doc.sections)
+          # Title paragraphs are ParagraphBlock objects at the top level of
+          # sections. They are rendered by render_doc_title, so skip them here.
+          section_children.reject! do |node|
+            node.is_a?(Metanorma::Document::Components::Paragraphs::ParagraphBlock)
+          end
+          items.concat(section_children)
           # Also add typed attributes that may not be in element_order
           %i[terms definitions].each do |attr|
             val = safe_attr(doc.sections, attr)
             next if val.nil?
+
             Array(val).each { |v| items << v unless items.include?(v) }
           end
         end
 
         # Normative references from bibliography (may have displayorder)
-        if doc.bibliography && doc.bibliography.references
-          doc.bibliography.references.each { |r| items << r }
-        end
+        doc.bibliography&.references&.each { |r| items << r }
 
         # Annexes
         doc.annex&.each { |a| items << a }
 
         # Non-normative bibliography (no displayorder = goes at end)
-        if doc.bibliography && doc.bibliography.references
+        if doc.bibliography&.references
           # Already included above; filter normative vs non-normative below
         end
 
         items.compact!
         items.sort_by do |node|
-          order = node.displayorder rescue nil
+          order = begin
+            node.displayorder
+          rescue StandardError
+            nil
+          end
           order &&= order.to_i
           order || Float::INFINITY
         end
@@ -797,7 +814,7 @@ module Metanorma
         children
       end
 
-      def publisher_logos_html(doc)
+      def publisher_logos_html(_doc)
         publishers = flavor_publishers(extract_primary_doc_id)
         logo_map = publisher_logo_map
         return [] if publishers.empty? && logo_map.empty?
@@ -811,8 +828,8 @@ module Metanorma
           next unless svg
 
           # White fill for dark cover background
-          svg = svg.gsub(/fill:#00b1ff/, "fill:white") if pub == "OGC"
-          svg = svg.gsub(/fill:#e3000f/, "fill:white") if pub == "ISO"
+          svg = svg.gsub("fill:#00b1ff", "fill:white") if pub == "OGC"
+          svg = svg.gsub("fill:#e3000f", "fill:white") if pub == "ISO"
           svg
         end
       end
