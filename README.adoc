@@ -75,6 +75,34 @@ BaseRenderer                  # Core HTML rendering, document assembly, CSS/JS p
     └── RiboseRenderer        # Ribose-specific formatting
 ....
 
+===== Drop Pattern
+
+Block elements (notes, examples, sourcecode, formulas, figures, admonitions) use the Drop pattern:
+
+[source,ruby]
+# A Drop captures rendered content via RendererContext, then passes
+# data to a Liquid template. The renderer never emits HTML directly.
+def render_note(note, **_opts)
+  drop = Drops::NoteDrop.from_model(note, renderer: renderer_context)
+  @output << render_liquid("_note.html.liquid", { "block" => drop })
+end
+
+Each Drop class inherits from `BlockElementDrop` and implements `.from_model(model, renderer:)` which:
+
+. Captures child content via `renderer.capture_output { ... }`
+. Returns a new Drop instance with pre-rendered HTML strings
+. The Liquid template reads Drop attributes and outputs final HTML
+
+`RendererContext` is a facade that exposes only the rendering methods Drops need, maintaining encapsulation.
+
+===== Class Name Ownership
+
+The HTML renderer owns its class names entirely. **No XML-originated class names appear in the HTML output.**
+
+* Block-level classes (`note-block`, `formula`, `figure`, etc.) are assigned by the renderer based on what it's rendering
+* Inline span classes use `SPAN_ROLE_CLASSES` to map XML span roles to HTML-specific names (e.g., `boldtitle` → `title-text`, `citesec` → `xref-section`)
+* The XML's `class_attr` is read as **input only** to determine semantic role, never emitted directly
+
 ==== Presentation XML
 
 The HTML renderer expects **presentation XML** (not source XML). Presentation XML contains `fmt-*` display elements (`fmt-title`, `fmt-xref`, `fmt-link`, `fmt-concept`, `fmt-definition`, `fmt-preferred`, etc.) alongside semantic elements. The renderer prioritizes `fmt-*` elements for rendering, falling back to semantic elements when display elements are absent.
@@ -107,8 +135,15 @@ HTML structure is defined in `.liquid` templates under `lib/metanorma/html/templ
 `_header.html.liquid` :: Sticky header with publisher logos
 `_footer.html.liquid` :: Footer with copyright
 `_cover.html.liquid` :: Cover page layout
+`_iso_cover.html.liquid` :: ISO-specific cover page
 `_footnotes.html.liquid` :: Footnotes section
 `_doc_title.html.liquid` :: Document title rendering
+`_note.html.liquid` :: Note block
+`_example.html.liquid` :: Example block
+`_sourcecode.html.liquid` :: Source code block
+`_formula.html.liquid` :: Formula block
+`_figure.html.liquid` :: Figure block
+`_admonition.html.liquid` :: Admonition block
 
 Templates use `Liquid::LocalFileSystem` for partials (prefixed with `_`). The `render_liquid` method handles template caching via `TEMPLATE_CACHE`.
 
@@ -151,26 +186,32 @@ Renderer instance methods:
 `theme` :: Returns the `Theme` instance (override in subclasses).
 `render_liquid(template_name, assigns)` :: Renders a Liquid template with caching.
 
- == Document Flavors
+== Document Flavors
 
- The gem provides a hierarchy of document flavors:
+The gem provides a hierarchy of document flavors:
 
- * BasicDocument - Basic document model
- * StandardDocument - Standard document model (extends BasicDocument)
- * IsoDocument - ISO standard document model (extends StandardDocument)
- * IecDocument - IEC standard document model
- * IeeeDocument - IEEE standard document model
- * IetfDocument - IETF standard document model
- * IhoDocument - IHO standard document model
- * OimlDocument - OIML standard document model
- * BipmDocument - BIPM standard document model
- * ItuDocument - ITU standard document model
- * OgcDocument - OGC standard document model
- * CcDocument - CC standard document model
- * RiboseDocument - Ribose standard document model
+* BasicDocument - Basic document model
+* StandardDocument - Standard document model (extends BasicDocument)
+* IsoDocument - ISO standard document model (extends StandardDocument)
+* IecDocument - IEC standard document model
+* IeeeDocument - IEEE standard document model
+* IetfDocument - IETF standard document model
+* IhoDocument - IHO standard document model
+* OimlDocument - OIML standard document model
+* BipmDocument - BIPM standard document model
+* ItuDocument - ITU standard document model
+* OgcDocument - OGC standard document model
+* CcDocument - CC standard document model
+* RiboseDocument - Ribose standard document model
 
- == Supported XML Formats
+== Supported XML Formats
 
- This library targets the modern Metanorma XML format which uses `<metanorma>` as the root element.
+This library targets the modern Metanorma XML format which uses `<metanorma>` as the root element.
 
- Legacy XML formats that use flavor-specific root elements (e.g. `<iso-standard>`, `<m3d-standard>`, `<csa-standard>`, `<un-standard>`) are *not supported*.
+Legacy XML formats that use flavor-specific root elements (e.g. `<iso-standard>`, `<m3d-standard>`, `<csa-standard>`, `<un-standard>`) are *not supported*.
+
+== Documentation
+
+Detailed architecture documentation is in the `docs/` directory:
+
+* xref:docs/html-renderer.adoc[HTML Renderer Architecture] — renderer pipeline, drop pattern, class name ownership, template system
