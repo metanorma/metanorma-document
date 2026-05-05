@@ -1,0 +1,261 @@
+= HTML Renderer Architecture
+
+== Overview
+
+The HTML renderer converts a Metanorma document model (parsed from presentation XML) into a complete, self-contained HTML document. It produces all body content, header, footer, table of contents, CSS theming, and JavaScript interactivity.
+
+== Pipeline
+
+....
+Generator.generate(doc)
+  ├── Auto-selects renderer by document class
+  ├── Renderer.new
+  └── renderer.generate_full_document(doc)
+        ├── Header (publisher logos, document title)
+        ├── ToC sidebar
+        ├── Body content (recursive render)
+        ├── Footnotes
+        ├── Footer (copyright)
+        └── Asset pipeline (inline CSS + JS)
+....
+
+== Renderer Hierarchy
+
+[source,ruby]
+BaseRenderer                  # Core HTML rendering, document assembly, CSS/JS pipeline
+└── StandardRenderer          # Terms, definitions, annexes, bibliography
+    ├── IsoRenderer           # ISO cover page, copyright, title formatting
+    │   ├── IccRenderer       # ICC publisher styling
+    │   └── PdfaRenderer      # PDF Association publisher styling
+    ├── IecRenderer           # IEC-specific formatting
+    ├── IeeeRenderer          # IEEE-specific formatting
+    ├── IetfRenderer          # IETF-specific formatting
+    ├── IhoRenderer           # IHO-specific formatting
+    ├── ItuRenderer           # ITU-specific formatting
+    ├── OgcRenderer           # OGC-specific formatting
+    ├── OimlRenderer          # OIML-specific formatting
+    ├── BipmRenderer          # BIPM-specific formatting
+    ├── CcRenderer            # CC-specific formatting
+    └── RiboseRenderer        # Ribose-specific formatting
+
+=== Renderer Selection
+
+The `Generator` uses a two-tier lookup:
+
+1. **Taste match**: If the document's publisher matches a registered taste, use that renderer.
+2. **Model class**: Walk the ancestor chain from most specific to `BaseRenderer`.
+
+[source,ruby]
+# ICC documents are IsoDocument::Root but use IccRenderer
+Metanorma::Html::Generator.register_taste(
+  Metanorma::IsoDocument::Root,
+  "ICC",
+  Metanorma::Html::IccRenderer
+)
+
+== Class Name Ownership
+
+The HTML renderer owns its class names entirely. **No XML-originated class names appear in the HTML output.**
+
+The XML document model's `class_attr` is read as **input only** to determine semantic role. The renderer maps XML roles to HTML-specific class names via `SPAN_ROLE_CLASSES`:
+
+[source,ruby]
+SPAN_ROLE_CLASSES = {
+  "boldtitle" => "title-text",
+  "citefig" => "xref-fig",
+  "citesec" => "xref-section",
+  "fmt-element-name" => "element-label",
+  "fmt-obligation" => "obligation-text",
+  # ...
+}.freeze
+
+Block-level classes (`note-block`, `formula`, `figure`, etc.) are assigned by the renderer based on what it's rendering — never carried over from XML.
+
+Inline span classes go through `html_class_for_span`:
+
+[source,ruby]
+def html_class_for_span(xml_class)
+  SPAN_ROLE_CLASSES[xml_class] || "span-#{xml_class}"
+end
+
+Raw XML content (e.g., boilerplate) passes through Nokogiri post-processing that remaps any remaining XML class names.
+
+== Drop Pattern
+
+Block elements (notes, examples, sourcecode, formulas, figures, admonitions) use the Drop pattern to separate data capture from template rendering.
+
+=== How It Works
+
+. A `Drop` class captures rendered content via `RendererContext`
+. The Drop passes pre-rendered HTML strings to a Liquid template
+. The template reads Drop attributes and outputs final HTML
+
+[source,ruby]
+# In the renderer:
+def render_note(note, **_opts)
+  drop = Drops::NoteDrop.from_model(note, renderer: renderer_context)
+  @output << render_liquid("_note.html.liquid", { "block" => drop })
+end
+
+# In the Drop:
+class NoteDrop < BlockElementDrop
+  def self.from_model(note, renderer:)
+    content_html = renderer.capture_output do
+      note.content.each { |para| renderer.render_paragraph(para) }
+    end
+    new(id: renderer.safe_attr(note, :id),
+        label_html: renderer.escape_html(label),
+        content_html: content_html,
+        css_class: "note-block")
+  end
+end
+
+=== BlockElementDrop
+
+All block drops inherit from `BlockElementDrop`, which provides common attributes:
+
+`id` :: HTML element id
+`type` :: Block type identifier
+`label_html` :: Pre-rendered label (e.g., "NOTE", "EXAMPLE 1")
+`content_html` :: Pre-rendered inner content
+`css_class` :: HTML-specific class name
+
+=== RendererContext
+
+`RendererContext` is a facade inside `BaseRenderer` that exposes only the rendering methods Drops need. Drops call renderer methods through this facade — the renderer's private interface stays encapsulated.
+
+[source,ruby]
+class RendererContext
+  def safe_attr(obj, method_name)
+  def escape_html(text)
+  def extract_block_label(block, default)
+  def extract_plain_text(node)
+  def capture_output(&block)
+  def render_paragraph(p)
+  def render_mixed_inline(node)
+  def render_inline_element(el)
+  def render_unordered_list(ul)
+  def render_ordered_list(ol)
+  def render_definition_list(dl)
+  def render_table(table)
+  def render_figure(figure)
+end
+
+== Liquid Templates
+
+HTML structure is defined in `.liquid` templates under `lib/metanorma/html/templates/`.
+
+[horizontal]
+`document.html.liquid` :: Full document shell (`<html>`, `<head>`, `<body>`)
+`_header.html.liquid` :: Sticky header with publisher logos
+`_footer.html.liquid` :: Footer with copyright
+`_cover.html.liquid` :: Generic cover page layout
+`_iso_cover.html.liquid` :: ISO-specific cover page
+`_iso_doc_title.html.liquid` :: ISO document title rendering
+`_doc_title.html.liquid` :: Generic document title rendering
+`_footnotes.html.liquid` :: Footnotes section
+`_note.html.liquid` :: Note block
+`_example.html.liquid` :: Example block
+`_sourcecode.html.liquid` :: Source code block
+`_formula.html.liquid` :: Formula block
+`_figure.html.liquid` :: Figure block
+`_admonition.html.liquid` :: Admonition block
+
+Templates use `Liquid::LocalFileSystem` for partials (prefixed with `_`). The `render_liquid` method handles template caching.
+
+=== Template Example
+
+`_note.html.liquid`:
+
+[source,liquid]
+----
+<div{% if block.id %} id="{{ block.id }}"{% endif %} class="{{ block.css_class }}">
+  {% if block.label_html %}
+  <p class="note-label"><strong>{{ block.label_html }}</strong></p>
+  {% endif %}
+  <div class="note-content">
+    {{ block.content_html }}
+  </div>
+</div>
+----
+
+== Theming
+
+Each renderer has a `Theme` object controlling colors, typography, and layout. Theme properties are emitted as CSS custom properties (`--mn-primary`, `--font-body`, etc.).
+
+[source,ruby]
+class MyRenderer < Metanorma::Html::StandardRenderer
+  def theme
+    @theme ||= begin
+      t = Theme.new
+      t.primary = "#1a5276"
+      t.accent = "#2e86c1"
+      t.font_body = '"Charter", serif'
+      t
+    end
+  end
+end
+
+=== Theme Properties
+
+[horizontal]
+`primary` :: Primary brand color
+`accent` :: Accent/highlight color
+`gradient` :: Header gradient
+`font_body` :: Body text font stack
+`font_sans` :: Sans-serif font stack
+`font_mono` :: Monospace font stack
+`font_url` :: Google Fonts URL
+`note_border` :: Note block border color
+`note_bg` :: Note block background
+`example_border` :: Example block border color
+`example_bg` :: Example block background
+`admonition_border` :: Admonition border color
+`admonition_bg` :: Admonition background
+`extra_css` :: Additional CSS string appended after defaults
+
+== Presentation XML
+
+The HTML renderer expects **presentation XML** (not source XML). Presentation XML contains `fmt-*` display elements alongside semantic elements:
+
+- `fmt-title` — formatted section/block titles
+- `fmt-xref` — formatted cross-reference text
+- `fmt-link` — formatted link text
+- `fmt-concept` — formatted concept references
+- `fmt-definition` — formatted term definitions
+- `fmt-preferred` — formatted preferred term names
+
+The renderer prioritizes `fmt-*` elements for rendering, falling back to semantic elements when display elements are absent.
+
+== Asset Pipeline
+
+The `AssetPipeline` compiles CSS and JavaScript from modular source files into inline `<style>` and `<script>` blocks for self-contained output.
+
+=== CSS
+
+[horizontal]
+`data/stylesheets/base/` :: Reset, typography, layout, dark mode, print
+`data/stylesheets/components/` :: Component stylesheets (inline, tables, notes, etc.)
+
+=== JavaScript
+
+[horizontal]
+`data/javascripts/core/` :: Reader, theme, scroll, navigation, reveal
+`data/javascripts/components/` :: ToC, search, lightbox, code copy, glossary, etc.
+
+== Extending
+
+To add a new flavor renderer:
+
+. Subclass the appropriate base (usually `IsoRenderer` or `StandardRenderer`)
+. Override `theme` with brand colors/fonts
+. Override `publisher_logo_map` with logo filenames
+. Register with the Generator:
+
+[source,ruby]
+Metanorma::Html::Generator.register(
+  Metanorma::MyDocument::Root,
+  Metanorma::Html::MyRenderer
+)
+
+To customize how a specific block renders, override the `render_*` method and either emit HTML directly or use the Drop pattern with a new template.
