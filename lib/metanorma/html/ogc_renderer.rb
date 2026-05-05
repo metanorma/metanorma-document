@@ -46,7 +46,7 @@ module Metanorma
           t.example_bg      = "#e8f4fa"
           t.example_color   = "#004d73"
           t.admonition_border = "#e8812e"
-          t.admonition_bg   = "#fff5eb"
+          t.admonition_bg = "#fff5eb"
           t.admonition_color = "#c06a1a"
           t.footer_border_color = "#00b1ff"
           t.cover_separator_color = "rgba(0,177,255,0.25)"
@@ -69,13 +69,13 @@ module Metanorma
         preface_clauses = preface.clause&.reject { |cl| cl.type == "toc" } || []
 
         return if preface_clauses.empty? &&
-                  !preface.foreword && !preface.introduction &&
-                  !preface.abstract && !preface.acknowledgements &&
-                  !preface.executivesummary
+          !preface.foreword && !preface.introduction &&
+          !preface.abstract && !preface.acknowledgements &&
+          !preface.executivesummary
 
         @output << "<div id=\"preface\" class=\"preface-section\">"
         register_toc_entry(id: "preface", level: 1, text: "Preface")
-        @output << "<h1 class=\"ForewordTitle\">Preface</h1>"
+        @output << "<h1 class=\"foreword-title\">Preface</h1>"
 
         preface_clauses.each { |cl| render(cl, level: 2) }
 

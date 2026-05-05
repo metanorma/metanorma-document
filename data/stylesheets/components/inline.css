@@ -1,8 +1,8 @@
 /* === Inline Elements === */
 .fn-marker { vertical-align: super; font-size: 0.78em; color: var(--mn-primary); font-family: var(--font-sans); }
 .small-caps { font-variant: small-caps; letter-spacing: 0.03em; }
-.obligation { font-style: italic; color: var(--mn-accent); }
-.bold-title { font-weight: 700; }
+.obligation-text { font-style: italic; color: var(--mn-accent); }
+.title-text { font-weight: 700; }
 
 /* Math container — hover dropdown for source formats */
 .math-container { position: relative; display: inline; }
@@ -30,28 +30,27 @@
   border-radius: 2px; transition: background 0.15s, color 0.15s;
 }
 .stem-copy-btn:hover { background: var(--mn-primary-light); color: var(--mn-primary); }
-.nonboldtitle { font-weight: 400; }
+.subtitle-text { font-weight: 400; }
 
-.citesec, .citefig, .citetbl, .citeapp {
+.xref-section, .xref-fig, .xref-table, .xref-app {
   color: var(--mn-primary);
   text-decoration: underline;
   text-decoration-color: rgba(40,56,138,0.2);
   cursor: pointer;
 }
-.citesec:hover, .citefig:hover, .citetbl:hover, .citeapp:hover {
+.xref-section:hover, .xref-fig:hover, .xref-table:hover, .xref-app:hover {
   color: var(--mn-accent);
 }
 
-.doc-subtitle { font-weight: 400; }
-.doc-part-number { font-weight: 500; }
-.doc-part-title { font-style: italic; }
-.doc-publisher, .doc-publisher-name { font-weight: 500; }
-.std-doc-number { font-weight: 500; }
-.std-year { font-weight: 500; }
+.ref-part-number { font-weight: 500; }
+.ref-title { font-style: italic; }
+.ref-publisher, .ref-publisher-name { font-weight: 500; }
+.ref-doc-number { font-weight: 500; }
+.ref-year { font-weight: 500; }
 .xref-label { font-weight: 600; }
 a.xref { color: var(--mn-primary); text-decoration: none; border-bottom: 1px solid var(--mn-primary-light); }
 a.xref:hover { border-bottom-color: var(--mn-primary); }
-.doc-content a.xref .element-name { font-style: italic; }
+.doc-content a.xref .element-label { font-style: italic; }
 
 .kbd-hint {
   display: inline-block;
