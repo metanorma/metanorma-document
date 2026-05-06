@@ -51,45 +51,20 @@ module Metanorma
         end
       end
 
-      def render(node, **)
-        case node
-        when Metanorma::IsoDocument::Root
-          render_document(node, **)
-        when Metanorma::IsoDocument::Sections::IsoPreface
-          render_preface(node, **)
-        when Metanorma::IsoDocument::Sections::IsoSections
-          render_sections(node, **)
-        when Metanorma::IsoDocument::Sections::IsoClauseSection
-          render_clause(node, **)
-        when Metanorma::IsoDocument::Sections::IsoAnnexSection
-          render_annex(node, **)
-        when Metanorma::IsoDocument::Sections::IsoTermsSection
-          render_terms_section(node, **)
-        when Metanorma::IsoDocument::Sections::IsoForewordSection
-          render_foreword(node, **)
-        when Metanorma::IsoDocument::Sections::IsoAbstractSection
-          render_abstract(node, **)
-        when Metanorma::IsoDocument::Terms::IsoTerm
-          render_term(node, **)
-        when Metanorma::IsoDocument::Terms::TermNote
-          render_term_note(node, **)
-        when Metanorma::IsoDocument::Terms::TermExample
-          render_term_example(node, **)
-        when Metanorma::IsoDocument::Boilerplate
-          render_boilerplate(node, **)
-        else
-          super
-        end
-      end
+      register_render Metanorma::IsoDocument::Root, :render_document
+      register_render Metanorma::IsoDocument::Sections::IsoPreface, :render_preface
+      register_render Metanorma::IsoDocument::Sections::IsoSections, :render_sections
+      register_render Metanorma::IsoDocument::Sections::IsoClauseSection, :render_clause
+      register_render Metanorma::IsoDocument::Sections::IsoAnnexSection, :render_annex
+      register_render Metanorma::IsoDocument::Sections::IsoTermsSection, :render_terms_section
+      register_render Metanorma::IsoDocument::Sections::IsoForewordSection, :render_foreword
+      register_render Metanorma::IsoDocument::Sections::IsoAbstractSection, :render_abstract
+      register_render Metanorma::IsoDocument::Terms::IsoTerm, :render_term
+      register_render Metanorma::IsoDocument::Terms::TermNote, :render_term_note
+      register_render Metanorma::IsoDocument::Terms::TermExample, :render_term_example
+      register_render Metanorma::IsoDocument::Boilerplate, :render_boilerplate
 
-      def render_inline_element(element)
-        case element
-        when Metanorma::IsoDocument::Terms::TermOrigin
-          render_term_origin(element)
-        else
-          super
-        end
-      end
+      register_inline_render Metanorma::IsoDocument::Terms::TermOrigin, :render_term_origin
 
       def render_term_origin(element)
         text = extract_text_value(element)

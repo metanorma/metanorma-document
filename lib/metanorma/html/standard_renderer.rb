@@ -5,38 +5,19 @@ module Metanorma
     # Renders StandardDocument components to HTML.
     # Extends BaseRenderer with terms, bibliography, and standard sections.
     class StandardRenderer < BaseRenderer
-      def render(node, **)
-        case node
-        when Metanorma::StandardDocument::Root
-          render_standard_document(node, **)
-        when Metanorma::StandardDocument::Terms::Term
-          render_term(node, **)
-        when Metanorma::StandardDocument::Sections::TermsSection
-          render_terms_section(node, **)
-        when Metanorma::StandardDocument::Sections::StandardReferencesSection
-          render_references_section(node, **)
-        when Metanorma::StandardDocument::Sections::BibliographySection
-          render_bibliography(node, **)
-        when Metanorma::StandardDocument::Sections::ClauseSection
-          render_clause_section(node, **)
-        when Metanorma::StandardDocument::Sections::AnnexSection
-          render_annex_section(node, **)
-        when Metanorma::StandardDocument::Sections::StandardSection
-          render_standard_section(node, **)
-        when Metanorma::StandardDocument::Sections::Abstract
-          render_abstract_section(node, **)
-        when Metanorma::StandardDocument::Sections::Foreword
-          render_foreword_section(node, **)
-        when Metanorma::StandardDocument::Sections::Introduction
-          render_introduction_section(node, **)
-        when Metanorma::StandardDocument::Sections::FloatingTitle
-          render_floating_title(node, **)
-        when Metanorma::StandardDocument::Blocks::AmendBlock
-          render_amend_block(node, **)
-        else
-          super
-        end
-      end
+      register_render Metanorma::StandardDocument::Root, :render_standard_document
+      register_render Metanorma::StandardDocument::Terms::Term, :render_term
+      register_render Metanorma::StandardDocument::Sections::TermsSection, :render_terms_section
+      register_render Metanorma::StandardDocument::Sections::StandardReferencesSection, :render_references_section
+      register_render Metanorma::StandardDocument::Sections::BibliographySection, :render_bibliography
+      register_render Metanorma::StandardDocument::Sections::ClauseSection, :render_clause_section
+      register_render Metanorma::StandardDocument::Sections::AnnexSection, :render_annex_section
+      register_render Metanorma::StandardDocument::Sections::StandardSection, :render_standard_section
+      register_render Metanorma::StandardDocument::Sections::Abstract, :render_abstract_section
+      register_render Metanorma::StandardDocument::Sections::Foreword, :render_foreword_section
+      register_render Metanorma::StandardDocument::Sections::Introduction, :render_introduction_section
+      register_render Metanorma::StandardDocument::Sections::FloatingTitle, :render_floating_title
+      register_render Metanorma::StandardDocument::Blocks::AmendBlock, :render_amend_block
 
       private
 
