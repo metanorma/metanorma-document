@@ -585,32 +585,6 @@ module Metanorma
         end
       end
 
-      def render_term_note(note)
-        attrs = element_attrs(id: safe_attr(note, :id), class: "note-block")
-        tag("div", attrs) do
-          label = extract_termnote_label(note)
-          @output << "<p><span class=\"term-note-label\">#{escape_html(label)}: </span>"
-          note.p&.each { |para| render_mixed_inline(para) }
-          @output << "</p>"
-          note.ul&.each { |ul| render_unordered_list(ul) }
-          note.ol&.each { |ol| render_ordered_list(ol) }
-          note.dl&.then { |dl| render_definition_list(dl) }
-        end
-      end
-
-      def render_term_example(example)
-        attrs = element_attrs(id: safe_attr(example, :id), class: "example")
-        tag("div", attrs) do
-          label = extract_block_label(example, "EXAMPLE")
-          @output << "<p><span class=\"example-label\">#{escape_html(label)}</span>&nbsp;"
-          example.p&.each { |para| render_mixed_inline(para) }
-          @output << "</p>"
-          example.ul&.each { |ul| render_unordered_list(ul) }
-          example.ol&.each { |ol| render_ordered_list(ol) }
-          example.dl&.then { |dl| render_definition_list(dl) }
-        end
-      end
-
       # --- Boilerplate rendering ---
 
       def render_boilerplate(boilerplate, **_opts)
@@ -685,45 +659,6 @@ module Metanorma
         @output << "</#{h}>"
       end
 
-      # Collect all renderable children from a section, sorted by displayorder.
-      # Uses element_order directly because each_mixed_content returns early
-      # when the model class doesn't declare mixed_content (mixed? is false).
-      def collect_ordered_children(section)
-        children = gather_element_order_children(section)
-
-        # Also gather typed attributes that may not appear in element_order
-        %i[terms definitions].each do |attr|
-          val = safe_attr(section, attr)
-          next if val.nil?
-
-          Array(val).each do |v|
-            children << v unless children.include?(v)
-          end
-        end
-
-        # Sort by displayorder (non-nil first, then nil at end)
-        children.compact!
-        children.sort_by do |node|
-          order = begin
-            node.displayorder
-          rescue StandardError
-            nil
-          end
-          order &&= order.to_i
-          order || Float::INFINITY
-        end
-      end
-
-      def render_ordered_content(section, level = 1)
-        children = collect_ordered_children(section)
-        children.each do |node|
-          next if node.is_a?(String)
-          next if is_title_element?(node, section)
-
-          render(node, level: level + 1)
-        end
-      end
-
       # Collect all document-level children (sections, normative refs, annexes,
       # bibliography) sorted by displayorder for correct document order.
       # Top-level paragraphs in sections (title paragraphs) are excluded —
@@ -731,87 +666,19 @@ module Metanorma
       def collect_document_children(doc)
         items = []
 
-        # Main sections children (clauses, terms, etc.)
         if doc.sections
-          section_children = gather_element_order_children(doc.sections)
-          # Title paragraphs are ParagraphBlock objects at the top level of
-          # sections. They are rendered by render_doc_title, so skip them here.
+          section_children = collect_ordered_children(doc.sections)
           section_children.reject! do |node|
             node.is_a?(Metanorma::Document::Components::Paragraphs::ParagraphBlock)
           end
           items.concat(section_children)
-          # Also add typed attributes that may not be in element_order
-          %i[terms definitions].each do |attr|
-            val = safe_attr(doc.sections, attr)
-            next if val.nil?
-
-            Array(val).each { |v| items << v unless items.include?(v) }
-          end
         end
 
-        # Normative references from bibliography (may have displayorder)
         doc.bibliography&.references&.each { |r| items << r }
-
-        # Annexes
         doc.annex&.each { |a| items << a }
 
-        # Non-normative bibliography (no displayorder = goes at end)
-        if doc.bibliography&.references
-          # Already included above; filter normative vs non-normative below
-        end
-
         items.compact!
-        items.sort_by do |node|
-          order = begin
-            node.displayorder
-          rescue StandardError
-            nil
-          end
-          order &&= order.to_i
-          order || Float::INFINITY
-        end
-      end
-
-      # Iterate element_order directly, bypassing each_mixed_content which
-      # requires mixed?/ordered? to be true (many section models aren't).
-      def gather_element_order_children(node)
-        children = []
-        return children unless node.is_a?(Lutaml::Model::Serializable)
-        return children unless node.element_order && !node.element_order.empty?
-
-        xml_mapping = node.class.mappings_for(:xml, node.lutaml_register)
-        return children unless xml_mapping
-
-        element_to_attr = {}
-        xml_mapping.mapping_elements_hash.each_value do |rule_or_array|
-          Array(rule_or_array).each do |rule|
-            element_to_attr[rule.name] = rule.to
-            element_to_attr[rule.name.to_s] = rule.to if rule.name.is_a?(Symbol)
-          end
-        end
-
-        indices = Hash.new(0)
-
-        node.element_order.each do |el|
-          if el.text?
-            children << el.text_content if el.text_content
-          elsif el.element?
-            attr_name = element_to_attr[el.name]
-            next unless attr_name
-
-            coll = node.send(attr_name)
-            obj = if coll.is_a?(Array)
-                    idx = indices[attr_name]
-                    indices[attr_name] += 1
-                    coll[idx]
-                  else
-                    coll
-                  end
-            children << obj if obj
-          end
-        end
-
-        children
+        sort_by_displayorder(items)
       end
 
       def publisher_logos_html(_doc)

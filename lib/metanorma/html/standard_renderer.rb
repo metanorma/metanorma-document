@@ -285,11 +285,7 @@ module Metanorma
         tag("div", attrs) do
           label = extract_termnote_label(note)
           @output << "<p><span class=\"term-note-label\">#{escape_html(label)}: </span>"
-          if note.p && !note.p.empty?
-            note.p.each do |para|
-              render_mixed_inline(para)
-            end
-          end
+          note.p&.each { |para| render_mixed_inline(para) }
           @output << "</p>"
           note.ul&.each { |ul| render_unordered_list(ul) }
           note.ol&.each { |ol| render_ordered_list(ol) }
@@ -302,11 +298,7 @@ module Metanorma
         tag("div", attrs) do
           label = extract_block_label(example, "EXAMPLE")
           @output << "<p><span class=\"example-label\">#{escape_html(label)}</span>&nbsp;"
-          if example.p && !example.p.empty?
-            example.p.each do |para|
-              render_mixed_inline(para)
-            end
-          end
+          example.p&.each { |para| render_mixed_inline(para) }
           @output << "</p>"
           example.ul&.each { |ul| render_unordered_list(ul) }
           example.ol&.each { |ol| render_ordered_list(ol) }

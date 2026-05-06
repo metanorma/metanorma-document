@@ -2,6 +2,7 @@
 
 require "liquid"
 require "nokogiri"
+require "cgi"
 require_relative "drops/footnote_drop"
 
 module Metanorma
@@ -141,11 +142,14 @@ module Metanorma
 
       # --- Document Assembly ---
 
-      TEMPLATE_CACHE = Hash.new { |h, k| h[k] = Liquid::Template.parse(File.read(k)) }
+      TEMPLATE_CACHE = {}
+      TEMPLATE_CACHE_MUTEX = Mutex.new
 
       def render_liquid(template_name, assigns)
         template_path = File.join(TEMPLATES_ROOT, template_name)
-        template = TEMPLATE_CACHE[template_path]
+        template = TEMPLATE_CACHE_MUTEX.synchronize do
+          TEMPLATE_CACHE[template_path] ||= Liquid::Template.parse(File.read(template_path))
+        end
         assigns = assigns.transform_keys(&:to_s) if assigns.is_a?(Hash)
         template.render(assigns)
       end
@@ -989,7 +993,9 @@ module Metanorma
       end
 
       def raw_content_node?(node)
-        node.is_a?(Metanorma::IsoDocument::RawParagraph)
+        node.is_a?(Lutaml::Model::Serializable) &&
+          node.respond_to?(:content) &&
+          node.content.is_a?(String)
       end
 
       # Iterate element_order directly, preserving whitespace text nodes
@@ -1427,32 +1433,34 @@ module Metanorma
         parts.join
       end
 
+      BLOCK_TYPES = Set[
+        Metanorma::Document::Components::Paragraphs::ParagraphBlock,
+        Metanorma::Document::Components::Tables::TableBlock,
+        Metanorma::Document::Components::Lists::UnorderedList,
+        Metanorma::Document::Components::Lists::OrderedList,
+        Metanorma::Document::Components::Lists::DefinitionList,
+        Metanorma::Document::Components::AncillaryBlocks::FigureBlock,
+        Metanorma::Document::Components::Blocks::NoteBlock,
+        Metanorma::Document::Components::AncillaryBlocks::ExampleBlock,
+        Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock,
+        Metanorma::Document::Components::AncillaryBlocks::FormulaBlock,
+        Metanorma::Document::Components::MultiParagraph::QuoteBlock,
+        Metanorma::Document::Components::MultiParagraph::AdmonitionBlock,
+        Metanorma::Document::Components::Sections::HierarchicalSection,
+        Metanorma::Document::Components::Sections::BasicSection,
+        Metanorma::Document::Components::Sections::ContentSection,
+      ].freeze
+
       def html_class_for_span(xml_class)
         SPAN_ROLE_CLASSES[xml_class] || "span-#{xml_class}"
       end
 
       def block_element?(obj)
-        obj.is_a?(Metanorma::Document::Components::Paragraphs::ParagraphBlock) ||
-          obj.is_a?(Metanorma::Document::Components::Tables::TableBlock) ||
-          obj.is_a?(Metanorma::Document::Components::Lists::UnorderedList) ||
-          obj.is_a?(Metanorma::Document::Components::Lists::OrderedList) ||
-          obj.is_a?(Metanorma::Document::Components::Lists::DefinitionList) ||
-          obj.is_a?(Metanorma::Document::Components::AncillaryBlocks::FigureBlock) ||
-          obj.is_a?(Metanorma::Document::Components::Blocks::NoteBlock) ||
-          obj.is_a?(Metanorma::Document::Components::AncillaryBlocks::ExampleBlock) ||
-          obj.is_a?(Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock) ||
-          obj.is_a?(Metanorma::Document::Components::AncillaryBlocks::FormulaBlock) ||
-          obj.is_a?(Metanorma::Document::Components::MultiParagraph::QuoteBlock) ||
-          obj.is_a?(Metanorma::Document::Components::MultiParagraph::AdmonitionBlock) ||
-          obj.is_a?(Metanorma::Document::Components::Sections::HierarchicalSection) ||
-          obj.is_a?(Metanorma::Document::Components::Sections::BasicSection) ||
-          obj.is_a?(Metanorma::Document::Components::Sections::ContentSection)
+        BLOCK_TYPES.any? { |type| obj.is_a?(type) }
       end
 
       def safe_attr(obj, method_name)
-        obj.public_send(method_name)
-      rescue NoMethodError
-        nil
+        obj.public_send(method_name) if obj.respond_to?(method_name)
       end
 
       def collect_index_term(element)
@@ -1504,14 +1512,7 @@ module Metanorma
       end
 
       def escape_html(text)
-        return "" if text.nil?
-
-        text
-          .to_s
-          .gsub("&", "&amp;")
-          .gsub("<", "&lt;")
-          .gsub(">", "&gt;")
-          .gsub('"', "&quot;")
+        CGI.escapeHTML(text.to_s)
       end
 
       def extract_text_value(val)
