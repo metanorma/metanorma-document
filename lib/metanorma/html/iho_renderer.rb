@@ -4,7 +4,6 @@ module Metanorma
   module Html
     # IHO brand: #00AAA9 teal + #05164D navy + #FEDC5B gold from logo
     class IhoRenderer < IsoRenderer
-      registers_doc_type Metanorma::IhoDocument::Root
 
       def flavor_publishers(_doc_id)
         ["IHO"]

@@ -5,7 +5,6 @@ module Metanorma
     # Renders BipmDocument components to HTML.
     # Extends IsoRenderer with BIPM-specific branding (institutional navy, scientific precision).
     class BipmRenderer < IsoRenderer
-      registers_doc_type Metanorma::BipmDocument::Root
 
       def flavor_publishers(_doc_id)
         ["BIPM"]

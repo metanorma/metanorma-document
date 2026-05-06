@@ -5,7 +5,6 @@ module Metanorma
     # Renders IetfDocument components to HTML.
     # Extends IsoRenderer with IETF/RFC branding.
     class IetfRenderer < IsoRenderer
-      registers_doc_type Metanorma::IetfDocument::Root
 
       def flavor_publishers(_doc_id)
         ["IETF"]

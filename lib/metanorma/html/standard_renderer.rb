@@ -138,63 +138,46 @@ module Metanorma
 
       # --- Section rendering ---
 
-      def render_clause_section(clause, level: 1, **_opts)
-        attrs = element_attrs(id: safe_attr(clause, :id))
-        tag("div", attrs) do
-          render_standard_title(clause, level)
-          render_standard_section_blocks(clause, level)
-          render_subsections(clause, level)
-        end
-      end
-
-      def render_annex_section(annex, level: 1, **_opts)
-        attrs = element_attrs(id: safe_attr(annex, :id))
-        tag("div", attrs) do
-          render_standard_title(annex, level)
-          render_standard_section_blocks(annex, level)
-          render_subsections(annex, level)
-        end
-      end
-
-      def render_standard_section(section, level: 1, **_opts)
+      def render_section(section, level: 1, title_class: nil, with_subsections: false, with_terms: false)
         attrs = element_attrs(id: safe_attr(section, :id))
         tag("div", attrs) do
-          render_standard_title(section, level)
+          if title_class
+            render_standard_title(section, level, default_class: title_class)
+          else
+            render_standard_title(section, level)
+          end
           render_standard_section_blocks(section, level)
+          render_subsections(section, level) if with_subsections
+          section.terms&.each { |term| render_term(term) } if with_terms
         end
       end
 
-      def render_terms_section(terms, level: 1, **_opts)
-        attrs = element_attrs(id: safe_attr(terms, :id))
-        tag("div", attrs) do
-          render_standard_title(terms, level)
-          render_standard_section_blocks(terms, level)
-          terms.terms&.each { |term| render_term(term) }
-        end
+      def render_clause_section(section, level: 1, **)
+        render_section(section, level: level, with_subsections: true)
       end
 
-      def render_abstract_section(section, level: 1, **_opts)
-        attrs = element_attrs(id: safe_attr(section, :id))
-        tag("div", attrs) do
-          render_standard_title(section, level, default_class: "intro-title")
-          render_standard_section_blocks(section, level)
-        end
+      def render_annex_section(section, level: 1, **)
+        render_section(section, level: level, with_subsections: true)
       end
 
-      def render_foreword_section(section, level: 1, **_opts)
-        attrs = element_attrs(id: safe_attr(section, :id))
-        tag("div", attrs) do
-          render_standard_title(section, level, default_class: "foreword-title")
-          render_standard_section_blocks(section, level)
-        end
+      def render_standard_section(section, level: 1, **)
+        render_section(section, level: level)
       end
 
-      def render_introduction_section(section, level: 1, **_opts)
-        attrs = element_attrs(id: safe_attr(section, :id))
-        tag("div", attrs) do
-          render_standard_title(section, level, default_class: "intro-title")
-          render_standard_section_blocks(section, level)
-        end
+      def render_terms_section(section, level: 1, **)
+        render_section(section, level: level, with_terms: true)
+      end
+
+      def render_abstract_section(section, level: 1, **)
+        render_section(section, level: level, title_class: "intro-title")
+      end
+
+      def render_foreword_section(section, level: 1, **)
+        render_section(section, level: level, title_class: "foreword-title")
+      end
+
+      def render_introduction_section(section, level: 1, **)
+        render_section(section, level: level, title_class: "intro-title")
       end
 
       def render_floating_title(title_node, **_opts)
@@ -285,11 +268,7 @@ module Metanorma
         tag("div", attrs) do
           label = extract_termnote_label(note)
           @output << "<p><span class=\"term-note-label\">#{escape_html(label)}: </span>"
-          if note.p && !note.p.empty?
-            note.p.each do |para|
-              render_mixed_inline(para)
-            end
-          end
+          note.p&.each { |para| render_mixed_inline(para) }
           @output << "</p>"
           note.ul&.each { |ul| render_unordered_list(ul) }
           note.ol&.each { |ol| render_ordered_list(ol) }
@@ -302,11 +281,7 @@ module Metanorma
         tag("div", attrs) do
           label = extract_block_label(example, "EXAMPLE")
           @output << "<p><span class=\"example-label\">#{escape_html(label)}</span>&nbsp;"
-          if example.p && !example.p.empty?
-            example.p.each do |para|
-              render_mixed_inline(para)
-            end
-          end
+          example.p&.each { |para| render_mixed_inline(para) }
           @output << "</p>"
           example.ul&.each { |ul| render_unordered_list(ul) }
           example.ol&.each { |ol| render_ordered_list(ol) }
@@ -433,7 +408,7 @@ module Metanorma
           end
           if primary
             id_val = extract_text_value(primary)
-            @output << "<span class=\"std-doc-number\">#{escape_html(id_val)}</span>" unless id_val.to_s.empty?
+            @output << "<span class=\"ref-doc-number\">#{escape_html(id_val)}</span>" unless id_val.to_s.empty?
           end
         end
 
@@ -442,7 +417,7 @@ module Metanorma
             date_on = date.is_a?(Metanorma::Document::Relaton::BibliographicDate) ? date.on : nil
             date_val = extract_text_value(date_on || safe_attr(date, :text))
             if date_val && !date_val.to_s.empty?
-              @output << ":<span class=\"std-year\">#{escape_html(date_val.to_s)}</span>"
+              @output << ":<span class=\"ref-year\">#{escape_html(date_val.to_s)}</span>"
             end
           end
         end
