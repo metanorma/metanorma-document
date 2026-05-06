@@ -1,0 +1,27 @@
+{% for fig in figures %}
+<li class="toc-list-header" data-list="figures"><button class="toc-list-toggle" aria-expanded="false"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="14" height="12" rx="1"/><circle cx="5" cy="6.5" r="1.5"/><path d="M1 12l4-4 2 2 3-3 5 5"/></svg> Figures <span class="toc-list-count">({{ figures.size }})</span></button></li>
+{% break %}
+{% endfor %}
+{% for fig in figures %}
+<li class="toc-list-item toc-figures" style="display:none"><a href="#{{ fig.id }}" class="toc-link" data-target="{{ fig.id }}">{{ fig.text | escape }}</a></li>
+{% endfor %}
+
+{% for tbl in tables %}
+<li class="toc-list-header" data-list="tables"><button class="toc-list-toggle" aria-expanded="false"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="14" height="12" rx="1"/><line x1="1" y1="6" x2="15" y2="6"/><line x1="1" y1="10" x2="15" y2="10"/><line x1="7" y1="2" x2="7" y2="14"/></svg> Tables <span class="toc-list-count">({{ tables.size }})</span></button></li>
+{% break %}
+{% endfor %}
+{% for tbl in tables %}
+<li class="toc-list-item toc-tables" style="display:none"><a href="#{{ tbl.id }}" class="toc-link" data-target="{{ tbl.id }}">{{ tbl.text | escape }}</a></li>
+{% endfor %}
+
+{% if has_special_lists %}
+<li class="toc-divider"></li>
+{% endif %}
+
+{% if entries.size == 0 %}
+<li class="toc-empty">No entries</li>
+{% else %}
+{% for entry in entries %}
+<li class="toc-level-{{ entry.level }}"><a href="#{{ entry.id }}" class="toc-link" data-target="{{ entry.id }}">{{ entry.text | escape }}</a></li>
+{% endfor %}
+{% endif %}

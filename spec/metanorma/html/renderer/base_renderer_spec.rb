@@ -79,15 +79,15 @@ RSpec.describe Metanorma::Html::BaseRenderer do
   end
 
   describe "BLOCK_TYPES" do
-    it "is a frozen Set" do
+    it "is a frozen Hash" do
       described_class::BLOCK_TYPES.should be_frozen
-      described_class::BLOCK_TYPES.should be_a(Set)
+      described_class::BLOCK_TYPES.should be_a(Hash)
     end
 
     it "includes all block element types" do
-      described_class::BLOCK_TYPES.should include(Metanorma::Document::Components::Paragraphs::ParagraphBlock)
-      described_class::BLOCK_TYPES.should include(Metanorma::Document::Components::Tables::TableBlock)
-      described_class::BLOCK_TYPES.should include(Metanorma::Document::Components::Blocks::NoteBlock)
+      described_class::BLOCK_TYPES.should have_key(Metanorma::Document::Components::Paragraphs::ParagraphBlock)
+      described_class::BLOCK_TYPES.should have_key(Metanorma::Document::Components::Tables::TableBlock)
+      described_class::BLOCK_TYPES.should have_key(Metanorma::Document::Components::Blocks::NoteBlock)
     end
   end
 end

@@ -11,6 +11,8 @@ module Metanorma
       autoload :SourcecodeDrop, "metanorma/html/drops/sourcecode_drop"
       autoload :FormulaDrop, "metanorma/html/drops/formula_drop"
       autoload :FigureDrop, "metanorma/html/drops/figure_drop"
+      autoload :TocEntryDrop, "metanorma/html/drops/toc_entry_drop"
+      autoload :FigureListEntryDrop, "metanorma/html/drops/figure_list_entry_drop"
     end
   end
 end

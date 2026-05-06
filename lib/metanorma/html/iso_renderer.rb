@@ -133,7 +133,7 @@ module Metanorma
 
       # Extract document type from ext.doctype.
       def extract_doctype(bibdata)
-        return nil unless bibdata.respond_to?(:ext)
+        return nil unless bibdata.is_a?(Metanorma::IsoDocument::Metadata::IsoBibliographicItem)
 
         ext = bibdata.ext
         return nil unless ext
