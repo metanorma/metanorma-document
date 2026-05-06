@@ -49,6 +49,26 @@ module Metanorma
 
       METANORMA_LOGO = "metanorma-logo.svg"
 
+      # Type-to-method registry for OCP dispatch.
+      # Each subclass gets its own hash; lookup traverses ancestors.
+      class << self
+        def render_registry
+          @render_registry ||= {}
+        end
+
+        def register_render(type_class, method_name)
+          render_registry[type_class] = method_name
+        end
+
+        def inline_registry
+          @inline_registry ||= {}
+        end
+
+        def register_inline_render(type_class, method_name)
+          inline_registry[type_class] = method_name
+        end
+      end
+
       def initialize
         @output = +""
         @toc_entries = []
@@ -469,53 +489,124 @@ module Metanorma
         parts.join.strip.gsub("\u00A0", " ")
       end
 
-      # Dispatch to the appropriate render method based on node class.
+      # Dispatch to the appropriate render method via type registry.
+      # Lookups traverse the ancestor chain so subclasses inherit
+      # parent registrations and can override them independently.
       def render(node, **)
-        case node
-        when Metanorma::Document::Components::Paragraphs::ParagraphBlock
-          render_paragraph(node, **)
-        when Metanorma::Document::Components::Tables::TableBlock
-          render_table(node, **)
-        when Metanorma::Document::Components::Lists::UnorderedList
-          render_unordered_list(node, **)
-        when Metanorma::Document::Components::Lists::OrderedList
-          render_ordered_list(node, **)
-        when Metanorma::Document::Components::Lists::DefinitionList
-          render_definition_list(node, **)
-        when Metanorma::Document::Components::AncillaryBlocks::FigureBlock
-          render_figure(node, **)
-        when Metanorma::Document::Components::Blocks::NoteBlock
-          render_note(node, **)
-        when Metanorma::Document::Components::AncillaryBlocks::ExampleBlock
-          render_example(node, **)
-        when Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock
-          render_sourcecode(node, **)
-        when Metanorma::Document::Components::AncillaryBlocks::FormulaBlock
-          render_formula(node, **)
-        when Metanorma::Document::Components::MultiParagraph::QuoteBlock
-          render_quote(node, **)
-        when Metanorma::Document::Components::MultiParagraph::AdmonitionBlock
-          render_admonition(node, **)
-        when Metanorma::Document::Components::Sections::HierarchicalSection
-          render_hierarchical_section(node, **)
-        when Metanorma::Document::Components::Sections::BasicSection
-          render_basic_section(node, **)
-        when Metanorma::Document::Components::Sections::ContentSection
-          render_content_section(node, **)
-        when Metanorma::Document::Components::EmptyElements::PageBreakElement
-          ""
-        when Metanorma::Document::Components::IdElements::Bookmark
-          render_bookmark(node)
-        when Metanorma::Document::Components::Inline::SemxElement
-          render_semx_content(node)
-        when String
-          escape_html(node)
-        else
-          ""
+        return escape_html(node) if node.is_a?(String)
+
+        method = lookup_dispatch(node.class, :render_registry)
+        method ? send(method, node, **) : ""
+      end
+
+      # Dispatch to the appropriate inline render method via type registry.
+      def render_inline_element(element, **)
+        return "" if element.nil?
+        return escape_html(element) if element.is_a?(String)
+
+        method = lookup_dispatch(element.class, :inline_registry)
+        if method
+          send(method, element)
+        elsif element.is_a?(Lutaml::Model::Serializable) && element.mixed?
+          render_mixed_inline(element)
         end
       end
 
+      # --- Type registrations (class-level, evaluated at class load time) ---
+
+      register_render Metanorma::Document::Components::Paragraphs::ParagraphBlock, :render_paragraph
+      register_render Metanorma::Document::Components::Tables::TableBlock, :render_table
+      register_render Metanorma::Document::Components::Lists::UnorderedList, :render_unordered_list
+      register_render Metanorma::Document::Components::Lists::OrderedList, :render_ordered_list
+      register_render Metanorma::Document::Components::Lists::DefinitionList, :render_definition_list
+      register_render Metanorma::Document::Components::AncillaryBlocks::FigureBlock, :render_figure
+      register_render Metanorma::Document::Components::Blocks::NoteBlock, :render_note
+      register_render Metanorma::Document::Components::AncillaryBlocks::ExampleBlock, :render_example
+      register_render Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock, :render_sourcecode
+      register_render Metanorma::Document::Components::AncillaryBlocks::FormulaBlock, :render_formula
+      register_render Metanorma::Document::Components::MultiParagraph::QuoteBlock, :render_quote
+      register_render Metanorma::Document::Components::MultiParagraph::AdmonitionBlock, :render_admonition
+      register_render Metanorma::Document::Components::Sections::HierarchicalSection, :render_hierarchical_section
+      register_render Metanorma::Document::Components::Sections::BasicSection, :render_basic_section
+      register_render Metanorma::Document::Components::Sections::ContentSection, :render_content_section
+      register_render Metanorma::Document::Components::EmptyElements::PageBreakElement, :render_noop
+      register_render Metanorma::Document::Components::IdElements::Bookmark, :render_bookmark
+      register_render Metanorma::Document::Components::Inline::SemxElement, :render_semx_content
+
+      register_inline_render Metanorma::Document::Components::Inline::EmRawElement, :render_em
+      register_inline_render Metanorma::Document::Components::Inline::StrongRawElement, :render_strong
+      register_inline_render Metanorma::Document::Components::Inline::TtElement, :render_tt
+      register_inline_render Metanorma::Document::Components::Inline::SubElement, :render_sub
+      register_inline_render Metanorma::Document::Components::Inline::SupElement, :render_sup
+      register_inline_render Metanorma::Document::Components::Inline::SmallCapElement, :render_small_caps
+      register_inline_render Metanorma::Document::Components::TextElements::UnderlineElement, :render_underline
+      register_inline_render Metanorma::Document::Components::TextElements::StrikeElement, :render_strike
+      register_inline_render Metanorma::Document::Components::Inline::BrElement, :render_br
+      register_inline_render Metanorma::Document::Components::Inline::TabElement, :render_tab
+      register_inline_render Metanorma::Document::Components::Inline::LinkElement, :render_link
+      register_inline_render Metanorma::Document::Components::Inline::XrefElement, :render_noop_inline
+      register_inline_render Metanorma::Document::Components::Inline::ErefElement, :render_noop_inline
+      register_inline_render Metanorma::Document::Components::Inline::SpanElement, :render_span
+      register_inline_render Metanorma::Document::Components::Inline::FnElement, :render_fn_inline
+      register_inline_render Metanorma::Document::Components::Inline::ConceptElement, :render_concept
+      register_inline_render Metanorma::Document::Components::Inline::StemInlineElement, :render_noop_inline
+      register_inline_render Metanorma::Document::Components::TextElements::StemElement, :render_stem
+      register_inline_render Metanorma::Document::Components::Inline::SemxElement, :render_semx_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtXrefElement, :render_fmt_xref
+      register_inline_render Metanorma::Document::Components::Inline::FmtStemElement, :render_fmt_stem
+      register_inline_render Metanorma::Document::Components::Inline::CommaElement, :render_comma
+      register_inline_render Metanorma::Document::Components::Inline::EnumCommaElement, :render_comma
+      register_inline_render Metanorma::Document::Components::IdElements::Bookmark, :render_bookmark
+      register_inline_render Metanorma::Document::Components::IdElements::Image, :render_image
+      register_inline_render Metanorma::Document::Components::Inline::MathElement, :render_math
+      register_inline_render Metanorma::Document::Components::Inline::AsciimathElement, :render_asciimath
+      register_inline_render Metanorma::Document::Components::EmptyElements::IndexElement, :render_index
+      register_inline_render Metanorma::Document::Components::ReferenceElements::IndexXrefElement, :render_index
+      register_inline_render Metanorma::Document::Components::Blocks::NoteBlock, :render_note_inline
+      # All Fmt* elements delegate to render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtNameElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtTitleElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtXrefLabelElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtFnLabelElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtConceptElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtAnnotationStartElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtAnnotationEndElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtAnnotationBodyElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::VariantTitleElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::LocalizedStringElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::TitleWithAnnotationElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::BiblioTagElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::NameWithIdElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::DisplayTextElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtFootnoteContainerElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtFnBodyElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtPreferredElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtDefinitionElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtTermsourceElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtAdmittedElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtIdentifierElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtSourcecodeElement, :render_mixed_inline
+
       private
+
+      def lookup_dispatch(type_class, registry_method)
+        self.class.ancestors.each do |ancestor|
+          next unless ancestor.respond_to?(registry_method)
+
+          registry = ancestor.send(registry_method)
+          method_name = registry[type_class]
+          return method_name if method_name
+        end
+        nil
+      end
+
+      def render_noop(*)
+        ""
+      end
+
+      def render_noop_inline(*)
+        nil
+      end
 
       # --- Block-level rendering ---
 
@@ -801,7 +892,7 @@ module Metanorma
         @output << render_liquid("_admonition.html.liquid", { "block" => drop })
       end
 
-      def render_bookmark(bookmark)
+      def render_bookmark(bookmark, **_opts)
         @output << %(<a id="#{escape_html(safe_attr(bookmark, :id).to_s)}"></a>)
       end
 
@@ -1023,112 +1114,96 @@ module Metanorma
         end
       end
 
-      def render_inline_element(element)
-        return "" if element.nil?
+      # Inline adapter methods for registry dispatch
 
-        case element
-        when String
-          @output << escape_html(element)
-        when Metanorma::Document::Components::Inline::EmRawElement
-          render_inline_tag("em", element)
-        when Metanorma::Document::Components::Inline::StrongRawElement
-          render_inline_tag("strong", element)
-        when Metanorma::Document::Components::Inline::TtElement
-          render_inline_tag("tt", element)
-        when Metanorma::Document::Components::Inline::SubElement
-          render_inline_tag("sub", element)
-        when Metanorma::Document::Components::Inline::SupElement
-          render_inline_tag("sup", element)
-        when Metanorma::Document::Components::Inline::SmallCapElement
-          render_inline_tag("span", element, class: "small-caps")
-        when Metanorma::Document::Components::TextElements::UnderlineElement
-          render_inline_tag("u", element)
-        when Metanorma::Document::Components::TextElements::StrikeElement
-          render_inline_tag("s", element)
-        when Metanorma::Document::Components::Inline::BrElement
-          @output << "<br />"
-        when Metanorma::Document::Components::Inline::TabElement
-          @output << "\u00a0\u00a0"
-        when Metanorma::Document::Components::Inline::LinkElement
-          render_link(element)
-        when Metanorma::Document::Components::Inline::XrefElement
-          # Source element — skip; rendered via fmt-xref in semx wrapper
-          nil
-        when Metanorma::Document::Components::Inline::ErefElement
-          # Source element — skip; rendered via fmt-xref in semx wrapper
-          nil
-        when Metanorma::Document::Components::Inline::SpanElement
-          xml_class = safe_attr(element, :class_attr).to_s
-          html_class = html_class_for_span(xml_class) unless xml_class.empty?
-          attrs = element_attrs(style: safe_attr(element, :style), class: html_class)
-          tag("span", attrs) { render_mixed_inline(element) }
-        when Metanorma::Document::Components::Inline::FnElement
-          render_fn(element)
-        when Metanorma::Document::Components::Inline::ConceptElement
-          render_concept(element)
-        when Metanorma::Document::Components::Inline::StemInlineElement
-          # Source element — skip; rendered via FmtStemElement
-          nil
-        when Metanorma::Document::Components::TextElements::StemElement
-          @output << render_stem_content(element)
-        when Metanorma::Document::Components::Inline::SemxElement
-          render_semx_content(element)
-        when Metanorma::Document::Components::Inline::FmtNameElement,
-             Metanorma::Document::Components::Inline::FmtTitleElement,
-             Metanorma::Document::Components::Inline::FmtXrefLabelElement,
-             Metanorma::Document::Components::Inline::FmtFnLabelElement,
-             Metanorma::Document::Components::Inline::FmtConceptElement,
-             Metanorma::Document::Components::Inline::FmtAnnotationStartElement,
-             Metanorma::Document::Components::Inline::FmtAnnotationEndElement,
-             Metanorma::Document::Components::Inline::FmtAnnotationBodyElement,
-             Metanorma::Document::Components::Inline::VariantTitleElement,
-             Metanorma::Document::Components::Inline::LocalizedStringElement,
-             Metanorma::Document::Components::Inline::TitleWithAnnotationElement,
-             Metanorma::Document::Components::Inline::BiblioTagElement,
-             Metanorma::Document::Components::Inline::NameWithIdElement,
-             Metanorma::Document::Components::Inline::DisplayTextElement,
-             Metanorma::Document::Components::Inline::FmtFootnoteContainerElement,
-             Metanorma::Document::Components::Inline::FmtFnBodyElement,
-             Metanorma::Document::Components::Inline::FmtPreferredElement,
-             Metanorma::Document::Components::Inline::FmtDefinitionElement,
-             Metanorma::Document::Components::Inline::FmtTermsourceElement,
-             Metanorma::Document::Components::Inline::FmtAdmittedElement,
-             Metanorma::Document::Components::Inline::FmtIdentifierElement,
-             Metanorma::Document::Components::Inline::FmtSourcecodeElement
-          render_mixed_inline(element)
-        when Metanorma::Document::Components::Inline::FmtXrefElement
-          target = safe_attr(element, :target) || safe_attr(element, :to_attr)
-          if target
-            attrs = element_attrs(href: "##{escape_html(target)}", class: "xref")
-            tag("a", attrs) { render_mixed_inline(element) }
-          else
-            render_mixed_inline(element)
-          end
-        when Metanorma::Document::Components::Inline::FmtStemElement
-          render_fmt_stem(element)
-        when Metanorma::Document::Components::Inline::CommaElement,
-             Metanorma::Document::Components::Inline::EnumCommaElement
-          @output << ", "
-        when Metanorma::Document::Components::IdElements::Bookmark
-          render_bookmark(element)
-        when Metanorma::Document::Components::IdElements::Image
-          render_image(element)
-        when Metanorma::Document::Components::Inline::MathElement
-          @output << element.content.to_s
-        when Metanorma::Document::Components::Inline::AsciimathElement
-          @output << %(<span class="stem">#{escape_html(Array(element.text).join)}</span>)
-        when Metanorma::Document::Components::EmptyElements::IndexElement,
-             Metanorma::Document::Components::ReferenceElements::IndexXrefElement
-          collect_index_term(element)
-          ""
-        when Metanorma::Document::Components::Blocks::NoteBlock
-          render_note(element)
+      def render_em(el)
+        render_inline_tag("em", el)
+      end
+
+      def render_strong(el)
+        render_inline_tag("strong", el)
+      end
+
+      def render_tt(el)
+        render_inline_tag("tt", el)
+      end
+
+      def render_sub(el)
+        render_inline_tag("sub", el)
+      end
+
+      def render_sup(el)
+        render_inline_tag("sup", el)
+      end
+
+      def render_small_caps(el)
+        render_inline_tag("span", el, class: "small-caps")
+      end
+
+      def render_underline(el)
+        render_inline_tag("u", el)
+      end
+
+      def render_strike(el)
+        render_inline_tag("s", el)
+      end
+
+      def render_br(*)
+        @output << "<br />"
+      end
+
+      def render_tab(*)
+        @output << "\u00a0\u00a0"
+      end
+
+      def render_span(el)
+        xml_class = safe_attr(el, :class_attr).to_s
+        html_class = html_class_for_span(xml_class) unless xml_class.empty?
+        attrs = element_attrs(style: safe_attr(el, :style), class: html_class)
+        tag("span", attrs) { render_mixed_inline(el) }
+      end
+
+      def render_fn_inline(el)
+        render_fn(el)
+      end
+
+      def render_stem(el)
+        @output << render_stem_content(el)
+      end
+
+      def render_semx_inline(el)
+        render_semx_content(el)
+      end
+
+      def render_fmt_xref(el)
+        target = safe_attr(el, :target) || safe_attr(el, :to_attr)
+        if target
+          attrs = element_attrs(href: "##{escape_html(target)}", class: "xref")
+          tag("a", attrs) { render_mixed_inline(el) }
         else
-          # Attempt generic mixed content rendering for unknown inline types
-          if element.is_a?(Lutaml::Model::Serializable) && element.mixed?
-            render_mixed_inline(element)
-          end
+          render_mixed_inline(el)
         end
+      end
+
+      def render_comma(*)
+        @output << ", "
+      end
+
+      def render_math(el)
+        @output << el.content.to_s
+      end
+
+      def render_asciimath(el)
+        @output << %(<span class="stem">#{escape_html(Array(el.text).join)}</span>)
+      end
+
+      def render_index(el)
+        collect_index_term(el)
+        ""
+      end
+
+      def render_note_inline(el)
+        render_note(el)
       end
 
       def render_inline_collections(node)
@@ -1164,7 +1239,7 @@ module Metanorma
       # Render SemxElement display content only, skipping semantic linkage.
       # semx wraps both semantic data (origin, xref, source, etc.) and
       # display content (fmt-xref, span, strong, etc.). Only render display.
-      def render_semx_content(element)
+      def render_semx_content(element, **_opts)
         display_attrs = %i[text fmt_xref fmt_link fmt_concept span strong em sup p semx
                            asciimath math sub_child tt_child br_child tab_child
                            stem_child figure_child formula_child sourcecode_child]
