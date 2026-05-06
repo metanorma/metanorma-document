@@ -8,22 +8,6 @@ module Metanorma
     # Extends StandardRenderer with ISO-specific cover page, boilerplate,
     # foreword, introduction, annex formatting, and ISO term entries.
     class IsoRenderer < StandardRenderer
-      class << self
-        def doc_types
-          @doc_types ||= []
-          if superclass <= IsoRenderer && superclass != IsoRenderer
-            superclass.doc_types + @doc_types
-          else
-            @doc_types.dup
-          end
-        end
-
-        def registers_doc_type(klass)
-          @doc_types ||= []
-          @doc_types << klass
-        end
-      end
-
       # --- Public hooks for flavor customization ---
 
       def flavor_publishers(_doc_id)
