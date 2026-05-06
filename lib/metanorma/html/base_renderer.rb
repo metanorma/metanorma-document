@@ -196,11 +196,6 @@ module Metanorma
         raw.length > 60 ? "#{raw[0, 57]}..." : raw
       end
 
-      # Reader controls — kept for backward compat with flavor renderers
-      def build_reader_controls
-        ""
-      end
-
       def build_publisher_logos
         publishers = flavor_publishers(extract_primary_doc_id)
         logo_map = publisher_logo_map
@@ -218,10 +213,6 @@ module Metanorma
 
           "<span class=\"brand-logo\" aria-label=\"#{pub} logo\">#{svg}</span>"
         end.join("\n")
-      end
-
-      def detect_publishers
-        flavor_publishers(extract_primary_doc_id)
       end
 
       def load_logo_svg(filename, height: 32)

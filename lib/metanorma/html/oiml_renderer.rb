@@ -5,7 +5,6 @@ module Metanorma
     # Renders OimlDocument (OIML) components to HTML.
     # Extends IsoRenderer with OIML branding.
     class OimlRenderer < IsoRenderer
-      registers_doc_type Metanorma::OimlDocument::Root
 
       def flavor_publishers(_doc_id)
         ["OIML"]

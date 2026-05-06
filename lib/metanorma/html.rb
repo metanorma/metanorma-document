@@ -8,7 +8,6 @@ module Metanorma
     autoload :Generator, "metanorma/html/generator"
     autoload :Theme, "metanorma/html/theme"
     autoload :AssetPipeline, "metanorma/html/asset_pipeline"
-    autoload :ComponentRegistry, "metanorma/html/component_registry"
     autoload :Component, "metanorma/html/component"
     autoload :Drops, "metanorma/html/drops"
     autoload :StandardRenderer, "metanorma/html/standard_renderer"

@@ -5,7 +5,6 @@ module Metanorma
     # Renders IeeeDocument components to HTML.
     # Extends IsoRenderer with IEEE branding.
     class IeeeRenderer < IsoRenderer
-      registers_doc_type Metanorma::IeeeDocument::Root
 
       def flavor_publishers(_doc_id)
         ["IEEE"]

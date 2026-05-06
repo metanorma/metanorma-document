@@ -69,4 +69,14 @@ RSpec.describe "HTML class name ownership" do
     page.at_css(".foreword-title").should_not be_nil
     page.at_css(".ForewordTitle").should be_nil
   end
+
+  it "uses ref-doc-number class instead of std-doc-number in bibliography" do
+    page.at_css(".ref-doc-number").should_not be_nil
+    page.at_css(".std-doc-number").should be_nil
+  end
+
+  it "uses ref-year class instead of std-year in bibliography" do
+    page.at_css(".ref-year").should_not be_nil
+    page.at_css(".std-year").should be_nil
+  end
 end
