@@ -83,33 +83,37 @@ module Metanorma
       # --- Public API ---
 
       # Facade object for Drops to call renderer methods without exposing
-      # the full private interface. Delegates to the renderer internally.
+      # the full private interface. Delegates via method_missing with an
+      # explicit allowlist — adding new delegations only requires updating
+      # DELEGATED_METHODS, not writing a new one-liner.
       class RendererContext
+        DELEGATED_METHODS = %i[
+          safe_attr escape_html extract_block_label extract_plain_text
+          capture_output render_paragraph render_mixed_inline
+          render_inline_element render_unordered_list render_ordered_list
+          render_definition_list render_sourcecode render_table
+          render_figure render_quote render_formula render_note
+          render_image render_stem_content register_figure_entry
+          render_liquid
+        ].freeze
+
         def initialize(renderer)
           @renderer = renderer
         end
 
-        def safe_attr(obj, method_name) = @renderer.send(:safe_attr, obj, method_name)
-        def escape_html(text) = @renderer.send(:escape_html, text)
-        def extract_block_label(block, default) = @renderer.send(:extract_block_label, block, default)
-        def extract_plain_text(node) = @renderer.send(:extract_plain_text, node)
-        def capture_output(&) = @renderer.send(:capture_output, &)
-        def render_paragraph(p) = @renderer.send(:render_paragraph, p)
-        def render_mixed_inline(node) = @renderer.send(:render_mixed_inline, node)
-        def render_inline_element(el) = @renderer.send(:render_inline_element, el)
-        def render_unordered_list(ul) = @renderer.send(:render_unordered_list, ul)
-        def render_ordered_list(ol) = @renderer.send(:render_ordered_list, ol)
-        def render_definition_list(dl) = @renderer.send(:render_definition_list, dl)
-        def render_sourcecode(sc) = @renderer.send(:render_sourcecode, sc)
-        def render_table(t) = @renderer.send(:render_table, t)
-        def render_figure(f) = @renderer.send(:render_figure, f)
-        def render_quote(q) = @renderer.send(:render_quote, q)
-        def render_formula(f) = @renderer.send(:render_formula, f)
-        def render_note(n) = @renderer.send(:render_note, n)
-        def render_image(img) = @renderer.send(:render_image, img)
-        def render_stem_content(stem) = @renderer.send(:render_stem_content, stem)
-        def register_figure_entry(...) = @renderer.send(:register_figure_entry, ...)
-        def render_liquid(template_name, assigns) = @renderer.send(:render_liquid, template_name, assigns)
+        def respond_to_missing?(method_name, include_private = false)
+          DELEGATED_METHODS.include?(method_name) || super
+        end
+
+        private
+
+        def method_missing(method_name, *args, **kwargs, &block)
+          if DELEGATED_METHODS.include?(method_name)
+            @renderer.send(method_name, *args, **kwargs, &block)
+          else
+            super
+          end
+        end
       end
 
       def renderer_context
@@ -265,41 +269,17 @@ module Metanorma
       # --- ToC generation ---
 
       def build_toc_html(entries)
-        top_lines = []
-        main_lines = if entries.empty?
-                       ["<li class=\"toc-empty\">No entries</li>"]
-                     else
-                       entries.map do |e|
-                         id = e[:id].to_s
-                         text = escape_html(e[:text].to_s)
-                         lvl = e[:level]
-                         "<li class=\"toc-level-#{lvl}\"><a href=\"##{id}\" class=\"toc-link\" data-target=\"#{id}\">#{text}</a></li>"
-                       end
-                     end
+        entry_drops = entries.map { |e| Drops::TocEntryDrop.new(e) }
+        figure_drops = @figure_entries.map { |f| Drops::FigureListEntryDrop.new(f) }
+        table_drops = @table_entries.map { |t| Drops::FigureListEntryDrop.new(t) }
+        has_special_lists = !@figure_entries.empty? || !@table_entries.empty?
 
-        # List of Figures — at top of sidebar
-        unless @figure_entries.empty?
-          top_lines << "<li class=\"toc-list-header\" data-list=\"figures\"><button class=\"toc-list-toggle\" aria-expanded=\"false\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><rect x=\"1\" y=\"2\" width=\"14\" height=\"12\" rx=\"1\"/><circle cx=\"5\" cy=\"6.5\" r=\"1.5\"/><path d=\"M1 12l4-4 2 2 3-3 5 5\"/></svg> Figures <span class=\"toc-list-count\">(#{@figure_entries.size})</span></button></li>"
-          @figure_entries.each do |f|
-            id = f[:id].to_s
-            text = escape_html(f[:text].to_s)
-            top_lines << "<li class=\"toc-list-item toc-figures\" style=\"display:none\"><a href=\"##{id}\" class=\"toc-link\" data-target=\"#{id}\">#{text}</a></li>"
-          end
-        end
-
-        # List of Tables — at top of sidebar
-        unless @table_entries.empty?
-          top_lines << "<li class=\"toc-list-header\" data-list=\"tables\"><button class=\"toc-list-toggle\" aria-expanded=\"false\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><rect x=\"1\" y=\"2\" width=\"14\" height=\"12\" rx=\"1\"/><line x1=\"1\" y1=\"6\" x2=\"15\" y2=\"6\"/><line x1=\"1\" y1=\"10\" x2=\"15\" y2=\"10\"/><line x1=\"7\" y1=\"2\" x2=\"7\" y2=\"14\"/></svg> Tables <span class=\"toc-list-count\">(#{@table_entries.size})</span></button></li>"
-          @table_entries.each do |t|
-            id = t[:id].to_s
-            text = escape_html(t[:text].to_s)
-            top_lines << "<li class=\"toc-list-item toc-tables\" style=\"display:none\"><a href=\"##{id}\" class=\"toc-link\" data-target=\"#{id}\">#{text}</a></li>"
-          end
-        end
-
-        top_lines << "<li class=\"toc-divider\"></li>" unless top_lines.empty?
-
-        (top_lines + main_lines).join("\n")
+        render_liquid("_toc.html.liquid", {
+                        "entries" => entry_drops,
+                        "figures" => figure_drops,
+                        "tables" => table_drops,
+                        "has_special_lists" => has_special_lists,
+                      })
       end
 
       # --- Scripts ---
@@ -1103,15 +1083,6 @@ module Metanorma
             end
           end
         end
-      rescue StandardError
-        node.each_mixed_content do |child|
-          case child
-          when String
-            @output << escape_html(child)
-          else
-            render_inline_element(child)
-          end
-        end
       end
 
       # Inline adapter methods for registry dispatch
@@ -1207,17 +1178,14 @@ module Metanorma
       end
 
       def render_inline_collections(node)
-        # Fallback: render text and inline collections sequentially
         texts = node.text
         if texts.is_a?(Array)
           texts.each do |t|
-            @output << if t.is_a?(Metanorma::Document::Components::Inline::MathElement)
-                         t.content.to_s
-                       elsif t.is_a?(Metanorma::Document::Components::Inline::AsciimathElement)
-                         %(<span class="stem">#{escape_html(Array(t.text).join)}</span>)
-                       else
-                         escape_html(t.to_s)
-                       end
+            if t.is_a?(String)
+              @output << escape_html(t)
+            else
+              render_inline_element(t)
+            end
           end
         elsif texts.is_a?(String)
           @output << escape_html(texts)
@@ -1464,7 +1432,7 @@ module Metanorma
               return stem.math.to_xml
             rescue StandardError
               math_items = Array(stem.math)
-              return math_items.map { |m| m.respond_to?(:content) ? m.content.to_s : m.to_s }.join
+              return math_items.map { |m| m.is_a?(Lutaml::Model::Serializable) ? m.content.to_s : m.to_s }.join
             end
           end
           if stem.asciimath
@@ -1499,30 +1467,30 @@ module Metanorma
         parts.join
       end
 
-      BLOCK_TYPES = Set[
-        Metanorma::Document::Components::Paragraphs::ParagraphBlock,
-        Metanorma::Document::Components::Tables::TableBlock,
-        Metanorma::Document::Components::Lists::UnorderedList,
-        Metanorma::Document::Components::Lists::OrderedList,
-        Metanorma::Document::Components::Lists::DefinitionList,
-        Metanorma::Document::Components::AncillaryBlocks::FigureBlock,
-        Metanorma::Document::Components::Blocks::NoteBlock,
-        Metanorma::Document::Components::AncillaryBlocks::ExampleBlock,
-        Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock,
-        Metanorma::Document::Components::AncillaryBlocks::FormulaBlock,
-        Metanorma::Document::Components::MultiParagraph::QuoteBlock,
-        Metanorma::Document::Components::MultiParagraph::AdmonitionBlock,
-        Metanorma::Document::Components::Sections::HierarchicalSection,
-        Metanorma::Document::Components::Sections::BasicSection,
-        Metanorma::Document::Components::Sections::ContentSection,
-      ].freeze
+      BLOCK_TYPES = {
+        Metanorma::Document::Components::Paragraphs::ParagraphBlock => true,
+        Metanorma::Document::Components::Tables::TableBlock => true,
+        Metanorma::Document::Components::Lists::UnorderedList => true,
+        Metanorma::Document::Components::Lists::OrderedList => true,
+        Metanorma::Document::Components::Lists::DefinitionList => true,
+        Metanorma::Document::Components::AncillaryBlocks::FigureBlock => true,
+        Metanorma::Document::Components::Blocks::NoteBlock => true,
+        Metanorma::Document::Components::AncillaryBlocks::ExampleBlock => true,
+        Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock => true,
+        Metanorma::Document::Components::AncillaryBlocks::FormulaBlock => true,
+        Metanorma::Document::Components::MultiParagraph::QuoteBlock => true,
+        Metanorma::Document::Components::MultiParagraph::AdmonitionBlock => true,
+        Metanorma::Document::Components::Sections::HierarchicalSection => true,
+        Metanorma::Document::Components::Sections::BasicSection => true,
+        Metanorma::Document::Components::Sections::ContentSection => true,
+      }.freeze
 
       def html_class_for_span(xml_class)
         SPAN_ROLE_CLASSES[xml_class] || "span-#{xml_class}"
       end
 
       def block_element?(obj)
-        BLOCK_TYPES.any? { |type| obj.is_a?(type) }
+        BLOCK_TYPES[obj.class] || BLOCK_TYPES.any? { |type, _| obj.is_a?(type) }
       end
 
       def safe_attr(obj, method_name)

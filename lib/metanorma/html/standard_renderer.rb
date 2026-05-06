@@ -50,7 +50,7 @@ module Metanorma
         end
 
         # Index section from indexsect element (presentation XML)
-        if doc.respond_to?(:indexsect) && doc.indexsect
+        if doc.is_a?(Metanorma::IsoDocument::Root) && doc.indexsect
           render(doc.indexsect)
         end
 
