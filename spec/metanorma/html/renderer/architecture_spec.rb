@@ -14,13 +14,13 @@ RSpec.describe "Architecture improvements" do
     it "extract_doctype uses is_a? for IsoBibliographicItem" do
       renderer = Metanorma::Html::IsoRenderer.new
       bibdata = doc.bibdata
-      doctype = renderer.send(:extract_doctype, bibdata)
+      doctype = renderer.extract_doctype(bibdata)
       doctype.should be_a(String)
     end
 
     it "extract_doctype returns nil for non-ISO bibdata" do
       renderer = Metanorma::Html::IsoRenderer.new
-      doctype = renderer.send(:extract_doctype, "not a bibdata")
+      doctype = renderer.extract_doctype("not a bibdata")
       doctype.should be_nil
     end
   end
@@ -76,12 +76,12 @@ RSpec.describe "Architecture improvements" do
     it "block_element? returns true for registered types" do
       renderer = Metanorma::Html::BaseRenderer.new
       para = Metanorma::Document::Components::Paragraphs::ParagraphBlock.new(text: "test")
-      renderer.send(:block_element?, para).should be true
+      renderer.block_element?(para).should be true
     end
 
     it "block_element? returns false for non-block types" do
       renderer = Metanorma::Html::BaseRenderer.new
-      renderer.send(:block_element?, "string").should be false
+      renderer.block_element?("string").should be false
     end
   end
 
@@ -110,19 +110,19 @@ RSpec.describe "Architecture improvements" do
 
   describe "inline collections registry dispatch" do
     it "renders MathElement in text collections via registry" do
-      # Math elements in inline text should be rendered by render_math
-      # (previously they were special-cased with inline if/elsif)
       renderer = Metanorma::Html::BaseRenderer.new
-      renderer.send(:lookup_dispatch,
-                     Metanorma::Document::Components::Inline::MathElement,
-                     :inline_registry).should eq(:render_math)
+      renderer.lookup_dispatch(
+        Metanorma::Document::Components::Inline::MathElement,
+        :inline_registry,
+      ).should eq(:render_math)
     end
 
     it "renders AsciimathElement in text collections via registry" do
       renderer = Metanorma::Html::BaseRenderer.new
-      renderer.send(:lookup_dispatch,
-                     Metanorma::Document::Components::Inline::AsciimathElement,
-                     :inline_registry).should eq(:render_asciimath)
+      renderer.lookup_dispatch(
+        Metanorma::Document::Components::Inline::AsciimathElement,
+        :inline_registry,
+      ).should eq(:render_asciimath)
     end
   end
 

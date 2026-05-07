@@ -109,7 +109,7 @@ module Metanorma
 
         def method_missing(method_name, *args, **kwargs, &block)
           if DELEGATED_METHODS.include?(method_name)
-            @renderer.send(method_name, *args, **kwargs, &block)
+            @renderer.public_send(method_name, *args, **kwargs, &block)
           else
             super
           end
@@ -476,7 +476,7 @@ module Metanorma
         return escape_html(node) if node.is_a?(String)
 
         method = lookup_dispatch(node.class, :render_registry)
-        method ? send(method, node, **) : ""
+        method ? public_send(method, node, **) : ""
       end
 
       # Dispatch to the appropriate inline render method via type registry.
@@ -486,7 +486,7 @@ module Metanorma
 
         method = lookup_dispatch(element.class, :inline_registry)
         if method
-          send(method, element)
+          public_send(method, element)
         elsif element.is_a?(Lutaml::Model::Serializable) && element.mixed?
           render_mixed_inline(element)
         end
@@ -567,13 +567,11 @@ module Metanorma
       register_inline_render Metanorma::Document::Components::Inline::FmtIdentifierElement, :render_mixed_inline
       register_inline_render Metanorma::Document::Components::Inline::FmtSourcecodeElement, :render_mixed_inline
 
-      private
-
       def lookup_dispatch(type_class, registry_method)
         self.class.ancestors.each do |ancestor|
-          next unless ancestor.respond_to?(registry_method)
+          next unless ancestor.is_a?(Class) && (ancestor == BaseRenderer || ancestor < BaseRenderer)
 
-          registry = ancestor.send(registry_method)
+          registry = ancestor.public_send(registry_method)
           method_name = registry[type_class]
           return method_name if method_name
         end
@@ -962,7 +960,7 @@ module Metanorma
             # Apply optional filter (used by semx to skip semantic attrs)
             next if allow_filter && !allow_filter.include?(attr_name)
 
-            coll = node.send(attr_name)
+            coll = node.public_send(attr_name)
             obj = if coll.is_a?(Array)
                     idx = indices[attr_name]
                     indices[attr_name] += 1
@@ -1056,8 +1054,9 @@ module Metanorma
 
       def raw_content_node?(node)
         node.is_a?(Lutaml::Model::Serializable) &&
-          node.respond_to?(:content) &&
           node.content.is_a?(String)
+      rescue NoMethodError
+        false
       end
 
       # Iterate element_order directly, preserving whitespace text nodes
@@ -1494,7 +1493,9 @@ module Metanorma
       end
 
       def safe_attr(obj, method_name)
-        obj.public_send(method_name) if obj.respond_to?(method_name)
+        obj.public_send(method_name)
+      rescue NoMethodError
+        nil
       end
 
       def collect_index_term(element)

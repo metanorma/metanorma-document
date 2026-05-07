@@ -154,8 +154,6 @@ module Metanorma
         val.strip.empty? ? nil : val
       end
 
-      private
-
       # --- Top-level document rendering ---
 
       def render_document(doc, **_opts)

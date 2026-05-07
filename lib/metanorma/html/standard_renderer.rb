@@ -19,8 +19,6 @@ module Metanorma
       register_render Metanorma::StandardDocument::Sections::FloatingTitle, :render_floating_title
       register_render Metanorma::StandardDocument::Blocks::AmendBlock, :render_amend_block
 
-      private
-
       # --- Top-level document rendering ---
 
       def render_standard_document(doc, **_opts)

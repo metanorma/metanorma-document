@@ -8,56 +8,56 @@ RSpec.describe Metanorma::Html::BaseRenderer do
 
   describe "#escape_html" do
     it "escapes ampersands" do
-      renderer.send(:escape_html, "a&b").should eq("a&amp;b")
+      renderer.escape_html("a&b").should eq("a&amp;b")
     end
 
     it "escapes angle brackets" do
-      renderer.send(:escape_html, "<em>").should eq("&lt;em&gt;")
+      renderer.escape_html("<em>").should eq("&lt;em&gt;")
     end
 
     it "escapes double quotes" do
-      renderer.send(:escape_html, 'a "b" c').should eq("a &quot;b&quot; c")
+      renderer.escape_html('a "b" c').should eq("a &quot;b&quot; c")
     end
 
     it "handles nil" do
-      renderer.send(:escape_html, nil).should eq("")
+      renderer.escape_html(nil).should eq("")
     end
   end
 
   describe "#element_attrs" do
     it "builds attribute string" do
-      result = renderer.send(:element_attrs, id: "foo", class: "bar")
+      result = renderer.element_attrs(id: "foo", class: "bar")
       result.should include('id="foo"')
       result.should include('class="bar"')
     end
 
     it "skips nil values" do
-      result = renderer.send(:element_attrs, id: "foo", class: nil)
+      result = renderer.element_attrs(id: "foo", class: nil)
       result.should include('id="foo"')
       result.should_not include("class")
     end
 
     it "skips empty strings" do
-      result = renderer.send(:element_attrs, id: "", class: "bar")
+      result = renderer.element_attrs(id: "", class: "bar")
       result.should_not include("id=")
       result.should include('class="bar"')
     end
 
     it "skips false values" do
-      result = renderer.send(:element_attrs, disabled: false)
+      result = renderer.element_attrs(disabled: false)
       result.should be_empty
     end
   end
 
   describe "#html_class_for_span" do
     it "maps known XML roles to HTML class names" do
-      renderer.send(:html_class_for_span, "boldtitle").should eq("title-text")
-      renderer.send(:html_class_for_span, "citesec").should eq("xref-section")
-      renderer.send(:html_class_for_span, "fmt-obligation").should eq("obligation-text")
+      renderer.html_class_for_span("boldtitle").should eq("title-text")
+      renderer.html_class_for_span("citesec").should eq("xref-section")
+      renderer.html_class_for_span("fmt-obligation").should eq("obligation-text")
     end
 
     it "generates prefixed class for unknown roles" do
-      renderer.send(:html_class_for_span, "custom-thing").should eq("span-custom-thing")
+      renderer.html_class_for_span("custom-thing").should eq("span-custom-thing")
     end
   end
 
