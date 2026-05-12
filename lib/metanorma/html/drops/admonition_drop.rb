@@ -9,7 +9,8 @@ module Metanorma
           id = renderer.safe_attr(admonition, :id)
 
           content_html = renderer.capture_output do
-            admonition.paragraphs&.each { |para| renderer.render_paragraph(para) }
+            renderer.render_block_children(admonition,
+                                           children: BaseRenderer::SIMPLE_CHILDREN)
           end
 
           new(
