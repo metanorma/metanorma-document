@@ -92,41 +92,54 @@ RSpec.describe Metanorma::Html::BaseRenderer do
   end
 
   describe "BLOCK_CHILDREN" do
-    it "is a frozen Hash mapping attr names to render methods" do
+    it "is frozen" do
       described_class::BLOCK_CHILDREN.should be_frozen
-      described_class::BLOCK_CHILDREN[:paragraphs].should eq(:render_paragraph)
-      described_class::BLOCK_CHILDREN[:ul].should eq(:render_unordered_list)
-      described_class::BLOCK_CHILDREN[:ol].should eq(:render_ordered_list)
-      described_class::BLOCK_CHILDREN[:dl].should eq(:render_definition_list)
-      described_class::BLOCK_CHILDREN[:sourcecode].should eq(:render_sourcecode)
-      described_class::BLOCK_CHILDREN[:table].should eq(:render_table)
-      described_class::BLOCK_CHILDREN[:figure].should eq(:render_figure)
-      described_class::BLOCK_CHILDREN[:quote].should eq(:render_quote)
-      described_class::BLOCK_CHILDREN[:formula].should eq(:render_formula)
+    end
+
+    it "maps text and list children to render methods" do
+      bc = described_class::BLOCK_CHILDREN
+      bc[:paragraphs].should eq(:render_paragraph)
+      bc[:ul].should eq(:render_unordered_list)
+      bc[:ol].should eq(:render_ordered_list)
+      bc[:dl].should eq(:render_definition_list)
+    end
+
+    it "maps media and special children to render methods" do
+      bc = described_class::BLOCK_CHILDREN
+      bc[:sourcecode].should eq(:render_sourcecode)
+      bc[:table].should eq(:render_table)
+      bc[:figure].should eq(:render_figure)
+      bc[:quote].should eq(:render_quote)
+      bc[:formula].should eq(:render_formula)
     end
   end
 
   describe "#render_block_children" do
-    it "renders each present child collection via the mapped method" do
-      renderer = described_class.new
-      ul = Metanorma::Document::Components::Lists::UnorderedList.new(
-        listitem: [Metanorma::Document::Components::Lists::ListItem.new(text: "item")]
+    let(:renderer) { described_class.new }
+    let(:list_item) do
+      Metanorma::Document::Components::Lists::ListItem.new(text: "item")
+    end
+    let(:ul_model) do
+      Metanorma::Document::Components::Lists::UnorderedList.new(
+        listitem: [list_item],
       )
-      model = Struct.new(:paragraphs, :ul, :ol).new(nil, [ul], nil)
+    end
 
+    it "renders present child collections via the mapped method" do
+      model = Struct.new(:paragraphs, :ul, :ol).new(nil, [ul_model], nil)
       output = renderer.capture_output do
-        renderer.render_block_children(model, children: { ul: :render_unordered_list })
+        renderer.render_block_children(model,
+                                       children: { ul: :render_unordered_list })
       end
       output.should include("<ul>")
       output.should include("<li>")
     end
 
     it "skips nil child collections" do
-      renderer = described_class.new
       model = Struct.new(:paragraphs, :ul).new(nil, nil)
-
       output = renderer.capture_output do
-        renderer.render_block_children(model, children: { paragraphs: :render_paragraph })
+        renderer.render_block_children(model,
+                                       children: { paragraphs: :render_paragraph })
       end
       output.should be_empty
     end
