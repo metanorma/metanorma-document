@@ -9,17 +9,8 @@ module Metanorma
           label = renderer.extract_block_label(example, "EXAMPLE")
 
           content_html = renderer.capture_output do
-            if example.paragraphs && !example.paragraphs.empty?
-              example.paragraphs.each { |para| renderer.render_paragraph(para) }
-            end
-            example.ul&.each { |ul| renderer.render_unordered_list(ul) }
-            example.ol&.each { |ol| renderer.render_ordered_list(ol) }
-            example.dl&.each { |dl| renderer.render_definition_list(dl) }
-            example.sourcecode&.each { |sc| renderer.render_sourcecode(sc) }
-            example.table&.each { |t| renderer.render_table(t) }
-            example.figure&.each { |f| renderer.render_figure(f) }
-            example.quote&.each { |q| renderer.render_quote(q) }
-            example.formula&.each { |f| renderer.render_formula(f) }
+            renderer.render_block_children(example,
+                                           children: BaseRenderer::BLOCK_CHILDREN)
           end
 
           new(

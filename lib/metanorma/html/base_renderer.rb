@@ -94,7 +94,7 @@ module Metanorma
           render_definition_list render_sourcecode render_table
           render_figure render_quote render_formula render_note
           render_image render_stem_content register_figure_entry
-          render_liquid
+          render_liquid render_block_children
         ].freeze
 
         def initialize(renderer)
@@ -874,6 +874,51 @@ module Metanorma
         @output << %(<a id="#{escape_html(safe_attr(bookmark, :id).to_s)}"></a>)
       end
 
+      # Renders the typed child collections of a block element (paragraphs,
+      # lists, nested blocks) in a standard order.  Used by Drops and section
+      # rendering to avoid duplicating the enumeration in each consumer.
+      #
+      # +children+ is a Hash mapping attr names to render-method symbols:
+      #   { paragraphs: :render_paragraph, ul: :render_unordered_list, ... }
+      #
+      # Each key is sent to +model+ via safe_attr; non-nil results are
+      # dispatched to the corresponding render method.
+      def render_block_children(model, children:)
+        children.each do |attr, render_method|
+          values = safe_attr(model, attr)
+          next if values.nil?
+
+          Array(values).each { |v| public_send(render_method, v) }
+        end
+      end
+
+      # Standard child set for container blocks (example, note, etc.)
+      BLOCK_CHILDREN = {
+        paragraphs: :render_paragraph,
+        ul: :render_unordered_list,
+        ol: :render_ordered_list,
+        dl: :render_definition_list,
+        sourcecode: :render_sourcecode,
+        table: :render_table,
+        figure: :render_figure,
+        quote: :render_quote,
+        formula: :render_formula,
+      }.freeze
+
+      # Minimal child set for simple blocks (admonition, note with content only)
+      SIMPLE_CHILDREN = {
+        paragraphs: :render_paragraph,
+      }.freeze
+
+      # Note-style child set (paragraphs + lists + dl, no nested blocks)
+      NOTE_CHILDREN = {
+        paragraphs: :render_paragraph,
+        ul: :render_unordered_list,
+        ol: :render_ordered_list,
+        dl: :render_definition_list,
+        quote: :render_quote,
+      }.freeze
+
       # --- Section rendering ---
 
       def render_basic_section(section, level: 1, **_opts)
@@ -1431,7 +1476,7 @@ module Metanorma
               return stem.math.to_xml
             rescue StandardError
               math_items = Array(stem.math)
-              return math_items.map { |m| m.is_a?(Lutaml::Model::Serializable) ? m.content.to_s : m.to_s }.join
+              return math_items.join
             end
           end
           if stem.asciimath

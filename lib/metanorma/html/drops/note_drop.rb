@@ -14,9 +14,8 @@ module Metanorma
             else
               renderer.render_mixed_inline(note)
             end
-            note.ul&.each { |ul| renderer.render_unordered_list(ul) }
-            note.ol&.each { |ol| renderer.render_ordered_list(ol) }
-            note.dl&.then { |dl| renderer.render_definition_list(dl) }
+            renderer.render_block_children(note,
+                                           children: BaseRenderer::NOTE_CHILDREN)
           end
 
           new(
