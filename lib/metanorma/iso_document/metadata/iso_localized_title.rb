@@ -41,14 +41,15 @@ module Metanorma
           if title_part
             prefix = title_part_prefix&.value.to_s.strip
             part_val = title_part.value
-            if !prefix.empty?
+            if prefix.empty?
+              parts << part_val
+            else
               sep = prefix.end_with?(":") ? " " : ": "
               parts << "#{prefix}#{sep}#{part_val}"
-            else
-              parts << part_val
             end
           end
           return parts.join(" — ") unless parts.empty?
+
           ""
         end
       end

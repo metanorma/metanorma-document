@@ -4,7 +4,6 @@ module Metanorma
   module Html
     # IEC brand: #0061a9 blue from logo
     class IecRenderer < IsoRenderer
-
       def flavor_publishers(_doc_id)
         ["IEC"]
       end

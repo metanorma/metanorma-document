@@ -4,7 +4,6 @@ module Metanorma
   module Html
     # IHO brand: #00AAA9 teal + #05164D navy + #FEDC5B gold from logo
     class IhoRenderer < IsoRenderer
-
       def flavor_publishers(_doc_id)
         ["IHO"]
       end
@@ -44,7 +43,7 @@ module Metanorma
           t.example_bg      = "#eaf5f5"
           t.example_color   = "#008887"
           t.admonition_border = "#FEDC5B"
-          t.admonition_bg   = "#fff9e6"
+          t.admonition_bg = "#fff9e6"
           t.admonition_color = "#b8860b"
           t.footer_border_color = "#00AAA9"
           t.cover_separator_color = "rgba(0,170,169,0.3)"

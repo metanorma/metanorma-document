@@ -4,10 +4,8 @@ module Metanorma
   module StandardDocument
     module Sections
       # Abstract of the document.
-      class Abstract < Metanorma::StandardDocument::Sections::StandardContentSection
-        attribute :semx_id, :string
+      class Abstract < Metanorma::StandardDocument::Sections::ContentSection
         attribute :original_id, :string
-        attribute :displayorder, :integer
         xml do
           element "abstract"
 

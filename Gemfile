@@ -24,3 +24,5 @@ gem "rubocop"
 gem "rubocop-performance"
 gem "rubocop-rake"
 gem "rubocop-rspec"
+
+gem "concurrent-ruby", "~> 1.3"

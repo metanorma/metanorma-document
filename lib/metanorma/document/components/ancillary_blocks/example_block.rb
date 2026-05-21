@@ -59,11 +59,11 @@ module Metanorma
                     collection: true
 
           # Requirement/recommendation/permission blocks inside examples.
-          attribute :requirement, "Metanorma::StandardDocument::Blocks::RequirementModel",
+          attribute :requirement, "Metanorma::Document::Components::Blocks::RequirementModel",
                     collection: true
-          attribute :recommendation, "Metanorma::StandardDocument::Blocks::RecommendationModel",
+          attribute :recommendation, "Metanorma::Document::Components::Blocks::RecommendationModel",
                     collection: true
-          attribute :permission, "Metanorma::StandardDocument::Blocks::PermissionModel",
+          attribute :permission, "Metanorma::Document::Components::Blocks::PermissionModel",
                     collection: true
 
           # Paragraph blocks contributing to example content.

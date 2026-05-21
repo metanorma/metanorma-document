@@ -17,7 +17,9 @@ RSpec.describe Metanorma::Html::BaseRenderer::RendererContext do
   end
 
   it "exposes capture_output" do
-    result = ctx.capture_output { renderer.instance_variable_get(:@output) << "hello" }
+    result = ctx.capture_output do
+      renderer.instance_variable_get(:@output) << "hello"
+    end
     result.should eq("hello")
   end
 

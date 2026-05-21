@@ -4,7 +4,10 @@ require "spec_helper"
 require "metanorma/html/generator"
 
 RSpec.describe Metanorma::Html::Drops do
-  let(:xml_path) { File.expand_path("../../../fixtures/iso/is/document-en.presentation.xml", __dir__) }
+  let(:xml_path) do
+    File.expand_path("../../../fixtures/iso/is/document-en.presentation.xml",
+                     __dir__)
+  end
   let(:xml) { File.read(xml_path) }
   let(:doc) { Metanorma::IsoDocument::Root.from_xml(xml) }
   let(:html) { Metanorma::Html::Generator.generate(doc) }
@@ -53,7 +56,9 @@ RSpec.describe Metanorma::Html::Drops do
       formulas = page.css(".formula")
       formulas.length.should be > 0
       # Formulas contain either math elements or where clauses
-      formulas.any? { |f| f.inner_html.include?("formula-where") }.should be(true)
+      formulas.any? do |f|
+        f.inner_html.include?("formula-where")
+      end.should be(true)
     end
   end
 

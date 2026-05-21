@@ -5,8 +5,11 @@ module Metanorma
     module Sections
       # Extension point for extraneous elements that need to be added to standards document
       # from other schemas, e.g. UnitsML.
+      #
+      # Content is stored as raw XML text since the children come from external
+      # vocabularies not defined in the metanorma schema.
       class MiscContainer < Lutaml::Model::Serializable
-        attribute :element, Object, collection: true
+        attribute :content, :string
 
         attribute :semx_id, :string
         attribute :original_id, :string
@@ -14,7 +17,7 @@ module Metanorma
 
         xml do
           element "misc-container"
-          map_element "element", to: :element
+          map_content to: :content
 
           map_attribute "semx-id", to: :semx_id
           map_attribute "original-id", to: :original_id

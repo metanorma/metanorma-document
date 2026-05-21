@@ -5,7 +5,8 @@ module Metanorma
     module Refs
       # Cross-reference to a term.
       class ReferenceToTerm < Metanorma::Document::Components::ReferenceElements::ReferenceElement
-        attribute :source, BasicObject
+        attribute :source,
+                  Metanorma::Document::Components::ReferenceElements::SourceElement
         attribute :term, :string, collection: true
 
         attribute :semx_id, :string

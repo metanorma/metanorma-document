@@ -9,7 +9,9 @@ module Metanorma
       # annotations).
       class ParagraphWithFootnote < Metanorma::BasicDocument::Paragraphs::ParagraphBlock
         # Footnotes contained in the paragraph.
-        attribute :footnotes, BasicObject, collection: true # But actually: ReferenceToldWithParagraphElement
+        attribute :footnotes,
+                  Metanorma::BasicDocument::ReferenceElements::Footnote,
+                  collection: true
 
         xml do
           element "paragraph-with-footnote"

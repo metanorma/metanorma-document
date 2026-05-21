@@ -9,6 +9,9 @@ module Metanorma
           attribute :id, :string
           attribute :semx_id, :string
           attribute :key, :string
+          attribute :newline, :string
+          attribute :indent, :string
+          attribute :spacing, :string
           attribute :name, Metanorma::Document::Components::Inline::NameWithIdElement
           attribute :dt, DtElement, collection: true
           attribute :dd, DdElement, collection: true
@@ -32,6 +35,9 @@ module Metanorma
             map_attribute "id", to: :id
             map_attribute "semx-id", to: :semx_id
             map_attribute "key", to: :key
+            map_attribute "newline", to: :newline
+            map_attribute "indent", to: :indent
+            map_attribute "spacing", to: :spacing
             map_element "name", to: :name
             map_element "dt", to: :dt
             map_element "dd", to: :dd

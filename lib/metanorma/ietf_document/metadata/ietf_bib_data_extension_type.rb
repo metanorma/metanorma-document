@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "lutaml/model"
-
 module Metanorma
   module IetfDocument
     module Metadata

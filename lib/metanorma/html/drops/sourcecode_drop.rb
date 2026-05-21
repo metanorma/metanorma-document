@@ -11,7 +11,9 @@ module Metanorma
           lang = renderer.safe_attr(sc, :lang)
 
           name_html = if sc.name
-                        renderer.capture_output { renderer.render_inline_element(sc.name) }
+                        renderer.capture_output do
+                          renderer.render_inline_element(sc.name)
+                        end
                       end
 
           code_text = if sc.body&.content
@@ -21,7 +23,9 @@ module Metanorma
                       else
                         ""
                       end
-          raw_text = code_text.gsub("&lt;", "<").gsub("&gt;", ">").gsub("&amp;", "&").gsub("&quot;", "\"")
+          raw_text = code_text.gsub("&lt;", "<").gsub("&gt;", ">").gsub("&amp;", "&").gsub(
+            "&quot;", "\""
+          )
 
           new(
             id: id,

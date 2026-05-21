@@ -22,6 +22,7 @@ module Metanorma
       autoload :Term, "#{__dir__}/terms/term"
       autoload :TermCollection, "#{__dir__}/terms/term_collection"
       autoload :TermDefinition, "#{__dir__}/terms/term_definition"
+      autoload :TermExpression, "#{__dir__}/terms/term_expression"
       autoload :TermSource, "#{__dir__}/terms/term_source"
       autoload :TermSourceStatus, "#{__dir__}/terms/term_source_status"
       autoload :TermSourceType, "#{__dir__}/terms/term_source_type"

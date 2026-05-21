@@ -4,7 +4,10 @@ require "spec_helper"
 require "metanorma/html/generator"
 
 RSpec.describe "Architecture improvements" do
-  let(:xml_path) { File.expand_path("../../../fixtures/iso/is/document-en.presentation.xml", __dir__) }
+  let(:xml_path) do
+    File.expand_path("../../../fixtures/iso/is/document-en.presentation.xml",
+                     __dir__)
+  end
   let(:xml) { File.read(xml_path) }
   let(:doc) { Metanorma::IsoDocument::Root.from_xml(xml) }
   let(:html) { Metanorma::Html::Generator.generate(doc) }
@@ -128,7 +131,9 @@ RSpec.describe "Architecture improvements" do
 
   describe "render_ordered_inline no silent error rescue" do
     it "does not have a rescue StandardError block" do
-      source = File.read(File.expand_path("../../../../lib/metanorma/html/base_renderer.rb", __dir__))
+      source = File.read(File.expand_path(
+                           "../../../../lib/metanorma/html/base_renderer.rb", __dir__
+                         ))
       method_source = source[/def render_ordered_inline.*?(?=      def |\z)/m]
       method_source.should_not include("rescue StandardError")
     end

@@ -19,7 +19,7 @@ module Metanorma
           @tastes << [model_class, publisher_abbrev, renderer_class]
         end
 
-        def generate(document, **options)
+        def generate(document, **_options)
           setup! unless @setup
           renderer_for(document).new.generate_full_document(document)
         end
@@ -43,7 +43,8 @@ module Metanorma
         def find_taste(document)
           @tastes.each do |model_class, publisher_abbrev, renderer_class|
             next unless document.is_a?(model_class)
-            return renderer_class if taste_publisher?(document, publisher_abbrev)
+            return renderer_class if taste_publisher?(document,
+                                                      publisher_abbrev)
           end
           nil
         end
@@ -51,25 +52,39 @@ module Metanorma
         def taste_publisher?(document, abbrev)
           bibdata = document.bibdata if document.is_a?(Lutaml::Model::Serializable)
           return false unless bibdata
+
           contributors = bibdata.contributor
           return false unless contributors
-          contributors.any? do |c|
-            next false unless c.role&.any? { |r| r&.type == "author" } rescue false
-            org = c.organization
-            next false unless org
-            org_abbrev = org.abbreviation
-            if org_abbrev.is_a?(String)
-              org_abbrev == abbrev
-            elsif org_abbrev.is_a?(Lutaml::Model::Serializable)
-              safe_attr(org_abbrev, :content) == abbrev
-            else
-              org_abbrev.to_s == abbrev
+
+          begin
+            contributors.any? do |c|
+              begin
+                next false unless c.role&.any? do |r|
+                  r&.type == "author"
+                end
+              rescue StandardError
+                false
+              end
+              org = c.organization
+              next false unless org
+
+              org_abbrev = org.abbreviation
+              if org_abbrev.is_a?(String)
+                org_abbrev == abbrev
+              elsif org_abbrev.is_a?(Lutaml::Model::Serializable)
+                safe_attr(org_abbrev, :content) == abbrev
+              else
+                org_abbrev.to_s == abbrev
+              end
             end
-          end rescue false
+          rescue StandardError
+            false
+          end
         end
 
         def setup!
           return if @setup
+
           @setup = true
 
           # Trigger autoloads by referencing constants
@@ -105,8 +120,10 @@ module Metanorma
           register Metanorma::RiboseDocument::Root,     RiboseRenderer
 
           # Register tastes (publisher-based dispatch within same model)
-          register_taste Metanorma::IsoDocument::Root,    "ICC",            IccRenderer
-          register_taste Metanorma::RiboseDocument::Root, "PDF Association", PdfaRenderer
+          register_taste Metanorma::IsoDocument::Root,    "ICC",
+                         IccRenderer
+          register_taste Metanorma::RiboseDocument::Root, "PDF Association",
+                         PdfaRenderer
         end
       end
     end

@@ -92,7 +92,7 @@ module Metanorma
             end
 
             text&.filter_map do |t|
-              t.respond_to?(:text) ? t.text : t.to_s
+              t.is_a?(String) ? t : t.text
             end&.join
           end
         end

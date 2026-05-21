@@ -5,19 +5,31 @@ module Metanorma
     # Renders StandardDocument components to HTML.
     # Extends BaseRenderer with terms, bibliography, and standard sections.
     class StandardRenderer < BaseRenderer
-      register_render Metanorma::StandardDocument::Root, :render_standard_document
+      register_render Metanorma::StandardDocument::Root,
+                      :render_standard_document
       register_render Metanorma::StandardDocument::Terms::Term, :render_term
-      register_render Metanorma::StandardDocument::Sections::TermsSection, :render_terms_section
-      register_render Metanorma::StandardDocument::Sections::StandardReferencesSection, :render_references_section
-      register_render Metanorma::StandardDocument::Sections::BibliographySection, :render_bibliography
-      register_render Metanorma::StandardDocument::Sections::ClauseSection, :render_clause_section
-      register_render Metanorma::StandardDocument::Sections::AnnexSection, :render_annex_section
-      register_render Metanorma::StandardDocument::Sections::StandardSection, :render_standard_section
-      register_render Metanorma::StandardDocument::Sections::Abstract, :render_abstract_section
-      register_render Metanorma::StandardDocument::Sections::Foreword, :render_foreword_section
-      register_render Metanorma::StandardDocument::Sections::Introduction, :render_introduction_section
-      register_render Metanorma::StandardDocument::Sections::FloatingTitle, :render_floating_title
-      register_render Metanorma::StandardDocument::Blocks::AmendBlock, :render_amend_block
+      register_render Metanorma::StandardDocument::Sections::TermsSection,
+                      :render_terms_section
+      register_render Metanorma::StandardDocument::Sections::StandardReferencesSection,
+                      :render_references_section
+      register_render Metanorma::StandardDocument::Sections::BibliographySection,
+                      :render_bibliography
+      register_render Metanorma::StandardDocument::Sections::ClauseSection,
+                      :render_clause_section
+      register_render Metanorma::StandardDocument::Sections::AnnexSection,
+                      :render_annex_section
+      register_render Metanorma::StandardDocument::Sections::StandardSection,
+                      :render_standard_section
+      register_render Metanorma::StandardDocument::Sections::Abstract,
+                      :render_abstract_section
+      register_render Metanorma::StandardDocument::Sections::Foreword,
+                      :render_foreword_section
+      register_render Metanorma::StandardDocument::Sections::Introduction,
+                      :render_introduction_section
+      register_render Metanorma::StandardDocument::Sections::FloatingTitle,
+                      :render_floating_title
+      register_render Metanorma::StandardDocument::Blocks::AmendBlock,
+                      :render_amend_block
 
       # --- Top-level document rendering ---
 
@@ -48,9 +60,7 @@ module Metanorma
         end
 
         # Index section from indexsect element (presentation XML)
-        if doc.is_a?(Metanorma::IsoDocument::Root) && doc.indexsect
-          render(doc.indexsect)
-        end
+        render(doc.indexsect) if doc.indexsect
 
         # Footnotes section
         render_footnotes_section
@@ -117,7 +127,8 @@ module Metanorma
 
       # --- Section rendering ---
 
-      def render_section(section, level: 1, title_class: nil, with_subsections: false, with_terms: false)
+      def render_section(section, level: 1, title_class: nil,
+with_subsections: false, with_terms: false)
         attrs = element_attrs(id: safe_attr(section, :id))
         tag("div", attrs) do
           if title_class
@@ -184,12 +195,22 @@ module Metanorma
 
           # Domain
           if term.domain
-            domain_text = term.domain.is_a?(String) ? term.domain : safe_attr(term.domain, :text).to_s
+            domain_text = if term.domain.is_a?(String)
+                            term.domain
+                          else
+                            safe_attr(
+                              term.domain, :text
+                            ).to_s
+                          end
             @output << "<p class=\"term-domain\">&lt;#{escape_html(domain_text)}&gt;</p>" unless domain_text.to_s.empty?
           end
 
           # Definitions
-          Array(term.definition).each { |defn| render_term_definition(defn) } if term.definition
+          if term.definition
+            Array(term.definition).each do |defn|
+              render_term_definition(defn)
+            end
+          end
 
           # Notes (mapped from <termnote>)
           term.note&.each_with_index do |note, i|
@@ -222,10 +243,10 @@ module Metanorma
       def extract_designation_name(designation)
         if designation.is_a?(Metanorma::StandardDocument::Terms::Designation) && designation.expression
           expr = designation.expression
-          if expr.is_a?(Metanorma::IsoDocument::Terms::TermExpression) && expr.name
+          if expr.is_a?(Metanorma::StandardDocument::Terms::TermExpression) && expr.name
             Array(expr.name).join
           end
-        elsif designation.is_a?(Metanorma::IsoDocument::Terms::TermExpression) && designation.name
+        elsif designation.is_a?(Metanorma::StandardDocument::Terms::TermExpression) && designation.name
           Array(designation.name).join
         else
           extract_text_value(designation)
@@ -313,7 +334,9 @@ module Metanorma
 
       def render_bibliography(bib, level: 1, **_opts)
         tag("div", "") do
-          bib.references&.each { |ref| render_references_section(ref, level: level) }
+          bib.references&.each do |ref|
+            render_references_section(ref, level: level)
+          end
           bib.clause&.each { |cl| render(cl, level: level) }
         end
       end
@@ -322,10 +345,13 @@ module Metanorma
         is_normative = safe_attr(section, :normative) == "true"
         attrs = element_attrs(id: safe_attr(section, :id))
         tag("div", attrs) do
-          render_standard_title(section, level, default_class: is_normative ? "" : "section-sub")
+          render_standard_title(section, level,
+                                default_class: is_normative ? "" : "section-sub")
           section.p&.each { |para| render_paragraph(para) }
           section.note&.each { |note| render_paragraph(note) }
-          section.references&.each_with_index { |bibitem, i| render_bibitem(bibitem, i + 1, normative: is_normative) }
+          section.references&.each_with_index do |bibitem, i|
+            render_bibitem(bibitem, i + 1, normative: is_normative)
+          end
           section.table&.each { |t| render_table(t) }
         end
       end
@@ -365,7 +391,9 @@ module Metanorma
         return preferred.content.to_s if preferred && !preferred.content.to_s.empty?
 
         # Fallback: first non-RSS link
-        non_rss = links.find { |l| !l.content.to_s.include?(".rss") && !l.content.to_s.empty? }
+        non_rss = links.find do |l|
+          !l.content.to_s.include?(".rss") && !l.content.to_s.empty?
+        end
         non_rss&.content&.to_s
       end
 
@@ -403,7 +431,9 @@ module Metanorma
 
         if item.title && !item.title.empty?
           titles = Array(item.title)
-          main_title = titles.find { |t| safe_attr(t, :type) == "main" } || titles.first
+          main_title = titles.find do |t|
+            safe_attr(t, :type) == "main"
+          end || titles.first
           if main_title
             @output << ", <i>"
             render_mixed_inline(main_title)
@@ -415,7 +445,8 @@ module Metanorma
       # --- Standard section helpers ---
 
       def render_standard_title(section, level, default_class: "")
-        title_element = safe_attr(section, :fmt_title) || safe_attr(section, :title)
+        title_element = safe_attr(section,
+                                  :fmt_title) || safe_attr(section, :title)
         return unless title_element
 
         section_id = safe_attr(section, :id)
@@ -457,14 +488,16 @@ module Metanorma
         end
 
         # Block elements
-        %i[tables figures formulas examples notes admonitions sourcecode_blocks quote_blocks].each do |attr|
+        %i[tables figures formulas examples notes admonitions sourcecode_blocks
+           quote_blocks].each do |attr|
           values = safe_attr(section, attr)
           Array(values).each { |v| render(v, level: level + 1) } if values
         end
       end
 
       def render_subsections(section, level)
-        clauses = safe_attr(section, :clause) || safe_attr(section, :subsections)
+        clauses = safe_attr(section,
+                            :clause) || safe_attr(section, :subsections)
         Array(clauses).each { |cl| render(cl, level: level + 1) } if clauses
       end
 

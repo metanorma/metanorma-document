@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "metanorma/standard_document"
-
 module Metanorma
   module BipmDocument
     autoload :Metadata, "metanorma/bipm_document/metadata"

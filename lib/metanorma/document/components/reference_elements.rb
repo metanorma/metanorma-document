@@ -21,6 +21,12 @@ module Metanorma
                  "#{__dir__}/reference_elements/reference_to_id_with_paragraph_element"
         autoload :ReferenceToLinkElement,
                  "#{__dir__}/reference_elements/reference_to_link_element"
+        autoload :SourceElement,
+                 "#{__dir__}/reference_elements/source_element"
+        autoload :SourceModification,
+                 "#{__dir__}/reference_elements/source_element"
+        autoload :SourceOrigin,
+                 "#{__dir__}/reference_elements/source_element"
       end
     end
   end

@@ -5,7 +5,6 @@ module Metanorma
     # Renders PDF Association (PDFA) taste documents to HTML.
     # PDFA brand: #cf9c1d gold + #d03544 red + #4992b2 steel blue from logo
     class PdfaRenderer < IsoRenderer
-
       def flavor_publishers(_doc_id)
         ["PDF Association"]
       end

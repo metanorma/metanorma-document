@@ -5,6 +5,8 @@ module Metanorma
     module Metadata
       autoload :EditorialGroupType, "#{__dir__}/metadata/editorial_group_type"
       autoload :IcsType, "#{__dir__}/metadata/ics_type"
+      autoload :MetanormaExtension,
+               "#{__dir__}/metadata/metanorma_extension"
       autoload :StandardBibData, "#{__dir__}/metadata/standard_bib_data"
       autoload :StandardBibDataExtensionType,
                "#{__dir__}/metadata/standard_bib_data_extension_type"

@@ -4,11 +4,8 @@ module Metanorma
   module StandardDocument
     module Sections
       # Introduction of document.
-      class Introduction < Metanorma::StandardDocument::Sections::StandardContentSection
-        attribute :semx_id, :string
+      class Introduction < Metanorma::StandardDocument::Sections::ContentSection
         attribute :original_id, :string
-        attribute :autonum, :string
-        attribute :displayorder, :integer
         xml do
           element "introduction"
 

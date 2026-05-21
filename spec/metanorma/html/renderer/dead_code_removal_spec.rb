@@ -24,7 +24,9 @@ RSpec.describe "Dead code removal" do
   end
 
   it "component_registry.rb file does not exist" do
-    path = File.expand_path("../../../lib/metanorma/html/component_registry.rb", __dir__)
+    path = File.expand_path(
+      "../../../lib/metanorma/html/component_registry.rb", __dir__
+    )
     File.exist?(path).should be(false)
   end
 end

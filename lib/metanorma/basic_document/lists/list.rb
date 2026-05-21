@@ -5,7 +5,8 @@ module Metanorma
     module Lists
       # List block.
       class List < Metanorma::BasicDocument::Blocks::BasicBlock
-        attribute :listitem, BasicObject, collection: true
+        attribute :listitem, Metanorma::BasicDocument::Lists::ListItem,
+                  collection: true
 
         xml do
           element "list"
