@@ -13,8 +13,9 @@ module Metanorma
       #     term+
       #   }
       class TermsSection < Lutaml::Model::Serializable
+        include Metanorma::StandardDocument::PresentationAttributes
+
         attribute :id, :string
-        attribute :anchor, :string
         attribute :type, :string
         attribute :number, :string
         attribute :obligation, :string
@@ -38,19 +39,6 @@ module Metanorma
                   Metanorma::StandardDocument::Terms::Term,
                   collection: true
 
-        # Presentation-specific attributes
-        attribute :semx_id, :string
-        attribute :autonum, :string
-        attribute :displayorder, :integer
-        attribute :fmt_title,
-                  Metanorma::Document::Components::Inline::FmtTitleElement
-        attribute :fmt_xref_label,
-                  Metanorma::Document::Components::Inline::FmtXrefLabelElement,
-                  collection: true
-        attribute :variant_title,
-                  Metanorma::Document::Components::Inline::VariantTitleElement,
-                  collection: true
-
         xml do
           element "terms"
           ordered
@@ -64,6 +52,8 @@ module Metanorma
           map_element "p",                to: :paragraphs
           map_element "ul",               to: :unordered_lists
           map_element "term",             to: :terms
+          map_element "fmt-annotation-start", to: :fmt_annotation_start
+          map_element "fmt-annotation-end",   to: :fmt_annotation_end
         end
       end
     end

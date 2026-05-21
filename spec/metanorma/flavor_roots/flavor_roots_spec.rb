@@ -2084,6 +2084,56 @@ RSpec.describe "Flavor Root classes" do
                       "#{f} uses apply_content_section_attributes but lacks :class_attr"
       end
     end
+
+    it "PresentationAttributes mixin provides all presentation attrs" do
+      # Test against ClauseSection which includes PresentationAttributes
+      cls = Metanorma::StandardDocument::Sections::ClauseSection
+      attrs = cls.attributes
+      %i[anchor semx_id autonum displayorder fmt_title
+         fmt_xref_label variant_title fmt_annotation_start fmt_annotation_end].each do |attr|
+        attrs.should have_key(attr),
+                     "ClauseSection (includes PresentationAttributes) missing :#{attr}"
+      end
+    end
+
+    it "OrderedContent mixin provides blocks method" do
+      cls = Metanorma::StandardDocument::Sections::ClauseSection
+      cls.instance_methods.should include(:blocks)
+    end
+
+    it "no section type declares individual presentation attrs when using PresentationAttributes" do
+      sd_files = Dir.glob("lib/metanorma/standard_document/sections/*.rb")
+      sd_files.each do |f|
+        source = File.read(f)
+        next unless source.include?("PresentationAttributes")
+
+        source.should_not match(/attribute\s+:semx_id/),
+                          "#{f} includes PresentationAttributes but re-declares :semx_id"
+        source.should_not match(/attribute\s+:autonum/),
+                          "#{f} includes PresentationAttributes but re-declares :autonum"
+        source.should_not match(/attribute\s+:displayorder/),
+                          "#{f} includes PresentationAttributes but re-declares :displayorder"
+        source.should_not match(/attribute\s+:fmt_title,/),
+                          "#{f} includes PresentationAttributes but re-declares :fmt_title"
+        source.should_not match(/attribute\s+:fmt_xref_label/),
+                          "#{f} includes PresentationAttributes but re-declares :fmt_xref_label"
+        source.should_not match(/attribute\s+:variant_title/),
+                          "#{f} includes PresentationAttributes but re-declares :variant_title"
+        source.should_not match(/attribute\s+:fmt_annotation_start/),
+                          "#{f} includes PresentationAttributes but re-declares :fmt_annotation_start"
+        source.should_not match(/attribute\s+:fmt_annotation_end/),
+                          "#{f} includes PresentationAttributes but re-declares :fmt_annotation_end"
+      end
+    end
+
+    it "no rescue StandardError in model code" do
+      model_files = Dir.glob("lib/metanorma/{document,standard_document,*_document,basic_document}/**/*.rb")
+      offenders = model_files.select do |f|
+        File.read(f).include?("rescue StandardError")
+      end
+      offenders.should be_empty,
+                       "Model files using rescue StandardError: #{offenders.join(', ')}"
+    end
   end
 
   # ============================================================

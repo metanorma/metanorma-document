@@ -51,6 +51,48 @@ module Metanorma
       end
     end
 
+    # Provides `blocks` method for ordered-content section types.
+    # Returns child nodes in document order via `each_mixed_content`.
+    module OrderedContent
+      def blocks
+        @blocks ||=
+          begin
+            result = []
+            each_mixed_content do |node|
+              result << node unless node.is_a?(String)
+            end
+            result
+          end
+      end
+    end
+
+    # Presentation/formatting attributes shared by all section types.
+    # Include in any section class that supports presentation metadata.
+    module PresentationAttributes
+      def self.included(base)
+        base.class_eval do
+          attribute :anchor, :string
+          attribute :semx_id, :string
+          attribute :autonum, :string
+          attribute :displayorder, :integer
+          attribute :fmt_title,
+                    Metanorma::Document::Components::Inline::FmtTitleElement
+          attribute :fmt_xref_label,
+                    Metanorma::Document::Components::Inline::FmtXrefLabelElement,
+                    collection: true
+          attribute :variant_title,
+                    Metanorma::Document::Components::Inline::VariantTitleElement,
+                    collection: true
+          attribute :fmt_annotation_start,
+                    Metanorma::Document::Components::Inline::FmtAnnotationStartElement,
+                    collection: true
+          attribute :fmt_annotation_end,
+                    Metanorma::Document::Components::Inline::FmtAnnotationEndElement,
+                    collection: true
+        end
+      end
+    end
+
     # Adds XML element mappings for block-level content to a mapping builder.
     # Call inside an `xml do` block:
     #

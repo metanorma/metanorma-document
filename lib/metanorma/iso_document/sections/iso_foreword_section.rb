@@ -11,19 +11,8 @@ module Metanorma
           element "foreword"
           ordered
 
-          map_attribute "id",             to: :id
-          map_attribute "anchor",         to: :anchor
-          map_attribute "obligation",     to: :obligation
-          map_attribute "semx-id",        to: :semx_id
-          map_attribute "displayorder",   to: :displayorder
-
-          map_element "title",            to: :title
-          map_element "fmt-title",        to: :fmt_title
-
-          Metanorma::StandardDocument::BlockXmlMapping.apply_block_mappings(self)
-
-          map_element "fmt-annotation-start", to: :fmt_annotation_start
-          map_element "fmt-annotation-end",   to: :fmt_annotation_end
+          Metanorma::StandardDocument::SectionXmlMapping.apply_content_section_attributes(self)
+          Metanorma::StandardDocument::SectionXmlMapping.apply_content_section_elements(self)
         end
 
         json do
