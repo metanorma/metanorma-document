@@ -7,8 +7,7 @@ module Metanorma
       # one or more <references> sections (normative and/or informative).
       class BibliographySection < Lutaml::Model::Serializable
         attribute :references, StandardReferencesSection, collection: true
-        attribute :clause, Metanorma::IsoDocument::Sections::IsoClauseSection,
-                  collection: true
+        attribute :clause, ClauseSection, collection: true
 
         xml do
           element "bibliography"

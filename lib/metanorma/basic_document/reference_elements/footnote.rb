@@ -5,7 +5,7 @@ module Metanorma
     module ReferenceElements
       # Inline reference to a paragraph or paragraphs, appearing as a footnote.
       class Footnote < Metanorma::BasicDocument::ReferenceElements::ReferenceToIdWithParagraphElement
-        attribute :type, BasicObject
+        attribute :type, :string
 
         xml do
           element "footnote"

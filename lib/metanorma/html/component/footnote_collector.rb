@@ -32,7 +32,7 @@ module Metanorma
             number: number,
             reference: ref,
             content: fn.p,
-            fmt_label: fn.fmt_fn_label
+            fmt_label: fn.fmt_fn_label,
           )
           number
         end
@@ -41,8 +41,8 @@ module Metanorma
           @footnotes.empty?
         end
 
-        def each(&blk)
-          @footnotes.each(&blk)
+        def each(&)
+          @footnotes.each(&)
         end
 
         def to_a

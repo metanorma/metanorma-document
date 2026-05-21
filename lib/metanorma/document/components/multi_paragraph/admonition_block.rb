@@ -24,6 +24,12 @@ module Metanorma
           # Location where the content of the admonition is accessible as an external document.
           attribute :uri, :string
 
+          # Target cross-reference for the admonition (BSI).
+          attribute :target, :string
+
+          # Whether the admonition is excluded from automatic numbering (UN).
+          attribute :unnumbered, :string
+
           # Paragraphs within the admonition.
           attribute :paragraphs,
                     Metanorma::Document::Components::Paragraphs::ParagraphBlock,
@@ -51,6 +57,8 @@ module Metanorma
             map_attribute "type", to: :type
             map_element "name", to: :name
             map_attribute "class", to: :block_class
+            map_attribute "target", to: :target
+            map_attribute "unnumbered", to: :unnumbered
             map_element "uri", to: :uri
             map_element "p", to: :paragraphs
             map_element "fmt-name", to: :fmt_name

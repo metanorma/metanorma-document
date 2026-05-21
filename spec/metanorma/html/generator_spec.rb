@@ -4,7 +4,10 @@ require "spec_helper"
 require "metanorma/html/generator"
 
 RSpec.describe Metanorma::Html::Generator do
-  let(:xml_path) { File.expand_path("../../fixtures/iso/is/document-en.presentation.xml", __dir__) }
+  let(:xml_path) do
+    File.expand_path("../../fixtures/iso/is/document-en.presentation.xml",
+                     __dir__)
+  end
   let(:xml) { File.read(xml_path) }
   let(:doc) { Metanorma::IsoDocument::Root.from_xml(xml) }
   let(:html) { described_class.generate(doc) }
@@ -42,7 +45,9 @@ RSpec.describe Metanorma::Html::Generator do
     end
 
     it "renders DEPRECATED label" do
-      deprecated_text = page.css("p").map(&:inner_text).find { |t| t.include?("DEPRECATED") }
+      deprecated_text = page.css("p").map(&:inner_text).find do |t|
+        t.include?("DEPRECATED")
+      end
       deprecated_text.should_not be_nil
     end
 
@@ -57,7 +62,9 @@ RSpec.describe Metanorma::Html::Generator do
 
   describe "bibliography cross-references" do
     it "does not double the Reference label" do
-      page.css("h2, h3").map(&:text).none? { |t| t.match?(/Reference.*Reference/) }.should be(true)
+      page.css("h2, h3").map(&:text).none? do |t|
+        t.match?(/Reference.*Reference/)
+      end.should be(true)
     end
   end
 

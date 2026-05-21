@@ -8,7 +8,9 @@ module Metanorma
         class ContributionElementMetadata < Lutaml::Model::Serializable
           attribute :date_time, :string
           attribute :contributor, Metanorma::Document::Relaton::Contributor
-          attribute :integrity_value, BasicObject, collection: true
+          attribute :integrity_value,
+                    Metanorma::Document::Components::ContribMetadata::IntegrityValue,
+                    collection: true
 
           xml do
             element "contribution-element-metadata"

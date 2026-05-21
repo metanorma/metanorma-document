@@ -4,7 +4,10 @@ require "spec_helper"
 require "metanorma/html/generator"
 
 RSpec.describe Metanorma::Html::StandardRenderer do
-  let(:xml_path) { File.expand_path("../../../fixtures/iso/is/document-en.presentation.xml", __dir__) }
+  let(:xml_path) do
+    File.expand_path("../../../fixtures/iso/is/document-en.presentation.xml",
+                     __dir__)
+  end
   let(:xml) { File.read(xml_path) }
   let(:doc) { Metanorma::IsoDocument::Root.from_xml(xml) }
   let(:html) { Metanorma::Html::Generator.generate(doc) }
@@ -26,7 +29,9 @@ RSpec.describe Metanorma::Html::StandardRenderer do
 
     it "does not emit raw XML class names in sections" do
       xml_classes = %w[ForewordTitle IntroTitle Section3 Annex]
-      all_classes = page.css("[class]").flat_map { |el| el["class"].split(/\s+/) }.uniq
+      all_classes = page.css("[class]").flat_map do |el|
+        el["class"].split(/\s+/)
+      end.uniq
       (all_classes & xml_classes).should be_empty
     end
 

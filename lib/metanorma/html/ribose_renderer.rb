@@ -5,7 +5,6 @@ module Metanorma
     # Renders RiboseDocument components to HTML.
     # Extends IsoRenderer with Ribose branding.
     class RiboseRenderer < IsoRenderer
-
       def flavor_publishers(_doc_id)
         ["Ribose"]
       end

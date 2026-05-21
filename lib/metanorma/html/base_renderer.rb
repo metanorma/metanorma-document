@@ -3,14 +3,9 @@
 require "liquid"
 require "nokogiri"
 require "cgi"
-require_relative "drops/footnote_drop"
 
 module Metanorma
   module Html
-    TEMPLATES_ROOT = File.join(__dir__, "templates")
-
-    Liquid::Environment.default.file_system = Liquid::LocalFileSystem.new(TEMPLATES_ROOT, "_%s.html.liquid")
-
     # Renders BasicDocument components to HTML.
     # Subclassed by StandardRenderer and flavor-specific renderers.
     # Owns the full HTML document generation pipeline: body content, header,
@@ -107,9 +102,9 @@ module Metanorma
 
         private
 
-        def method_missing(method_name, *args, **kwargs, &block)
+        def method_missing(method_name, ...)
           if DELEGATED_METHODS.include?(method_name)
-            @renderer.public_send(method_name, *args, **kwargs, &block)
+            @renderer.public_send(method_name, ...)
           else
             super
           end
@@ -249,7 +244,8 @@ module Metanorma
         svg = svg.sub(/<path[^>]*style="fill:#e3000f[^"]*"[^>]*\/>/, "")
         svg = svg.sub(/<svg\s/, '<svg class="header-logo" ')
         svg = if svg.match?(/<svg[^>]*\sheight="[^"]*"/)
-                svg.sub(/(<svg[^>]*?)(\sheight="[^"]*")/, "\\1 height=\"#{height}\"")
+                svg.sub(/(<svg[^>]*?)(\sheight="[^"]*")/,
+                        "\\1 height=\"#{height}\"")
               else
                 svg.sub(/(<svg\b)/, "\\1 height=\"#{height}\"")
               end
@@ -325,23 +321,18 @@ module Metanorma
         end
 
         if node.is_a?(Lutaml::Model::Serializable)
-          return true if begin
-            node.fmt_title
-          rescue StandardError
-            nil
+          node_attrs = node.class.attributes
+          if node_attrs.key?(:fmt_title) && node.fmt_title
+            return true
           end
-          return true if begin
-            node.displayorder
-          rescue StandardError
-            nil
+          if node_attrs.key?(:displayorder) && node.displayorder
+            return true
           end
 
           %i[preface sections annex bibliography].each do |attr|
-            val = begin
-              node.public_send(attr)
-            rescue StandardError
-              nil
-            end
+            next unless node_attrs.key?(attr)
+
+            val = node.public_send(attr)
             next unless val
 
             Array(val).each { |v| return true if check_presentation_markers(v) }
@@ -494,78 +485,148 @@ module Metanorma
 
       # --- Type registrations (class-level, evaluated at class load time) ---
 
-      register_render Metanorma::Document::Components::Paragraphs::ParagraphBlock, :render_paragraph
-      register_render Metanorma::Document::Components::Tables::TableBlock, :render_table
-      register_render Metanorma::Document::Components::Lists::UnorderedList, :render_unordered_list
-      register_render Metanorma::Document::Components::Lists::OrderedList, :render_ordered_list
-      register_render Metanorma::Document::Components::Lists::DefinitionList, :render_definition_list
-      register_render Metanorma::Document::Components::AncillaryBlocks::FigureBlock, :render_figure
-      register_render Metanorma::Document::Components::Blocks::NoteBlock, :render_note
-      register_render Metanorma::Document::Components::AncillaryBlocks::ExampleBlock, :render_example
-      register_render Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock, :render_sourcecode
-      register_render Metanorma::Document::Components::AncillaryBlocks::FormulaBlock, :render_formula
-      register_render Metanorma::Document::Components::MultiParagraph::QuoteBlock, :render_quote
-      register_render Metanorma::Document::Components::MultiParagraph::AdmonitionBlock, :render_admonition
-      register_render Metanorma::Document::Components::Sections::HierarchicalSection, :render_hierarchical_section
-      register_render Metanorma::Document::Components::Sections::BasicSection, :render_basic_section
-      register_render Metanorma::Document::Components::Sections::ContentSection, :render_content_section
-      register_render Metanorma::Document::Components::EmptyElements::PageBreakElement, :render_noop
-      register_render Metanorma::Document::Components::IdElements::Bookmark, :render_bookmark
-      register_render Metanorma::Document::Components::Inline::SemxElement, :render_semx_content
+      register_render Metanorma::Document::Components::Paragraphs::ParagraphBlock,
+                      :render_paragraph
+      register_render Metanorma::Document::Components::Tables::TableBlock,
+                      :render_table
+      register_render Metanorma::Document::Components::Lists::UnorderedList,
+                      :render_unordered_list
+      register_render Metanorma::Document::Components::Lists::OrderedList,
+                      :render_ordered_list
+      register_render Metanorma::Document::Components::Lists::DefinitionList,
+                      :render_definition_list
+      register_render Metanorma::Document::Components::AncillaryBlocks::FigureBlock,
+                      :render_figure
+      register_render Metanorma::Document::Components::Blocks::NoteBlock,
+                      :render_note
+      register_render Metanorma::Document::Components::AncillaryBlocks::ExampleBlock,
+                      :render_example
+      register_render Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock,
+                      :render_sourcecode
+      register_render Metanorma::Document::Components::AncillaryBlocks::FormulaBlock,
+                      :render_formula
+      register_render Metanorma::Document::Components::MultiParagraph::QuoteBlock,
+                      :render_quote
+      register_render Metanorma::Document::Components::MultiParagraph::AdmonitionBlock,
+                      :render_admonition
+      register_render Metanorma::Document::Components::Sections::HierarchicalSection,
+                      :render_hierarchical_section
+      register_render Metanorma::Document::Components::Sections::BasicSection,
+                      :render_basic_section
+      register_render Metanorma::Document::Components::Sections::ContentSection,
+                      :render_content_section
+      register_render Metanorma::Document::Components::EmptyElements::PageBreakElement,
+                      :render_noop
+      register_render Metanorma::Document::Components::IdElements::Bookmark,
+                      :render_bookmark
+      register_render Metanorma::Document::Components::Inline::SemxElement,
+                      :render_semx_content
 
-      register_inline_render Metanorma::Document::Components::Inline::EmRawElement, :render_em
-      register_inline_render Metanorma::Document::Components::Inline::StrongRawElement, :render_strong
-      register_inline_render Metanorma::Document::Components::Inline::TtElement, :render_tt
-      register_inline_render Metanorma::Document::Components::Inline::SubElement, :render_sub
-      register_inline_render Metanorma::Document::Components::Inline::SupElement, :render_sup
-      register_inline_render Metanorma::Document::Components::Inline::SmallCapElement, :render_small_caps
-      register_inline_render Metanorma::Document::Components::TextElements::UnderlineElement, :render_underline
-      register_inline_render Metanorma::Document::Components::TextElements::StrikeElement, :render_strike
-      register_inline_render Metanorma::Document::Components::Inline::BrElement, :render_br
-      register_inline_render Metanorma::Document::Components::Inline::TabElement, :render_tab
-      register_inline_render Metanorma::Document::Components::Inline::LinkElement, :render_link
-      register_inline_render Metanorma::Document::Components::Inline::XrefElement, :render_noop_inline
-      register_inline_render Metanorma::Document::Components::Inline::ErefElement, :render_noop_inline
-      register_inline_render Metanorma::Document::Components::Inline::SpanElement, :render_span
-      register_inline_render Metanorma::Document::Components::Inline::FnElement, :render_fn_inline
-      register_inline_render Metanorma::Document::Components::Inline::ConceptElement, :render_concept
-      register_inline_render Metanorma::Document::Components::Inline::StemInlineElement, :render_noop_inline
-      register_inline_render Metanorma::Document::Components::TextElements::StemElement, :render_stem
-      register_inline_render Metanorma::Document::Components::Inline::SemxElement, :render_semx_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtXrefElement, :render_fmt_xref
-      register_inline_render Metanorma::Document::Components::Inline::FmtStemElement, :render_fmt_stem
-      register_inline_render Metanorma::Document::Components::Inline::CommaElement, :render_comma
-      register_inline_render Metanorma::Document::Components::Inline::EnumCommaElement, :render_comma
-      register_inline_render Metanorma::Document::Components::IdElements::Bookmark, :render_bookmark
-      register_inline_render Metanorma::Document::Components::IdElements::Image, :render_image
-      register_inline_render Metanorma::Document::Components::Inline::MathElement, :render_math
-      register_inline_render Metanorma::Document::Components::Inline::AsciimathElement, :render_asciimath
-      register_inline_render Metanorma::Document::Components::EmptyElements::IndexElement, :render_index
-      register_inline_render Metanorma::Document::Components::ReferenceElements::IndexXrefElement, :render_index
-      register_inline_render Metanorma::Document::Components::Blocks::NoteBlock, :render_note_inline
+      register_inline_render Metanorma::Document::Components::Inline::EmRawElement,
+                             :render_em
+      register_inline_render Metanorma::Document::Components::Inline::StrongRawElement,
+                             :render_strong
+      register_inline_render Metanorma::Document::Components::Inline::TtElement,
+                             :render_tt
+      register_inline_render Metanorma::Document::Components::Inline::SubElement,
+                             :render_sub
+      register_inline_render Metanorma::Document::Components::Inline::SupElement,
+                             :render_sup
+      register_inline_render Metanorma::Document::Components::Inline::SmallCapElement,
+                             :render_small_caps
+      register_inline_render Metanorma::Document::Components::TextElements::UnderlineElement,
+                             :render_underline
+      register_inline_render Metanorma::Document::Components::TextElements::StrikeElement,
+                             :render_strike
+      register_inline_render Metanorma::Document::Components::Inline::BrElement,
+                             :render_br
+      register_inline_render Metanorma::Document::Components::Inline::TabElement,
+                             :render_tab
+      register_inline_render Metanorma::Document::Components::Inline::LinkElement,
+                             :render_link
+      register_inline_render Metanorma::Document::Components::Inline::XrefElement,
+                             :render_noop_inline
+      register_inline_render Metanorma::Document::Components::Inline::ErefElement,
+                             :render_noop_inline
+      register_inline_render Metanorma::Document::Components::Inline::SpanElement,
+                             :render_span
+      register_inline_render Metanorma::Document::Components::Inline::FnElement,
+                             :render_fn_inline
+      register_inline_render Metanorma::Document::Components::Inline::ConceptElement,
+                             :render_concept
+      register_inline_render Metanorma::Document::Components::Inline::StemInlineElement,
+                             :render_noop_inline
+      register_inline_render Metanorma::Document::Components::TextElements::StemElement,
+                             :render_stem
+      register_inline_render Metanorma::Document::Components::Inline::SemxElement,
+                             :render_semx_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtXrefElement,
+                             :render_fmt_xref
+      register_inline_render Metanorma::Document::Components::Inline::FmtStemElement,
+                             :render_fmt_stem
+      register_inline_render Metanorma::Document::Components::Inline::CommaElement,
+                             :render_comma
+      register_inline_render Metanorma::Document::Components::Inline::EnumCommaElement,
+                             :render_comma
+      register_inline_render Metanorma::Document::Components::IdElements::Bookmark,
+                             :render_bookmark
+      register_inline_render Metanorma::Document::Components::IdElements::Image,
+                             :render_image
+      register_inline_render Metanorma::Document::Components::Inline::MathElement,
+                             :render_math
+      register_inline_render Metanorma::Document::Components::Inline::AsciimathElement,
+                             :render_asciimath
+      register_inline_render Metanorma::Document::Components::EmptyElements::IndexElement,
+                             :render_index
+      register_inline_render Metanorma::Document::Components::ReferenceElements::IndexXrefElement,
+                             :render_index
+      register_inline_render Metanorma::Document::Components::Blocks::NoteBlock,
+                             :render_note_inline
       # All Fmt* elements delegate to render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtNameElement, :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtTitleElement, :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtXrefLabelElement, :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtFnLabelElement, :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtConceptElement, :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtAnnotationStartElement, :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtAnnotationEndElement, :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtAnnotationBodyElement, :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::VariantTitleElement, :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::LocalizedStringElement, :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::TitleWithAnnotationElement, :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::BiblioTagElement, :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::NameWithIdElement, :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::DisplayTextElement, :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtFootnoteContainerElement, :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtFnBodyElement, :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtPreferredElement, :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtDefinitionElement, :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtTermsourceElement, :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtAdmittedElement, :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtIdentifierElement, :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtSourcecodeElement, :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtNameElement,
+                             :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtTitleElement,
+                             :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtXrefLabelElement,
+                             :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtFnLabelElement,
+                             :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtConceptElement,
+                             :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtAnnotationStartElement,
+                             :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtAnnotationEndElement,
+                             :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtAnnotationBodyElement,
+                             :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::VariantTitleElement,
+                             :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::LocalizedStringElement,
+                             :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::TitleWithAnnotationElement,
+                             :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::BiblioTagElement,
+                             :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::NameWithIdElement,
+                             :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::DisplayTextElement,
+                             :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtFootnoteContainerElement,
+                             :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtFnBodyElement,
+                             :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtPreferredElement,
+                             :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtDefinitionElement,
+                             :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtTermsourceElement,
+                             :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtAdmittedElement,
+                             :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtIdentifierElement,
+                             :render_mixed_inline
+      register_inline_render Metanorma::Document::Components::Inline::FmtSourcecodeElement,
+                             :render_mixed_inline
 
       def lookup_dispatch(type_class, registry_method)
         self.class.ancestors.each do |ancestor|
@@ -589,7 +650,10 @@ module Metanorma
       # --- Block-level rendering ---
 
       def render_paragraph(p, **_opts)
-        attrs = element_attrs(id: safe_attr(p, :id), style: alignment_style(safe_attr(p, :alignment)))
+        attrs = element_attrs(id: safe_attr(p, :id),
+                              style: alignment_style(safe_attr(
+                                                       p, :alignment
+                                                     )))
         tag("p", attrs) { render_mixed_inline(p) }
       end
 
@@ -641,8 +705,12 @@ module Metanorma
 
           sec.tr.each do |tr|
             cols = 0
-            Array(tr.th).each { |th| cols += th.colspan && th.colspan > 1 ? th.colspan : 1 }
-            Array(tr.td).each { |td| cols += td.colspan && td.colspan > 1 ? td.colspan : 1 }
+            Array(tr.th).each do |th|
+              cols += th.colspan && th.colspan > 1 ? th.colspan : 1
+            end
+            Array(tr.td).each do |td|
+              cols += td.colspan && td.colspan > 1 ? td.colspan : 1
+            end
             max_cols = cols if cols > max_cols
           end
         end
@@ -699,7 +767,8 @@ module Metanorma
       end
 
       def render_ordered_list(ol, **_opts)
-        attrs = element_attrs(id: safe_attr(ol, :id), start: safe_attr(ol, :start), type: safe_attr(ol, :type_attr))
+        attrs = element_attrs(id: safe_attr(ol, :id),
+                              start: safe_attr(ol, :start), type: safe_attr(ol, :type_attr))
         tag("ol", attrs) do
           ol.listitem&.each { |li| render_list_item(li) }
         end
@@ -771,11 +840,10 @@ module Metanorma
 
       def sort_by_displayorder(children)
         children.sort_by do |node|
-          order = begin
-            node.displayorder
-          rescue StandardError
-            nil
-          end
+          order = if node.is_a?(Lutaml::Model::Serializable) &&
+              node.class.attributes.key?(:displayorder)
+                    node.displayorder
+                  end
           order &&= order.to_i
           order || Float::INFINITY
         end
@@ -837,7 +905,8 @@ module Metanorma
       end
 
       def render_example(example, **_opts)
-        drop = Drops::ExampleDrop.from_model(example, renderer: renderer_context)
+        drop = Drops::ExampleDrop.from_model(example,
+                                             renderer: renderer_context)
         @output << render_liquid("_example.html.liquid", { "block" => drop })
       end
 
@@ -847,7 +916,8 @@ module Metanorma
       end
 
       def render_formula(formula, **_opts)
-        drop = Drops::FormulaDrop.from_model(formula, renderer: renderer_context)
+        drop = Drops::FormulaDrop.from_model(formula,
+                                             renderer: renderer_context)
         @output << render_liquid("_formula.html.liquid", { "block" => drop })
       end
 
@@ -866,7 +936,8 @@ module Metanorma
       end
 
       def render_admonition(admonition, **_opts)
-        drop = Drops::AdmonitionDrop.from_model(admonition, renderer: renderer_context)
+        drop = Drops::AdmonitionDrop.from_model(admonition,
+                                                renderer: renderer_context)
         @output << render_liquid("_admonition.html.liquid", { "block" => drop })
       end
 
@@ -1257,7 +1328,8 @@ module Metanorma
                            stem_child figure_child formula_child sourcecode_child]
         label_stripped = false
 
-        walked = walk_ordered(element, allow_filter: display_attrs) do |type, obj|
+        walked = walk_ordered(element,
+                              allow_filter: display_attrs) do |type, obj|
           case type
           when :text
             text = obj
@@ -1308,7 +1380,9 @@ module Metanorma
       end
 
       def render_inline_tag(tag_name, element, **extra_attrs)
-        tag(tag_name, element_attrs(**extra_attrs)) { render_mixed_inline(element) }
+        tag(tag_name, element_attrs(**extra_attrs)) do
+          render_mixed_inline(element)
+        end
       end
 
       # Process raw XML content from map_all_content models (e.g. RawParagraph).
@@ -1349,13 +1423,17 @@ module Metanorma
         end
         # Remap XML class names to HTML-specific class names
         doc.css("[class]").each do |el|
-          el["class"] = el["class"].split(/\s+/).map { |c| html_class_for_span(c) }.join(" ")
+          el["class"] = el["class"].split(/\s+/).map do |c|
+            html_class_for_span(c)
+          end.join(" ")
         end
         doc.inner_html
       end
 
       def deduplicate_semx_label(source_node, semx_node)
-        first_text = semx_node.children.find { |c| c.text? && !c.text.strip.empty? }
+        first_text = semx_node.children.find do |c|
+          c.text? && !c.text.strip.empty?
+        end
         return unless first_text
 
         semx_prefix = first_text.text[/\A(\s*\S+)/, 1]
@@ -1369,7 +1447,9 @@ module Metanorma
         return unless prev_text.end_with?(label)
 
         prev.content = prev_text.sub(/#{Regexp.escape(label)}\s*\z/, "")
-        first_text.content = first_text.text.sub(/\A\s*#{Regexp.escape(label)}\s*/, "")
+        first_text.content = first_text.text.sub(
+          /\A\s*#{Regexp.escape(label)}\s*/, ""
+        )
       end
 
       def render_link(link)
@@ -1388,7 +1468,9 @@ module Metanorma
 
       def render_xref(xref)
         target = safe_attr(xref, :target) || safe_attr(xref, :to_attr)
-        attrs = element_attrs(href: "##{escape_html(target)}", id: safe_attr(xref, :id))
+        attrs = element_attrs(href: "##{escape_html(target)}",
+                              id: safe_attr(xref,
+                                            :id))
         tag("a", attrs) { render_mixed_inline(xref) }
       end
 
@@ -1538,6 +1620,10 @@ module Metanorma
       end
 
       def safe_attr(obj, method_name)
+        if obj.is_a?(Lutaml::Model::Serializable) && !obj.class.attributes.key?(method_name)
+          return nil
+        end
+
         obj.public_send(method_name)
       rescue NoMethodError
         nil
@@ -1636,7 +1722,8 @@ module Metanorma
           Drops::FootnoteDrop.new(entry, content_html)
         end
 
-        @output << render_liquid("_footnotes.html.liquid", { "footnotes" => drops })
+        @output << render_liquid("_footnotes.html.liquid",
+                                 { "footnotes" => drops })
       end
 
       def capture_output

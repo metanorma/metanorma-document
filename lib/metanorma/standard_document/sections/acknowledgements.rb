@@ -4,10 +4,8 @@ module Metanorma
   module StandardDocument
     module Sections
       # Acknowledgements for the document.
-      class Acknowledgements < Metanorma::StandardDocument::Sections::StandardContentSection
-        attribute :semx_id, :string
+      class Acknowledgements < Metanorma::StandardDocument::Sections::ContentSection
         attribute :original_id, :string
-        attribute :displayorder, :integer
         xml do
           element "acknowledgements"
 

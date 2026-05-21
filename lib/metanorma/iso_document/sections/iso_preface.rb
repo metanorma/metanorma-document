@@ -3,39 +3,33 @@
 module Metanorma
   module IsoDocument
     module Sections
-      # Prefatory clauses appearing in an ISO/IEC document.
-      class IsoPreface < Lutaml::Model::Serializable
-        # Abstract.
+      # Prefatory clauses in an ISO/IEC document.
+      # Extends StandardDocument::Preface with ISO-specific section types:
+      #   abstract → IsoAbstractSection
+      #   foreword → IsoForewordSection
+      #   introduction → IsoClauseSection
+      # ISO preface mandates foreword; isodoc preface is permissive.
+      class IsoPreface < Metanorma::StandardDocument::Sections::Preface
+        # Override: ISO uses specific section types
         attribute :abstract, IsoAbstractSection
-
-        # Foreword.
         attribute :foreword, IsoForewordSection
-
-        # Introduction.
         attribute :introduction, IsoClauseSection
 
-        # TOC and other special clauses in preface.
+        # Generic clauses in preface use IsoClauseSection
         attribute :clause, IsoClauseSection, collection: true
 
-        # Acknowledgements section.
+        # Acknowledgements and executivesummary use IsoClauseSection
         attribute :acknowledgements, IsoClauseSection
-
-        # Executive summary section.
         attribute :executivesummary, IsoClauseSection
-
-        attribute :semx_id, :string
-        attribute :displayorder, :integer
 
         xml do
           element "preface"
-          map_element "abstract", to: :abstract
-          map_element "foreword", to: :foreword
-          map_element "introduction", to: :introduction
+          ordered
+
+          Metanorma::StandardDocument::SectionXmlMapping.apply_preface_elements(self)
           map_element "clause", to: :clause
-          map_element "acknowledgements", to: :acknowledgements
-          map_element "executivesummary", to: :executivesummary
-          map_attribute "semx-id", to: :semx_id
-          map_attribute "displayorder", to: :displayorder
+
+          Metanorma::StandardDocument::SectionXmlMapping.apply_preface_attributes(self)
         end
       end
     end

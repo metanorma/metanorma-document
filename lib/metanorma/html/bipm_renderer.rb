@@ -5,7 +5,6 @@ module Metanorma
     # Renders BipmDocument components to HTML.
     # Extends IsoRenderer with BIPM-specific branding (institutional navy, scientific precision).
     class BipmRenderer < IsoRenderer
-
       def flavor_publishers(_doc_id)
         ["BIPM"]
       end
@@ -27,7 +26,7 @@ module Metanorma
       # BIPM logo: white fill for dark header
       def load_logo_svg(filename, **opts)
         svg = super
-        svg = svg.gsub(/fill:#0f3c80/, "fill:white") if svg
+        svg = svg.gsub("fill:#0f3c80", "fill:white") if svg
         svg
       end
 
@@ -50,12 +49,16 @@ module Metanorma
         logos = publisher_logos_html(doc)
         if logos && !logos.empty?
           @output << "<div class=\"cover-publishers\">"
-          logos.each { |svg| @output << "<span class=\"cover-logo\">#{svg}</span>" }
+          logos.each do |svg|
+            @output << "<span class=\"cover-logo\">#{svg}</span>"
+          end
           @output << "</div>"
         end
 
         identifiers = Array(bibdata.doc_identifier).compact
-        cover_ids = identifiers.select { |di| safe_attr(di, :type) == "iso-reference" }
+        cover_ids = identifiers.select do |di|
+          safe_attr(di, :type) == "iso-reference"
+        end
         cover_ids = [identifiers.first].compact if cover_ids.empty?
 
         cover_ids.each do |di|
@@ -66,8 +69,13 @@ module Metanorma
         end
 
         bibdata.date&.each do |date|
-          date_type = extract_text_value(safe_attr(date, :type_attr) || safe_attr(date, :type))
-          date_val = extract_text_value(date.is_a?(Metanorma::Document::Relaton::BibliographicDate) ? date.on : safe_attr(date, :text))
+          date_type = extract_text_value(safe_attr(date,
+                                                   :type_attr) || safe_attr(
+                                                     date, :type
+                                                   ))
+          date_val = extract_text_value(date.is_a?(Metanorma::Document::Relaton::BibliographicDate) ? date.on : safe_attr(
+            date, :text
+          ))
           if date_type == "published" && date_val
             @output << "<p class=\"cover-date\">#{escape_html(date_val)}</p>"
           end
@@ -81,7 +89,7 @@ module Metanorma
           @output << "<div class=\"cover-title\"><span>#{escape_html(title_text)}</span></div>"
         end
 
-        if bibdata.status && bibdata.status.stage
+        if bibdata.status&.stage
           stages = Array(bibdata.status.stage)
           stage_text = stages.map { |s| Array(s.value).join }.join(" ")
           unless stage_text.empty?
@@ -121,7 +129,7 @@ module Metanorma
           t.example_bg      = "#f5f0e8"
           t.example_color   = "#7a6952"
           t.admonition_border = "#7a6952"
-          t.admonition_bg   = "#f5f0e8"
+          t.admonition_bg = "#f5f0e8"
           t.admonition_color = "#7a6952"
           t.footer_border_color = "#3d7ec7"
           t.cover_separator_color = "rgba(61,126,199,0.25)"

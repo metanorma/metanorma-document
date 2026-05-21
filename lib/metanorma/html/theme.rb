@@ -82,7 +82,7 @@ module Metanorma
         @example_bg      = "rgba(232, 248, 245, 0.6)"
         @example_border  = "#0d9488"
         @admonition_color = "#b8860b"
-        @admonition_bg   = "rgba(255, 252, 245, 0.8)"
+        @admonition_bg = "rgba(255, 252, 245, 0.8)"
         @admonition_border = "#e8a820"
         @footer_border_color = nil
         @cover_separator_color = nil
@@ -92,7 +92,7 @@ module Metanorma
         @cover_after_bg    = nil
         @cover_before_bg   = nil
         @progress_bar_color = nil
-        @extra_css         = nil
+        @extra_css = nil
 
         # Dark mode defaults
         @dark_bg          = "#0f1118"

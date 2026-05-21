@@ -9,6 +9,10 @@ module Metanorma
           attribute :id, :string
           attribute :semx_id, :string
           attribute :original_id, :string
+          attribute :nobullet, :string
+          attribute :spacing, :string
+          attribute :indent, :string
+          attribute :bare, :string
           attribute :json_type, :string
 
           def json_type
@@ -26,6 +30,10 @@ module Metanorma
             map_attribute "id", to: :id
             map_attribute "semx-id", to: :semx_id
             map_attribute "original-id", to: :original_id
+            map_attribute "nobullet", to: :nobullet
+            map_attribute "spacing", to: :spacing
+            map_attribute "indent", to: :indent
+            map_attribute "bare", to: :bare
           end
         end
       end

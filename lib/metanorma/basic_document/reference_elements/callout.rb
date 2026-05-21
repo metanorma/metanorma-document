@@ -7,7 +7,7 @@ module Metanorma
       # The target of the callout is understood to be the location of the callout within the source code;
       # the extent of the target is not expressed overtly.
       class Callout < Metanorma::BasicDocument::ReferenceElements::ReferenceToIdElement
-        attribute :type, BasicObject
+        attribute :type, :string
         attribute :text, Metanorma::BasicDocument::TextElements::TextElement
 
         xml do

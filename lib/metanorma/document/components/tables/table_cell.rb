@@ -61,7 +61,8 @@ module Metanorma
                     collection: true
           attribute :sourcecode, "Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock",
                     collection: true
-          attribute :source, "Metanorma::IsoDocument::Terms::TermSource",
+          attribute :source,
+                    Metanorma::Document::Components::ReferenceElements::SourceElement,
                     collection: true
 
           # Nested tables (table inside td/th)

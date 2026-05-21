@@ -4,7 +4,10 @@ require "spec_helper"
 require "metanorma/html/generator"
 
 RSpec.describe "HTML class name ownership" do
-  let(:xml_path) { File.expand_path("../../../fixtures/iso/is/document-en.presentation.xml", __dir__) }
+  let(:xml_path) do
+    File.expand_path("../../../fixtures/iso/is/document-en.presentation.xml",
+                     __dir__)
+  end
   let(:xml) { File.read(xml_path) }
   let(:doc) { Metanorma::IsoDocument::Root.from_xml(xml) }
   let(:html) { Metanorma::Html::Generator.generate(doc) }
@@ -32,7 +35,9 @@ RSpec.describe "HTML class name ownership" do
   ].freeze
 
   it "contains no XML-originated class names in any element" do
-    all_classes = page.css("[class]").flat_map { |el| el["class"].split(/\s+/) }.uniq
+    all_classes = page.css("[class]").flat_map do |el|
+      el["class"].split(/\s+/)
+    end.uniq
 
     leaks = all_classes & XML_CLASS_NAMES
     leaks.should be_empty,
@@ -45,7 +50,9 @@ RSpec.describe "HTML class name ownership" do
 
   it "uses HTML-specific class names for xrefs" do
     # At least one xref-section or xref-fig should exist if the document has xrefs
-    xref_classes = page.css("[class*='xref-']").flat_map { |el| el["class"].split(/\s+/) }
+    xref_classes = page.css("[class*='xref-']").flat_map do |el|
+      el["class"].split(/\s+/)
+    end
     xref_classes.select { |c| c.start_with?("xref-") }.should_not be_empty
   end
 

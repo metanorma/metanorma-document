@@ -12,6 +12,8 @@ module Metanorma
           attribute :semx_id, :string
           attribute :original_id, :string
           attribute :keep_with_next, :string
+          attribute :keep_with_previous, :string
+          attribute :indent, :string
           attribute :class_attr, :string
           attribute :type_attr, :string
           attribute :displayorder, :integer
@@ -75,9 +77,9 @@ module Metanorma
                     collection: true
           attribute :image, Metanorma::Document::Components::IdElements::Image,
                     collection: true
-          attribute :add, "Metanorma::StandardDocument::Elements::Add",
+          attribute :add, "Metanorma::Document::Elements::Add",
                     collection: true
-          attribute :del, "Metanorma::StandardDocument::Elements::Del",
+          attribute :del, "Metanorma::Document::Elements::Del",
                     collection: true
 
           # JSON serialization attributes
@@ -99,6 +101,8 @@ module Metanorma
             map_attribute "semx-id", to: :semx_id
             map_attribute "original-id", to: :original_id
             map_attribute "keep-with-next", to: :keep_with_next
+            map_attribute "keep-with-previous", to: :keep_with_previous
+            map_attribute "indent", to: :indent
             map_attribute "class", to: :class_attr
             map_attribute "type", to: :type_attr
             map_attribute "displayorder", to: :displayorder

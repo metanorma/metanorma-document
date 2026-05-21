@@ -13,6 +13,9 @@ module Metanorma
           attribute :display, :string
           attribute :display_directives, :string
           attribute :class_attr, :string
+          attribute :group, :string
+          attribute :spacing, :string
+          attribute :indent, :string
 
           def json_type
             "ol"
@@ -34,6 +37,9 @@ module Metanorma
             map_attribute "display-directives", to: :display_directives
             map_attribute "class", to: :class_attr, render_empty: true
             map_attribute "start", to: :start
+            map_attribute "group", to: :group
+            map_attribute "spacing", to: :spacing
+            map_attribute "indent", to: :indent
           end
         end
       end

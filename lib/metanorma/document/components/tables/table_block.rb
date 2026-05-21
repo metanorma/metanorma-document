@@ -44,6 +44,12 @@ module Metanorma
                     collection: true
           attribute :dl, Metanorma::Document::Components::Lists::DefinitionList
           attribute :key, Metanorma::Document::Components::AncillaryBlocks::KeyElement
+          attribute :example,
+                    Metanorma::Document::Components::AncillaryBlocks::ExampleBlock,
+                    collection: true
+          attribute :sourcecode,
+                    Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock,
+                    collection: true
           attribute :colgroup, ColGroupElement
 
           # Presentation-specific elements
@@ -54,6 +60,7 @@ module Metanorma
                     collection: true
 
           attribute :width, :string
+          attribute :align, :string
           attribute :json_type, :string
 
           def json_type
@@ -78,6 +85,7 @@ module Metanorma
             map_attribute "summary", to: :summary
             map_attribute "uri", to: :uri
             map_attribute "width", to: :width
+            map_attribute "align", to: :align
             map_attribute "semx-id", to: :semx_id
             map_attribute "autonum", to: :autonum
             map_attribute "displayorder", to: :displayorder
@@ -88,6 +96,8 @@ module Metanorma
             map_element "dl", to: :dl
             map_element "colgroup", to: :colgroup
             map_element "key", to: :key
+            map_element "example", to: :example
+            map_element "sourcecode", to: :sourcecode
             map_element "fmt-name", to: :fmt_name
             map_element "fmt-xref-label", to: :fmt_xref_label
             map_element "fmt-footnote-container", to: :fmt_footnote_container

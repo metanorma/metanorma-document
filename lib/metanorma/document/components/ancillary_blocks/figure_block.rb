@@ -31,6 +31,7 @@ module Metanorma
           attribute :displayorder, :integer
           attribute :height, :string
           attribute :width, :string
+          attribute :align, :string
 
           # The image file to be included in the figure as its main content.
           attribute :image, Metanorma::Document::Components::IdElements::Image
@@ -89,6 +90,7 @@ module Metanorma
             map_attribute "displayorder", to: :displayorder
             map_attribute "height", to: :height
             map_attribute "width", to: :width, render_empty: true
+            map_attribute "align", to: :align
             map_attribute "source", to: :source
             map_attribute "unnumbered", to: :unnumbered
             map_attribute "subsequence", to: :subsequence

@@ -38,7 +38,8 @@ RSpec.describe Metanorma::Html::Component::IndexTermCollector do
     end
 
     it "supports secondary and tertiary terms" do
-      collector.add(primary: "Grain", secondary: "Wheat", tertiary: "Durum", target_id: "sec1")
+      collector.add(primary: "Grain", secondary: "Wheat", tertiary: "Durum",
+                    target_id: "sec1")
 
       groups = collector.sorted_groups
       groups.length.should eq(1)

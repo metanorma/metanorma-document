@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "metanorma/document"
-
 module Metanorma
   module IetfDocument
     module Metadata

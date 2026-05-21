@@ -1,9 +1,56 @@
 # frozen_string_literal: true
 
-require "metanorma/html/whitespace_patch"
+require "liquid"
+require "nokogiri"
 
 module Metanorma
   module Html
+    unless defined?(TEMPLATES_ROOT)
+      TEMPLATES_ROOT = File.join(__dir__, "html", "templates")
+
+      Liquid::Environment.default.file_system = Liquid::LocalFileSystem.new(
+        TEMPLATES_ROOT, "_%s.html.liquid"
+      )
+
+      Moxml::Adapter::Nokogiri.class_eval do
+        class << self
+          alias_method :_original_children_patched, :children
+          remove_method :children
+        end
+
+        def self.children(node)
+          node.children.to_a
+        end
+      end
+
+      Lutaml::Xml::XmlElement.class_eval do
+        remove_method :order
+
+        def order
+          return @order_cache if @order_cache
+
+          @order_cache = children.filter_map do |child|
+            if child.text?
+              Lutaml::Xml::Element.new("Text", "text",
+                                       text_content: child.text,
+                                       node_type: :text)
+            elsif child.cdata?
+              Lutaml::Xml::Element.new("Text", "#cdata-section",
+                                       text_content: child.text,
+                                       node_type: :cdata)
+            elsif child.comment?
+              nil
+            else
+              Lutaml::Xml::Element.new("Element", child.unprefixed_name,
+                                       node_type: :element,
+                                       namespace_uri: child.namespace_uri,
+                                       namespace_prefix: child.namespace_prefix)
+            end
+          end
+        end
+      end
+    end
+
     autoload :BaseRenderer, "metanorma/html/base_renderer"
     autoload :Generator, "metanorma/html/generator"
     autoload :Theme, "metanorma/html/theme"

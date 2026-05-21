@@ -25,9 +25,14 @@ module Metanorma
             formula.dl&.then { |dl| renderer.render_definition_list(dl) }
           end
 
-          name_el = renderer.safe_attr(formula, :fmt_name) || renderer.safe_attr(formula, :name)
+          name_el = renderer.safe_attr(formula,
+                                       :fmt_name) || renderer.safe_attr(
+                                         formula, :name
+                                       )
           number_html = if name_el
-                          renderer.capture_output { renderer.render_inline_element(name_el) }
+                          renderer.capture_output do
+                            renderer.render_inline_element(name_el)
+                          end
                         end
 
           new(

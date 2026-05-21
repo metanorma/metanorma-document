@@ -10,7 +10,7 @@ module Metanorma
           attribute :references, Metanorma::Document::Components::BibData::BibliographicItem,
                     collection: true
 
-          attribute :passthrough, Metanorma::StandardDocument::Blocks::Passthrough,
+          attribute :passthrough, Metanorma::Document::Components::Blocks::Passthrough,
                     collection: true
 
           xml do

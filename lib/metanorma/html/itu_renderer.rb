@@ -4,7 +4,6 @@ module Metanorma
   module Html
     # ITU brand: #0e99d5 blue from logo
     class ItuRenderer < IsoRenderer
-
       def flavor_publishers(_doc_id)
         ["ITU"]
       end

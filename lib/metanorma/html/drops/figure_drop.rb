@@ -8,9 +8,13 @@ module Metanorma
 
         def self.from_model(figure, renderer:)
           id = renderer.safe_attr(figure, :id)
-          fig_name = renderer.safe_attr(figure, :fmt_name) || renderer.safe_attr(figure, :name)
+          fig_name = renderer.safe_attr(figure,
+                                        :fmt_name) || renderer.safe_attr(
+                                          figure, :name
+                                        )
           if id && fig_name
-            renderer.register_figure_entry(id: id, text: renderer.extract_plain_text(fig_name))
+            renderer.register_figure_entry(id: id,
+                                           text: renderer.extract_plain_text(fig_name))
           end
 
           image_html = renderer.capture_output do
@@ -24,7 +28,8 @@ module Metanorma
 
           caption_html = if fig_name || renderer.safe_attr(figure, :name)
                            renderer.capture_output do
-                             el = renderer.safe_attr(figure, :fmt_name) || figure.name
+                             el = renderer.safe_attr(figure,
+                                                     :fmt_name) || figure.name
                              renderer.render_inline_element(el)
                            end
                          end
@@ -34,8 +39,12 @@ module Metanorma
           end
 
           key_html = renderer.capture_output do
-            renderer.safe_attr(figure, :note)&.each { |n| renderer.render_note(n) }
-            renderer.safe_attr(figure, :dl)&.then { |dl| renderer.render_definition_list(dl) }
+            renderer.safe_attr(figure, :note)&.each do |n|
+              renderer.render_note(n)
+            end
+            renderer.safe_attr(figure, :dl)&.then do |dl|
+              renderer.render_definition_list(dl)
+            end
           end
 
           new(

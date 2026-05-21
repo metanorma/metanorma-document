@@ -42,7 +42,9 @@ module Metanorma
         attribute :definitions, Metanorma::BasicDocument::Lists::DefinitionList
 
         # Optional footnotes specific to the figure.
-        attribute :footnotes, BasicObject, collection: true # But actually: ReferenceToldWithParagraphElement
+        attribute :footnotes,
+                  Metanorma::BasicDocument::ReferenceElements::Footnote,
+                  collection: true
 
         xml do
           element "figure"

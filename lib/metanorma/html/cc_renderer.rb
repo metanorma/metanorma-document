@@ -5,7 +5,6 @@ module Metanorma
     # Renders CcDocument (CalConnect) components to HTML.
     # Extends IsoRenderer with CalConnect branding.
     class CcRenderer < IsoRenderer
-
       def flavor_publishers(_doc_id)
         ["CalConnect"]
       end

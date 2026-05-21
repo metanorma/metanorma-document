@@ -52,19 +52,28 @@ module Metanorma
       end
 
       register_render Metanorma::IsoDocument::Root, :render_document
-      register_render Metanorma::IsoDocument::Sections::IsoPreface, :render_preface
-      register_render Metanorma::IsoDocument::Sections::IsoSections, :render_sections
-      register_render Metanorma::IsoDocument::Sections::IsoClauseSection, :render_clause
-      register_render Metanorma::IsoDocument::Sections::IsoAnnexSection, :render_annex
-      register_render Metanorma::IsoDocument::Sections::IsoTermsSection, :render_terms_section
-      register_render Metanorma::IsoDocument::Sections::IsoForewordSection, :render_foreword
-      register_render Metanorma::IsoDocument::Sections::IsoAbstractSection, :render_abstract
+      register_render Metanorma::IsoDocument::Sections::IsoPreface,
+                      :render_preface
+      register_render Metanorma::IsoDocument::Sections::IsoSections,
+                      :render_sections
+      register_render Metanorma::IsoDocument::Sections::IsoClauseSection,
+                      :render_clause
+      register_render Metanorma::IsoDocument::Sections::IsoAnnexSection,
+                      :render_annex
+      register_render Metanorma::IsoDocument::Sections::IsoTermsSection,
+                      :render_terms_section
+      register_render Metanorma::IsoDocument::Sections::IsoForewordSection,
+                      :render_foreword
+      register_render Metanorma::IsoDocument::Sections::IsoAbstractSection,
+                      :render_abstract
       register_render Metanorma::IsoDocument::Terms::IsoTerm, :render_term
       register_render Metanorma::IsoDocument::Terms::TermNote, :render_term_note
-      register_render Metanorma::IsoDocument::Terms::TermExample, :render_term_example
+      register_render Metanorma::IsoDocument::Terms::TermExample,
+                      :render_term_example
       register_render Metanorma::IsoDocument::Boilerplate, :render_boilerplate
 
-      register_inline_render Metanorma::IsoDocument::Terms::TermOrigin, :render_term_origin
+      register_inline_render Metanorma::IsoDocument::Terms::TermOrigin,
+                             :render_term_origin
 
       def render_term_origin(element)
         text = extract_text_value(element)
@@ -82,7 +91,9 @@ module Metanorma
         return result if result && !result.empty?
 
         if titles.is_a?(Metanorma::IsoDocument::Metadata::TitleCollection) && !titles.items.empty?
-          raw = titles.items.find { |t| t.language == "en" } || titles.items.first
+          raw = titles.items.find do |t|
+            t.language == "en"
+          end || titles.items.first
           return raw.value.to_s if raw&.value
         end
         nil
@@ -195,8 +206,13 @@ module Metanorma
 
         pub_date = nil
         bibdata.date&.each do |date|
-          date_type = extract_text_value(safe_attr(date, :type_attr) || safe_attr(date, :type))
-          date_val = extract_text_value(date.is_a?(Metanorma::Document::Relaton::BibliographicDate) ? date.on : safe_attr(date, :text))
+          date_type = extract_text_value(safe_attr(date,
+                                                   :type_attr) || safe_attr(
+                                                     date, :type
+                                                   ))
+          date_val = extract_text_value(date.is_a?(Metanorma::Document::Relaton::BibliographicDate) ? date.on : safe_attr(
+            date, :text
+          ))
           if date_type == "published" && date_val
             pub_date = date_val
           end
@@ -350,8 +366,14 @@ module Metanorma
         term_name = extract_term_name(term)
         term_def = extract_term_definition(term)
         data_attrs = {}
-        data_attrs["data-term-name"] = term_name if term_name && !term_name.empty?
-        data_attrs["data-term-definition"] = term_def if term_def && !term_def.empty?
+        if term_name && !term_name.empty?
+          data_attrs["data-term-name"] =
+            term_name
+        end
+        if term_def && !term_def.empty?
+          data_attrs["data-term-definition"] =
+            term_def
+        end
         attrs = element_attrs(id: safe_attr(term, :id), **data_attrs)
         tag("div", attrs) do
           # In presentation mode, use fmt_* elements
@@ -372,23 +394,37 @@ module Metanorma
 
           # Preferred designations — use fmt-preferred if available
           if term.fmt_preferred && !term.fmt_preferred.empty?
-            term.fmt_preferred.each { |fp| fp.p&.each { |para| render_paragraph(para) } }
+            term.fmt_preferred.each do |fp|
+              fp.p&.each do |para|
+                render_paragraph(para)
+              end
+            end
           elsif term.preferred && !term.preferred.empty?
-            term.preferred&.each { |designation| render_term_designation(designation, "preferred") }
+            term.preferred&.each do |designation|
+              render_term_designation(designation, "preferred")
+            end
           end
 
           # Admitted designations — use fmt-admitted if available
           if term.fmt_admitted && !term.fmt_admitted.empty?
-            term.fmt_admitted.each { |fa| fa.p&.each { |para| render_paragraph(para) } }
+            term.fmt_admitted.each do |fa|
+              fa.p&.each do |para|
+                render_paragraph(para)
+              end
+            end
           elsif term.admitted && !term.admitted.empty?
-            term.admitted&.each { |designation| render_term_designation(designation, "admitted") }
+            term.admitted&.each do |designation|
+              render_term_designation(designation, "admitted")
+            end
           end
 
           # Deprecated designations — use fmt-deprecates if available
           if term.fmt_deprecates
             term.fmt_deprecates.p&.each { |para| render_paragraph(para) }
           elsif term.deprecates && !term.deprecates.empty?
-            term.deprecates&.each { |designation| render_term_designation(designation, "deprecated") }
+            term.deprecates&.each do |designation|
+              render_term_designation(designation, "deprecated")
+            end
           end
 
           # Domain — only render separately when fmt-definition is absent
@@ -450,11 +486,17 @@ module Metanorma
 
       def extract_term_definition(term)
         if term.fmt_definition
-          rendered = capture_output { render_ordered_content(term.fmt_definition) }
+          rendered = capture_output do
+            render_ordered_content(term.fmt_definition)
+          end
           return strip_html(rendered).gsub(/\s+/, " ").strip
         end
         if term.p && !term.p.empty?
-          rendered = capture_output { term.p.each { |para| render_paragraph(para) } }
+          rendered = capture_output do
+            term.p.each do |para|
+              render_paragraph(para)
+            end
+          end
           return strip_html(rendered).gsub(/\s+/, " ").strip
         end
         nil
@@ -564,7 +606,9 @@ module Metanorma
         # Remap XML class names to HTML-specific class names
         boilerplate_doc = Nokogiri::HTML::DocumentFragment.parse(clean)
         boilerplate_doc.css("[class]").each do |el|
-          el["class"] = el["class"].split(/\s+/).map { |c| html_class_for_span(c) }.join(" ")
+          el["class"] = el["class"].split(/\s+/).map do |c|
+            html_class_for_span(c)
+          end.join(" ")
         end
 
         @output << boilerplate_doc.inner_html.strip
@@ -603,7 +647,8 @@ module Metanorma
       # --- Helpers ---
 
       def render_title(section, level)
-        title_element = safe_attr(section, :fmt_title) || safe_attr(section, :title)
+        title_element = safe_attr(section,
+                                  :fmt_title) || safe_attr(section, :title)
         return unless title_element
 
         section_id = safe_attr(section, :id)

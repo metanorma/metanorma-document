@@ -158,10 +158,10 @@ module Metanorma
           if titles.is_a?(TitleCollection)
             titles.for_language(language)
           elsif titles.is_a?(Array)
-            titles.find { |t|
+            titles.find do |t|
               lang = safe_attr(t, :language) || safe_attr(t, :lang)
               lang == language
-            }
+            end
           end
         end
 

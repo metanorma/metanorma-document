@@ -5,7 +5,6 @@ module Metanorma
     # Renders OgcDocument components to HTML.
     # Extends IsoRenderer with OGC-specific branding (geospatial, OGC cyan-blue #00b1ff).
     class OgcRenderer < IsoRenderer
-
       def flavor_publishers(_doc_id)
         ["OGC"]
       end

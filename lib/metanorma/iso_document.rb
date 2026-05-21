@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "metanorma/standard_document"
-
 module Metanorma
   module IsoDocument
     autoload :AnnotationContainer, "metanorma/iso_document/annotation_container"
@@ -14,3 +12,5 @@ module Metanorma
     autoload :Terms, "metanorma/iso_document/terms"
   end
 end
+
+Metanorma::Registers::Setup.setup_iso_register

@@ -12,6 +12,9 @@ module Metanorma
         attribute :number, :string
         attribute :obligation, :string
         attribute :inline_header, :string
+        attribute :unnumbered, :string
+        attribute :toc, :string
+        attribute :class_attr, :string
         attribute :title, Metanorma::Document::Components::Inline::TitleWithAnnotationElement
         attribute :p, RawParagraph, collection: true
         attribute :ul, Metanorma::Document::Components::Lists::UnorderedList,
@@ -58,12 +61,9 @@ module Metanorma
 
         xml do
           element "terms"
-          map_attribute "id", to: :id
-          map_attribute "anchor", to: :anchor
-          map_attribute "type", to: :type
-          map_attribute "number", to: :number
-          map_attribute "obligation", to: :obligation
-          map_attribute "inline-header", to: :inline_header
+
+          Metanorma::StandardDocument::SectionXmlMapping.apply_content_section_attributes(self)
+
           map_element "title", to: :title
           map_element "fmt-title", to: :fmt_title
           map_element "fmt-xref-label", to: :fmt_xref_label
@@ -78,9 +78,6 @@ module Metanorma
           map_element "clause", to: :clause
           map_element "fmt-annotation-start", to: :fmt_annotation_start
           map_element "fmt-annotation-end", to: :fmt_annotation_end
-          map_attribute "semx-id", to: :semx_id
-          map_attribute "autonum", to: :autonum
-          map_attribute "displayorder", to: :displayorder
         end
       end
     end

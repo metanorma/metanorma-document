@@ -50,7 +50,11 @@ module Metanorma
         def safe_attr(obj, method_name) = renderer.safe_attr(obj, method_name)
         def extract_plain_text(node) = renderer.extract_plain_text(node)
         def extract_text_value(val) = renderer.extract_text_value(val)
-        def extract_block_label(block, default) = renderer.extract_block_label(block, default)
+
+        def extract_block_label(block,
+default)
+          renderer.extract_block_label(block, default)
+        end
 
         def self.register_in(registry)
           handled_classes.each do |klass|

@@ -61,6 +61,7 @@ module Metanorma
 
           # Whether callout markers are displayed
           attribute :markers, :string
+          attribute :alt, :string
 
           # The computer code or other such text presented in the block, as a single unformatted string. (The
           # string should be treated as pre-formatted text, with whitespace treated as significant.)
@@ -109,6 +110,7 @@ module Metanorma
             map_attribute "filename", to: :filename
             map_attribute "lang", to: :lang
             map_attribute "markers", to: :markers
+            map_attribute "alt", to: :alt
             map_content to: :content
             map_element "body", to: :body
             map_element "callout", to: :callouts

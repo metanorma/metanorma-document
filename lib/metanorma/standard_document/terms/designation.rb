@@ -10,7 +10,7 @@ module Metanorma
                   Metanorma::Document::Components::DataTypes::Iso3166Code, collection: true
         attribute :sources, Metanorma::StandardDocument::Terms::TermSource,
                   collection: true
-        attribute :expression, Metanorma::IsoDocument::Terms::TermExpression
+        attribute :expression, Metanorma::StandardDocument::Terms::TermExpression
 
         attribute :semx_id, :string
         attribute :original_id, :string

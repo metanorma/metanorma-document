@@ -17,7 +17,7 @@ module Metanorma
             see: see,
             see_also: see_also,
             target_id: target_id,
-            target_text: target_text
+            target_text: target_text,
           )
         end
 
@@ -67,7 +67,7 @@ module Metanorma
                              keyword_init: true)
 
       IndexEntry = Struct.new(:term, :locators, :see, :see_also_entries, :children,
-                               keyword_init: true) do
+                              keyword_init: true) do
         def initialize(*)
           super
           self.locators ||= []
@@ -76,7 +76,12 @@ module Metanorma
         end
 
         def add_locator(id, text)
-          locators << IndexLocator.new(id: id, text: text) if id && !locators.any? { |l| l.id == id }
+          if id && locators.none? do |l|
+            l.id == id
+          end
+            locators << IndexLocator.new(id: id,
+                                         text: text)
+          end
         end
 
         def add_see_also(term)
