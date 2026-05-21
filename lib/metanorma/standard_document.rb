@@ -7,6 +7,9 @@ module Metanorma
     autoload :BlockAttributes, "metanorma/standard_document/block_attributes"
     autoload :BlockXmlMapping, "metanorma/standard_document/block_attributes"
     autoload :SectionXmlMapping, "metanorma/standard_document/block_attributes"
+    autoload :PresentationAttributes,
+             "metanorma/standard_document/block_attributes"
+    autoload :OrderedContent, "metanorma/standard_document/block_attributes"
     autoload :Blocks, "metanorma/standard_document/blocks"
     autoload :Boilerplate, "metanorma/standard_document/boilerplate"
     autoload :Elements, "metanorma/standard_document/elements"

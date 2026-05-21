@@ -161,7 +161,7 @@ module Metanorma
 
       # --- Document Assembly ---
 
-      TEMPLATE_CACHE = {}
+      TEMPLATE_CACHE = {} # rubocop:disable Style/MutableConstant
       TEMPLATE_CACHE_MUTEX = Mutex.new
 
       def render_liquid(template_name, assigns)
@@ -1554,14 +1554,13 @@ module Metanorma
         # TextElements::StemElement — block math (no fmt- counterpart for display formulas)
         if stem.is_a?(Metanorma::Document::Components::TextElements::StemElement)
           if stem.math
-            begin
-              return stem.math.to_xml
-            rescue StandardError
-              math_items = Array(stem.math)
-              return math_items.join
-            end
-          end
-          if stem.asciimath
+            math_val = stem.math
+            return math_val.to_xml if math_val.is_a?(Nokogiri::XML::Node)
+            return math_val.to_xml if defined?(Moxml::Document) && math_val.is_a?(Moxml::Document)
+
+            math_items = Array(math_val)
+            math_items.join
+          elsif stem.asciimath
             text = extract_text_value(stem.asciimath)
             return %(<span class="stem">#{escape_html(text)}</span>)
           end

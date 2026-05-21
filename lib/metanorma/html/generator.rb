@@ -56,29 +56,22 @@ module Metanorma
           contributors = bibdata.contributor
           return false unless contributors
 
-          begin
-            contributors.any? do |c|
-              begin
-                next false unless c.role&.any? do |r|
-                  r&.type == "author"
-                end
-              rescue StandardError
-                false
-              end
-              org = c.organization
-              next false unless org
+          contributors.any? do |c|
+            roles = c.role
+            next false unless roles.is_a?(Array)
+            next false unless roles.any? { |r| r&.type == "author" }
 
-              org_abbrev = org.abbreviation
-              if org_abbrev.is_a?(String)
-                org_abbrev == abbrev
-              elsif org_abbrev.is_a?(Lutaml::Model::Serializable)
-                safe_attr(org_abbrev, :content) == abbrev
-              else
-                org_abbrev.to_s == abbrev
-              end
+            org = c.organization
+            next false unless org
+
+            org_abbrev = org.abbreviation
+            if org_abbrev.is_a?(String)
+              org_abbrev == abbrev
+            elsif org_abbrev.is_a?(Lutaml::Model::Serializable)
+              safe_attr(org_abbrev, :content) == abbrev
+            else
+              org_abbrev.to_s == abbrev
             end
-          rescue StandardError
-            false
           end
         end
 

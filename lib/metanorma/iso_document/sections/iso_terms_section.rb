@@ -6,8 +6,9 @@ module Metanorma
       # Terms section specific to ISO/IEC documents.
       # Maps <terms> element with <title>, <p>, <ul>, <term> children.
       class IsoTermsSection < Lutaml::Model::Serializable
+        include Metanorma::StandardDocument::PresentationAttributes
+
         attribute :id, :string
-        attribute :anchor, :string
         attribute :type, :string
         attribute :number, :string
         attribute :obligation, :string
@@ -46,18 +47,6 @@ module Metanorma
 
         # Nested clause sections inside terms
         attribute :clause, IsoClauseSection, collection: true
-        attribute :semx_id, :string
-        attribute :autonum, :string
-        attribute :displayorder, :integer
-        attribute :fmt_title, Metanorma::Document::Components::Inline::FmtTitleElement
-        attribute :fmt_xref_label,
-                  Metanorma::Document::Components::Inline::FmtXrefLabelElement, collection: true
-        attribute :fmt_annotation_start,
-                  Metanorma::Document::Components::Inline::FmtAnnotationStartElement,
-                  collection: true
-        attribute :fmt_annotation_end,
-                  Metanorma::Document::Components::Inline::FmtAnnotationEndElement,
-                  collection: true
 
         xml do
           element "terms"
@@ -65,6 +54,7 @@ module Metanorma
           Metanorma::StandardDocument::SectionXmlMapping.apply_content_section_attributes(self)
 
           map_element "title", to: :title
+          map_element "variant-title", to: :variant_title
           map_element "fmt-title", to: :fmt_title
           map_element "fmt-xref-label", to: :fmt_xref_label
           map_element "p", to: :p

@@ -11,6 +11,7 @@ module Metanorma
       #   ( BasicBlock*, content-subsection* )
       class ContentSection < Lutaml::Model::Serializable
         include Metanorma::StandardDocument::BlockAttributes
+        include Metanorma::StandardDocument::PresentationAttributes
 
         # Section identity
         attribute :id, :string
@@ -26,26 +27,6 @@ module Metanorma
 
         # Nested content subsections (recursive)
         attribute :subsection, ContentSection, collection: true
-
-        # Presentation-specific attributes
-        attribute :anchor, :string
-        attribute :semx_id, :string
-        attribute :autonum, :string
-        attribute :displayorder, :integer
-        attribute :fmt_title,
-                  Metanorma::Document::Components::Inline::FmtTitleElement
-        attribute :fmt_xref_label,
-                  Metanorma::Document::Components::Inline::FmtXrefLabelElement,
-                  collection: true
-        attribute :variant_title,
-                  Metanorma::Document::Components::Inline::VariantTitleElement,
-                  collection: true
-        attribute :fmt_annotation_start,
-                  Metanorma::Document::Components::Inline::FmtAnnotationStartElement,
-                  collection: true
-        attribute :fmt_annotation_end,
-                  Metanorma::Document::Components::Inline::FmtAnnotationEndElement,
-                  collection: true
 
         xml do
           element "clause"
