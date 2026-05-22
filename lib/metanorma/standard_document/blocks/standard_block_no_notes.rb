@@ -4,8 +4,8 @@ module Metanorma
   module StandardDocument
     module Blocks
       class StandardBlockNoNotes < Metanorma::Document::Components::Blocks::BasicBlockNoNotes
-        attribute :keep_with_next, :string
-        attribute :keep_lines_together, :string
+        attribute :keep_with_next, :boolean
+        attribute :keep_lines_together, :boolean
         attribute :tag, :string
         attribute :multilingual_rendering, :string
         attribute :columns, :string

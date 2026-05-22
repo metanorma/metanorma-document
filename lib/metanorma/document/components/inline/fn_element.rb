@@ -5,7 +5,7 @@ module Metanorma
         class FnElement < Lutaml::Model::Serializable
           attribute :id, :string
           attribute :reference, :string
-          attribute :hiddenref, :string
+          attribute :hiddenref, :boolean
           attribute :target, :string
           attribute :semx_id, :string
           attribute :original_reference, :string

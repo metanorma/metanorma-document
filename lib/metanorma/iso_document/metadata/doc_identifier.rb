@@ -7,7 +7,7 @@ module Metanorma
       # Used for the multiple <docidentifier> elements in bibdata/bibitem.
       class DocIdentifier < Lutaml::Model::Serializable
         attribute :type, :string
-        attribute :primary, :string
+        attribute :primary, :boolean
         attribute :scope, :string
         attribute :language, :string
         attribute :value, :string

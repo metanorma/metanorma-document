@@ -238,8 +238,8 @@ RSpec.describe "StandardDocument section models" do
       bib = described_class.from_xml(xml)
 
       bib.references.length.should eq(2)
-      bib.references.first.normative.should eq("true")
-      bib.references.last.normative.should eq("false")
+      bib.references.first.normative.should be(true)
+      bib.references.last.normative.should be(false)
     end
   end
 end

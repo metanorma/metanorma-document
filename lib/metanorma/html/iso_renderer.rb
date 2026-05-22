@@ -589,7 +589,7 @@ module Metanorma
       def render_boilerplate(boilerplate, **_opts)
         return unless boilerplate
 
-        content = boilerplate.content
+        content = boilerplate_to_xml(boilerplate)
         return unless content
 
         @output << "<div class=\"boilerplate-copyright\">"
@@ -614,6 +614,29 @@ module Metanorma
         @output << boilerplate_doc.inner_html.strip
 
         @output << "</div>"
+      end
+
+      def boilerplate_to_xml(boilerplate)
+        parts = []
+        %i[copyright_statement license_statement legal_statement
+           feedback_statement clause].each do |attr|
+          items = boilerplate.public_send(attr)
+          next unless items
+
+          tag = attr.to_s.gsub("_", "-")
+          items.each do |item|
+            inner = item.to_xml
+            next if !inner || inner.strip.empty?
+
+            # Strip the outer <clause> wrapper — the inner content is what matters
+            stripped = inner.strip
+            stripped = stripped.sub(%r{^<clause[^>]*>\n?}, "").sub(%r{\n?</clause>$}, "")
+            parts << "<#{tag}>#{stripped}</#{tag}>"
+          end
+        end
+        return nil if parts.empty?
+
+        parts.join("\n")
       end
 
       def convert_boilerplate_links(raw)

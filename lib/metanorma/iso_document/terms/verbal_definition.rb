@@ -7,7 +7,8 @@ module Metanorma
       class VerbalDefinition < Lutaml::Model::Serializable
         attribute :id, :string
         attribute :semx_id, :string
-        attribute :p, RawParagraph, collection: true
+        attribute :p, Metanorma::Document::Components::Paragraphs::ParagraphBlock,
+                  collection: true
         attribute :ol, Metanorma::Document::Components::Lists::OrderedList,
                   collection: true
         attribute :ul, Metanorma::Document::Components::Lists::UnorderedList,

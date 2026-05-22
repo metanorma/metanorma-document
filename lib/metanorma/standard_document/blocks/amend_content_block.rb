@@ -4,12 +4,30 @@ module Metanorma
   module StandardDocument
     module Blocks
       # Content block for amend description and new-content elements.
-      # Uses map_all_content to preserve all children (p, ol, ul, table, etc.)
+      # Contains block-level content: paragraphs, notes, lists, tables, etc.
       class AmendContentBlock < Lutaml::Model::Serializable
-        attribute :content, :string
+        attribute :paragraphs,
+                  Metanorma::Document::Components::Paragraphs::ParagraphBlock,
+                  collection: true
+        attribute :note,
+                  Metanorma::Document::Components::Blocks::NoteBlock,
+                  collection: true
+        attribute :ol,
+                  Metanorma::Document::Components::Lists::OrderedList,
+                  collection: true
+        attribute :ul,
+                  Metanorma::Document::Components::Lists::UnorderedList,
+                  collection: true
+        attribute :dl,
+                  Metanorma::Document::Components::Lists::DefinitionList,
+                  collection: true
 
         xml do
-          map_all_content to: :content
+          map_element "p", to: :paragraphs
+          map_element "note", to: :note
+          map_element "ol", to: :ol
+          map_element "ul", to: :ul
+          map_element "dl", to: :dl
         end
       end
     end

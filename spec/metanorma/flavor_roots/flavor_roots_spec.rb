@@ -191,7 +191,7 @@ RSpec.describe "Flavor Root classes" do
         </annex>
       XML
       annex = described_class.from_xml(xml)
-      annex.commentary.should eq("true")
+      annex.commentary.should be(true)
       annex.clause.length.should eq(1)
     end
   end
@@ -246,7 +246,7 @@ RSpec.describe "Flavor Root classes" do
         </annex>
       XML
       annex = described_class.from_xml(xml)
-      annex.unnumbered.should eq("true")
+      annex.unnumbered.should be(true)
       annex.paragraphs.length.should eq(1)
       annex.clause.length.should eq(1)
       annex.terms.length.should eq(1)
@@ -337,7 +337,7 @@ RSpec.describe "Flavor Root classes" do
       it "parses paragraph with keep-with-previous and indent" do
         xml = '<p id="_p1" keep-with-previous="true" indent="3">Text</p>'
         para = described_class.from_xml(xml)
-        para.keep_with_previous.should eq("true")
+        para.keep_with_previous.should be(true)
         para.indent.should eq("3")
       end
     end
@@ -362,10 +362,10 @@ RSpec.describe "Flavor Root classes" do
       it "parses ul with IETF attributes" do
         xml = '<ul id="_ul1" nobullet="true" spacing="compact" indent="2" bare="true"><li><p>Item</p></li></ul>'
         ul = described_class.from_xml(xml)
-        ul.nobullet.should eq("true")
+        ul.nobullet.should be(true)
         ul.spacing.should eq("compact")
         ul.indent.should eq("2")
-        ul.bare.should eq("true")
+        ul.bare.should be(true)
       end
 
       it "round-trips ul with IETF attributes" do
@@ -655,7 +655,7 @@ RSpec.describe "Flavor Root classes" do
 
       content = described_class.from_xml(xml)
       content.numbered.should eq("true")
-      content.remove_in_rfc.should eq("false")
+      content.remove_in_rfc.should be(false)
       content.subsection.length.should eq(1)
       content.subsection.first.should be_a(described_class)
     end
@@ -699,7 +699,7 @@ RSpec.describe "Flavor Root classes" do
 
       clause = described_class.from_xml(xml)
       clause.numbered.should eq("true")
-      clause.remove_in_rfc.should eq("true")
+      clause.remove_in_rfc.should be(true)
       clause.toc.should eq("default")
       clause.clause.length.should eq(1)
       clause.clause.first.should be_a(described_class)
@@ -732,7 +732,7 @@ RSpec.describe "Flavor Root classes" do
 
       annex = described_class.from_xml(xml)
       annex.numbered.should eq("true")
-      annex.remove_in_rfc.should eq("false")
+      annex.remove_in_rfc.should be(false)
       annex.clause.length.should eq(1)
       annex.clause.first.should be_a(
         Metanorma::IetfDocument::Sections::IetfClauseSection,
@@ -1224,9 +1224,12 @@ RSpec.describe "Flavor Root classes" do
       end
 
       it "parses boilerplate content" do
-        xml = "<boilerplate><p>Legal text</p></boilerplate>"
+        xml = '<boilerplate><copyright-statement><clause id="cs1" obligation="normative"><title>Copyright</title><p>Legal text</p></clause></copyright-statement></boilerplate>'
         bp = described_class.from_xml(xml)
-        bp.content.should include("Legal text")
+        bp.copyright_statement.should_not be_empty
+        cs = bp.copyright_statement.first
+        cs.subsection.should_not be_empty
+        cs.subsection.first.paragraphs.first.text.first.should include("Legal text")
       end
     end
 
@@ -1467,7 +1470,7 @@ RSpec.describe "Flavor Root classes" do
       XML
 
       clause = Metanorma::StandardDocument::Sections::ClauseSection.from_xml(xml)
-      clause.unnumbered.should eq("true")
+      clause.unnumbered.should be(true)
     end
 
     it "parses UN annex with unnumbered" do
@@ -1479,7 +1482,7 @@ RSpec.describe "Flavor Root classes" do
       XML
 
       annex = Metanorma::StandardDocument::Sections::AnnexSection.from_xml(xml)
-      annex.unnumbered.should eq("true")
+      annex.unnumbered.should be(true)
       annex.obligation.should eq("informative")
     end
   end
@@ -1590,7 +1593,7 @@ RSpec.describe "Flavor Root classes" do
       adm = Metanorma::Document::Components::MultiParagraph::AdmonitionBlock.from_xml(xml)
       adm.type.should eq("commentary")
       adm.target.should eq("_s1")
-      adm.unnumbered.should eq("true")
+      adm.unnumbered.should be(true)
     end
 
     it "round-trips admonition with target" do
@@ -1751,7 +1754,7 @@ RSpec.describe "Flavor Root classes" do
         cs.type.should eq("scope")
         cs.number.should eq("1")
         cs.obligation.should eq("normative")
-        cs.inline_header.should eq("false")
+        cs.inline_header.should be(false)
         cs.semx_id.should eq("s1")
         cs.autonum.should eq("1.")
         cs.displayorder.should eq(1)
@@ -1769,7 +1772,7 @@ RSpec.describe "Flavor Root classes" do
         XML
         ics = Metanorma::IetfDocument::Sections::IetfContentSection.from_xml(xml)
         ics.numbered.should eq("true")
-        ics.remove_in_rfc.should eq("false")
+        ics.remove_in_rfc.should be(false)
         ics.paragraphs.length.should eq(1)
         ics.subsection.length.should eq(1)
         ics.subsection.first.should be_a(Metanorma::IetfDocument::Sections::IetfContentSection)
@@ -2134,6 +2137,53 @@ RSpec.describe "Flavor Root classes" do
       offenders.should be_empty,
                        "Model files using rescue StandardError: #{offenders.join(', ')}"
     end
+
+    # map_all_content is only allowed for inherently arbitrary XML content.
+    # All structured content must use typed element mappings.
+    it "no map_all_content except whitelisted legitimate uses" do
+      whitelist = %w[
+        math_element.rb
+        semx_child_element.rb
+        sourcecode_block.rb
+        organization.rb
+        bipm_bibliographic_item.rb
+        metanorma_extension.rb
+      ]
+      model_files = Dir.glob("lib/metanorma/{document,standard_document,*_document,basic_document}/**/*.rb")
+      offenders = model_files.select do |f|
+        next false if whitelist.any? { |w| f.end_with?(w) }
+
+        File.read(f).include?("map_all_content")
+      end
+      offenders.should be_empty,
+                       "Files with map_all_content (not whitelisted): #{offenders.join(', ')}"
+    end
+
+    it "no RawParagraph class exists" do
+      rb_files = Dir.glob("lib/metanorma/**/*.rb")
+      offenders = rb_files.select do |f|
+        source = File.read(f)
+        source.include?("RawParagraph")
+      end
+      offenders.should be_empty,
+                       "Files referencing RawParagraph: #{offenders.join(', ')}"
+    end
+
+    # Boolean attributes must use :boolean type, not :string
+    it "no boolean-valued attributes typed as :string" do
+      boolean_attrs = %w[unnumbered keep_with_next keep_with_previous
+                         keep_lines_together remove_in_rfc inline_header
+                         hidden hiddenref commentary]
+      rb_files = Dir.glob("lib/metanorma/{document,standard_document,*_document}/**/*.rb")
+      offenders = rb_files.flat_map do |f|
+        source = File.read(f)
+        boolean_attrs.select do |attr|
+          source.match?(/attribute\s+:#{attr},\s*:string/)
+        end.map { |attr| "#{f}: #{attr}" }
+      end
+      offenders.should be_empty,
+                       "Boolean attrs typed as :string: #{offenders.join(', ')}"
+    end
   end
 
   # ============================================================
@@ -2452,8 +2502,8 @@ RSpec.describe "Flavor Root classes" do
           Metanorma::JisDocument::Root, xml
         )
         doc.annex.length.should eq(1)
-        doc.annex.first.commentary.should eq("true")
-        reparsed.annex.first.commentary.should eq("true")
+        doc.annex.first.commentary.should be(true)
+        reparsed.annex.first.commentary.should be(true)
         output.should include('commentary="true"')
       end
     end
@@ -2607,8 +2657,8 @@ RSpec.describe "Flavor Root classes" do
         )
         doc.sections.clause.length.should eq(2)
         doc.annex.length.should eq(1)
-        doc.annex.first.unnumbered.should eq("true")
-        reparsed.annex.first.unnumbered.should eq("true")
+        doc.annex.first.unnumbered.should be(true)
+        reparsed.annex.first.unnumbered.should be(true)
         output.should include('unnumbered="true"')
       end
     end

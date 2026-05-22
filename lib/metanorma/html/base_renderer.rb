@@ -1143,7 +1143,7 @@ module Metanorma
       end
 
       def render_mixed_inline(node)
-        # Models using map_all_content (e.g. RawParagraph): raw XML in content
+        # Models using map_all_content: raw XML in content
         if raw_content_node?(node)
           raw = node.content
           if raw.is_a?(String) && !raw.strip.empty?
@@ -1385,7 +1385,7 @@ module Metanorma
         end
       end
 
-      # Process raw XML content from map_all_content models (e.g. RawParagraph).
+      # Process raw XML content from map_all_content models.
       # Strips source elements (xref, eref, stem) that have a following <semx>
       # wrapper, keeping only the semx display content.
       def render_raw_content(raw_xml)

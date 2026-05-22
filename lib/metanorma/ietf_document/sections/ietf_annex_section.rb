@@ -6,7 +6,7 @@ module Metanorma
       class IetfAnnexSection < Metanorma::StandardDocument::Sections::AnnexSection
         # IETF-specific attributes
         attribute :numbered, :string
-        attribute :remove_in_rfc, :string
+        attribute :remove_in_rfc, :boolean
 
         # Sub-clauses within IETF annex use IetfClauseSection
         attribute :clause, IetfClauseSection, collection: true

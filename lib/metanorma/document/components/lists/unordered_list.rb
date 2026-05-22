@@ -9,10 +9,10 @@ module Metanorma
           attribute :id, :string
           attribute :semx_id, :string
           attribute :original_id, :string
-          attribute :nobullet, :string
+          attribute :nobullet, :boolean
           attribute :spacing, :string
           attribute :indent, :string
-          attribute :bare, :string
+          attribute :bare, :boolean
           attribute :json_type, :string
 
           def json_type

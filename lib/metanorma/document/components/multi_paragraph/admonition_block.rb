@@ -10,7 +10,10 @@ module Metanorma
           # Subclass of admonition determining how it is to be rendered; e.g.
           # Warning, Note, Tip.
           # Distinct admonition types are often associated with distinct icons or rendering.
-          attribute :type, :string
+          attribute :type, :string,
+                    values: %w[danger caution warning important
+                               safety\ precautions editorial tip note
+                               commentary]
 
           # Caption of admonition.
           attribute :name, Metanorma::Document::Components::TextElements::TextElement,
@@ -28,7 +31,7 @@ module Metanorma
           attribute :target, :string
 
           # Whether the admonition is excluded from automatic numbering (UN).
-          attribute :unnumbered, :string
+          attribute :unnumbered, :boolean
 
           # Paragraphs within the admonition.
           attribute :paragraphs,

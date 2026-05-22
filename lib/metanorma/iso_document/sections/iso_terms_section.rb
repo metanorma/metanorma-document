@@ -12,12 +12,13 @@ module Metanorma
         attribute :type, :string
         attribute :number, :string
         attribute :obligation, :string
-        attribute :inline_header, :string
-        attribute :unnumbered, :string
+        attribute :inline_header, :boolean
+        attribute :unnumbered, :boolean
         attribute :toc, :string
         attribute :class_attr, :string
         attribute :title, Metanorma::Document::Components::Inline::TitleWithAnnotationElement
-        attribute :p, RawParagraph, collection: true
+        attribute :p, Metanorma::Document::Components::Paragraphs::ParagraphBlock,
+                  collection: true
         attribute :ul, Metanorma::Document::Components::Lists::UnorderedList,
                   collection: true
         attribute :term, Metanorma::IsoDocument::Terms::IsoTerm,

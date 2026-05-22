@@ -11,8 +11,8 @@ module Metanorma
           attribute :alignment, :string
           attribute :semx_id, :string
           attribute :original_id, :string
-          attribute :keep_with_next, :string
-          attribute :keep_with_previous, :string
+          attribute :keep_with_next, :boolean
+          attribute :keep_with_previous, :boolean
           attribute :indent, :string
           attribute :class_attr, :string
           attribute :type_attr, :string
