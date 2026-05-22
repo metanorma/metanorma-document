@@ -10,7 +10,7 @@ module Metanorma
         attribute :amend, Metanorma::StandardDocument::Blocks::AmendBlock
         attribute :number, :string
         attribute :branch_number, :string
-        attribute :unnumbered, :string
+        attribute :unnumbered, :boolean
         attribute :obligation, :string
 
         attribute :semx_id, :string

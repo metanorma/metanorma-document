@@ -14,7 +14,7 @@ module Metanorma
         attribute :original_id, :string
         attribute :autonum, :string
         attribute :displayorder, :integer
-        attribute :inline_header, :string
+        attribute :inline_header, :boolean
 
         xml do
           element "clause-hierarchical-section"

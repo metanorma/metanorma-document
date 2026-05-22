@@ -17,9 +17,9 @@ module Metanorma
       # bibliographical references (as modelled in Relaton), along with
       # any prefatory text.
       class StandardReferencesSection < Metanorma::StandardDocument::Sections::StandardSection
-        attribute :normative, :string
+        attribute :normative, :boolean
         attribute :obligation, :string
-        attribute :hidden, :string
+        attribute :hidden, :boolean
         attribute :references, Metanorma::Document::Components::BibData::BibliographicItem,
                   collection: true
         attribute :passthrough, Metanorma::StandardDocument::Blocks::Passthrough,

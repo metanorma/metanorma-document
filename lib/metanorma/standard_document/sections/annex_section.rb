@@ -19,9 +19,9 @@ module Metanorma
         attribute :id, :string
         attribute :number, :string
         attribute :obligation, :string
-        attribute :unnumbered, :string
+        attribute :unnumbered, :boolean
         attribute :toc, :string
-        attribute :inline_header, :string
+        attribute :inline_header, :boolean
         attribute :title,
                   Metanorma::Document::Components::Inline::TitleWithAnnotationElement
 

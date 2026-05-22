@@ -6,7 +6,7 @@ module Metanorma
       class IetfClauseSection < Metanorma::StandardDocument::Sections::ClauseSection
         # IETF-specific attributes
         attribute :numbered, :string
-        attribute :remove_in_rfc, :string
+        attribute :remove_in_rfc, :boolean
 
         # Recursive IETF sub-clauses
         attribute :clause, IetfClauseSection, collection: true

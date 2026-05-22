@@ -45,7 +45,7 @@ module Metanorma
 
           attribute :anchor, :string
 
-          attribute :remove_in_rfc, :string
+          attribute :remove_in_rfc, :boolean
 
           attribute :name, Metanorma::Document::Components::Inline::NameWithIdElement,
                     collection: true

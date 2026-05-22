@@ -20,8 +20,8 @@ module Metanorma
         attribute :type, :string
         attribute :number, :string
         attribute :obligation, :string
-        attribute :inline_header, :string
-        attribute :unnumbered, :string
+        attribute :inline_header, :boolean
+        attribute :unnumbered, :boolean
         attribute :toc, :string
         attribute :class_attr, :string
         attribute :title,

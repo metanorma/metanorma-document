@@ -7,7 +7,7 @@ module Metanorma
           attribute :type, :string
           attribute :bibitemid, :string
           attribute :citeas, :string
-          attribute :normative, :string
+          attribute :normative, :boolean
           attribute :alt, :string
           attribute :display_format, :string
           attribute :relative, :string

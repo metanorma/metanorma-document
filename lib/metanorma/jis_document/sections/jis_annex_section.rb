@@ -4,7 +4,7 @@ module Metanorma
   module JisDocument
     module Sections
       class JisAnnexSection < Metanorma::IsoDocument::Sections::IsoAnnexSection
-        attribute :commentary, :string
+        attribute :commentary, :boolean
 
         xml do
           element "annex"
