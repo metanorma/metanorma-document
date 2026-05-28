@@ -103,49 +103,7 @@ module Metanorma
       end
 
       def theme
-        @theme ||= Theme.new.tap do |t|
-          t.primary        = "#0f3c80"
-          t.accent         = "#3d7ec7"
-          t.accent_deep    = "#1a5a9e"
-          t.gradient       = "linear-gradient(135deg, #082247 0%, #0f3c80 50%, #1a5a9e 100%)"
-          t.primary_light  = "#edf1f7"
-          t.accent_light   = "#e8f0fa"
-          t.warm           = "#7a6952"
-          t.warm_light     = "#f5f0e8"
-          t.sidebar_bg     = "#f4f6fa"
-          t.font_body      = '"Crimson Pro", "Georgia", "Times New Roman", serif'
-          t.font_sans      = '"IBM Plex Sans", "Helvetica Neue", Arial, sans-serif'
-          t.font_mono      = '"IBM Plex Mono", "Fira Code", "Courier New", monospace'
-          t.font_url       = "https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap"
-          t.header_background = "linear-gradient(135deg, #082247 0%, #0f3c80 50%, #1a5a9e 100%)"
-          t.cover_background  = "linear-gradient(175deg, #04122a 0%, #0a2e5c 25%, #0f3c80 55%, #1a5a9e 80%, #3d7ec7 100%)"
-          t.cover_before_bg   = "background: radial-gradient(ellipse at 25% 15%, rgba(61,126,199,0.15) 0%, transparent 50%), radial-gradient(ellipse at 75% 85%, rgba(15,60,128,0.18) 0%, transparent 40%), radial-gradient(circle at 50% 50%, rgba(255,255,255,0.02) 0%, transparent 70%)"
-          t.cover_after_bg    = "height: 3px; background: linear-gradient(90deg, transparent, #3d7ec7 20%, #0f3c80 50%, #3d7ec7 80%, transparent)"
-          t.progress_bar_color = "#3d7ec7"
-          t.note_border     = "#3d7ec7"
-          t.note_bg         = "#edf1f7"
-          t.note_color      = "#3d7ec7"
-          t.example_border  = "#0f3c80"
-          t.example_bg      = "#f5f0e8"
-          t.example_color   = "#7a6952"
-          t.admonition_border = "#7a6952"
-          t.admonition_bg = "#f5f0e8"
-          t.admonition_color = "#7a6952"
-          t.footer_border_color = "#3d7ec7"
-          t.cover_separator_color = "rgba(61,126,199,0.25)"
-          t.dark_note_bg    = "#0d1520"
-          t.dark_example_bg = "#14100e"
-          t.dark_admonition_bg = "#141210"
-          t.extra_css = <<~CSS
-            .sourcecode pre { background: #0a1628; border-color: #1a2d4a; }
-            .reading-progress { box-shadow: 0 0 10px rgba(61,126,199,0.4); }
-            mark.search-match { background: #edf1f7; box-shadow: 0 0 0 1px rgba(15,60,128,0.25); }
-            mark.search-match.search-current { background: #3d7ec7; color: #fff; }
-            [data-theme="dark"] .sourcecode pre { background: #060a14; border-color: #1a2040; }
-            [data-theme="dark"] mark.search-match { background: #0d1a30; box-shadow: 0 0 0 1px rgba(61,126,199,0.4); }
-            [data-theme="dark"] mark.search-match.search-current { background: #1a5a9e; }
-          CSS
-        end
+        @theme ||= Theme.load(:bipm)
       end
     end
   end
