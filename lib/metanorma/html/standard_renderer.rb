@@ -358,28 +358,68 @@ with_subsections: false, with_terms: false)
 
       def render_bibitem(item, index, normative: false)
         css_class = normative ? "norm-ref-entry" : "biblio-entry"
-        attrs = element_attrs(id: safe_attr(item, :id), class: css_class)
+        item_id = safe_attr(item, :id)
         url = bibitem_url(item)
 
-        tag("p", attrs) do
-          if url
-            @output << "<a href=\"#{escape_html(url)}\" target=\"_blank\" rel=\"noopener\" class=\"biblio-link\">"
-          end
+        if item.biblio_tag
+          prefix, rest = split_biblio_tag(item.biblio_tag)
+          ordinal_html = prefix.empty? ? nil : escape_html(prefix)
+          pubid_html = rest ? capture_output { rest.each { |child| render_inline_element(child) } } : nil
+        else
+          ordinal_html = "[#{index}]"
+          pubid_html = nil
+        end
 
-          # Use biblio-tag from presentation XML if available
-          if item.biblio_tag
-            render_mixed_inline(item.biblio_tag)
-            @output << "&nbsp;"
+        content_html = capture_output { render_bibitem_content(item) }
+
+        drop = Drops::BiblioEntryDrop.new(
+          id: item_id,
+          css_class: css_class,
+          ordinal_html: ordinal_html,
+          pubid_html: pubid_html,
+          url: url ? escape_html(url) : nil,
+          content_html: content_html,
+        )
+        @output << render_liquid("_biblio_entry.html.liquid", { "entry" => drop })
+      end
+
+      # Splits biblio-tag content into ordinal prefix (e.g. "[1]")
+      # and remaining content (pubid spans, footnotes, etc.)
+      def split_biblio_tag(tag)
+        children = []
+        tag.each_mixed_content { |c| children << c }
+
+        prefix = +""
+        rest = []
+        found_boundary = false
+
+        children.each do |child|
+          if !found_boundary
+            case child
+            when Metanorma::Document::Components::Inline::TabElement
+              found_boundary = true
+              next
+            when String
+              stripped = child.strip
+              if stripped.match?(/\A\[\d+\]\z/)
+                prefix << child
+              elsif child.match?(/\A\s*\z/)
+                prefix << child
+              else
+                found_boundary = true
+                rest << child
+              end
+            else
+              found_boundary = true
+              rest << child
+            end
           else
-            @output << "[#{index}]&nbsp;"
-          end
-
-          render_bibitem_content(item)
-
-          if url
-            @output << "</a>"
+            rest << child
           end
         end
+
+        prefix_text = prefix.strip
+        [prefix_text, rest.empty? ? nil : rest]
       end
 
       def bibitem_url(item)
