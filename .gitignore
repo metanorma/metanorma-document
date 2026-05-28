@@ -12,6 +12,7 @@
 
 /Gemfile.lock
 TODO*
+!TODO.finalize/
 /data/dist/
 **/output/
 output.html
