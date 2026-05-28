@@ -6,6 +6,17 @@ a.fn-link {
 a.fn-link:hover {
   color: var(--mn-primary);
 }
+.fn-marker {
+  position: relative;
+  cursor: pointer;
+}
+.fn-marker .fn-link {
+  vertical-align: inherit;
+  font-size: inherit;
+}
+.fn-marker .fn-popup {
+  display: none;
+}
 .footnotes-section {
   margin-top: 3em;
   padding-top: 1.5em;
@@ -19,23 +30,72 @@ a.fn-link:hover {
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
-ol.footnotes {
-  list-style: decimal;
-  padding-left: 2em;
+.footnotes {
   font-size: 0.88em;
   color: var(--color-text-light);
 }
-ol.footnotes li {
+.footnotes .footnote {
   margin: 0.4em 0;
-  padding-left: 0.3em;
+}
+.footnote-label {
+  font-weight: 600;
+  color: var(--mn-primary);
+  font-family: var(--font-sans);
+  margin-right: 0.3em;
 }
 a.footnote-backref {
   text-decoration: none;
   color: var(--mn-primary);
   font-weight: 600;
+  margin-right: 0.3em;
+}
+.footnote-arrival {
+  background: var(--mn-primary-light);
+  border-radius: var(--radius-sm);
+  transition: background 0.3s;
 }
 .formula-where {
   font-style: italic;
   font-size: 0.95em;
   margin: 0.5em 0 0;
+}
+
+/* === Slide-up annotation pane === */
+.fn-annotation-pane {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: var(--color-bg);
+  border-top: 2px solid var(--mn-primary);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  max-height: 40vh;
+  transform: translateY(100%);
+  transition: transform 0.25s ease;
+  pointer-events: none;
+  font-family: var(--font-sans);
+  font-size: 0.9em;
+  line-height: 1.6;
+  color: var(--color-text);
+}
+.fn-annotation-pane.visible {
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.fn-annotation-header {
+  padding: 0.5em 1em;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+}
+.fn-annotation-label {
+  font-weight: 600;
+  color: var(--mn-primary);
+  font-size: 0.85em;
+}
+.fn-annotation-body {
+  padding: 0.6em 1em 1em;
+  overflow-y: auto;
+  max-height: calc(40vh - 2.5em);
 }

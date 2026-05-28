@@ -13,7 +13,7 @@ module Metanorma
           @entry.number
         end
 
-        def reference
+        def label
           @entry.reference
         end
 

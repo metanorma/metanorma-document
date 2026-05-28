@@ -23,6 +23,7 @@ module Metanorma
         components/mn-stem-dropdown
         components/mn-glossary
         components/mn-shortcuts
+        components/mn-footnotes
       ].freeze
 
       BASE_CSS = %w[
