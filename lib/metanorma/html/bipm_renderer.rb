@@ -41,19 +41,7 @@ module Metanorma
         bibdata = doc.bibdata
         return unless bibdata
 
-        @output << "<div class=\"title-section\">"
-        @output << "<div class=\"cover-grid\">"
-        @output << "<div class=\"cover-meta\">"
-
-        # Publisher logos
         logos = publisher_logos_html(doc)
-        if logos && !logos.empty?
-          @output << "<div class=\"cover-publishers\">"
-          logos.each do |svg|
-            @output << "<span class=\"cover-logo\">#{svg}</span>"
-          end
-          @output << "</div>"
-        end
 
         identifiers = Array(bibdata.doc_identifier).compact
         cover_ids = identifiers.select do |di|
@@ -61,45 +49,40 @@ module Metanorma
         end
         cover_ids = [identifiers.first].compact if cover_ids.empty?
 
-        cover_ids.each do |di|
+        doc_id_texts = cover_ids.filter_map do |di|
           id = clean_doc_id(extract_text_value(di))
-          next if id.to_s.empty?
-
-          @output << "<p class=\"cover-doc-id\">#{escape_html(id)}</p>"
+          id.to_s.empty? ? nil : escape_html(id)
         end
 
+        date_val = nil
         bibdata.date&.each do |date|
           date_type = extract_text_value(safe_attr(date,
                                                    :type_attr) || safe_attr(
                                                      date, :type
                                                    ))
-          date_val = extract_text_value(date.is_a?(Metanorma::Document::Relaton::BibliographicDate) ? date.on : safe_attr(
+          raw_date = extract_text_value(date.is_a?(Metanorma::Document::Relaton::BibliographicDate) ? date.on : safe_attr(
             date, :text
           ))
-          if date_type == "published" && date_val
-            @output << "<p class=\"cover-date\">#{escape_html(date_val)}</p>"
+          if date_type == "published" && raw_date
+            date_val = escape_html(raw_date)
           end
         end
 
-        @output << "</div>"
-        @output << "<div class=\"cover-body\">"
-
         title_text = extract_display_title(bibdata)
-        if title_text && !title_text.empty?
-          @output << "<div class=\"cover-title\"><span>#{escape_html(title_text)}</span></div>"
-        end
-
+        stage_text = nil
         if bibdata.status&.stage
           stages = Array(bibdata.status.stage)
           stage_text = stages.map { |s| Array(s.value).join }.join(" ")
-          unless stage_text.empty?
-            @output << "<div class=\"cover-stage\"><p>#{escape_html(stage_text)}</p></div>"
-          end
+          stage_text = nil if stage_text.empty?
         end
 
-        @output << "</div>"
-        @output << "</div>"
-        @output << "</div><hr class=\"cover-separator\" />"
+        @output << render_liquid("_bipm_cover.html.liquid", {
+          "logos" => logos&.any? ? logos : nil,
+          "doc_ids" => doc_id_texts,
+          "date" => date_val,
+          "title" => title_text && !title_text.empty? ? escape_html(title_text) : nil,
+          "stage" => stage_text ? escape_html(stage_text) : nil,
+        })
       end
 
       def theme

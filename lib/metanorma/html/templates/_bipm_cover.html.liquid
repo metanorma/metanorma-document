@@ -1,0 +1,27 @@
+<div class="title-section">
+  <div class="cover-grid">
+    <div class="cover-meta">
+      {% if logos %}
+      <div class="cover-publishers">
+        {% for svg in logos %}
+        <span class="cover-logo">{{ svg }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% for id in doc_ids %}
+      <p class="cover-doc-id">{{ id }}</p>
+      {% endfor %}
+      {% if date %}
+      <p class="cover-date">{{ date }}</p>
+      {% endif %}
+    </div>
+    <div class="cover-body">
+      {% if title %}
+      <div class="cover-title"><span>{{ title }}</span></div>
+      {% endif %}
+      {% if stage %}
+      <div class="cover-stage"><p>{{ stage }}</p></div>
+      {% endif %}
+    </div>
+  </div>
+</div><hr class="cover-separator" />
