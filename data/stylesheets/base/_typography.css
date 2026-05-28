@@ -33,11 +33,6 @@ p {
   hanging-punctuation: first last;
   orphans: 3; widows: 3;
 }
-.doc-content p + p { text-indent: 1.5em; margin-top: -0.3em; }
-h1 + p, h2 + p, h3 + p, blockquote + p, figure + p, table + p,
-.note-block p + p, .example p + p,
-div[id^="term-"] p + p,
-.norm-ref-entry, .biblio-entry { text-indent: 0; }
 
 a {
   color: var(--mn-primary);

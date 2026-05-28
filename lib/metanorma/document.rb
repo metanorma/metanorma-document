@@ -60,4 +60,5 @@ module Metanorma
   autoload :UnDocument, "metanorma/un_document"
   autoload :Collection, "metanorma/collection"
   autoload :Html, "metanorma/html"
+  autoload :Mirror, "metanorma/mirror"
 end

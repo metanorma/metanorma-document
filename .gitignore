@@ -17,3 +17,13 @@ TODO*
 output.html
 output-*.html
 /private-do-not-commit/
+
+# Frontend build artifacts (bundled into gem, not committed)
+frontend/node_modules/
+frontend/dist/
+
+# Generated test artifacts
+spec/tmp/
+
+# IDE
+.idea/
