@@ -19,11 +19,23 @@ figcaption .caption-label { vertical-align: middle; }
   cursor: zoom-out;
   animation: lightboxIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
+.lightbox-inner {
+  display: flex; flex-direction: column;
+  align-items: center; max-width: 90vw; max-height: 90vh;
+}
 .lightbox-overlay img {
-  max-width: 90vw; max-height: 82vh;
+  max-width: 90vw; max-height: 75vh;
   object-fit: contain; border-radius: var(--radius-md);
   box-shadow: 0 12px 56px rgba(0,0,0,0.6);
   animation: lightboxImgIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.lightbox-caption {
+  margin-top: 1em;
+  font-style: italic; font-size: 0.9em;
+  color: rgba(255, 255, 255, 0.75);
+  font-family: var(--font-sans);
+  text-align: center;
+  max-width: 600px;
 }
 
 .doc-content figure img { cursor: zoom-in; transition: transform var(--transition-fast), box-shadow var(--transition-fast); }

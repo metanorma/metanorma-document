@@ -1,7 +1,7 @@
 /* === Inline Elements === */
 .fn-marker { vertical-align: super; font-size: 0.78em; color: var(--mn-primary); font-family: var(--font-sans); }
 .small-caps { font-variant: small-caps; letter-spacing: 0.03em; }
-.obligation-text { font-style: italic; color: var(--mn-accent); }
+.obligation-text { font-style: italic; color: var(--color-text-light); }
 .title-text { font-weight: 700; }
 
 /* Math container — hover dropdown for source formats */

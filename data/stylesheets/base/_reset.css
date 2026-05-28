@@ -22,9 +22,9 @@ body {
 /* Font size scaling — applied to doc-content only, not header/sidebar */
 .doc-content { font-size: calc(1em * var(--reader-font-scale)); }
 
-/* Serif mode override — swaps font-body to a serif stack */
-.reader-serif {
-  --font-body: "Source Serif 4", "Noto Serif", Georgia, "Times New Roman", serif;
+/* Serif/sans toggle — swaps font-body between serif and sans */
+.reader-sans {
+  --font-body: var(--font-sans);
 }
 
 /* Skip navigation link */

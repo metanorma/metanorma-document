@@ -75,21 +75,21 @@
   });
   applyFontSize(getCurrentFontIdx());
 
-  // Serif toggle
+  // Serif toggle — switches between serif (default) and sans-serif
   var serifBtn = document.getElementById('serif-toggle');
-  var SERIF_KEY = 'metanorma-serif';
+  var SERIF_KEY = 'metanorma-sans';
 
-  function applySerifMode(useSerif) {
-    document.documentElement.classList.toggle('reader-serif', useSerif);
-    if (serifBtn) serifBtn.classList.toggle('active', useSerif);
+  function applySansMode(useSans) {
+    document.documentElement.classList.toggle('reader-sans', useSans);
+    if (serifBtn) serifBtn.classList.toggle('active', useSans);
   }
 
   if (serifBtn) serifBtn.addEventListener('click', function() {
-    var isSerif = document.documentElement.classList.contains('reader-serif');
-    applySerifMode(!isSerif);
-    R.setSetting(SERIF_KEY, (!isSerif).toString());
+    var isSans = document.documentElement.classList.contains('reader-sans');
+    applySansMode(!isSans);
+    R.setSetting(SERIF_KEY, (!isSans).toString());
   });
-  applySerifMode(R.getSetting(SERIF_KEY) === 'true');
+  applySansMode(R.getSetting(SERIF_KEY) === 'true');
 
   // Reading mode button
   var readingBtn = document.getElementById('reading-mode-btn');
