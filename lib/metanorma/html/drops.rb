@@ -14,6 +14,8 @@ module Metanorma
       autoload :TocEntryDrop, "metanorma/html/drops/toc_entry_drop"
       autoload :FigureListEntryDrop,
                "metanorma/html/drops/figure_list_entry_drop"
+      autoload :BiblioEntryDrop,
+               "metanorma/html/drops/biblio_entry_drop"
     end
   end
 end
