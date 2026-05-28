@@ -473,7 +473,11 @@ module Metanorma
       # Dispatch to the appropriate inline render method via type registry.
       def render_inline_element(element, **)
         return "" if element.nil?
-        return escape_html(element) if element.is_a?(String)
+
+        if element.is_a?(String)
+          @output << escape_html(element)
+          return
+        end
 
         method = lookup_dispatch(element.class, :inline_registry)
         if method
@@ -666,13 +670,13 @@ module Metanorma
         end
         col_count = table_column_count(table)
         @output << "<div class=\"table-scroll-wrapper\">"
+        name_el = safe_attr(table, :fmt_name) || safe_attr(table, :name)
+        if name_el
+          @output << "<div class=\"table-caption\">"
+          render_inline_element(name_el)
+          @output << "</div>"
+        end
         tag("table", attrs) do
-          name_el = safe_attr(table, :fmt_name) || safe_attr(table, :name)
-          if name_el
-            @output << "<caption>"
-            render_inline_element(name_el)
-            @output << "</caption>"
-          end
           @output << "<colgroup>" if table.colgroup
           render_table_colgroup(table.colgroup) if table.colgroup
           @output << "</colgroup>" if table.colgroup
@@ -1254,7 +1258,8 @@ module Metanorma
       end
 
       def render_stem(el)
-        @output << render_stem_content(el)
+        # StemElement in presentation XML is always paired with FmtStemElement
+        # which renders the formatted version — skip the raw stem to avoid duplication
       end
 
       def render_semx_inline(el)
@@ -1487,15 +1492,22 @@ module Metanorma
         fn_id = safe_attr(fn, :id)
         number = @footnote_collector.register(fn)
 
-        attrs = element_attrs(id: fn_id, class: "fn-marker")
-        tag("span", attrs) do
-          label = safe_attr(fn, :fn_label) || safe_attr(fn, :reference)
-          if label
-            @output << "<sup><a href=\"##{escape_html("footnote-#{number}")}\" " \
-                       "class=\"fn-link\" id=\"#{escape_html("fnref-#{number}")}\">" \
-                       "#{escape_html(label.to_s)}</a></sup>"
+        label = safe_attr(fn, :fn_label) || safe_attr(fn, :reference)
+        return unless label
+
+        popup_html = capture_output do
+          Array(fn.p).each do |para|
+            render_mixed_inline(para)
           end
         end
+
+        assigns = {
+          "attrs" => element_attrs(id: fn_id, class: "fn-marker"),
+          "number" => number,
+          "label" => escape_html(label.to_s),
+          "popup_html" => popup_html.strip.empty? ? nil : popup_html,
+        }
+        @output << render_liquid("_fn_marker.html.liquid", assigns)
       end
 
       def render_concept(concept)
@@ -1555,23 +1567,28 @@ module Metanorma
         if stem.is_a?(Metanorma::Document::Components::TextElements::StemElement)
           if stem.math
             math_val = stem.math
-            return math_val.to_xml if math_val.is_a?(Nokogiri::XML::Node)
-            return math_val.to_xml if defined?(Moxml::Document) && math_val.is_a?(Moxml::Document)
+            if math_val.respond_to?(:to_xml)
+              @output << math_val.to_xml
+              return
+            end
 
-            math_items = Array(math_val)
-            math_items.join
+            text = extract_text_value(math_val)
+            @output << %(<span class="stem">#{escape_html(text)}</span>)
+            return
           elsif stem.asciimath
             text = extract_text_value(stem.asciimath)
-            return %(<span class="stem">#{escape_html(text)}</span>)
+            @output << %(<span class="stem">#{escape_html(text)}</span>)
+            return
           end
           if stem.latexmath
             text = extract_text_value(stem.latexmath)
-            return %(<span class="stem">#{escape_html(text)}</span>)
+            @output << %(<span class="stem">#{escape_html(text)}</span>)
+            return
           end
         end
 
         text = extract_text_value(stem)
-        text.empty? ? "" : %(<span class="stem">#{escape_html(text)}</span>)
+        @output << %(<span class="stem">#{escape_html(text)}</span>) unless text.empty?
       end
 
       # --- Helper methods ---
