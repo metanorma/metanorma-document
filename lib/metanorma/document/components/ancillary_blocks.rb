@@ -4,6 +4,8 @@ module Metanorma
   module Document
     module Components
       module AncillaryBlocks
+        autoload :CalloutAnnotation,
+                 "#{__dir__}/ancillary_blocks/callout_annotation"
         autoload :ExampleBlock, "#{__dir__}/ancillary_blocks/example_block"
         autoload :FigureBlock, "#{__dir__}/ancillary_blocks/figure_block"
         autoload :FormulaBlock, "#{__dir__}/ancillary_blocks/formula_block"
@@ -11,6 +13,8 @@ module Metanorma
         autoload :LiteralBlock, "#{__dir__}/ancillary_blocks/literal_block"
         autoload :SourcecodeBlock,
                  "#{__dir__}/ancillary_blocks/sourcecode_block"
+        autoload :SourcecodeBody,
+                 "#{__dir__}/ancillary_blocks/sourcecode_body"
         autoload :Subfigure, "#{__dir__}/ancillary_blocks/subfigure"
       end
     end

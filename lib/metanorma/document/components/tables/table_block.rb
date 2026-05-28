@@ -4,27 +4,6 @@ module Metanorma
   module Document
     module Components
       module Tables
-        # Column element within colgroup.
-        class ColElement < Lutaml::Model::Serializable
-          attribute :width, :string
-
-          xml do
-            element "col"
-            map_attribute "width", to: :width
-          end
-        end
-
-        # Column group element for table column width specifications.
-        class ColGroupElement < Lutaml::Model::Serializable
-          attribute :col, ColElement, collection: true
-
-          xml do
-            element "colgroup"
-            map_element "col", to: :col
-          end
-        end
-
-        # Tabular arrangement of text
         class TableBlock < Metanorma::Document::Components::Blocks::BasicBlock
           attribute :id, :string
           attribute :anchor, :string
@@ -52,7 +31,6 @@ module Metanorma
                     collection: true
           attribute :colgroup, ColGroupElement
 
-          # Presentation-specific elements
           attribute :fmt_name, Metanorma::Document::Components::Inline::FmtNameElement
           attribute :fmt_xref_label,
                     Metanorma::Document::Components::Inline::FmtXrefLabelElement, collection: true

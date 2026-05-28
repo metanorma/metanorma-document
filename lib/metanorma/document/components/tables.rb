@@ -4,6 +4,8 @@ module Metanorma
   module Document
     module Components
       module Tables
+        autoload :ColElement, "#{__dir__}/tables/col_element"
+        autoload :ColGroupElement, "#{__dir__}/tables/col_group_element"
         autoload :HeaderTableCell, "#{__dir__}/tables/header_table_cell"
         autoload :ParagraphTableCell, "#{__dir__}/tables/paragraph_table_cell"
         autoload :TableBlock, "#{__dir__}/tables/table_block"
