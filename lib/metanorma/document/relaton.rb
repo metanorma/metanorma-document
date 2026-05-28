@@ -4,6 +4,7 @@ module Metanorma
   module Document
     module Relaton
       autoload :Address, "#{__dir__}/relaton/address"
+      autoload :FormattedAddress, "#{__dir__}/relaton/formatted_address"
       autoload :Affiliation, "#{__dir__}/relaton/affiliation"
       autoload :BibItemLocality, "#{__dir__}/relaton/bib_item_locality"
       autoload :BibItemSize, "#{__dir__}/relaton/bib_item_size"
@@ -17,7 +18,7 @@ module Metanorma
       autoload :Contributor, "#{__dir__}/relaton/contributor"
       autoload :ContributorRole, "#{__dir__}/relaton/contributor_role"
       autoload :CopyrightAssociation, "#{__dir__}/relaton/copyright_association"
-      autoload :CopyrightOwner, "#{__dir__}/relaton/copyright_association"
+      autoload :CopyrightOwner, "#{__dir__}/relaton/copyright_owner"
       autoload :DateTime, "#{__dir__}/relaton/date_time"
       autoload :DocumentIdentifier, "#{__dir__}/relaton/document_identifier"
       autoload :DocumentRelation, "#{__dir__}/relaton/document_relation"
@@ -30,6 +31,7 @@ module Metanorma
       autoload :Iso8601Date, "#{__dir__}/relaton/iso8601_date"
       autoload :KeywordType, "#{__dir__}/relaton/keyword_type"
       autoload :LocalizedName, "#{__dir__}/relaton/localized_name"
+      autoload :LogoElement, "#{__dir__}/relaton/logo_element"
       autoload :LocalityStack, "#{__dir__}/relaton/locality_stack"
       autoload :MediumType, "#{__dir__}/relaton/medium_type"
       autoload :OrgIdentifier, "#{__dir__}/relaton/org_identifier"
@@ -45,6 +47,7 @@ module Metanorma
       autoload :PlaceType, "#{__dir__}/relaton/place_type"
       autoload :PriceType, "#{__dir__}/relaton/price_type"
       autoload :RegionType, "#{__dir__}/relaton/region_type"
+      autoload :RegionElement, "#{__dir__}/relaton/region_element"
       autoload :RelatonCollection, "#{__dir__}/relaton/relaton_collection"
       autoload :SeriesType, "#{__dir__}/relaton/series_type"
       autoload :SeriesTypeType, "#{__dir__}/relaton/series_type_type"

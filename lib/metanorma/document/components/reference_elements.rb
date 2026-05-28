@@ -24,9 +24,9 @@ module Metanorma
         autoload :SourceElement,
                  "#{__dir__}/reference_elements/source_element"
         autoload :SourceModification,
-                 "#{__dir__}/reference_elements/source_element"
+                 "#{__dir__}/reference_elements/source_modification"
         autoload :SourceOrigin,
-                 "#{__dir__}/reference_elements/source_element"
+                 "#{__dir__}/reference_elements/source_origin"
       end
     end
   end

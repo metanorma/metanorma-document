@@ -3,20 +3,6 @@
 module Metanorma
   module Document
     module Relaton
-      # Logo element with arbitrary SVG/image content. Uses map_all_content
-      # to preserve all child XML including <image>, <svg>, <path>, etc.
-      class LogoElement < Lutaml::Model::Serializable
-        attribute :type, :string
-        attribute :content, :string
-
-        xml do
-          element "logo"
-          map_attribute "type", to: :type
-          map_all_content to: :content
-        end
-      end
-
-      # Organization associated with a bibliographic item.
       class Organization < Contributor
         attribute :name, LocalizedName, collection: true
         attribute :variant, VariantOrgName, collection: true

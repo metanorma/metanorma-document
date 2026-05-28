@@ -4,9 +4,9 @@ module Metanorma
   module Document
     module Components
       module Blocks
-        class RequirementModel < RequirementBase
+        class RecommendationModel < RequirementBase
           xml do
-            element "requirement"
+            element "recommendation"
             map_attribute "id", to: :id
             map_attribute "model", to: :model
             map_attribute "obligation", to: :obligation

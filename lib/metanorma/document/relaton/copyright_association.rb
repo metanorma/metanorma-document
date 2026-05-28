@@ -3,16 +3,6 @@
 module Metanorma
   module Document
     module Relaton
-      # The copyright status of a bibliographic item.
-      class CopyrightOwner < Lutaml::Model::Serializable
-        attribute :organization, Organization
-
-        xml do
-          element "owner"
-          map_element "organization", to: :organization
-        end
-      end
-
       class CopyrightAssociation < Lutaml::Model::Serializable
         attribute :from, Metanorma::Document::Relaton::DateTime
         attribute :to, Metanorma::Document::Relaton::DateTime
