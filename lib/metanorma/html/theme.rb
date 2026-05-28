@@ -5,6 +5,29 @@ module Metanorma
     class Theme
       THEMES_DIR = File.join(File.dirname(__FILE__), "..", "..", "..", "data", "themes")
 
+      VALID_KEYS = %i[
+        primary accent gradient primary_light accent_light primary_dark
+        accent_deep warm warm_light
+        text_color text_light text_muted bg bg_light border sidebar_bg
+        font_body font_sans font_mono font_url
+        content_max_width sidebar_width header_height
+        radius_sm radius_md shadow_sm shadow_md
+        note_color note_bg note_border
+        example_color example_bg example_border
+        admonition_color admonition_bg admonition_border
+        footer_border_color cover_separator_color
+        header_background cover_background cover_after_bg cover_before_bg
+        progress_bar_color
+        dark_bg dark_bg_light dark_border dark_sidebar
+        dark_text dark_text_light dark_text_muted
+        dark_primary_light dark_accent_light
+        dark_note_bg dark_example_bg dark_admonition_bg
+        dark_code_bg dark_code_border
+        extra_css
+      ].freeze
+
+      SETTERS = VALID_KEYS.to_h { |k| [k.to_s, :"#{k}="] }.freeze
+
       # Primary palette
       attr_accessor :primary, :accent, :gradient,
                     :primary_light, :accent_light, :primary_dark,
@@ -121,8 +144,8 @@ module Metanorma
         overrides = YAML.safe_load_file(path, permitted_classes: [Symbol])
         new.tap do |theme|
           overrides.each do |key, value|
-            setter = "#{key}="
-            theme.public_send(setter, value) if theme.respond_to?(setter)
+            setter = SETTERS[key]
+            theme.public_send(setter, value) if setter
           end
         end
       end
