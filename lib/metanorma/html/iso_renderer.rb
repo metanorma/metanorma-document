@@ -24,31 +24,7 @@ module Metanorma
 
       # ISO brand: #e3000f red from logo
       def theme
-        @theme ||= Theme.new.tap do |t|
-          t.primary        = "#b3000c"
-          t.accent         = "#e3000f"
-          t.accent_deep    = "#b3000c"
-          t.gradient       = "linear-gradient(135deg, #8a0009 0%, #b3000c 50%, #e3000f 100%)"
-          t.primary_light  = "#fef0f1"
-          t.accent_light   = "#fde8ea"
-          t.warm           = "#1a1a1a"
-          t.warm_light     = "#f5f5f5"
-          t.header_background = "linear-gradient(135deg, #8a0009 0%, #b3000c 40%, #e3000f 100%)"
-          t.cover_background  = "linear-gradient(175deg, #5a0006 0%, #8a0009 25%, #b3000c 50%, #e3000f 80%, #ff4d4d 100%)"
-          t.cover_before_bg   = "background: radial-gradient(ellipse at 25% 20%, rgba(255,77,77,0.15) 0%, transparent 50%), radial-gradient(ellipse at 75% 80%, rgba(26,26,26,0.1) 0%, transparent 40%)"
-          t.cover_after_bg    = "height: 3px; background: linear-gradient(90deg, transparent, #e3000f, #1a1a1a, transparent)"
-          t.progress_bar_color = "#e3000f"
-          t.note_border     = "#e3000f"
-          t.note_bg         = "#fde8ea"
-          t.note_color      = "#e3000f"
-          t.example_border  = "#b3000c"
-          t.example_bg      = "#fef0f1"
-          t.example_color   = "#b3000c"
-          t.admonition_border = "#1a1a1a"
-          t.admonition_color  = "#1a1a1a"
-          t.footer_border_color = "#e3000f"
-          t.cover_separator_color = "rgba(227,0,15,0.25)"
-        end
+        @theme ||= Theme.load(:iso)
       end
 
       register_render Metanorma::IsoDocument::Root, :render_document

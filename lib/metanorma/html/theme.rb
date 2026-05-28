@@ -3,6 +3,8 @@
 module Metanorma
   module Html
     class Theme
+      THEMES_DIR = File.join(File.dirname(__FILE__), "..", "..", "..", "data", "themes")
+
       # Primary palette
       attr_accessor :primary, :accent, :gradient,
                     :primary_light, :accent_light, :primary_dark,
@@ -109,6 +111,20 @@ module Metanorma
         @dark_admonition_bg = nil
         @dark_code_bg     = nil
         @dark_code_border = nil
+      end
+
+      def self.load(flavor)
+        path = File.join(THEMES_DIR, "#{flavor}.yaml")
+        return new unless File.exist?(path)
+
+        require "yaml"
+        overrides = YAML.safe_load_file(path, permitted_classes: [Symbol])
+        new.tap do |theme|
+          overrides.each do |key, value|
+            setter = "#{key}="
+            theme.public_send(setter, value) if theme.respond_to?(setter)
+          end
+        end
       end
 
       def to_css_root
