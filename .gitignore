@@ -28,3 +28,4 @@ spec/tmp/
 
 # IDE
 .idea/
+node_modules/
