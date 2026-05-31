@@ -9,6 +9,8 @@ module Metanorma
                "metanorma/ietf_document/metadata/ietf_bibliographic_item"
       autoload :IetfEditorialGroup,
                "metanorma/ietf_document/metadata/ietf_editorial_group"
+      autoload :PiSettings,
+               "metanorma/ietf_document/metadata/pi_settings"
     end
   end
 end

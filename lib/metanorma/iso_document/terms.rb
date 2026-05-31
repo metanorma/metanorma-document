@@ -7,6 +7,7 @@ module Metanorma
                "#{__dir__}/terms/iso_term_collection"
       autoload :IsoTerm, "#{__dir__}/terms/iso_term"
       autoload :TermDesignation, "#{__dir__}/terms/term_designation"
+      autoload :TermDomainElement, "#{__dir__}/terms/term_domain_element"
       autoload :TermExpression, "#{__dir__}/terms/term_expression"
       autoload :TermDefinition, "#{__dir__}/terms/term_definition"
       autoload :VerbalDefinition, "#{__dir__}/terms/verbal_definition"

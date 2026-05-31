@@ -6,7 +6,7 @@ module Metanorma
       autoload :AmendBlock, "#{__dir__}/blocks/amend_block"
       autoload :AmendContentBlock, "#{__dir__}/blocks/amend_content_block"
       autoload :BlockSourceElement, "#{__dir__}/blocks/block_source"
-      autoload :SourceOriginElement, "#{__dir__}/blocks/block_source"
+      autoload :SourceOriginElement, "#{__dir__}/blocks/source_origin_element"
       autoload :AutoNumber, "#{__dir__}/blocks/auto_number"
       autoload :ChangeType, "#{__dir__}/blocks/change_type"
       autoload :ElementName, "#{__dir__}/blocks/element_name"
