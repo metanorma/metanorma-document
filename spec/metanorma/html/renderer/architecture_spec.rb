@@ -32,19 +32,19 @@ RSpec.describe "Architecture improvements" do
     let(:renderer) { Metanorma::Html::IsoRenderer.new }
     let(:ctx) { renderer.renderer_context }
 
-    it "delegates safe_attr via method_missing" do
+    it "delegates safe_attr via explicit method" do
       obj = Struct.new(:id).new("test-id")
       ctx.safe_attr(obj, :id).should eq("test-id")
     end
 
-    it "delegates escape_html via method_missing" do
+    it "delegates escape_html via explicit method" do
       ctx.escape_html("<b>").should eq("&lt;b&gt;")
     end
 
     it "delegates methods with keyword arguments" do
-      renderer.instance_variable_set(:@figure_entries, [])
+      renderer.figure_entries.clear
       ctx.register_figure_entry(id: "fig-1", text: "Figure 1")
-      entries = renderer.instance_variable_get(:@figure_entries)
+      entries = renderer.figure_entries
       entries.length.should eq(1)
       entries.first[:id].should eq("fig-1")
     end
@@ -132,9 +132,9 @@ RSpec.describe "Architecture improvements" do
   describe "render_ordered_inline no silent error rescue" do
     it "does not have a rescue StandardError block" do
       source = File.read(File.expand_path(
-                           "../../../../lib/metanorma/html/base_renderer.rb", __dir__
+                           "../../../../lib/metanorma/html/renderers/inline_renderer.rb", __dir__
                          ))
-      method_source = source[/def render_ordered_inline.*?(?=      def |\z)/m]
+      method_source = source[/def render_ordered_inline.*?(?=    def |\z)/m]
       method_source.should_not include("rescue StandardError")
     end
   end

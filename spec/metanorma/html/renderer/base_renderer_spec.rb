@@ -91,26 +91,25 @@ RSpec.describe Metanorma::Html::BaseRenderer do
     end
   end
 
-  describe "BLOCK_CHILDREN" do
-    it "is frozen" do
-      described_class::BLOCK_CHILDREN.should be_frozen
+  describe "semantic block children methods" do
+    let(:renderer) { described_class.new }
+
+    it "delegates render_note_children" do
+      model = Struct.new(:paragraphs, :ul, :ol).new(nil, nil, nil)
+      result = renderer.render_note_children(model)
+      result.should eq("")
     end
 
-    it "maps text and list children to render methods" do
-      bc = described_class::BLOCK_CHILDREN
-      bc[:paragraphs].should eq(:render_paragraph)
-      bc[:ul].should eq(:render_unordered_list)
-      bc[:ol].should eq(:render_ordered_list)
-      bc[:dl].should eq(:render_definition_list)
+    it "delegates render_simple_children" do
+      model = Struct.new(:paragraphs, :ul, :ol).new(nil, nil, nil)
+      result = renderer.render_simple_children(model)
+      result.should eq("")
     end
 
-    it "maps media and special children to render methods" do
-      bc = described_class::BLOCK_CHILDREN
-      bc[:sourcecode].should eq(:render_sourcecode)
-      bc[:table].should eq(:render_table)
-      bc[:figure].should eq(:render_figure)
-      bc[:quote].should eq(:render_quote)
-      bc[:formula].should eq(:render_formula)
+    it "delegates render_full_block_children" do
+      model = Struct.new(:paragraphs, :ul, :ol).new(nil, nil, nil)
+      result = renderer.render_full_block_children(model)
+      result.should eq("")
     end
   end
 
@@ -127,20 +126,16 @@ RSpec.describe Metanorma::Html::BaseRenderer do
 
     it "renders present child collections via the mapped method" do
       model = Struct.new(:paragraphs, :ul, :ol).new(nil, [ul_model], nil)
-      output = renderer.capture_output do
-        renderer.render_block_children(model,
-                                       children: { ul: :render_unordered_list })
-      end
+      output = renderer.render_block_children(model,
+                                               children: { ul: :render_unordered_list })
       output.should include("<ul>")
       output.should include("<li>")
     end
 
     it "skips nil child collections" do
       model = Struct.new(:paragraphs, :ul).new(nil, nil)
-      output = renderer.capture_output do
-        renderer.render_block_children(model,
-                                       children: { paragraphs: :render_paragraph })
-      end
+      output = renderer.render_block_children(model,
+                                               children: { paragraphs: :render_paragraph })
       output.should be_empty
     end
   end

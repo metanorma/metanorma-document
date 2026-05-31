@@ -3,21 +3,19 @@
 require "liquid"
 require "nokogiri"
 require "cgi"
-require_relative "concerns/inline_rendering"
 
 module Metanorma
   module Html
-    # Renders BasicDocument components to HTML.
-    # Subclassed by StandardRenderer and flavor-specific renderers.
-    # Owns the full HTML document generation pipeline: body content, header,
-    # footer, ToC sidebar, CSS (via Theme), and JavaScript.
-    class BaseRenderer
-      include InlineRendering
+    module Renderers
+      autoload :InlineRenderer, "metanorma/html/renderers/inline_renderer"
+      autoload :BlockRenderer, "metanorma/html/renderers/block_renderer"
+      autoload :SectionRenderer, "metanorma/html/renderers/section_renderer"
+      autoload :PubidRenderer, "metanorma/html/renderers/pubid_renderer"
+    end
 
+    class BaseRenderer
       LOGO_DIR = File.expand_path("../../../data/logos", __dir__)
 
-      # HTML-specific class names for inline spans, keyed by the XML span role.
-      # The XML class_attr is INPUT only — we never emit it in HTML.
       SPAN_ROLE_CLASSES = {
         "boldtitle" => "title-text",
         "nonboldtitle" => "subtitle-text",
@@ -47,8 +45,6 @@ module Metanorma
 
       METANORMA_LOGO = "metanorma-logo.svg"
 
-      # Type-to-method registry for OCP dispatch.
-      # Each subclass gets its own hash; lookup traverses ancestors.
       class << self
         def render_registry
           @render_registry ||= {}
@@ -67,8 +63,9 @@ module Metanorma
         end
       end
 
+      attr_reader :inline_renderer, :block_renderer, :section_renderer, :pubid_renderer
+
       def initialize
-        @output = +""
         @toc_entries = []
         @figure_entries = []
         @table_entries = []
@@ -76,86 +73,103 @@ module Metanorma
         @footnote_collector = Component::FootnoteCollector.new
         @current_section_id = nil
         @current_section_number = nil
+
+        @inline_renderer = Renderers::InlineRenderer.new(self)
+        @block_renderer = Renderers::BlockRenderer.new(self)
+        @section_renderer = Renderers::SectionRenderer.new(self)
+        @pubid_renderer = Renderers::PubidRenderer.new(self)
       end
 
-      # --- Public API ---
-
-      # Facade object for Drops to call renderer methods without exposing
-      # the full private interface. Delegates via method_missing with an
-      # explicit allowlist — adding new delegations only requires updating
-      # DELEGATED_METHODS, not writing a new one-liner.
       class RendererContext
-        DELEGATED_METHODS = %i[
-          safe_attr escape_html extract_block_label extract_plain_text
-          capture_output render_paragraph render_mixed_inline
-          render_inline_element render_unordered_list render_ordered_list
-          render_definition_list render_sourcecode render_table
-          render_figure render_quote render_formula render_note
-          render_image render_stem_content register_figure_entry
-          render_liquid render_block_children
-        ].freeze
-
         def initialize(renderer)
           @renderer = renderer
         end
 
-        def respond_to_missing?(method_name, include_private = false)
-          DELEGATED_METHODS.include?(method_name) || super
-        end
-
-        private
-
-        def method_missing(method_name, ...)
-          if DELEGATED_METHODS.include?(method_name)
-            @renderer.public_send(method_name, ...)
-          else
-            super
-          end
-        end
+        def safe_attr(...)        = @renderer.safe_attr(...)
+        def escape_html(...)      = @renderer.escape_html(...)
+        def extract_block_label(...)= @renderer.extract_block_label(...)
+        def extract_plain_text(...)= @renderer.extract_plain_text(...)
+        def render_paragraph(...) = @renderer.render_paragraph(...)
+        def render_mixed_inline(...)= @renderer.render_mixed_inline(...)
+        def render_inline_element(...)= @renderer.render_inline_element(...)
+        def render_unordered_list(...)= @renderer.render_unordered_list(...)
+        def render_ordered_list(...)= @renderer.render_ordered_list(...)
+        def render_definition_list(...)= @renderer.render_definition_list(...)
+        def render_sourcecode(...)  = @renderer.render_sourcecode(...)
+        def render_table(...)       = @renderer.render_table(...)
+        def render_figure(...)      = @renderer.render_figure(...)
+        def render_quote(...)       = @renderer.render_quote(...)
+        def render_formula(...)     = @renderer.render_formula(...)
+        def render_note(...)        = @renderer.render_note(...)
+        def render_image(...)       = @renderer.render_image(...)
+        def render_stem_content(...)= @renderer.render_stem_content(...)
+        def register_figure_entry(...)= @renderer.register_figure_entry(...)
+        def render_liquid(...)      = @renderer.render_liquid(...)
+        def render_note_children(...) = @renderer.render_note_children(...)
+        def render_simple_children(...) = @renderer.render_simple_children(...)
+        def render_full_block_children(...) = @renderer.render_full_block_children(...)
       end
 
       def renderer_context
         @renderer_context ||= RendererContext.new(self)
       end
 
-      def to_html
-        @output
-      end
-
       def toc_entries
         @toc_entries
       end
 
-      # Generate a complete HTML document from a presentation XML document.
       def generate_full_document(document)
         @document = document
         validate_presentation_xml!
 
-        # First pass: render body content (collects ToC entries as side effect)
-        render(@document)
-        body = @output
+        body = render(@document) || ""
 
         assemble_document(body)
       end
 
-      # --- Flavor configuration hooks (override in subclasses) ---
+      # --- Flavor configuration hooks ---
+
+      FLAVOR_MAP = {
+        "IsoDocument" => :iso,
+        "IecDocument" => :iec,
+        "IeeeDocument" => :ieee,
+        "IetfDocument" => :ietf,
+        "ItuDocument" => :itu,
+        "IhoDocument" => :iho,
+        "BipmDocument" => :bipm,
+        "OgcDocument" => :ogc,
+        "OimlDocument" => :oiml,
+        "CcDocument" => :cc,
+        "IccDocument" => :icc,
+        "RiboseDocument" => :ribose,
+        "PdfaDocument" => :pdfa,
+      }.freeze
 
       def theme
-        @theme ||= Theme.new
+        @theme ||= resolve_theme
+      end
+
+      def resolve_theme
+        flavor = flavor_name
+        flavor ? Theme.load(flavor) : Theme.new
+      end
+
+      def flavor_name
+        return nil unless defined?(@document) && @document
+
+        @document.class.name&.split("::")&.detect { |ns| FLAVOR_MAP.key?(ns) }&.then { |ns| FLAVOR_MAP[ns] }
       end
 
       def flavor_publishers(_doc_id)
-        []
+        theme.publishers
       end
 
       def flavor_publisher_name
-        pubs = flavor_publishers(extract_primary_doc_id)
-        pubs.empty? ? nil : pubs.join("/")
+        theme.publisher_name
       end
 
-      # Map of publisher name => logo filename. Override in flavor renderers.
       def publisher_logo_map
-        {}
+        theme.logos
       end
 
       def flavor_font_url
@@ -168,7 +182,7 @@ module Metanorma
       TEMPLATE_CACHE_MUTEX = Mutex.new
 
       def render_liquid(template_name, assigns)
-        template_path = File.join(TEMPLATES_ROOT, template_name)
+        template_path = theme.resolve_template(template_name)
         template = TEMPLATE_CACHE_MUTEX.synchronize do
           TEMPLATE_CACHE[template_path] ||= Liquid::Template.parse(File.read(template_path))
         end
@@ -214,7 +228,7 @@ module Metanorma
       end
 
       def header_title_text
-        raw = html_title.to_s.split(" — ").first.to_s.gsub(/<[^>]+>/, "")
+        raw = html_title.to_s.split(" — ").first.to_s
         raw.length > 60 ? "#{raw[0, 57]}..." : raw
       end
 
@@ -223,7 +237,7 @@ module Metanorma
         logo_map = publisher_logo_map
         return "" if publishers.empty? && logo_map.empty?
 
-        # Use flavor-declared publishers; fall back to logo map keys
+        white_fills = theme.logo_white_fills
         display_pubs = publishers.empty? ? logo_map.keys : publishers
 
         display_pubs.filter_map do |pub|
@@ -233,18 +247,21 @@ module Metanorma
           svg = load_logo_svg(filename, height: 26)
           next unless svg
 
+          Array(white_fills[pub]).each { |fill| svg = svg.gsub("fill:#{fill}", "fill:white") }
           "<span class=\"brand-logo\" aria-label=\"#{pub} logo\">#{svg}</span>"
         end.join("\n")
       end
 
       def load_logo_svg(filename, height: 32)
-        path = File.join(LOGO_DIR, filename)
+        path = theme.resolve_asset(filename) || File.join(LOGO_DIR, filename)
         return nil unless File.exist?(path)
 
         svg = File.read(path)
         svg = svg.sub(/\A<\?xml[^?]*\?>\s*/, "")
         svg = svg.sub(/\A\s*<!--.*?-->\s*/m, "")
-        svg = svg.sub(/<path[^>]*style="fill:#e3000f[^"]*"[^>]*\/>/, "")
+        theme.logo_strip_fills.each do |fill|
+          svg = svg.sub(/<path[^>]*style="fill:#{Regexp.escape(fill)}[^"]*"[^>]*\/>/, "")
+        end
         svg = svg.sub(/<svg\s/, '<svg class="header-logo" ')
         svg = if svg.match?(/<svg[^>]*\sheight="[^"]*"/)
                 svg.sub(/(<svg[^>]*?)(\sheight="[^"]*")/,
@@ -300,7 +317,10 @@ module Metanorma
       def build_styles
         pipeline = AssetPipeline.new
         css = pipeline.compile_css(flavor_css: flavor_css_module)
-        "#{theme.to_css_root}\n#{css}\n#{theme.to_css_extras}"
+        parts = [theme.to_css_root, css, theme.to_css_extras]
+        custom_css_path = theme.theme_css_path
+        parts << File.read(custom_css_path) if custom_css_path
+        parts.join("\n")
       end
 
       # --- Validation ---
@@ -366,16 +386,21 @@ module Metanorma
       end
 
       def html_title
-        bibdata = @document.bibdata
-        return "Document" unless bibdata
+        extract_display_title(@document.bibdata) || "Document"
+      end
 
-        titles = bibdata.titles
-        if titles
-          title = bibdata.title_for("en")
-          title.to_s
-        else
-          "Document"
-        end
+      def extract_display_title(bibdata)
+        return nil unless bibdata
+
+        title = bibdata.title_for("en") if bibdata.is_a?(Metanorma::Document::Components::BibData::BibData)
+        return title.to_s if title && !title.to_s.empty?
+
+        titles = safe_attr(bibdata, :title)
+        return nil unless titles && !titles.is_a?(String) && !titles.empty?
+
+        en = titles.find { |t| safe_attr(t, :language) == "en" }
+        found = en || titles.first
+        extract_text_value(found).to_s
       end
 
       def extract_primary_doc_id
@@ -396,7 +421,7 @@ module Metanorma
         text.strip.empty? ? nil : text.strip
       end
 
-      # --- CSS loader ---
+      # --- Registration helpers ---
 
       def register_toc_entry(id:, level:, text:)
         @toc_entries << { id: id, level: level, text: text }
@@ -404,6 +429,10 @@ module Metanorma
 
       def register_figure_entry(id:, text:)
         @figure_entries << { id: id, text: text }
+      end
+
+      def figure_entries
+        @figure_entries
       end
 
       def register_table_entry(id:, text:)
@@ -434,38 +463,39 @@ module Metanorma
             if el.text?
               parts << el.text_content.to_s
             elsif el.name == "tab"
-              parts << "\u00A0\u00A0"
+              parts << " "
             elsif el.name == "br"
               parts << " "
             elsif el.element?
               attr_name = element_to_attr[el.name]
-              next unless attr_name
-
-              coll = node.public_send(attr_name)
-              obj = if coll.is_a?(Array)
-                      idx = indices[attr_name]
-                      indices[attr_name] += 1
-                      coll[idx]
-                    else
-                      coll
-                    end
-              parts << extract_plain_text(obj) if obj
+              if attr_name
+                coll = node.public_send(attr_name)
+                obj = if coll.is_a?(Array)
+                        idx = indices[attr_name]
+                        indices[attr_name] += 1
+                        coll[idx]
+                      else
+                        coll
+                      end
+                text = extract_plain_text(obj)
+                parts << (text.empty? ? " " : text)
+              else
+                parts << " " if el.name == "span"
+              end
             end
           end
         end
 
-        # Fallback: try .text
         if parts.join.strip.empty?
           t = safe_attr(node, :text)
           parts << (t.is_a?(Array) ? t.join : t.to_s) if t
         end
 
-        parts.join.strip.gsub("\u00A0", " ")
+        parts.join.strip.gsub(" ", " ")
       end
 
-      # Dispatch to the appropriate render method via type registry.
-      # Lookups traverse the ancestor chain so subclasses inherit
-      # parent registrations and can override them independently.
+      # --- Dispatch ---
+
       def render(node, **)
         return escape_html(node) if node.is_a?(String)
 
@@ -473,24 +503,18 @@ module Metanorma
         method ? public_send(method, node, **) : ""
       end
 
-      # Dispatch to the appropriate inline render method via type registry.
       def render_inline_element(element, **)
-        return "" if element.nil?
-
-        if element.is_a?(String)
-          @output << escape_html(element)
-          return
-        end
-
-        method = lookup_dispatch(element.class, :inline_registry)
-        if method
-          public_send(method, element)
-        elsif element.is_a?(Lutaml::Model::Serializable) && element.mixed?
-          render_mixed_inline(element)
-        end
+        @inline_renderer.render_inline_element(element)
       end
 
-      # --- Type registrations (class-level, evaluated at class load time) ---
+      def is_title_element?(node, section)
+        title = safe_attr(section, :title)
+        return false unless title
+
+        node.equal?(title)
+      end
+
+      # --- Type registrations ---
 
       register_render Metanorma::Document::Components::Paragraphs::ParagraphBlock,
                       :render_paragraph
@@ -589,7 +613,6 @@ module Metanorma
                              :render_index
       register_inline_render Metanorma::Document::Components::Blocks::NoteBlock,
                              :render_note_inline
-      # All Fmt* elements delegate to render_mixed_inline
       register_inline_render Metanorma::Document::Components::Inline::FmtNameElement,
                              :render_mixed_inline
       register_inline_render Metanorma::Document::Components::Inline::FmtTitleElement,
@@ -654,393 +677,87 @@ module Metanorma
         nil
       end
 
-      # --- Block-level rendering ---
+      # --- Delegation to sub-renderers ---
 
-      def render_paragraph(p, **_opts)
-        attrs = element_attrs(id: safe_attr(p, :id),
-                              style: alignment_style(safe_attr(
-                                                       p, :alignment
-                                                     )))
-        tag("p", attrs) { render_mixed_inline(p) }
+      # Inline rendering delegation
+      def walk_ordered(node, allow_filter: nil, &block)
+        @inline_renderer.walk_ordered(node, allow_filter: allow_filter, &block)
       end
 
-      def render_table(table, **_opts)
-        attrs = element_attrs(id: safe_attr(table, :id), class: "table-block")
-        table_id = safe_attr(table, :id)
-        name_el = safe_attr(table, :fmt_name) || safe_attr(table, :name)
-        if table_id && name_el
-          register_table_entry(id: table_id, text: extract_plain_text(name_el))
-        end
-        col_count = table_column_count(table)
-        @output << "<div class=\"table-scroll-wrapper\">"
-        name_el = safe_attr(table, :fmt_name) || safe_attr(table, :name)
-        if name_el
-          @output << "<div class=\"table-caption\">"
-          render_inline_element(name_el)
-          @output << "</div>"
-        end
-        tag("table", attrs) do
-          @output << "<colgroup>" if table.colgroup
-          render_table_colgroup(table.colgroup) if table.colgroup
-          @output << "</colgroup>" if table.colgroup
-          render_table_section(table.thead, "thead") if table.thead
-          render_table_section(table.tbody, "tbody") if table.tbody
-          if table.tfoot || (table.note && !table.note.empty?)
-            @output << "<tfoot>"
-            render_table_section_rows(table.tfoot) if table.tfoot
-            if table.note && !table.note.empty?
-              @output << "<tr><td colspan=\"#{col_count}\" class=\"table-notes\">"
-              table.note.each { |n| render_note(n) }
-              @output << "</td></tr>"
-            end
-            @output << "</tfoot>"
-          end
-        end
-        @output << "</div>"
+      def render_mixed_inline(node)
+        @inline_renderer.render_mixed_inline(node)
       end
 
-      def table_column_count(table)
-        if table.colgroup&.col && !table.colgroup.col.empty?
-          return table.colgroup.col.size
-        end
+      def render_em(el) = @inline_renderer.render_em(el)
+      def render_strong(el) = @inline_renderer.render_strong(el)
+      def render_tt(el) = @inline_renderer.render_tt(el)
+      def render_sub(el) = @inline_renderer.render_sub(el)
+      def render_sup(el) = @inline_renderer.render_sup(el)
+      def render_small_caps(el) = @inline_renderer.render_small_caps(el)
+      def render_underline(el) = @inline_renderer.render_underline(el)
+      def render_strike(el) = @inline_renderer.render_strike(el)
+      def render_br(*) = @inline_renderer.render_br
+      def render_tab(*) = @inline_renderer.render_tab
+      def render_span(el) = @inline_renderer.render_span(el)
+      def render_fn_inline(el) = @inline_renderer.render_fn_inline(el)
+      def render_stem(el) = @inline_renderer.render_stem(el)
+      def render_semx_inline(el) = @inline_renderer.render_semx_inline(el)
+      def render_fmt_xref(el) = @inline_renderer.render_fmt_xref(el)
+      def render_comma(*) = @inline_renderer.render_comma
+      def render_math(el) = @inline_renderer.render_math(el)
+      def render_asciimath(el) = @inline_renderer.render_asciimath(el)
+      def render_index(el) = @inline_renderer.render_index(el)
+      def render_note_inline(el) = @inline_renderer.render_note_inline(el)
+      def render_semx_content(el, **opts) = @inline_renderer.render_semx_content(el, **opts)
+      def render_stem_content(stem) = @inline_renderer.render_stem_content(stem)
+      def render_link(link) = @inline_renderer.render_link(link)
+      def render_xref(xref) = @inline_renderer.render_xref(xref)
+      def render_eref(eref) = @inline_renderer.render_eref(eref)
+      def render_fn(fn) = @inline_renderer.render_fn(fn)
+      def render_concept(concept) = @inline_renderer.render_concept(concept)
+      def render_fmt_stem(fmt_stem) = @inline_renderer.render_fmt_stem(fmt_stem)
+      def render_mixed_content_in_order(node) = @inline_renderer.render_mixed_content_in_order(node)
 
-        # Walk all rows to find max column count, accounting for colspan
-        max_cols = 0
-        %i[thead tbody tfoot].each do |section|
-          sec = table.public_send(section)
-          next unless sec&.tr
+      # Block rendering delegation
+      def render_paragraph(p, **opts) = @block_renderer.render_paragraph(p, **opts)
+      def render_table(table, **opts) = @block_renderer.render_table(table, **opts)
+      def render_unordered_list(ul, **opts) = @block_renderer.render_unordered_list(ul, **opts)
+      def render_ordered_list(ol, **opts) = @block_renderer.render_ordered_list(ol, **opts)
+      def render_definition_list(dl, **opts) = @block_renderer.render_definition_list(dl, **opts)
+      def render_figure(figure, **opts) = @block_renderer.render_figure(figure, **opts)
+      def render_image(image) = @block_renderer.render_image(image)
+      def render_video(video) = @block_renderer.render_video(video)
+      def render_audio(audio) = @block_renderer.render_audio(audio)
+      def render_note(note, **opts) = @block_renderer.render_note(note, **opts)
+      def render_example(example, **opts) = @block_renderer.render_example(example, **opts)
+      def render_sourcecode(sc, **opts) = @block_renderer.render_sourcecode(sc, **opts)
+      def render_formula(formula, **opts) = @block_renderer.render_formula(formula, **opts)
+      def render_quote(quote, **opts) = @block_renderer.render_quote(quote, **opts)
+      def render_admonition(admonition, **opts) = @block_renderer.render_admonition(admonition, **opts)
+      def render_bookmark(bookmark, **opts) = @block_renderer.render_bookmark(bookmark, **opts)
+      def render_block_children(model, children:) = @block_renderer.render_block_children(model, children: children)
+      def render_note_children(model) = @block_renderer.render_note_children(model)
+      def render_simple_children(model) = @block_renderer.render_simple_children(model)
+      def render_full_block_children(model) = @block_renderer.render_full_block_children(model)
 
-          sec.tr.each do |tr|
-            cols = 0
-            Array(tr.th).each do |th|
-              cols += th.colspan && th.colspan > 1 ? th.colspan : 1
-            end
-            Array(tr.td).each do |td|
-              cols += td.colspan && td.colspan > 1 ? td.colspan : 1
-            end
-            max_cols = cols if cols > max_cols
-          end
-        end
-        max_cols.positive? ? max_cols : 1
-      end
+      # Section rendering delegation
+      def render_basic_section(section, **opts) = @section_renderer.render_basic_section(section, **opts)
+      def render_hierarchical_section(section, **opts) = @section_renderer.render_hierarchical_section(section, **opts)
+      def render_content_section(section, **opts) = @section_renderer.render_content_section(section, **opts)
+      def render_ordered_content(section, level = 1) = @section_renderer.render_ordered_content(section, level)
+      def collect_ordered_children(section) = @section_renderer.collect_ordered_children(section)
+      def sort_by_displayorder(children) = @section_renderer.sort_by_displayorder(children)
+      def render_preface(preface, **opts) = @section_renderer.render_preface(preface, **opts)
 
-      def render_table_colgroup(colgroup)
-        colgroup.col&.each do |col|
-          attrs = element_attrs(style: col.width ? "width: #{col.width}" : nil)
-          @output << "<col#{attrs}>"
-        end
-      end
-
-      def render_table_section(section, tag_name)
-        @output << "<#{tag_name}>"
-        render_table_section_rows(section)
-        @output << "</#{tag_name}>"
-      end
-
-      def render_table_section_rows(section)
-        section.tr&.each do |tr|
-          @output << "<tr>"
-          walked = walk_ordered(tr) do |type, obj|
-            next unless type == :element
-
-            render_table_cell(obj)
-          end
-          unless walked
-            Array(tr.th).each { |th| render_table_cell(th, "th") }
-            Array(tr.td).each { |td| render_table_cell(td, "td") }
-          end
-          @output << "</tr>"
-        end
-      end
-
-      def render_unordered_list(ul, **_opts)
-        attrs = element_attrs(id: safe_attr(ul, :id))
-        tag("ul", attrs) do
-          ul.listitem&.each { |li| render_list_item(li) }
-        end
-      end
-
-      def render_table_cell(cell, force_tag = nil)
-        tag_name = force_tag || (cell.is_a?(Metanorma::Document::Components::Tables::HeaderTableCell) ? "th" : "td")
-        attrs = element_attrs(
-          colspan: safe_attr(cell, :colspan),
-          rowspan: safe_attr(cell, :rowspan),
-          align: safe_attr(cell, :alignment),
-          valign: safe_attr(cell, :vertical_alignment),
-        )
-        @output << "<#{tag_name}#{attrs}>"
-        render_cell_content(cell)
-        @output << "</#{tag_name}>"
-      end
-
-      def render_ordered_list(ol, **_opts)
-        attrs = element_attrs(id: safe_attr(ol, :id),
-                              start: safe_attr(ol, :start), type: safe_attr(ol, :type_attr))
-        tag("ol", attrs) do
-          ol.listitem&.each { |li| render_list_item(li) }
-        end
-      end
-
-      def render_list_item(li)
-        li_id = safe_attr(li, :id)
-        attrs = li_id ? %( id="#{escape_html(li_id)}") : ""
-        @output << "<li#{attrs}>"
-        render_mixed_content_in_order(li)
-        @output << "</li>"
-      end
-
-      # Render all children of a mixed-content node in document order,
-      # dispatching block elements to their render methods.
-      def render_mixed_content_in_order(node)
-        node.each_mixed_content do |child|
-          case child
-          when String
-            @output << escape_html(child)
-          else
-            if block_element?(child)
-              render(child)
-            else
-              render_inline_element(child)
-            end
-          end
-        end
-      end
-
-      # Collect all renderable children from a node in document order,
-      # sorted by displayorder when available. Uses walk_ordered to traverse
-      # element_order, and also gathers typed attributes that may not appear
-      # in element_order (e.g. terms, definitions on section models).
-      def collect_ordered_children(section)
-        children = []
-
-        walk_ordered(section) do |type, obj|
-          next if %i[text tab].include?(type)
-
-          children << obj
-        end
-
-        # Gather typed attributes that may not appear in element_order
-        supplementary_attrs = %i[terms definitions]
-        supplementary_attrs.each do |attr|
-          val = safe_attr(section, attr)
-          next if val.nil?
-
-          Array(val).each do |v|
-            children << v unless children.include?(v)
-          end
-        end
-
-        children.compact!
-        sort_by_displayorder(children)
-      end
-
-      # Render children of a section in displayorder, skipping title elements.
-      def render_ordered_content(section, level = 1)
-        children = collect_ordered_children(section)
-        children.each do |node|
-          next if node.is_a?(String)
-          next if is_title_element?(node, section)
-
-          render(node, level: level + 1)
-        end
-      end
-
-      def sort_by_displayorder(children)
-        children.sort_by do |node|
-          order = if node.is_a?(Lutaml::Model::Serializable) &&
-              node.class.attributes.key?(:displayorder)
-                    node.displayorder
-                  end
-          order &&= order.to_i
-          order || Float::INFINITY
-        end
-      end
-
-      def render_definition_list(dl, **_opts)
-        attrs = element_attrs(id: safe_attr(dl, :id))
-        tag("dl", attrs) do
-          dl.dt&.each_with_index do |dt, i|
-            @output << "<dt>"
-            render_mixed_inline(dt)
-            @output << "</dt>"
-            dd = dl.dd&.[](i)
-            if dd
-              @output << "<dd>"
-              render_mixed_inline(dd)
-              @output << "</dd>"
-            end
-          end
-        end
-      end
-
-      def render_figure(figure, **_opts)
-        drop = Drops::FigureDrop.from_model(figure, renderer: renderer_context)
-        @output << render_liquid("_figure.html.liquid", { "block" => drop })
-      end
-
-      def render_image(image)
-        src_val = safe_attr(image, :src) || safe_attr(image, :source)
-        attrs = element_attrs(
-          id: safe_attr(image, :id),
-          src: src_val,
-          alt: safe_attr(image, :alt),
-          height: safe_attr(image, :height),
-          width: safe_attr(image, :width),
-        )
-        @output << "<img#{attrs} />"
-      end
-
-      def render_video(video)
-        attrs = element_attrs(
-          id: safe_attr(video, :id),
-          src: safe_attr(video, :src),
-        )
-        @output << "<video#{attrs} controls></video>"
-      end
-
-      def render_audio(audio)
-        attrs = element_attrs(
-          id: safe_attr(audio, :id),
-          src: safe_attr(audio, :src),
-        )
-        @output << "<audio#{attrs} controls></audio>"
-      end
-
-      def render_note(note, **_opts)
-        drop = Drops::NoteDrop.from_model(note, renderer: renderer_context)
-        @output << render_liquid("_note.html.liquid", { "block" => drop })
-      end
-
-      def render_example(example, **_opts)
-        drop = Drops::ExampleDrop.from_model(example,
-                                             renderer: renderer_context)
-        @output << render_liquid("_example.html.liquid", { "block" => drop })
-      end
-
-      def render_sourcecode(sc, **_opts)
-        drop = Drops::SourcecodeDrop.from_model(sc, renderer: renderer_context)
-        @output << render_liquid("_sourcecode.html.liquid", { "block" => drop })
-      end
-
-      def render_formula(formula, **_opts)
-        drop = Drops::FormulaDrop.from_model(formula,
-                                             renderer: renderer_context)
-        @output << render_liquid("_formula.html.liquid", { "block" => drop })
-      end
-
-      def render_quote(quote, **_opts)
-        attrs = element_attrs(id: safe_attr(quote, :id), class: "quote")
-        tag("blockquote", attrs) do
-          quote.paragraphs&.each { |para| render_paragraph(para) }
-          quote.ul&.each { |ul| render_unordered_list(ul) }
-          quote.ol&.each { |ol| render_ordered_list(ol) }
-          if quote.attribution
-            @output << "<footer>"
-            render_mixed_inline(quote.attribution)
-            @output << "</footer>"
-          end
-        end
-      end
-
-      def render_admonition(admonition, **_opts)
-        drop = Drops::AdmonitionDrop.from_model(admonition,
-                                                renderer: renderer_context)
-        @output << render_liquid("_admonition.html.liquid", { "block" => drop })
-      end
-
-      def render_bookmark(bookmark, **_opts)
-        @output << %(<a id="#{escape_html(safe_attr(bookmark, :id).to_s)}"></a>)
-      end
-
-      # Renders the typed child collections of a block element (paragraphs,
-      # lists, nested blocks) in a standard order.  Used by Drops and section
-      # rendering to avoid duplicating the enumeration in each consumer.
-      #
-      # +children+ is a Hash mapping attr names to render-method symbols:
-      #   { paragraphs: :render_paragraph, ul: :render_unordered_list, ... }
-      #
-      # Each key is sent to +model+ via safe_attr; non-nil results are
-      # dispatched to the corresponding render method.
-      def render_block_children(model, children:)
-        children.each do |attr, render_method|
-          values = safe_attr(model, attr)
-          next if values.nil?
-
-          Array(values).each { |v| public_send(render_method, v) }
-        end
-      end
-
-      # Standard child set for container blocks (example, note, etc.)
-      BLOCK_CHILDREN = {
-        paragraphs: :render_paragraph,
-        ul: :render_unordered_list,
-        ol: :render_ordered_list,
-        dl: :render_definition_list,
-        sourcecode: :render_sourcecode,
-        table: :render_table,
-        figure: :render_figure,
-        quote: :render_quote,
-        formula: :render_formula,
-      }.freeze
-
-      # Minimal child set for simple blocks (admonition, note with content only)
-      SIMPLE_CHILDREN = {
-        paragraphs: :render_paragraph,
-      }.freeze
-
-      # Note-style child set (paragraphs + lists + dl, no nested blocks)
-      NOTE_CHILDREN = {
-        paragraphs: :render_paragraph,
-        ul: :render_unordered_list,
-        ol: :render_ordered_list,
-        dl: :render_definition_list,
-        quote: :render_quote,
-      }.freeze
-
-      # --- Section rendering ---
-
-      def render_basic_section(section, level: 1, **_opts)
-        attrs = element_attrs(id: safe_attr(section, :id))
-        tag("div", attrs) do
-          render_section_title(section, level)
-          section.blocks&.each { |block| render(block) }
-          section.notes&.each { |note| render_note(note) }
-        end
-      end
-
-      def render_hierarchical_section(section, level: 1, **_opts)
-        attrs = element_attrs(id: safe_attr(section, :id))
-        tag("div", attrs) do
-          render_section_title(section, level)
-          render_section_content(section, level)
-          section.subsections&.each { |sub| render(sub, level: level + 1) }
-        end
-      end
-
-      def render_content_section(section, level: 1, **_opts)
-        render_hierarchical_section(section, level: level, **_opts)
-      end
-
-      def render_section_title(section, level)
-        titles = section.title
-        return unless titles && !titles.empty?
-
-        h = "h#{[[level, 6].min, 1].max}"
-        title_text = extract_title_text(titles)
-        @output << "<#{h}>#{escape_html(title_text)}</#{h}>"
-      end
-
-      def render_section_content(section, _level)
-        section.blocks&.each { |block| render(block) }
-        section.notes&.each { |note| render_note(note) }
-      end
+      # Pubid rendering delegation
+      def parse_pubid(docidentifier_string) = @pubid_renderer.parse_pubid(docidentifier_string)
+      def pubid_to_html(identifier) = @pubid_renderer.pubid_to_html(identifier)
 
       # --- Helper methods ---
 
       def tag(name, attrs_str)
-        @output << "<#{name}#{attrs_str}>"
-        yield
-        @output << "</#{name}>"
+        inner = yield
+        "<#{name}#{attrs_str}>#{inner}</#{name}>"
       end
 
       def element_attrs(**attrs)
@@ -1105,7 +822,6 @@ module Metanorma
       end
 
       def extract_block_label(block, default)
-        # Presentation XML puts label in <name> child element
         names = safe_attr(block, :name)
         if names && !names.empty?
           name = names.is_a?(Array) ? names.first : names
@@ -1113,7 +829,6 @@ module Metanorma
           return text unless text.to_s.strip.empty?
         end
 
-        # Fallback: autonum XML attribute
         autonum = safe_attr(block, :autonum)
         if autonum && !autonum.to_s.empty?
           number = autonum.to_s
@@ -1130,9 +845,10 @@ module Metanorma
       end
 
       def extract_title_text(titles)
-        return "" if titles.nil? || titles.empty?
+        return "" if titles.nil?
+        return extract_text_value(titles).to_s unless titles.is_a?(Array)
+        return "" if titles.empty?
 
-        titles = Array(titles)
         title = titles.first
         extract_text_value(title).to_s
       end
@@ -1170,29 +886,18 @@ module Metanorma
       end
 
       def render_footnotes_section
-        return if @footnote_collector.empty?
+        return nil if @footnote_collector.empty?
 
         drops = @footnote_collector.to_a.map do |entry|
           content_html = ""
           if entry.content && !entry.content.empty?
-            content_html = capture_output do
-              Array(entry.content).each { |p| render_paragraph(p) }
-            end
+            content_html = Array(entry.content).filter_map { |p| render_paragraph(p) }.join
           end
           Drops::FootnoteDrop.new(entry, content_html)
         end
 
-        @output << render_liquid("_footnotes.html.liquid",
-                                 { "footnotes" => drops })
-      end
-
-      def capture_output
-        old_output = @output
-        @output = +""
-        yield
-        result = @output
-        @output = old_output
-        result
+        render_liquid("_footnotes.html.liquid",
+                       { "footnotes" => drops })
       end
     end
   end

@@ -8,10 +8,7 @@ module Metanorma
           id = renderer.safe_attr(example, :id)
           label = renderer.extract_block_label(example, "EXAMPLE")
 
-          content_html = renderer.capture_output do
-            renderer.render_block_children(example,
-                                           children: BaseRenderer::BLOCK_CHILDREN)
-          end
+          content_html = renderer.render_full_block_children(example) || ""
 
           new(
             id: id,

@@ -3,6 +3,16 @@
 module Metanorma
   module Html
     module Component
+      class OutputProxy
+        def initialize(renderer)
+          @renderer = renderer
+        end
+
+        def <<(html)
+          @renderer.append_output(html)
+        end
+      end
+
       class Base
         attr_reader :renderer
 
@@ -39,7 +49,7 @@ module Metanorma
         end
 
         def output
-          renderer.instance_variable_get(:@output)
+          OutputProxy.new(renderer)
         end
 
         def tag(...) = renderer.tag(...)

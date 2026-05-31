@@ -1,0 +1,6 @@
+<dl{{ attrs }}>
+  {% for term in terms %}
+  <dt>{{ term.dt }}</dt>
+  {% if term.dd %}<dd>{{ term.dd }}</dd>{% endif %}
+  {% endfor %}
+</dl>

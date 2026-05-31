@@ -16,11 +16,10 @@ RSpec.describe Metanorma::Html::BaseRenderer::RendererContext do
     ctx.escape_html("<b>").should eq("&lt;b&gt;")
   end
 
-  it "exposes capture_output" do
-    result = ctx.capture_output do
-      renderer.instance_variable_get(:@output) << "hello"
-    end
-    result.should eq("hello")
+  it "delegates render_paragraph" do
+    para = Metanorma::Document::Components::Paragraphs::ParagraphBlock.new
+    result = ctx.render_paragraph(para)
+    result.should include("<p>")
   end
 
   it "exposes render_liquid" do
