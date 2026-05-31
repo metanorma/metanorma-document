@@ -1,65 +1,39 @@
-# 07 — Replace relaton models with relaton-bib library
+ # 07 — Integrate relaton-bib library (partially complete)
 
-## Problem
-The project has 50 relaton model files in `lib/metanorma/document/relaton/` that duplicate models already provided by `relaton-bib` (at `~/src/relaton/relaton-bib`). The relaton-bib library has 52 model files that are the canonical, maintained versions.
+## Status
+- **Done**: relaton-bib dependency added, 4 models replaced via inheritance, `require` at module level
+- **Blocked**: Most models have incompatible XML schemas (different attribute names/types, different XML mappings)
 
-Our duplicate models:
-- Diverge from the canonical relaton-bib models
-- Require manual sync when relaton-bib is updated
-- Add maintenance burden for no benefit
-- Are incomplete compared to relaton-bib
+## What was done
+1. Added `relaton-bib ~> 2.1` to gemspec dependency
+2. Added `require "relaton/bib"` to `lib/metanorma/document/relaton.rb`
+3. Replaced 4 models with inheritance from relaton-bib:
+   - `Phone` < `::Relaton::Bib::Phone` (exact match)
+   - `PriceType` < `::Relaton::Bib::Price` (exact match)
+   - `BibItemLocality` < `::Relaton::Bib::Locality` (exact match)
+   - `Edition` < `::Relaton::Bib::Edition` (inherits + adds `language` attribute)
 
-## relaton-bib capabilities
-- Full `lutaml-model::Serializable` models for: Address, Affiliation, BibItem, Contributor, Copyright, Date, DocIdentifier, Organization, Person, Series, Title, etc.
-- XML serialization/deserialization
-- Hash conversion support
-- Actively maintained at `~/src/relaton/relaton-bib`
+## Why most models can't be directly replaced
+The 53 relaton models in our project have different XML schemas from relaton-bib's models:
 
-## Integration approach
+| Difference | Our models | relaton-bib |
+|---|---|---|
+| Attribute names | `on` (BibliographicDate), `bib_locality` (LocalityStack), `validity_begins` (ValidityType) | `at`, `locality`, `begins` |
+| Attribute types | `Components::DataTypes::*` throughout | `LocalizedString`, `LocalizedMarkedUpString` |
+| XML mapping | `map_attribute` for medium, `map_all_content` for logo | `map_element` for medium, `map_element "image"` for logo |
+| Extra attributes | `language` on Edition, `id` on DocumentIdentifier, `stage_abbreviation` on DocumentStatus | Not present |
+| Mixed content | Used in TypedTitleString (em/fn/stem/strong/sub/sup/tt/variant) | Plain content |
+| Model nesting | `CopyrightOwner` wraps `Organization` | `Contributor` as owner |
 
-### Phase 1: Add dependency
-```ruby
-# metanorma-document.gemspec
-spec.add_dependency "relaton-bib"
-```
+A full replacement requires updating all 86 consuming references and adapting to relaton-bib's API. This is a separate project-level migration.
 
-### Phase 2: Replace model references
-Replace all `Metanorma::Document::Relaton::*` references with `Relaton::Bib::Model::*`:
-
-| Our model | relaton-bib equivalent |
-|---|---|
-| `Relaton::Address` | `Relaton::Bib::Model::Address` |
-| `Relaton::Organization` | `Relaton::Bib::Model::Organization` |
-| `Relaton::Person` | `Relaton::Bib::Model::Person` |
-| `Relaton::Contributor` | `Relaton::Bib::Model::Contributor` |
-| `Relaton::CopyrightAssociation` | `Relaton::Bib::Model::Copyright` |
-| `Relaton::DocumentIdentifier` | `Relaton::Bib::Model::DocIdentifier` |
-| `Relaton::BibliographicDate` | `Relaton::Bib::Model::Date` |
-| `Relaton::TitleType` | `Relaton::Bib::Model::Title` |
-| ... (all 50 files) | ... |
-
-### Phase 3: Update XML mappings
-The document model's XML mappings reference relaton types. These need updating:
-```ruby
-# Before:
-attribute :contributor, Metanorma::Document::Relaton::Contributor, collection: true
-
-# After:
-attribute :contributor, Relaton::Bib::Model::Contributor, collection: true
-```
-
-### Phase 4: Remove our relaton directory
-Delete `lib/metanorma/document/relaton/` entirely after all references are updated.
-
-## Steps
-1. Add `relaton-bib` dependency to gemspec
-2. Create compatibility shim if needed (module aliases)
-3. Update all document model files that reference `Metanorma::Document::Relaton::*`
-4. Run full spec suite after each model replacement
-5. Handle any schema differences between our models and relaton-bib
-6. Remove `lib/metanorma/document/relaton/` once fully migrated
-7. Update `lib/metanorma/document/relaton.rb` autoloader
-8. Add integration specs for relaton-bib model usage
+## Remaining work for full migration
+1. Update consuming code (86 references) to use relaton-bib attribute names
+2. For models with extra attributes: inherit from relaton-bib and add extras
+3. For models with structural differences: create adapter classes
+4. Remove `lib/metanorma/document/relaton/` once fully migrated
+5. Update autoload configuration
+6. Integration specs for relaton-bib model usage
 
 ## Code quality requirements
 Ensure code cleanliness and OOP and MECE and fully model-driven, semantically-driven and open/closed principle, DRY, performance. ultrathink. Always think about what can we improve here in architecture and code? Make sure we have good specs throughout. Never use private send methods (breaks encapsulation), instance_variable_set/get, and never use respond_to? (poor typing).

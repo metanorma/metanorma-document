@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background-color: var(--ebook-bg, #ffffff); color: var(--ebook-text, #1a1a1a); transition: background-color 0.25s ease, color 0.25s ease; }
+body.font-serif { font-family: 'Merriweather', Georgia, serif; }
+body.font-sans { font-family: 'Inter', system-ui, sans-serif; }
+.font-mono { font-family: ui-monospace, monospace; }
+
+.dark { color-scheme: dark; }
+
+/* ============================================================
+   Theme: Day (default)
+   ============================================================ */
+:root, .theme-day {
+  --chrome-bg: #ffffff;
+  --chrome-bg-glass: rgba(255, 255, 255, 0.85);
+  --chrome-bg-hover: #f1f5f9;
+  --chrome-border: #e2e8f0;
+  --chrome-text: #1a1a1a;
+  --chrome-text-dim: #64748b;
+  --chrome-accent: #0d9488;
+
+  --ebook-bg: #ffffff;
+  --ebook-bg-secondary: #f8fafc;
+  --ebook-text: #1e293b;
+  --ebook-text-heading: #0f172a;
+  --ebook-text-muted: #64748b;
+  --ebook-border: #e2e8f0;
+  --ebook-accent: #0d9488;
+  --ebook-link-color: #0d9488;
+  --ebook-inline-code-bg: #f1f5f9;
+  --ebook-inline-code-text: #1e293b;
+  --ebook-inline-code-border: #e2e8f0;
+}
+
+/* ============================================================
+   Theme: Sepia
+   ============================================================ */
+.theme-sepia {
+  --chrome-bg: #faf8f0;
+  --chrome-bg-glass: rgba(250, 248, 240, 0.85);
+  --chrome-bg-hover: #f0ead6;
+  --chrome-border: #d6cdb6;
+  --chrome-text: #3d3529;
+  --chrome-text-dim: #7a7060;
+  --chrome-accent: #b8860b;
+
+  --ebook-bg: #faf8f0;
+  --ebook-bg-secondary: #f0ead6;
+  --ebook-text: #3d3529;
+  --ebook-text-heading: #2d2519;
+  --ebook-text-muted: #7a7060;
+  --ebook-border: #d6cdb6;
+  --ebook-accent: #b8860b;
+  --ebook-link-color: #b8860b;
+  --ebook-inline-code-bg: #f0ead6;
+  --ebook-inline-code-text: #3d3529;
+  --ebook-inline-code-border: #d6cdb6;
+}
+
+/* ============================================================
+   Theme: Night
+   ============================================================ */
+.theme-night {
+  --chrome-bg: #1a1a2e;
+  --chrome-bg-glass: rgba(26, 26, 46, 0.85);
+  --chrome-bg-hover: #25253e;
+  --chrome-border: #333355;
+  --chrome-text: #e2e8f0;
+  --chrome-text-dim: #94a3b8;
+  --chrome-accent: #5eead4;
+
+  --ebook-bg: #1a1a2e;
+  --ebook-bg-secondary: #25253e;
+  --ebook-text: #cbd5e1;
+  --ebook-text-heading: #e2e8f0;
+  --ebook-text-muted: #94a3b8;
+  --ebook-border: #333355;
+  --ebook-accent: #5eead4;
+  --ebook-link-color: #5eead4;
+  --ebook-inline-code-bg: #25253e;
+  --ebook-inline-code-text: #cbd5e1;
+  --ebook-inline-code-border: #333355;
+}
+
+/* ============================================================
+   Theme: OLED Black
+   ============================================================ */
+.theme-oled {
+  --chrome-bg: #000000;
+  --chrome-bg-glass: rgba(0, 0, 0, 0.85);
+  --chrome-bg-hover: #1a1a1a;
+  --chrome-border: #333333;
+  --chrome-text: #e2e8f0;
+  --chrome-text-dim: #94a3b8;
+  --chrome-accent: #5eead4;
+
+  --ebook-bg: #000000;
+  --ebook-bg-secondary: #1a1a1a;
+  --ebook-text: #cbd5e1;
+  --ebook-text-heading: #e2e8f0;
+  --ebook-text-muted: #94a3b8;
+  --ebook-border: #333333;
+  --ebook-accent: #5eead4;
+  --ebook-link-color: #5eead4;
+  --ebook-inline-code-bg: #1a1a1a;
+  --ebook-inline-code-text: #cbd5e1;
+  --ebook-inline-code-border: #333333;
+}
+
+/* ============================================================
+   Content Typography
+   ============================================================ */
+.mn-content { position: relative; }
+
+.mn-content h1 { font-size: 1.875rem; font-weight: 700; margin-bottom: 1rem; color: var(--ebook-text-heading); letter-spacing: -0.01em; padding-bottom: 0.5rem; border-bottom: 1px solid var(--ebook-border); }
+.mn-content h2 { font-size: 1.25rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 0.75rem; color: var(--ebook-text-heading); letter-spacing: -0.005em; }
+.mn-content h3 { font-size: 1.125rem; font-weight: 600; margin-top: 1.75rem; margin-bottom: 0.5rem; color: var(--ebook-text-heading); }
+.mn-content h4 { font-size: 1rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.4rem; color: var(--ebook-text); }
+.mn-content p { margin-bottom: 1.1rem; line-height: var(--ebook-line-height, 1.6); color: var(--ebook-text); font-size: var(--ebook-font-size, 18px); }
+.mn-content ul, .mn-content ol { margin-bottom: 1rem; }
+.mn-content li { margin-bottom: 0.3rem; line-height: 1.65; }
+.mn-content code { font-family: ui-monospace, monospace; font-size: 0.85em; background: var(--ebook-inline-code-bg); padding: 0.15em 0.45em; border-radius: 4px; }
+.mn-content a { color: var(--ebook-link-color); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--ebook-link-color) 40%, transparent); text-underline-offset: 2px; }
+.mn-content a:hover { text-decoration-color: var(--ebook-link-color); }
+.mn-content img { max-width: 100%; height: auto; border-radius: 6px; }
+.mn-content blockquote { border-left: 3px solid var(--ebook-accent); padding: 0.75rem 1.25rem; margin: 1.5rem 0; font-style: italic; color: var(--ebook-text-muted); }
+.mn-content dl { margin: 1rem 0; }
+.mn-content dt { font-weight: 600; color: var(--ebook-text-heading); margin-top: 1rem; }
+.mn-content dd { margin-left: 1.5rem; margin-bottom: 0.5rem; color: var(--ebook-text); line-height: 1.65; }
+
+/* Print */
+@media print {
+  .lg\:translate-x-0, #sidebar, .sticky { display: none !important; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--chrome-border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--chrome-text-dim); }
+
+/* Sidebar layout helpers */
+@media (min-width: 1024px) {
+  .lg\:pl-\[280px\] { padding-left: 280px; }
+  .lg\:translate-x-0 { --tw-translate-x: 0px; transform: translate(var(--tw-translate-x), var(--tw-translate-y)); }
+}
