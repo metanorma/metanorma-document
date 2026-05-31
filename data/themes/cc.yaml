@@ -25,3 +25,19 @@ admonition_border: "#c9982e"
 admonition_color: "#c9982e"
 footer_border_color: "#0078d4"
 cover_separator_color: "rgba(0,120,212,0.25)"
+
+# Publisher metadata
+publishers:
+  - "CalConnect"
+publisher_name: "CalConnect"
+logos: {}
+
+# Section ordering
+preface_order:
+  - foreword
+  - introduction
+  - abstract
+  - clause
+  - acknowledgements
+  - executivesummary
+toc_filter_types: []

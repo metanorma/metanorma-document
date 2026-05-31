@@ -14,6 +14,7 @@ else
   gem "canon", path: "../../lutaml/canon"
   gem "lutaml-model", path: "../../lutaml/lutaml-model"
   gem "mml", path: "../../plurimath/mml"
+  gem "pubid", path: "../../mn/pubid"
 end
 
 gem "nokogiri"

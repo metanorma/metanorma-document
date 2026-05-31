@@ -27,3 +27,20 @@ admonition_bg: "#fff9e6"
 admonition_color: "#b8860b"
 footer_border_color: "#00AAA9"
 cover_separator_color: "rgba(0,170,169,0.3)"
+
+# Publisher metadata
+publishers:
+  - "IHO"
+publisher_name: "IHO"
+logos:
+  "IHO": "iho-logo.svg"
+
+# Section ordering
+preface_order:
+  - foreword
+  - introduction
+  - abstract
+  - clause
+  - acknowledgements
+  - executivesummary
+toc_filter_types: []

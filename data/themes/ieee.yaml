@@ -25,3 +25,19 @@ admonition_border: "#c9982e"
 admonition_color: "#c9982e"
 footer_border_color: "#0099cc"
 cover_separator_color: "rgba(0,153,204,0.25)"
+
+# Publisher metadata
+publishers:
+  - "IEEE"
+publisher_name: "IEEE"
+logos: {}
+
+# Section ordering
+preface_order:
+  - foreword
+  - introduction
+  - abstract
+  - clause
+  - acknowledgements
+  - executivesummary
+toc_filter_types: []

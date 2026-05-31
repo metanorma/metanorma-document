@@ -21,3 +21,19 @@ admonition_border: "#c4956a"
 admonition_color: "#c4956a"
 footer_border_color: "#4a90c4"
 cover_separator_color: "rgba(74,144,196,0.25)"
+
+# Publisher metadata
+publishers:
+  - "ICC"
+publisher_name: "ICC"
+logos: {}
+
+# Section ordering
+preface_order:
+  - foreword
+  - introduction
+  - abstract
+  - clause
+  - acknowledgements
+  - executivesummary
+toc_filter_types: []

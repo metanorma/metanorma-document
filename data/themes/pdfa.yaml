@@ -21,3 +21,20 @@ admonition_border: "#d03544"
 admonition_color: "#d03544"
 footer_border_color: "#cf9c1d"
 cover_separator_color: "rgba(207,156,29,0.25)"
+
+# Publisher metadata
+publishers:
+  - "PDF Association"
+publisher_name: "PDF Association"
+logos:
+  "PDF Association": "pdfa-logo.svg"
+
+# Section ordering
+preface_order:
+  - foreword
+  - introduction
+  - abstract
+  - clause
+  - acknowledgements
+  - executivesummary
+toc_filter_types: []

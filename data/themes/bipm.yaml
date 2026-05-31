@@ -38,3 +38,27 @@ extra_css: |
   [data-theme="dark"] .sourcecode pre { background: #060a14; border-color: #1a2040; }
   [data-theme="dark"] mark.search-match { background: #0d1a30; box-shadow: 0 0 0 1px rgba(61,126,199,0.4); }
   [data-theme="dark"] mark.search-match.search-current { background: #1a5a9e; }
+
+# Logo transforms
+logo_white_fills:
+  "BIPM": ["#0f3c80"]
+
+# Document identifier formatting
+doc_id_strip_prefix: "BIPM"
+
+# Publisher metadata
+publishers:
+  - "BIPM"
+publisher_name: "BIPM"
+logos:
+  "BIPM": "bipm-logo.svg"
+
+# Section ordering
+preface_order:
+  - foreword
+  - introduction
+  - abstract
+  - clause
+  - acknowledgements
+  - executivesummary
+toc_filter_types: []

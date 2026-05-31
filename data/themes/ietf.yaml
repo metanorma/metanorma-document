@@ -27,3 +27,19 @@ footer_border_color: "#c44536"
 cover_separator_color: "rgba(196,69,54,0.25)"
 extra_css: |
   .sourcecode pre { background: #1a1a1a; border-color: #333; color: #e0e0e0; }
+
+# Publisher metadata
+publishers:
+  - "IETF"
+publisher_name: "IETF"
+logos: {}
+
+# Section ordering
+preface_order:
+  - foreword
+  - introduction
+  - abstract
+  - clause
+  - acknowledgements
+  - executivesummary
+toc_filter_types: []

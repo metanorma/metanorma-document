@@ -25,3 +25,19 @@ admonition_border: "#e8912e"
 admonition_color: "#e8912e"
 footer_border_color: "#7c3aed"
 cover_separator_color: "rgba(124,58,237,0.25)"
+
+# Publisher metadata
+publishers:
+  - "Ribose"
+publisher_name: "Ribose"
+logos: {}
+
+# Section ordering
+preface_order:
+  - foreword
+  - introduction
+  - abstract
+  - clause
+  - acknowledgements
+  - executivesummary
+toc_filter_types: []

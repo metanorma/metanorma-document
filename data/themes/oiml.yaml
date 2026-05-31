@@ -25,3 +25,19 @@ admonition_border: "#d4a017"
 admonition_color: "#d4a017"
 footer_border_color: "#2e8b57"
 cover_separator_color: "rgba(46,139,87,0.25)"
+
+# Publisher metadata
+publishers:
+  - "OIML"
+publisher_name: "OIML"
+logos: {}
+
+# Section ordering
+preface_order:
+  - foreword
+  - introduction
+  - abstract
+  - clause
+  - acknowledgements
+  - executivesummary
+toc_filter_types: []
