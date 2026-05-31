@@ -22,6 +22,20 @@ module Metanorma
           node.children.to_a
         end
       end
+    end
+
+    # Patch missing Moxml module method used by lutaml-model XML serializer
+    ::Moxml.class_eval do
+      def self.preprocess_entities(text)
+        if block_given?
+          yield text
+        else
+          text
+        end
+      end
+    end
+
+    module Html
 
       Lutaml::Xml::XmlElement.class_eval do
         remove_method :order

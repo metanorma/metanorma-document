@@ -2,152 +2,165 @@
 
 module Metanorma
   module Html
-    class Theme
+    class Theme < Lutaml::Model::Serializable
       THEMES_DIR = File.join(File.dirname(__FILE__), "..", "..", "..", "data", "themes")
+      TEMPLATES_ROOT = File.join(File.dirname(__FILE__), "templates")
 
-      VALID_KEYS = %i[
-        primary accent gradient primary_light accent_light primary_dark
-        accent_deep warm warm_light
-        text_color text_light text_muted bg bg_light border sidebar_bg
-        font_body font_sans font_mono font_url
-        content_max_width sidebar_width header_height
-        radius_sm radius_md shadow_sm shadow_md
-        note_color note_bg note_border
-        example_color example_bg example_border
-        admonition_color admonition_bg admonition_border
-        footer_border_color cover_separator_color
-        header_background cover_background cover_after_bg cover_before_bg
-        progress_bar_color
-        dark_bg dark_bg_light dark_border dark_sidebar
-        dark_text dark_text_light dark_text_muted
-        dark_primary_light dark_accent_light
-        dark_note_bg dark_example_bg dark_admonition_bg
-        dark_code_bg dark_code_border
-        extra_css
-      ].freeze
+      # --- Primary palette ---
+      attribute :primary, :string, default: -> { "#28388A" }
+      attribute :accent, :string, default: -> { "#9C60C1" }
+      attribute :gradient, :string, default: -> { "linear-gradient(135deg, #28388A 0%, #3a4ba0 50%, #9C60C1 100%)" }
+      attribute :primary_light, :string, default: -> { "#eef0f8" }
+      attribute :accent_light, :string, default: -> { "#f5eef9" }
+      attribute :primary_dark, :string, default: -> { "#1c2660" }
+      attribute :accent_deep, :string
+      attribute :warm, :string
+      attribute :warm_light, :string
 
-      SETTERS = VALID_KEYS.to_h { |k| [k.to_s, :"#{k}="] }.freeze
+      # --- Text & backgrounds ---
+      attribute :text_color, :string, default: -> { "#1a1a2e" }
+      attribute :text_light, :string, default: -> { "#4a4a6a" }
+      attribute :text_muted, :string, default: -> { "#8888a0" }
+      attribute :bg, :string, default: -> { "#fff" }
+      attribute :bg_light, :string, default: -> { "#fafbff" }
+      attribute :border, :string, default: -> { "#e0e2ee" }
+      attribute :sidebar_bg, :string, default: -> { "#f7f7fc" }
 
-      # Primary palette
-      attr_accessor :primary, :accent, :gradient,
-                    :primary_light, :accent_light, :primary_dark,
-                    :accent_deep, :warm, :warm_light
+      # --- Typography ---
+      attribute :font_body, :string, default: -> { '"Source Serif 4", "Noto Serif", Georgia, "Times New Roman", serif' }
+      attribute :font_sans, :string, default: -> { '"DM Sans", "Helvetica Neue", Arial, sans-serif' }
+      attribute :font_mono, :string, default: -> { '"JetBrains Mono", "Fira Code", "Courier New", monospace' }
+      attribute :font_url, :string, default: -> { "https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&family=JetBrains+Mono:wght@400;500&display=swap" }
 
-      # Text & backgrounds
-      attr_accessor :text_color, :text_light, :text_muted,
-                    :bg, :bg_light, :border, :sidebar_bg
+      # --- Layout constants ---
+      attribute :content_max_width, :string, default: -> { "50em" }
+      attribute :sidebar_width, :string, default: -> { "260px" }
+      attribute :header_height, :string, default: -> { "52px" }
+      attribute :radius_sm, :string, default: -> { "4px" }
+      attribute :radius_md, :string, default: -> { "8px" }
+      attribute :shadow_sm, :string, default: -> { "0 1px 3px rgba(40,56,138,0.08)" }
+      attribute :shadow_md, :string, default: -> { "0 4px 12px rgba(40,56,138,0.12)" }
 
-      # Typography
-      attr_accessor :font_body, :font_sans, :font_mono, :font_url
+      # --- Block element colors ---
+      attribute :note_color, :string, default: -> { "var(--mn-accent)" }
+      attribute :note_bg, :string, default: -> { "var(--mn-accent-light)" }
+      attribute :note_border, :string, default: -> { "var(--mn-accent)" }
+      attribute :example_color, :string, default: -> { "#0d9488" }
+      attribute :example_bg, :string, default: -> { "rgba(232, 248, 245, 0.6)" }
+      attribute :example_border, :string, default: -> { "#0d9488" }
+      attribute :admonition_color, :string, default: -> { "#b8860b" }
+      attribute :admonition_bg, :string, default: -> { "rgba(255, 252, 245, 0.8)" }
+      attribute :admonition_border, :string, default: -> { "#e8a820" }
 
-      # Layout constants
-      attr_accessor :content_max_width, :sidebar_width, :header_height,
-                    :radius_sm, :radius_md, :shadow_sm, :shadow_md
+      # --- Footer & cover ---
+      attribute :footer_border_color, :string
+      attribute :cover_separator_color, :string
 
-      # Block element colors (driven via CSS variables, eliminates extra_css)
-      attr_accessor :note_color, :note_bg, :note_border,
-                    :example_color, :example_bg, :example_border,
-                    :admonition_color, :admonition_bg, :admonition_border
+      # --- Computed CSS (gradients) ---
+      attribute :header_background, :string
+      attribute :cover_background, :string
+      attribute :cover_after_bg, :string
+      attribute :cover_before_bg, :string
+      attribute :progress_bar_color, :string
 
-      # Footer accent
-      attr_accessor :footer_border_color
+      # --- Dark mode overrides ---
+      attribute :dark_bg, :string, default: -> { "#0f1118" }
+      attribute :dark_bg_light, :string, default: -> { "#1a1d2a" }
+      attribute :dark_border, :string, default: -> { "#2e3248" }
+      attribute :dark_sidebar, :string, default: -> { "#141620" }
+      attribute :dark_text, :string, default: -> { "#e2e6f0" }
+      attribute :dark_text_light, :string, default: -> { "#c0c8dc" }
+      attribute :dark_text_muted, :string, default: -> { "#96a0b8" }
+      attribute :dark_primary_light, :string, default: -> { "#1e2140" }
+      attribute :dark_accent_light, :string, default: -> { "#2a2040" }
+      attribute :dark_note_bg, :string
+      attribute :dark_example_bg, :string
+      attribute :dark_admonition_bg, :string
+      attribute :dark_code_bg, :string
+      attribute :dark_code_border, :string
 
-      # Cover separator
-      attr_accessor :cover_separator_color
+      # --- Arbitrary per-element CSS overrides ---
+      attribute :extra_css, :string
 
-      # Computed CSS (gradients — cannot use CSS variables alone)
-      attr_accessor :header_background, :cover_background,
-                    :cover_after_bg, :cover_before_bg,
-                    :progress_bar_color
+      # --- Publisher metadata ---
+      attribute :publishers, :string, collection: true, default: -> { [] }
+      attribute :publisher_name, :string
+      attribute :logos, :hash, default: -> { {} }
 
-      # Dark mode overrides
-      attr_accessor :dark_bg, :dark_bg_light, :dark_border, :dark_sidebar,
-                    :dark_text, :dark_text_light, :dark_text_muted,
-                    :dark_primary_light, :dark_accent_light,
-                    :dark_note_bg, :dark_example_bg, :dark_admonition_bg,
-                    :dark_code_bg, :dark_code_border
+      # --- Logo transforms ---
+      attribute :logo_white_fills, :hash, default: -> { {} }
+      attribute :logo_strip_fills, :string, collection: true, default: -> { [] }
 
-      # Arbitrary per-element CSS overrides (search, sourcecode, etc.)
-      attr_accessor :extra_css
+      # --- Document identifier formatting ---
+      attribute :doc_id_strip_prefix, :string
 
-      def initialize
-        @primary        = "#28388A"
-        @accent         = "#9C60C1"
-        @gradient       = "linear-gradient(135deg, #28388A 0%, #3a4ba0 50%, #9C60C1 100%)"
-        @primary_light  = "#eef0f8"
-        @accent_light   = "#f5eef9"
-        @primary_dark   = "#1c2660"
-        @accent_deep    = nil
-        @warm           = nil
-        @warm_light     = nil
-        @text_color     = "#1a1a2e"
-        @text_light     = "#4a4a6a"
-        @text_muted     = "#8888a0"
-        @bg             = "#fff"
-        @bg_light       = "#fafbff"
-        @border         = "#e0e2ee"
-        @sidebar_bg     = "#f7f7fc"
-        @font_body      = '"Source Serif 4", "Noto Serif", Georgia, "Times New Roman", serif'
-        @font_sans      = '"DM Sans", "Helvetica Neue", Arial, sans-serif'
-        @font_mono      = '"JetBrains Mono", "Fira Code", "Courier New", monospace'
-        @font_url       = "https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&family=JetBrains+Mono:wght@400;500&display=swap"
-        @content_max_width = "50em"
-        @sidebar_width     = "260px"
-        @header_height     = "52px"
-        @radius_sm = "4px"
-        @radius_md = "8px"
-        @shadow_sm = "0 1px 3px rgba(40,56,138,0.08)"
-        @shadow_md = "0 4px 12px rgba(40,56,138,0.12)"
+      # --- Section ordering ---
+      attribute :preface_order, :string, collection: true, default: -> { %w[foreword introduction abstract clause acknowledgements executivesummary] }
+      attribute :clause_order, :string, collection: true, default: -> { %w[sections annex bibliography indexsect] }
+      attribute :preface_wrap, :boolean, default: -> { false }
+      attribute :toc_filter_types, :string, collection: true, default: -> { [] }
 
-        # Block element defaults
-        @note_color      = "var(--mn-accent)"
-        @note_bg         = "var(--mn-accent-light)"
-        @note_border     = "var(--mn-accent)"
-        @example_color   = "#0d9488"
-        @example_bg      = "rgba(232, 248, 245, 0.6)"
-        @example_border  = "#0d9488"
-        @admonition_color = "#b8860b"
-        @admonition_bg = "rgba(255, 252, 245, 0.8)"
-        @admonition_border = "#e8a820"
-        @footer_border_color = nil
-        @cover_separator_color = nil
-
-        @header_background = nil
-        @cover_background  = nil
-        @cover_after_bg    = nil
-        @cover_before_bg   = nil
-        @progress_bar_color = nil
-        @extra_css = nil
-
-        # Dark mode defaults
-        @dark_bg          = "#0f1118"
-        @dark_bg_light    = "#1a1d2a"
-        @dark_border      = "#2e3248"
-        @dark_sidebar     = "#141620"
-        @dark_text        = "#e2e6f0"
-        @dark_text_light  = "#c0c8dc"
-        @dark_text_muted  = "#96a0b8"
-        @dark_primary_light = "#1e2140"
-        @dark_accent_light  = "#2a2040"
-        @dark_note_bg     = nil
-        @dark_example_bg  = nil
-        @dark_admonition_bg = nil
-        @dark_code_bg     = nil
-        @dark_code_border = nil
-      end
+      # --- Non-YAML state (set programmatically) ---
+      attr_accessor :theme_dir
 
       def self.load(flavor)
-        path = File.join(THEMES_DIR, "#{flavor}.yaml")
-        return new unless File.exist?(path)
+        dir_theme = File.join(THEMES_DIR, flavor.to_s, "theme.yaml")
+        flat_theme = File.join(THEMES_DIR, "#{flavor}.yaml")
 
-        require "yaml"
-        overrides = YAML.safe_load_file(path, permitted_classes: [Symbol])
-        new.tap do |theme|
-          overrides.each do |key, value|
-            setter = SETTERS[key]
-            theme.public_send(setter, value) if setter
-          end
+        if File.exist?(dir_theme)
+          from_directory(dir_theme, flavor)
+        elsif File.exist?(flat_theme)
+          from_file(flat_theme)
+        else
+          new
         end
+      end
+
+      def self.from_file(path)
+        from_yaml(File.read(path))
+      end
+
+      def self.from_directory(path, flavor)
+        theme = from_yaml(File.read(path))
+        theme.theme_dir = File.join(THEMES_DIR, flavor.to_s)
+        theme
+      end
+
+      def theme_templates_dir
+        return nil unless theme_dir
+
+        dir = File.join(theme_dir, "templates")
+        File.directory?(dir) ? dir : nil
+      end
+
+      def theme_assets_dir
+        return nil unless theme_dir
+
+        dir = File.join(theme_dir, "assets")
+        File.directory?(dir) ? dir : nil
+      end
+
+      def theme_css_path
+        return nil unless theme_dir
+
+        path = File.join(theme_dir, "custom.css")
+        File.exist?(path) ? path : nil
+      end
+
+      def resolve_template(template_name)
+        if theme_templates_dir
+          flavor_path = File.join(theme_templates_dir, template_name)
+          return flavor_path if File.exist?(flavor_path)
+        end
+        File.join(TEMPLATES_ROOT, template_name)
+      end
+
+      def resolve_asset(filename)
+        if theme_assets_dir
+          flavor_path = File.join(theme_assets_dir, filename)
+          return flavor_path if File.exist?(flavor_path)
+        end
+        nil
       end
 
       def to_css_root

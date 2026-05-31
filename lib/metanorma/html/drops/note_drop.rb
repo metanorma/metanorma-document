@@ -8,15 +8,15 @@ module Metanorma
           id = renderer.safe_attr(note, :id)
           label = renderer.extract_block_label(note, "NOTE")
 
-          content_html = renderer.capture_output do
-            if note.content && !note.content.empty?
-              note.content.each { |para| renderer.render_paragraph(para) }
-            else
-              renderer.render_mixed_inline(note)
-            end
-            renderer.render_block_children(note,
-                                           children: BaseRenderer::NOTE_CHILDREN)
+          content_parts = []
+          if note.content && !note.content.empty?
+            note.content.each { |para| content_parts << (renderer.render_paragraph(para) || "") }
+          else
+            inline = renderer.render_mixed_inline(note)
+            content_parts << inline if inline
           end
+          content_parts << (renderer.render_note_children(note) || "")
+          content_html = content_parts.join
 
           new(
             id: id,

@@ -10,23 +10,6 @@ module Metanorma
     class IsoRenderer < StandardRenderer
       # --- Public hooks for flavor customization ---
 
-      def flavor_publishers(_doc_id)
-        ["ISO"]
-      end
-
-      def flavor_publisher_name
-        "ISO"
-      end
-
-      def publisher_logo_map
-        { "ISO" => "iso-logo.svg" }
-      end
-
-      # ISO brand: #e3000f red from logo
-      def theme
-        @theme ||= Theme.load(:iso)
-      end
-
       register_render Metanorma::IsoDocument::Root, :render_document
       register_render Metanorma::IsoDocument::Sections::IsoPreface,
                       :render_preface
@@ -53,9 +36,12 @@ module Metanorma
 
       def render_term_origin(element)
         text = extract_text_value(element)
-        return unless text
+        return nil unless text
 
-        @output << "<span class=\"term-source\">#{escape_html(text)}</span>"
+        render_liquid("_inline_span.html.liquid", {
+                        "attrs" => " class=\"term-source\"",
+                        "content" => escape_html(text),
+                      })
       end
 
       def extract_display_title(bibdata)
@@ -83,6 +69,7 @@ module Metanorma
         raw_id = extract_text_value(identifiers.first).to_s.strip
         return nil if raw_id.empty?
 
+        raw_id = strip_doc_id_prefix(raw_id)
         pub = flavor_publisher_name
         if pub && !raw_id.start_with?(pub)
           "#{pub} #{raw_id}"
@@ -91,21 +78,25 @@ module Metanorma
         end
       end
 
-      # Extract English stage text, deduplicating duplicate language variants.
+      def strip_doc_id_prefix(raw_id)
+        prefix = theme.doc_id_strip_prefix
+        return raw_id unless prefix
+
+        raw_id.to_s.gsub(/\A#{Regexp.escape(prefix)}\s+/, "").strip
+      end
+
       def extract_stage(bibdata)
         return nil unless bibdata.status&.stage
 
         stages = Array(bibdata.status.stage)
         return nil if stages.empty?
 
-        # Prefer English-language stage
         en_stage = stages.find do |s|
           lang = safe_attr(s, :language)
           lang == "en" if lang
         end
         return Array(en_stage.value).join.strip if en_stage&.value
 
-        # Fallback: first non-empty, deduplicated
         seen = Set.new
         stage_text = stages.filter_map do |s|
           val = Array(s.value).join.strip
@@ -118,7 +109,6 @@ module Metanorma
         stage_text.empty? ? nil : stage_text
       end
 
-      # Extract document type from ext.doctype.
       def extract_doctype(bibdata)
         return nil unless bibdata.is_a?(Metanorma::IsoDocument::Metadata::IsoBibliographicItem)
 
@@ -128,14 +118,12 @@ module Metanorma
         doctypes = ext.doctype
         return nil unless doctypes && !doctypes.empty?
 
-        # Prefer English-language doctype
         en_dt = doctypes.find do |d|
           lang = safe_attr(d, :language)
           lang == "en" if lang
         end
         return en_dt.value.to_s if en_dt&.value
 
-        # Fallback: first doctype
         dt = doctypes.first
         val = dt&.value.to_s
         val.strip.empty? ? nil : val
@@ -144,38 +132,33 @@ module Metanorma
       # --- Top-level document rendering ---
 
       def render_document(doc, **_opts)
-        render_coverpage(doc)
-        render_boilerplate_section(doc)
+        parts = []
+        parts << (render_coverpage(doc) || "")
+        parts << (render_boilerplate_section(doc) || "")
 
-        @output << "<main class=\"main-section\">"
+        parts << (render(doc.preface) || "") if doc.preface
+        parts << (render_doc_title(doc) || "")
 
-        # Preface sections
-        render(doc.preface) if doc.preface
-
-        # Document title line
-        render_doc_title(doc)
-
-        # Collect ALL top-level content (sections + normative refs + annexes + bibliography)
-        # and render in displayorder for correct document order.
         all_items = collect_document_children(doc)
-
         all_items.each do |node|
           next if node.is_a?(String)
           next if is_title_element?(node, doc.sections)
 
-          render(node)
+          parts << (render(node) || "")
         end
 
-        render_footnotes_section
+        parts << (render_footnotes_section || "")
 
-        @output << "</main>"
+        render_liquid("_main_content.html.liquid", {
+                        "content" => parts.join,
+                      })
       end
 
       # --- Cover page ---
 
       def render_coverpage(doc)
         bibdata = doc.bibdata
-        return unless bibdata
+        return "" unless bibdata
 
         logos = publisher_logos_html(doc) || []
         doc_id = formatted_doc_id(bibdata)
@@ -204,136 +187,134 @@ module Metanorma
 
         stage_text = extract_stage(bibdata)
 
-        @output << render_liquid("_iso_cover.html.liquid", {
-                                   "publisher_logos" => logos,
-                                   "doc_id" => doc_id,
-                                   "pub_date" => pub_date,
-                                   "doctype" => doctype,
-                                   "title" => title_text,
-                                   "stage" => stage_text,
-                                 })
+        render_liquid("_standard_cover.html.liquid", {
+                        "publisher_logos" => logos,
+                        "doc_id" => doc_id,
+                        "pub_date" => pub_date,
+                        "doctype" => doctype,
+                        "title" => title_text,
+                        "stage" => stage_text,
+                      })
       end
 
       def render_doc_title(doc)
         bibdata = doc.bibdata
-        return unless bibdata
+        return nil unless bibdata
 
         titles = bibdata.titles
-        return unless titles
+        return nil unless titles
 
         en_title = bibdata.title_for("en")
-        return unless en_title
+        return nil unless en_title
 
-        @output << render_liquid("_iso_doc_title.html.liquid", {
-                                   "title" => en_title.to_s,
-                                 })
+        render_liquid("_standard_doc_title.html.liquid", {
+                        "title" => en_title.to_s,
+                      })
       end
 
       def render_boilerplate_section(doc)
-        return unless doc.boilerplate
+        return nil unless doc.boilerplate
 
-        @output << "<div class=\"prefatory-section\">"
-        render(doc.boilerplate)
-        @output << "</div><hr class=\"cover-separator\" />"
-      end
-
-      def render_preface(preface, **_opts)
-        render(preface.foreword) if preface.foreword
-        render(preface.introduction) if preface.introduction
-        render(preface.abstract) if preface.abstract
-        preface.clause&.each { |cl| render(cl, level: 1) }
-        render(preface.acknowledgements) if preface.acknowledgements
-        render(preface.executivesummary) if preface.executivesummary
+        content = render(doc.boilerplate)
+        render_liquid("_prefatory_section.html.liquid", {
+                        "content" => content,
+                      })
       end
 
       def render_foreword(fw, level: 1, **_opts)
         attrs = element_attrs(id: safe_attr(fw, :id))
-        tag("div", attrs) do
-          title = safe_attr(fw, :fmt_title) || safe_attr(fw, :title)
-          if title
-            fw_id = safe_attr(fw, :id)
-            title_text = extract_plain_text(title)
-            register_toc_entry(id: fw_id, level: level, text: title_text)
-            @output << "<h1 class=\"foreword-title\">"
-            render_mixed_inline(title)
-            @output << "</h1>"
-          end
-          render_ordered_content(fw)
+        title = safe_attr(fw, :fmt_title) || safe_attr(fw, :title)
+        parts = []
+        if title
+          fw_id = safe_attr(fw, :id)
+          title_content = render_mixed_inline(title)
+          register_toc_entry(id: fw_id, level: level,
+                             text: extract_plain_text(title))
+          parts << render_liquid("_heading.html.liquid", {
+                                   "tag" => "h1",
+                                   "class_attr" => " class=\"foreword-title\"",
+                                   "content" => title_content,
+                                 })
         end
+        parts << (render_ordered_content(fw) || "")
+        render_liquid("_element.html.liquid", "tag" => "div", "extra_attrs" => attrs, "content" => parts.join)
       end
 
       def render_abstract(section, level: 1, **_opts)
         attrs = element_attrs(id: safe_attr(section, :id))
-        tag("div", attrs) do
-          title = safe_attr(section, :fmt_title) || safe_attr(section, :title)
-          if title
-            sec_id = safe_attr(section, :id)
-            title_text = extract_plain_text(title)
-            register_toc_entry(id: sec_id, level: level, text: title_text)
-            @output << "<h1 class=\"intro-title\">"
-            render_mixed_inline(title)
-            @output << "</h1>"
-          end
-          render_ordered_content(section)
+        title = safe_attr(section, :fmt_title) || safe_attr(section, :title)
+        parts = []
+        if title
+          sec_id = safe_attr(section, :id)
+          title_content = render_mixed_inline(title)
+          register_toc_entry(id: sec_id, level: level,
+                             text: extract_plain_text(title))
+          parts << render_liquid("_heading.html.liquid", {
+                                   "tag" => "h1",
+                                   "class_attr" => " class=\"intro-title\"",
+                                   "content" => title_content,
+                                 })
         end
+        parts << (render_ordered_content(section) || "")
+        render_liquid("_element.html.liquid", "tag" => "div", "extra_attrs" => attrs, "content" => parts.join)
       end
 
       # --- Main sections rendering ---
 
       def render_sections(sections, **_opts)
-        # Collect ALL section-level children (from mixed content AND typed attributes)
-        # then sort by displayorder for correct document order.
         children = collect_ordered_children(sections)
+        parts = []
         children.each do |node|
           next if node.is_a?(String)
           next if is_title_element?(node, sections)
 
-          render(node, level: 1)
+          parts << (render(node, level: 1) || "")
         end
+        parts.join
       end
 
       # --- Clause rendering ---
 
       def render_clause(clause, level: 1, **_opts)
         attrs = element_attrs(id: safe_attr(clause, :id))
-        tag("div", attrs) do
-          render_title(clause, level)
-          render_ordered_content(clause, level)
-        end
+        title = render_title(clause, level)
+        content = render_ordered_content(clause, level)
+        render_liquid("_element.html.liquid", "tag" => "div", "extra_attrs" => attrs, "content" => "#{title}#{content}")
       end
 
       # --- Annex rendering ---
 
       def render_annex(annex, level: 1, **_opts)
         attrs = element_attrs(id: safe_attr(annex, :id), class: "section-sub")
-        tag("div", attrs) do
-          render_annex_title(annex, level)
-          render_ordered_content(annex, level)
-        end
+        title = render_annex_title(annex, level)
+        content = render_ordered_content(annex, level)
+        render_liquid("_element.html.liquid", "tag" => "div", "extra_attrs" => attrs, "content" => "#{title}#{content}")
       end
 
       def render_annex_title(annex, level)
         title_element = safe_attr(annex, :fmt_title) || safe_attr(annex, :title)
-        return unless title_element
+        return nil unless title_element
 
         annex_id = safe_attr(annex, :id)
-        title_text = extract_plain_text(title_element)
-        register_toc_entry(id: annex_id, level: level, text: title_text)
+        title_content = render_mixed_inline(title_element)
+        register_toc_entry(id: annex_id, level: level,
+                           text: extract_plain_text(title_element))
 
         h = "h#{[[level, 6].min, 1].max}"
-        @output << "<#{h} class=\"annex-title\">"
-        render_mixed_inline(title_element)
-        @output << "</#{h}>"
+        render_liquid("_heading.html.liquid", {
+                        "tag" => h,
+                        "class_attr" => " class=\"annex-title\"",
+                        "content" => title_content,
+                      })
       end
 
       # --- Terms section rendering ---
 
       def render_terms_section(terms, level: 1, **_opts)
         attrs = element_attrs(id: safe_attr(terms, :id))
-        tag("div", attrs) do
-          render_title(terms, level)
-          render_ordered_content(terms, level)
-        end
+        title = render_title(terms, level)
+        content = render_ordered_content(terms, level)
+        render_liquid("_element.html.liquid", "tag" => "div", "extra_attrs" => attrs, "content" => "#{title}#{content}")
       end
 
       # --- ISO Term rendering ---
@@ -343,112 +324,103 @@ module Metanorma
         term_def = extract_term_definition(term)
         data_attrs = {}
         if term_name && !term_name.empty?
-          data_attrs["data-term-name"] =
-            term_name
+          data_attrs["data-term-name"] = term_name
         end
         if term_def && !term_def.empty?
-          data_attrs["data-term-definition"] =
-            term_def
+          data_attrs["data-term-definition"] = term_def
         end
         attrs = element_attrs(id: safe_attr(term, :id), **data_attrs)
-        tag("div", attrs) do
-          # In presentation mode, use fmt_* elements
-          if term.fmt_name
-            # Render term number (e.g. "3.1")
-            @output << "<p class=\"term-number\">"
-            render_inline_element(term.fmt_name)
-            @output << "</p>"
-          elsif term.term_number
-            tn = term.term_number
-            tn_text = if tn.is_a?(String)
-                        tn
-                      else
-                        extract_text_value(tn)
-                      end
-            @output << "<p class=\"term-number\">#{escape_html(tn_text)}</p>"
-          end
+        fmt_name = safe_attr(term, :fmt_name)
+        fmt_preferred = safe_attr(term, :fmt_preferred)
+        fmt_admitted = safe_attr(term, :fmt_admitted)
+        fmt_deprecates = safe_attr(term, :fmt_deprecates)
+        fmt_definition = safe_attr(term, :fmt_definition)
+        fmt_termsource = safe_attr(term, :fmt_termsource)
+        term_number = safe_attr(term, :term_number)
+        term_p = safe_attr(term, :p)
+        term_note = safe_attr(term, :termnote) || Array(safe_attr(term, :note))
+        term_example = safe_attr(term, :termexample) || Array(safe_attr(term, :example))
+        term_termsource = safe_attr(term, :termsource)
+        term_admonition = safe_attr(term, :admonition)
+        term_nested = safe_attr(term, :term)
 
-          # Preferred designations — use fmt-preferred if available
-          if term.fmt_preferred && !term.fmt_preferred.empty?
-            term.fmt_preferred.each do |fp|
-              fp.p&.each do |para|
-                render_paragraph(para)
-              end
-            end
-          elsif term.preferred && !term.preferred.empty?
-            term.preferred&.each do |designation|
-              render_term_designation(designation, "preferred")
-            end
-          end
-
-          # Admitted designations — use fmt-admitted if available
-          if term.fmt_admitted && !term.fmt_admitted.empty?
-            term.fmt_admitted.each do |fa|
-              fa.p&.each do |para|
-                render_paragraph(para)
-              end
-            end
-          elsif term.admitted && !term.admitted.empty?
-            term.admitted&.each do |designation|
-              render_term_designation(designation, "admitted")
-            end
-          end
-
-          # Deprecated designations — use fmt-deprecates if available
-          if term.fmt_deprecates
-            term.fmt_deprecates.p&.each { |para| render_paragraph(para) }
-          elsif term.deprecates && !term.deprecates.empty?
-            term.deprecates&.each do |designation|
-              render_term_designation(designation, "deprecated")
-            end
-          end
-
-          # Domain — only render separately when fmt-definition is absent
-          # (fmt-definition already includes domain text in its content)
-          if term.domain && !term.fmt_definition
-            domain_text = safe_attr(term.domain, :text)
-            @output << "<p class=\"term-domain\">&lt;#{escape_html(domain_text)}&gt;</p>" if domain_text
-          end
-
-          # Definition — use fmt-definition if available
-          if term.fmt_definition
-            render_ordered_content(term.fmt_definition)
-          else
-            # Definition paragraphs
-            term.p&.each { |para| render_paragraph(para) }
-            # Structured definitions
-            term.definition&.each { |defn| render_term_definition(defn) }
-          end
-
-          # Term notes
-          term.termnote&.each { |note| render_term_note(note) }
-
-          # Term examples
-          term.termexample&.each { |ex| render_term_example(ex) }
-
-          # Source references — use fmt-termsource if available
-          if term.fmt_termsource && !term.fmt_termsource.empty?
-            term.fmt_termsource.each do |fts|
-              @output << "<p class=\"term-source\">"
-              render_mixed_inline(fts)
-              @output << "</p>"
-            end
-          else
-            term.source&.each { |src| render_term_source(src) }
-            term.termsource&.each { |src| render_term_source_element(src) }
-          end
-
-          # Admonitions
-          term.admonition&.each { |adm| render_admonition(adm) }
-
-          # Nested terms
-          term.term&.each { |sub| render_term(sub) }
+        parts = []
+        if fmt_name
+          tn_content = render_inline_element(fmt_name)
+          parts << render_liquid("_term_number.html.liquid", { "content" => tn_content })
+        elsif term_number
+          tn_text = if term_number.is_a?(String)
+                      term_number
+                    else
+                      extract_text_value(term_number)
+                    end
+          parts << render_liquid("_term_number.html.liquid", { "content" => escape_html(tn_text) })
         end
+
+        if fmt_preferred && !fmt_preferred.empty?
+          fmt_preferred.each do |fp|
+            fp.p&.each { |para| parts << (render_paragraph(para) || "") }
+          end
+        elsif term.preferred && !term.preferred.empty?
+          term.preferred&.each { |designation| parts << (render_term_designation(designation, "preferred") || "") }
+        end
+
+        if fmt_admitted && !fmt_admitted.empty?
+          fmt_admitted.each do |fa|
+            fa.p&.each { |para| parts << (render_paragraph(para) || "") }
+          end
+        elsif term.admitted && !term.admitted.empty?
+          term.admitted&.each { |designation| parts << (render_term_designation(designation, "admitted") || "") }
+        end
+
+        if fmt_deprecates
+          fmt_deprecates.p&.each { |para| parts << (render_paragraph(para) || "") }
+        elsif term.deprecates && !term.deprecates.empty?
+          term.deprecates&.each { |designation| parts << (render_term_designation(designation, "deprecated") || "") }
+        end
+
+        if term.domain && !fmt_definition
+          domain_text = safe_attr(term.domain, :text)
+          if domain_text
+            parts << render_liquid("_term_domain.html.liquid", {
+                                     "text" => escape_html(domain_text),
+                                   })
+          end
+        end
+
+        if fmt_definition
+          parts << (render_ordered_content(fmt_definition) || "")
+        else
+          term_p&.each { |para| parts << (render_paragraph(para) || "") }
+          term.definition&.each { |defn| parts << (render_term_definition(defn) || "") }
+        end
+
+        term_note&.each { |note| parts << (render_term_note(note) || "") }
+        term_example&.each { |ex| parts << (render_term_example(ex) || "") }
+
+        if fmt_termsource && !fmt_termsource.empty?
+          fmt_termsource.each do |fts|
+            src_content = render_mixed_inline(fts)
+            parts << render_liquid("_paragraph.html.liquid", {
+                                     "attrs" => " class=\"term-source\"",
+                                     "content" => src_content,
+                                   })
+          end
+        else
+          term.source&.each { |src| parts << (render_term_source(src) || "") }
+          term_termsource&.each { |src| parts << (render_term_source_element(src) || "") }
+        end
+
+        term_admonition&.each { |adm| parts << (render_admonition(adm) || "") }
+        term_nested&.each { |sub| parts << (render_term(sub) || "") }
+
+        render_liquid("_element.html.liquid", "tag" => "div", "extra_attrs" => attrs, "content" => parts.join)
       end
 
       def extract_term_name(term)
-        if term.fmt_preferred && !term.fmt_preferred.empty?
-          fp = term.fmt_preferred.first
+        fmt_pref = safe_attr(term, :fmt_preferred)
+        if fmt_pref && !fmt_pref.empty?
+          fp = fmt_pref.first
           if fp.p && !fp.p.empty?
             return extract_plain_text(fp.p.first)
           end
@@ -461,49 +433,41 @@ module Metanorma
       end
 
       def extract_term_definition(term)
-        if term.fmt_definition
-          rendered = capture_output do
-            render_ordered_content(term.fmt_definition)
-          end
-          return strip_html(rendered).gsub(/\s+/, " ").strip
-        end
-        if term.p && !term.p.empty?
-          rendered = capture_output do
-            term.p.each do |para|
-              render_paragraph(para)
-            end
-          end
-          return strip_html(rendered).gsub(/\s+/, " ").strip
+        fmt_def = safe_attr(term, :fmt_definition)
+        return extract_plain_text(fmt_def) if fmt_def
+
+        term_p = safe_attr(term, :p)
+        if term_p && !term_p.empty?
+          text = term_p.map { |para| extract_plain_text(para) }.join(" ")
+          return text.strip unless text.strip.empty?
         end
         nil
       end
 
-      def strip_html(html)
-        html.gsub(/<[^>]+>/, "").gsub("&lt;", "<").gsub("&gt;", ">")
-          .gsub("&amp;", "&").gsub("&nbsp;", " ")
-      end
-
       def render_term_designation(designation, type)
         css_class = type == "deprecated" ? "term-deprecated" : "term-name"
-        @output << "<p class=\"#{css_class}\" style=\"text-align:left;\">"
-        @output << "<del>" if type == "deprecated"
-        @output << "<b><dfn>"
-
         name = extract_designation_name(designation)
-        if name
-          @output << escape_html(name)
-        else
-          # Fallback: render mixed content (e.g. <strong> element)
-          render_mixed_inline(designation)
+        inner = if name
+                  escape_html(name)
+                else
+                  render_mixed_inline(designation) || ""
+                end
+
+        dfn_content = render_liquid("_element.html.liquid", { "tag" => "dfn", "extra_attrs" => "", "content" => inner })
+        b_content = render_liquid("_element.html.liquid", { "tag" => "b", "extra_attrs" => "", "content" => dfn_content })
+
+        if type == "deprecated"
+          b_content = render_liquid("_element.html.liquid", { "tag" => "del", "extra_attrs" => "", "content" => b_content })
         end
 
-        @output << "</dfn></b>"
-        @output << "</del>" if type == "deprecated"
-        @output << "</p>"
+        render_liquid("_element.html.liquid", {
+                        "tag" => "p",
+                        "extra_attrs" => " class=\"#{css_class}\" style=\"text-align:left;\"",
+                        "content" => b_content,
+                      })
       end
 
       def extract_designation_name(designation)
-        # Try expression.name first (TermNameElement objects with text)
         expr = designation.expression
         if expr.is_a?(Metanorma::IsoDocument::Terms::TermExpression) && expr.name
           names = Array(expr.name)
@@ -511,7 +475,6 @@ module Metanorma
           return text unless text.strip.empty?
         end
 
-        # Try text attribute from mixed content
         texts = safe_attr(designation, :text)
         if texts
           joined = texts.is_a?(Array) ? texts.join : texts.to_s
@@ -534,113 +497,77 @@ module Metanorma
       end
 
       def render_term_definition(definition)
-        return unless definition
+        return nil unless definition
 
+        parts = []
         rendered = false
 
-        # Try verbal_definition first (ISO semantic format)
-        vd = definition.verbal_definition
+        vd = safe_attr(definition, :verbal_definition) || safe_attr(definition, :verbalexpression)
         if vd
-          vd.p&.each { |para| render_paragraph(para) }
-          vd.ul&.each { |ul| render_unordered_list(ul) }
-          vd.ol&.each { |ol| render_ordered_list(ol) }
+          vd_p = safe_attr(vd, :p) || safe_attr(vd, :paragraph)
+          vd_p&.each { |para| parts << (render_paragraph(para) || "") }
+          vd.ul&.each { |ul| parts << (render_unordered_list(ul) || "") }
+          vd.ol&.each { |ol| parts << (render_ordered_list(ol) || "") }
           rendered = true
         end
 
-        # Try direct p (presentation XML format where <p> is inside <definition>)
         p_children = safe_attr(definition, :p)
         if !rendered && p_children && !p_children.empty?
-          p_children.each { |para| render_paragraph(para) }
+          p_children.each { |para| parts << (render_paragraph(para) || "") }
           rendered = true
         end
 
-        # Fallback: render via element_order
         unless rendered
-          render_ordered_content(definition)
+          parts << (render_ordered_content(definition) || "")
         end
+        parts.join
       end
 
       # --- Boilerplate rendering ---
 
       def render_boilerplate(boilerplate, **_opts)
-        return unless boilerplate
+        return nil unless boilerplate
 
-        content = boilerplate_to_xml(boilerplate)
-        return unless content
-
-        @output << "<div class=\"boilerplate-copyright\">"
-
-        raw = content.to_s
-        clean = convert_boilerplate_links(raw)
-          .gsub(/<fmt-title[^>]*>.*?<\/fmt-title>/m, "")
-          .gsub(/<semx[^>]*>.*?<\/semx>/m, "")
-          .gsub(/<title[^>]*>.*?<\/title>/m, "")
-          .gsub(/<fmt-xref-label[^>]*>.*?<\/fmt-xref-label>/m, "")
-          .gsub(/<variant-title[^>]*>.*?<\/variant-title>/m, "")
-          .gsub(/<\/?(?:copyright-statement|clause)[^>]*>/, "")
-
-        # Remap XML class names to HTML-specific class names
-        boilerplate_doc = Nokogiri::HTML::DocumentFragment.parse(clean)
-        boilerplate_doc.css("[class]").each do |el|
-          el["class"] = el["class"].split(/\s+/).map do |c|
-            html_class_for_span(c)
-          end.join(" ")
-        end
-
-        @output << boilerplate_doc.inner_html.strip
-
-        @output << "</div>"
-      end
-
-      def boilerplate_to_xml(boilerplate)
         parts = []
-        %i[copyright_statement license_statement legal_statement
-           feedback_statement clause].each do |attr|
-          items = boilerplate.public_send(attr)
-          next unless items
+        parts << (render_boilerplate_items(boilerplate.copyright_statement) || "")
+        parts << (render_boilerplate_items(boilerplate.license_statement) || "")
+        parts << (render_boilerplate_items(boilerplate.legal_statement) || "")
+        parts << (render_boilerplate_items(boilerplate.feedback_statement) || "")
+        parts << (render_boilerplate_items(boilerplate.clause) || "")
 
-          tag = attr.to_s.gsub("_", "-")
-          items.each do |item|
-            inner = item.to_xml
-            next if !inner || inner.strip.empty?
-
-            # Strip the outer <clause> wrapper — the inner content is what matters
-            stripped = inner.strip
-            stripped = stripped.sub(%r{^<clause[^>]*>\n?}, "").sub(%r{\n?</clause>$}, "")
-            parts << "<#{tag}>#{stripped}</#{tag}>"
-          end
-        end
-        return nil if parts.empty?
-
-        parts.join("\n")
+        render_liquid("_boilerplate.html.liquid", content: parts.join)
       end
 
-      def convert_boilerplate_links(raw)
-        doc = Nokogiri::XML.fragment(raw)
-        doc.css("link").each do |link|
-          target = link["target"] || link["href"]
-          next_sib = link.next_sibling
-          while next_sib.is_a?(Nokogiri::XML::Text) && next_sib.text.strip.empty?
-            next_sib = next_sib.next_sibling
-          end
+      def render_boilerplate_items(items)
+        return nil unless items
+        Array(items).filter_map { |item| render_boilerplate_clause(item) }.join
+      end
 
-          display_text = if next_sib&.element? && next_sib.name == "semx"
-                           fmt_link = next_sib.at_css("fmt-link")
-                           if fmt_link
-                             fmt_target = fmt_link["target"] || fmt_link["href"] || target
-                             display_text = fmt_target.to_s.delete_prefix("mailto:")
-                             next_sib.remove
-                             display_text
-                           end
-                         end
+      def render_boilerplate_clause(item)
+        return nil unless item
+        return nil unless item.is_a?(Lutaml::Model::Serializable)
 
-          display_text ||= target.to_s.delete_prefix("mailto:")
-          a_tag = Nokogiri::HTML::DocumentFragment.parse(
-            "<a href=\"#{CGI.escapeHTML(target.to_s)}\">#{CGI.escapeHTML(display_text)}</a>",
-          )
-          link.replace(a_tag)
+        inner = safe_attr(item, :subsection)
+        targets = if inner && !Array(inner).empty?
+                    Array(inner)
+                  else
+                    [item]
+                  end
+
+        targets.filter_map { |section| render_boilerplate_clause_content(section) }.join
+      end
+
+      def render_boilerplate_clause_content(section)
+        fmt_title = safe_attr(section, :fmt_title)
+        parts = []
+        section.each_mixed_content do |child|
+          next if child.is_a?(String)
+          next if is_title_element?(child, section)
+          next if child.equal?(fmt_title)
+
+          parts << (render(child) || "")
         end
-        doc.inner_html
+        parts.join
       end
 
       # --- Helpers ---
@@ -648,22 +575,17 @@ module Metanorma
       def render_title(section, level)
         title_element = safe_attr(section,
                                   :fmt_title) || safe_attr(section, :title)
-        return unless title_element
+        return nil unless title_element
 
         section_id = safe_attr(section, :id)
-        title_text = extract_plain_text(title_element)
-        register_toc_entry(id: section_id, level: level, text: title_text)
+        title_content = render_mixed_inline(title_element)
+        register_toc_entry(id: section_id, level: level,
+                           text: extract_plain_text(title_element))
 
         h = "h#{[[level, 6].min, 1].max}"
-        @output << "<#{h}>"
-        render_mixed_inline(title_element)
-        @output << "</#{h}>"
+        render_liquid("_heading.html.liquid", tag: h, class_attr: "", content: title_content)
       end
 
-      # Collect all document-level children (sections, normative refs, annexes,
-      # bibliography) sorted by displayorder for correct document order.
-      # Top-level paragraphs in sections (title paragraphs) are excluded —
-      # they are rendered separately by render_doc_title.
       def collect_document_children(doc)
         items = []
 
@@ -687,6 +609,7 @@ module Metanorma
         logo_map = publisher_logo_map
         return [] if publishers.empty? && logo_map.empty?
 
+        white_fills = theme.logo_white_fills
         display_pubs = publishers.empty? ? logo_map.keys : publishers
         display_pubs.filter_map do |pub|
           filename = logo_map[pub]
@@ -695,9 +618,7 @@ module Metanorma
           svg = load_logo_svg(filename, height: 48)
           next unless svg
 
-          # White fill for dark cover background
-          svg = svg.gsub("fill:#00b1ff", "fill:white") if pub == "OGC"
-          svg = svg.gsub("fill:#e3000f", "fill:white") if pub == "ISO"
+          Array(white_fills[pub]).each { |fill| svg = svg.gsub("fill:#{fill}", "fill:white") }
           svg
         end
       end

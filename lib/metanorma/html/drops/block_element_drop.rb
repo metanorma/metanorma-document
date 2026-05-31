@@ -6,8 +6,12 @@ module Metanorma
       class BlockElementDrop < Liquid::Drop
         attr_reader :id, :type, :label_html, :content_html, :css_class
 
-        def initialize(attrs = {})
-          attrs.each { |k, v| instance_variable_set(:"@#{k}", v) }
+        def initialize(id: nil, type: nil, label_html: nil, content_html: nil, css_class: nil)
+          @id = id
+          @type = type
+          @label_html = label_html
+          @content_html = content_html
+          @css_class = css_class
         end
 
         # Subclasses override to build from model + RendererContext

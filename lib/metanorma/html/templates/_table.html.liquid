@@ -1,0 +1,9 @@
+<div class="table-scroll-wrapper">
+  {% if caption %}<div class="table-caption">{{ caption }}</div>{% endif %}
+<table{{ attrs }}>
+  {% if colgroup_html %}{{ colgroup_html }}{% endif %}
+  {% if thead_html %}{{ thead_html }}{% endif %}
+  {{ tbody_html }}
+  {% if tfoot_html %}{{ tfoot_html }}{% endif %}
+</table>
+</div>
