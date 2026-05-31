@@ -25,3 +25,20 @@ admonition_border: "#d4a017"
 admonition_color: "#b8860b"
 footer_border_color: "#0061a9"
 cover_separator_color: "rgba(0,97,169,0.25)"
+
+# Publisher metadata
+publishers:
+  - "IEC"
+publisher_name: "IEC"
+logos:
+  "IEC": "iec-logo.svg"
+
+# Section ordering
+preface_order:
+  - foreword
+  - introduction
+  - abstract
+  - clause
+  - acknowledgements
+  - executivesummary
+toc_filter_types: []

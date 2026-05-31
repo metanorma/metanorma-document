@@ -21,3 +21,26 @@ admonition_border: "#1a1a1a"
 admonition_color: "#1a1a1a"
 footer_border_color: "#e3000f"
 cover_separator_color: "rgba(227,0,15,0.25)"
+
+# Logo transforms
+logo_white_fills:
+  "ISO": ["#e3000f"]
+logo_strip_fills:
+  - "#e3000f"
+
+# Publisher metadata
+publishers:
+  - "ISO"
+publisher_name: "ISO"
+logos:
+  "ISO": "iso-logo.svg"
+
+# Section ordering
+preface_order:
+  - foreword
+  - introduction
+  - abstract
+  - clause
+  - acknowledgements
+  - executivesummary
+toc_filter_types: []
