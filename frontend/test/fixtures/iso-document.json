@@ -1,0 +1,271 @@
+{
+  "type": "doc",
+  "attrs": { "id": "iso-17301-1" },
+  "meta": {
+    "title": "ISO 17301-1:2016 — Cereals and pulses",
+    "flavor": "iso",
+    "type": "international-standard",
+    "schema_version": "v2.1.5"
+  },
+  "toc": {
+    "sections": [
+      { "id": "foreword", "title": "Foreword", "type": "foreword", "children": [] },
+      { "id": "scope", "title": "Scope", "type": "clause", "children": [] },
+      { "id": "normrefs", "title": "Normative references", "type": "references", "children": [] },
+      { "id": "terms", "title": "Terms and definitions", "type": "terms", "children": [
+        { "id": "term-rice", "title": "rice", "type": "clause", "children": [] }
+      ]},
+      { "id": "test-methods", "title": "Test methods", "type": "clause", "children": [] }
+    ],
+    "numbering": { "scope": "1", "normrefs": "2", "terms": "3", "term-rice": "3.1", "test-methods": "4" }
+  },
+  "content": [
+    {
+      "type": "foreword",
+      "attrs": { "id": "foreword", "title": "Foreword" },
+      "content": [
+        {
+          "type": "paragraph",
+          "attrs": { "id": "foreword-p1" },
+          "content": [
+            { "type": "text", "text": "ISO (the International Organization for Standardization) is a worldwide federation of national standards bodies (ISO member bodies)." }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "attrs": { "id": "foreword-p2" },
+          "content": [
+            { "type": "text", "text": "The procedures used to develop this document are described in the ISO/IEC Directives, Part 1." }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "clause",
+      "attrs": { "id": "scope", "title": "Scope", "number": "1" },
+      "content": [
+        {
+          "type": "paragraph",
+          "attrs": { "id": "scope-p1" },
+          "content": [
+            { "type": "text", "text": "This document specifies " },
+            { "type": "text", "text": "the test methods", "marks": [{ "type": "strong" }] },
+            { "type": "text", "text": " for cereals and pulses." }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "attrs": { "id": "scope-p2" },
+          "content": [
+            { "type": "text", "text": "It is applicable to " },
+            { "type": "text", "text": "Oryza sativa L.", "marks": [{ "type": "emphasis" }] },
+            { "type": "text", "text": " and " },
+            { "type": "text", "text": "Oryza glaberrima", "marks": [{ "type": "emphasis" }] },
+            { "type": "text", "text": "." }
+          ]
+        },
+        {
+          "type": "bullet_list",
+          "attrs": { "id": "scope-list1" },
+          "content": [
+            { "type": "list_item", "content": [{ "type": "text", "text": "Milling quality assessment" }] },
+            { "type": "list_item", "content": [{ "type": "text", "text": "Moisture content determination" }] },
+            { "type": "list_item", "content": [
+              { "type": "text", "text": "See " },
+              { "type": "text", "text": "ISO 712", "marks": [{ "type": "xref", "attrs": { "target": "iso712" } }] }
+            ] }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "references",
+      "attrs": { "id": "normrefs", "title": "Normative references", "number": "2" },
+      "content": [
+        {
+          "type": "paragraph",
+          "attrs": { "id": "normrefs-p1" },
+          "content": [
+            { "type": "text", "text": "The following documents are referred to in the text." }
+          ]
+        },
+        {
+          "type": "bullet_list",
+          "attrs": { "id": "normrefs-list1" },
+          "content": [
+            { "type": "list_item", "content": [
+              { "type": "text", "text": "ISO 712, " },
+              { "type": "text", "text": "Cereals and cereal products", "marks": [{ "type": "emphasis" }] },
+              { "type": "text", "text": " — Determination of moisture content" }
+            ] },
+            { "type": "list_item", "content": [
+              { "type": "text", "text": "ISO 520, " },
+              { "type": "text", "text": "Cereals", "marks": [{ "type": "emphasis" }] },
+              { "type": "text", "text": " — Determination of the mass of 1 000 grains" }
+            ] }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "terms",
+      "attrs": { "id": "terms", "title": "Terms and definitions", "number": "3" },
+      "content": [
+        {
+          "type": "paragraph",
+          "attrs": { "id": "terms-p1" },
+          "content": [
+            { "type": "text", "text": "For the purposes of this document, the following terms and definitions apply." }
+          ]
+        },
+        {
+          "type": "clause",
+          "attrs": { "id": "term-rice", "title": "rice", "number": "3.1" },
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": { "id": "term-rice-p1" },
+              "content": [
+                { "type": "text", "text": "grains of " },
+                { "type": "text", "text": "Oryza sativa L.", "marks": [{ "type": "emphasis" }] }
+              ]
+            },
+            {
+              "type": "example",
+              "attrs": { "id": "term-rice-ex1", "type": "example" },
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    { "type": "text", "text": "Long-grain rice, medium-grain rice, and short-grain rice are the main categories." }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "note",
+              "attrs": { "id": "term-rice-n1", "type": "note" },
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    { "type": "text", "text": "The term \"rice\" also applies to paddy rice (unhulled) and brown rice (hulled but unpolished)." }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "clause",
+      "attrs": { "id": "test-methods", "title": "Test methods", "number": "4" },
+      "content": [
+        {
+          "type": "paragraph",
+          "attrs": { "id": "test-methods-p1" },
+          "content": [
+            { "type": "text", "text": "The following test methods shall be used for determining the quality parameters." }
+          ]
+        },
+        {
+          "type": "table",
+          "attrs": { "id": "table-1", "title": "Table 1 — Test parameters" },
+          "content": [
+            {
+              "type": "table_head",
+              "content": [
+                {
+                  "type": "table_row",
+                  "content": [
+                    { "type": "table_cell", "content": [{ "type": "text", "text": "Parameter" }] },
+                    { "type": "table_cell", "content": [{ "type": "text", "text": "Method" }] },
+                    { "type": "table_cell", "content": [{ "type": "text", "text": "Unit" }] }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "table_body",
+              "content": [
+                {
+                  "type": "table_row",
+                  "content": [
+                    { "type": "table_cell", "content": [{ "type": "text", "text": "Moisture content" }] },
+                    { "type": "table_cell", "content": [{ "type": "text", "text": "ISO 712" }] },
+                    { "type": "table_cell", "content": [{ "type": "text", "text": "%" }] }
+                  ]
+                },
+                {
+                  "type": "table_row",
+                  "content": [
+                    { "type": "table_cell", "content": [{ "type": "text", "text": "Grain mass" }] },
+                    { "type": "table_cell", "content": [{ "type": "text", "text": "ISO 520" }] },
+                    { "type": "table_cell", "content": [{ "type": "text", "text": "g" }] }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "admonition",
+          "attrs": { "type": "warning" },
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                { "type": "text", "text": "All measurements shall be performed at (20 ± 2) °C ambient temperature." }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "sourcecode",
+          "attrs": { "language": "python", "text": "def moisture_content(wet, dry):\n    return (wet - dry) / wet * 100" }
+        },
+        {
+          "type": "figure",
+          "attrs": { "id": "fig-1", "title": "Figure 1 — Grain structure" },
+          "content": [
+            { "type": "image", "attrs": { "src": "grain.png", "alt": "Grain structure diagram" } }
+          ]
+        },
+        {
+          "type": "formula",
+          "attrs": { "id": "formula-1", "text": "m = (w - d) / w * 100" }
+        },
+        {
+          "type": "ordered_list",
+          "attrs": { "id": "test-steps" },
+          "content": [
+            { "type": "list_item", "content": [{ "type": "text", "text": "Weigh the sample" }] },
+            { "type": "list_item", "content": [{ "type": "text", "text": "Dry at 130 °C" }] },
+            { "type": "list_item", "content": [{ "type": "text", "text": "Re-weigh and calculate" }] }
+          ]
+        },
+        {
+          "type": "quote",
+          "attrs": { "id": "quote-1" },
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                { "type": "text", "text": "Precision is the soul of science." }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "footnotes",
+      "content": [
+        { "type": "list_item", "attrs": { "id": "fn1", "ref_id": "fnref1" }, "content": [
+          { "type": "paragraph", "content": [{ "type": "text", "text": "Published by ISO." }] }
+        ] }
+      ]
+    }
+  ]
+}
