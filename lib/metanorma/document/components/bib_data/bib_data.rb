@@ -60,6 +60,13 @@ module Metanorma
             map_element "keyword", to: :keyword
             map_element "classification", to: :classification
           end
+
+          def title_for(language = "en")
+            return nil unless title && !title.empty?
+
+            found = title.find { |t| t.language == language }
+            found || title.first
+          end
         end
       end
     end

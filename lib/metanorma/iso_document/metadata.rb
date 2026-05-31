@@ -5,6 +5,7 @@ module Metanorma
     module Metadata
       autoload :AbstractTitle, "#{__dir__}/metadata/abstract_title"
       autoload :DocIdentifier, "#{__dir__}/metadata/doc_identifier"
+      autoload :DoctypeElement, "#{__dir__}/metadata/doctype_element"
       autoload :IecDocumentCategory, "#{__dir__}/metadata/iec_document_category"
       autoload :IsoBibDataExtensionType,
                "#{__dir__}/metadata/iso_bib_data_extension_type"
@@ -21,6 +22,14 @@ module Metanorma
       autoload :TitleCollection, "#{__dir__}/metadata/title_collection"
       autoload :IsoProjectGroup, "#{__dir__}/metadata/iso_project_group"
       autoload :IsoSubGroup, "#{__dir__}/metadata/iso_sub_group"
+      autoload :LanguageElement, "#{__dir__}/metadata/language_element"
+      autoload :MetanormaExtension, "#{__dir__}/metadata/metanorma_extension"
+      autoload :ProjectNumber, "#{__dir__}/metadata/project_number"
+      autoload :ScriptElement, "#{__dir__}/metadata/script_element"
+      autoload :StagenameElement, "#{__dir__}/metadata/stagename_element"
+      autoload :StageElement, "#{__dir__}/metadata/stage_element"
+      autoload :StructuredIdentifier,
+               "#{__dir__}/metadata/structured_identifier"
       autoload :TitleFull, "#{__dir__}/metadata/title_full"
       autoload :TitleIntro, "#{__dir__}/metadata/title_intro"
       autoload :TitleMain, "#{__dir__}/metadata/title_main"
@@ -30,10 +39,6 @@ module Metanorma
       autoload :TitleAmendmentPrefix,
                "#{__dir__}/metadata/title_amendment_prefix"
       autoload :Ics, "#{__dir__}/metadata/ics"
-      autoload :StructuredIdentifier,
-               "#{__dir__}/metadata/structured_identifier"
-      autoload :ProjectNumber, "#{__dir__}/metadata/structured_identifier"
-      autoload :MetanormaExtension, "#{__dir__}/metadata/metanorma_extension"
     end
   end
 end

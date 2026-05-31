@@ -9,7 +9,7 @@ module Metanorma
                "#{__dir__}/metadata/bipm_bibliographic_item"
       autoload :BipmStructuredIdentifier,
                "#{__dir__}/metadata/bipm_structured_identifier"
-      autoload :DepictionElement, "#{__dir__}/metadata/bipm_bibliographic_item"
+      autoload :DepictionElement, "#{__dir__}/metadata/depiction_element"
     end
   end
 end
