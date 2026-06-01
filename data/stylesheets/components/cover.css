@@ -59,9 +59,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  background: rgba(255,255,255,0.92);
+  border-radius: var(--radius-sm);
+  padding: 0.2em 0.4em;
 }
 .cover-logo svg { height: 40px; width: auto; max-width: 120px; }
-.cover-logo svg path { fill: #fff; }
 .cover-body {
   display: flex;
   flex-direction: column;

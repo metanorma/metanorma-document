@@ -3,13 +3,16 @@
 module Metanorma
   module Html
     class Theme < Lutaml::Model::Serializable
-      THEMES_DIR = File.join(File.dirname(__FILE__), "..", "..", "..", "data", "themes")
+      THEMES_DIR = File.join(File.dirname(__FILE__), "..", "..", "..", "data",
+                             "themes")
       TEMPLATES_ROOT = File.join(File.dirname(__FILE__), "templates")
 
       # --- Primary palette ---
       attribute :primary, :string, default: -> { "#28388A" }
       attribute :accent, :string, default: -> { "#9C60C1" }
-      attribute :gradient, :string, default: -> { "linear-gradient(135deg, #28388A 0%, #3a4ba0 50%, #9C60C1 100%)" }
+      attribute :gradient, :string, default: -> {
+        "linear-gradient(135deg, #28388A 0%, #3a4ba0 50%, #9C60C1 100%)"
+      }
       attribute :primary_light, :string, default: -> { "#eef0f8" }
       attribute :accent_light, :string, default: -> { "#f5eef9" }
       attribute :primary_dark, :string, default: -> { "#1c2660" }
@@ -27,9 +30,15 @@ module Metanorma
       attribute :sidebar_bg, :string, default: -> { "#f7f7fc" }
 
       # --- Typography ---
-      attribute :font_body, :string, default: -> { '"Source Serif 4", "Noto Serif", Georgia, "Times New Roman", serif' }
-      attribute :font_sans, :string, default: -> { '"DM Sans", "Helvetica Neue", Arial, sans-serif' }
-      attribute :font_mono, :string, default: -> { '"JetBrains Mono", "Fira Code", "Courier New", monospace' }
+      attribute :font_body, :string, default: -> {
+        '"Source Serif 4", "Noto Serif", Georgia, "Times New Roman", serif'
+      }
+      attribute :font_sans, :string, default: -> {
+        '"DM Sans", "Helvetica Neue", Arial, sans-serif'
+      }
+      attribute :font_mono, :string, default: -> {
+        '"JetBrains Mono", "Fira Code", "Courier New", monospace'
+      }
       attribute :font_url, :string, default: -> { "https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&family=JetBrains+Mono:wght@400;500&display=swap" }
 
       # --- Layout constants ---
@@ -38,8 +47,12 @@ module Metanorma
       attribute :header_height, :string, default: -> { "52px" }
       attribute :radius_sm, :string, default: -> { "4px" }
       attribute :radius_md, :string, default: -> { "8px" }
-      attribute :shadow_sm, :string, default: -> { "0 1px 3px rgba(40,56,138,0.08)" }
-      attribute :shadow_md, :string, default: -> { "0 4px 12px rgba(40,56,138,0.12)" }
+      attribute :shadow_sm, :string, default: -> {
+        "0 1px 3px rgba(40,56,138,0.08)"
+      }
+      attribute :shadow_md, :string, default: -> {
+        "0 4px 12px rgba(40,56,138,0.12)"
+      }
 
       # --- Block element colors ---
       attribute :note_color, :string, default: -> { "var(--mn-accent)" }
@@ -49,7 +62,9 @@ module Metanorma
       attribute :example_bg, :string, default: -> { "rgba(232, 248, 245, 0.6)" }
       attribute :example_border, :string, default: -> { "#0d9488" }
       attribute :admonition_color, :string, default: -> { "#b8860b" }
-      attribute :admonition_bg, :string, default: -> { "rgba(255, 252, 245, 0.8)" }
+      attribute :admonition_bg, :string, default: -> {
+        "rgba(255, 252, 245, 0.8)"
+      }
       attribute :admonition_border, :string, default: -> { "#e8a820" }
 
       # --- Footer & cover ---
@@ -85,18 +100,20 @@ module Metanorma
       # --- Publisher metadata ---
       attribute :publishers, :string, collection: true, default: -> { [] }
       attribute :publisher_name, :string
-      attribute :logos, :hash, default: -> { {} }
-
-      # --- Logo transforms ---
-      attribute :logo_white_fills, :hash, default: -> { {} }
-      attribute :logo_strip_fills, :string, collection: true, default: -> { [] }
+      attribute :logos_light, :hash, default: -> { {} }
+      attribute :logos_dark, :hash, default: -> { {} }
+      attribute :doctype_labels, :hash, default: -> { {} }
 
       # --- Document identifier formatting ---
       attribute :doc_id_strip_prefix, :string
 
       # --- Section ordering ---
-      attribute :preface_order, :string, collection: true, default: -> { %w[foreword introduction abstract clause acknowledgements executivesummary] }
-      attribute :clause_order, :string, collection: true, default: -> { %w[sections annex bibliography indexsect] }
+      attribute :preface_order, :string, collection: true, default: -> {
+        %w[foreword introduction abstract clause acknowledgements executivesummary]
+      }
+      attribute :clause_order, :string, collection: true, default: -> {
+        %w[sections annex bibliography indexsect]
+      }
       attribute :preface_wrap, :boolean, default: -> { false }
       attribute :toc_filter_types, :string, collection: true, default: -> { [] }
 

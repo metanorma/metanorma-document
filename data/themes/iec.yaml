@@ -30,7 +30,7 @@ cover_separator_color: "rgba(0,97,169,0.25)"
 publishers:
   - "IEC"
 publisher_name: "IEC"
-logos:
+logos_light:
   "IEC": "iec-logo.svg"
 
 # Section ordering

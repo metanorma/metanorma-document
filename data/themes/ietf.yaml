@@ -32,7 +32,7 @@ extra_css: |
 publishers:
   - "IETF"
 publisher_name: "IETF"
-logos: {}
+logos_light: {}
 
 # Section ordering
 preface_order:
