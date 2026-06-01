@@ -7,6 +7,8 @@
     { key: '/', desc: 'Search' },
     { key: 'j / ]', desc: 'Next section' },
     { key: 'k / [', desc: 'Previous section' },
+    { key: 'Home', desc: 'Scroll to top' },
+    { key: 'End', desc: 'Scroll to bottom' },
     { key: 't', desc: 'Toggle table of contents (mobile)' },
     { key: 'g', desc: 'Glossary' },
     { key: 'r', desc: 'Reading mode' },

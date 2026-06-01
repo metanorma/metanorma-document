@@ -74,6 +74,14 @@
       e.preventDefault();
       toggleReadingMode();
     }
+    if (e.key === 'Home') {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    if (e.key === 'End') {
+      e.preventDefault();
+      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+    }
     if (e.key === 'd') {
       var btn = document.getElementById('theme-toggle');
       if (btn) btn.click();
