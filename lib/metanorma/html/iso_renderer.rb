@@ -182,7 +182,13 @@ module Metanorma
         title_text = nil
         if bibdata.titles
           en_title = bibdata.title_for("en")
-          title_text = en_title.to_s if en_title
+          if en_title
+            title_text = if en_title.is_a?(Metanorma::IsoDocument::Metadata::AbstractTitle) && en_title.value
+                           en_title.value.to_s
+                         else
+                           en_title.to_s
+                         end
+          end
         end
 
         stage_text = extract_stage(bibdata)
@@ -237,7 +243,8 @@ module Metanorma
                                  })
         end
         parts << (render_ordered_content(fw) || "")
-        render_liquid("_element.html.liquid", "tag" => "div", "extra_attrs" => attrs, "content" => parts.join)
+        render_liquid("_element.html.liquid", "tag" => "div",
+                                              "extra_attrs" => attrs, "content" => parts.join)
       end
 
       def render_abstract(section, level: 1, **_opts)
@@ -256,7 +263,8 @@ module Metanorma
                                  })
         end
         parts << (render_ordered_content(section) || "")
-        render_liquid("_element.html.liquid", "tag" => "div", "extra_attrs" => attrs, "content" => parts.join)
+        render_liquid("_element.html.liquid", "tag" => "div",
+                                              "extra_attrs" => attrs, "content" => parts.join)
       end
 
       # --- Main sections rendering ---
@@ -279,7 +287,8 @@ module Metanorma
         attrs = element_attrs(id: safe_attr(clause, :id))
         title = render_title(clause, level)
         content = render_ordered_content(clause, level)
-        render_liquid("_element.html.liquid", "tag" => "div", "extra_attrs" => attrs, "content" => "#{title}#{content}")
+        render_liquid("_element.html.liquid", "tag" => "div",
+                                              "extra_attrs" => attrs, "content" => "#{title}#{content}")
       end
 
       # --- Annex rendering ---
@@ -288,7 +297,8 @@ module Metanorma
         attrs = element_attrs(id: safe_attr(annex, :id), class: "section-sub")
         title = render_annex_title(annex, level)
         content = render_ordered_content(annex, level)
-        render_liquid("_element.html.liquid", "tag" => "div", "extra_attrs" => attrs, "content" => "#{title}#{content}")
+        render_liquid("_element.html.liquid", "tag" => "div",
+                                              "extra_attrs" => attrs, "content" => "#{title}#{content}")
       end
 
       def render_annex_title(annex, level)
@@ -314,7 +324,8 @@ module Metanorma
         attrs = element_attrs(id: safe_attr(terms, :id))
         title = render_title(terms, level)
         content = render_ordered_content(terms, level)
-        render_liquid("_element.html.liquid", "tag" => "div", "extra_attrs" => attrs, "content" => "#{title}#{content}")
+        render_liquid("_element.html.liquid", "tag" => "div",
+                                              "extra_attrs" => attrs, "content" => "#{title}#{content}")
       end
 
       # --- ISO Term rendering ---
@@ -339,7 +350,9 @@ module Metanorma
         term_number = safe_attr(term, :term_number)
         term_p = safe_attr(term, :p)
         term_note = safe_attr(term, :termnote) || Array(safe_attr(term, :note))
-        term_example = safe_attr(term, :termexample) || Array(safe_attr(term, :example))
+        term_example = safe_attr(term,
+                                 :termexample) || Array(safe_attr(term,
+                                                                  :example))
         term_termsource = safe_attr(term, :termsource)
         term_admonition = safe_attr(term, :admonition)
         term_nested = safe_attr(term, :term)
@@ -347,14 +360,16 @@ module Metanorma
         parts = []
         if fmt_name
           tn_content = render_inline_element(fmt_name)
-          parts << render_liquid("_term_number.html.liquid", { "content" => tn_content })
+          parts << render_liquid("_term_number.html.liquid",
+                                 { "content" => tn_content })
         elsif term_number
           tn_text = if term_number.is_a?(String)
                       term_number
                     else
                       extract_text_value(term_number)
                     end
-          parts << render_liquid("_term_number.html.liquid", { "content" => escape_html(tn_text) })
+          parts << render_liquid("_term_number.html.liquid",
+                                 { "content" => escape_html(tn_text) })
         end
 
         if fmt_preferred && !fmt_preferred.empty?
@@ -362,7 +377,9 @@ module Metanorma
             fp.p&.each { |para| parts << (render_paragraph(para) || "") }
           end
         elsif term.preferred && !term.preferred.empty?
-          term.preferred&.each { |designation| parts << (render_term_designation(designation, "preferred") || "") }
+          term.preferred&.each do |designation|
+            parts << (render_term_designation(designation, "preferred") || "")
+          end
         end
 
         if fmt_admitted && !fmt_admitted.empty?
@@ -370,13 +387,19 @@ module Metanorma
             fa.p&.each { |para| parts << (render_paragraph(para) || "") }
           end
         elsif term.admitted && !term.admitted.empty?
-          term.admitted&.each { |designation| parts << (render_term_designation(designation, "admitted") || "") }
+          term.admitted&.each do |designation|
+            parts << (render_term_designation(designation, "admitted") || "")
+          end
         end
 
         if fmt_deprecates
-          fmt_deprecates.p&.each { |para| parts << (render_paragraph(para) || "") }
+          fmt_deprecates.p&.each do |para|
+            parts << (render_paragraph(para) || "")
+          end
         elsif term.deprecates && !term.deprecates.empty?
-          term.deprecates&.each { |designation| parts << (render_term_designation(designation, "deprecated") || "") }
+          term.deprecates&.each do |designation|
+            parts << (render_term_designation(designation, "deprecated") || "")
+          end
         end
 
         if term.domain && !fmt_definition
@@ -392,7 +415,9 @@ module Metanorma
           parts << (render_ordered_content(fmt_definition) || "")
         else
           term_p&.each { |para| parts << (render_paragraph(para) || "") }
-          term.definition&.each { |defn| parts << (render_term_definition(defn) || "") }
+          term.definition&.each do |defn|
+            parts << (render_term_definition(defn) || "")
+          end
         end
 
         term_note&.each { |note| parts << (render_term_note(note) || "") }
@@ -408,13 +433,16 @@ module Metanorma
           end
         else
           term.source&.each { |src| parts << (render_term_source(src) || "") }
-          term_termsource&.each { |src| parts << (render_term_source_element(src) || "") }
+          term_termsource&.each do |src|
+            parts << (render_term_source_element(src) || "")
+          end
         end
 
         term_admonition&.each { |adm| parts << (render_admonition(adm) || "") }
         term_nested&.each { |sub| parts << (render_term(sub) || "") }
 
-        render_liquid("_element.html.liquid", "tag" => "div", "extra_attrs" => attrs, "content" => parts.join)
+        render_liquid("_element.html.liquid", "tag" => "div",
+                                              "extra_attrs" => attrs, "content" => parts.join)
       end
 
       def extract_term_name(term)
@@ -453,11 +481,17 @@ module Metanorma
                   render_mixed_inline(designation) || ""
                 end
 
-        dfn_content = render_liquid("_element.html.liquid", { "tag" => "dfn", "extra_attrs" => "", "content" => inner })
-        b_content = render_liquid("_element.html.liquid", { "tag" => "b", "extra_attrs" => "", "content" => dfn_content })
+        dfn_content = render_liquid("_element.html.liquid",
+                                    { "tag" => "dfn", "extra_attrs" => "",
+                                      "content" => inner })
+        b_content = render_liquid("_element.html.liquid",
+                                  { "tag" => "b", "extra_attrs" => "",
+                                    "content" => dfn_content })
 
         if type == "deprecated"
-          b_content = render_liquid("_element.html.liquid", { "tag" => "del", "extra_attrs" => "", "content" => b_content })
+          b_content = render_liquid("_element.html.liquid",
+                                    { "tag" => "del", "extra_attrs" => "",
+                                      "content" => b_content })
         end
 
         render_liquid("_element.html.liquid", {
@@ -502,7 +536,9 @@ module Metanorma
         parts = []
         rendered = false
 
-        vd = safe_attr(definition, :verbal_definition) || safe_attr(definition, :verbalexpression)
+        vd = safe_attr(definition,
+                       :verbal_definition) || safe_attr(definition,
+                                                        :verbalexpression)
         if vd
           vd_p = safe_attr(vd, :p) || safe_attr(vd, :paragraph)
           vd_p&.each { |para| parts << (render_paragraph(para) || "") }
@@ -540,6 +576,7 @@ module Metanorma
 
       def render_boilerplate_items(items)
         return nil unless items
+
         Array(items).filter_map { |item| render_boilerplate_clause(item) }.join
       end
 
@@ -554,7 +591,9 @@ module Metanorma
                     [item]
                   end
 
-        targets.filter_map { |section| render_boilerplate_clause_content(section) }.join
+        targets.filter_map do |section|
+          render_boilerplate_clause_content(section)
+        end.join
       end
 
       def render_boilerplate_clause_content(section)
@@ -583,7 +622,8 @@ module Metanorma
                            text: extract_plain_text(title_element))
 
         h = "h#{[[level, 6].min, 1].max}"
-        render_liquid("_heading.html.liquid", tag: h, class_attr: "", content: title_content)
+        render_liquid("_heading.html.liquid", tag: h, class_attr: "",
+                                              content: title_content)
       end
 
       def collect_document_children(doc)
@@ -609,7 +649,7 @@ module Metanorma
         logo_map = publisher_logo_map
         return [] if publishers.empty? && logo_map.empty?
 
-        white_fills = theme.logo_white_fills
+        dark_logo_map = theme.logos_dark
         display_pubs = publishers.empty? ? logo_map.keys : publishers
         display_pubs.filter_map do |pub|
           filename = logo_map[pub]
@@ -618,8 +658,18 @@ module Metanorma
           svg = load_logo_svg(filename, height: 48)
           next unless svg
 
-          Array(white_fills[pub]).each { |fill| svg = svg.gsub("fill:#{fill}", "fill:white") }
-          svg
+          light_span = "<span class=\"cover-logo cover-logo-light\">#{svg}</span>"
+
+          dark_span = ""
+          dark_filename = dark_logo_map[pub]
+          if dark_filename
+            dark_svg = load_logo_svg(dark_filename, height: 48)
+            if dark_svg
+              dark_span = "<span class=\"cover-logo cover-logo-dark\">#{dark_svg}</span>"
+            end
+          end
+
+          dark_span.empty? ? light_span : "#{light_span}\n#{dark_span}"
         end
       end
     end

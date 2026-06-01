@@ -31,17 +31,11 @@ module Metanorma
         def pubid_to_html(identifier)
           return nil unless identifier
 
-          parts = []
-          publisher = identifier.publisher
-          parts << "<span class=\"ref-publisher-name\">#{escape_html(publisher)}</span>" if publisher
-
-          number = identifier.number
-          parts << "<span class=\"ref-doc-number\">#{escape_html(number.to_s)}</span>" if number
-
-          date = identifier.date
-          parts << ":<span class=\"ref-year\">#{escape_html(date.to_s)}</span>" if date
-
-          parts.join(" ")
+          @coordinator.render_liquid("_pubid_identifier.html.liquid", {
+                                       "publisher" => identifier.publisher ? escape_html(identifier.publisher) : nil,
+                                       "number" => identifier.number ? escape_html(identifier.number.to_s) : nil,
+                                       "date" => identifier.date ? escape_html(identifier.date.to_s) : nil,
+                                     })
         end
 
         private
@@ -54,12 +48,12 @@ module Metanorma
           flavor_name = @coordinator.flavor_name
           return nil unless flavor_name
 
-          module_name = FLAVOR_PUBID_MAP.find { |_, _| true }&.first # placeholder
-          # Look up from the renderer class hierarchy
           @coordinator.class.ancestors.each do |ancestor|
             next unless ancestor.is_a?(Class)
 
-            ns = ancestor.name&.split("::")&.detect { |n| FLAVOR_PUBID_MAP.key?(n) }
+            ns = ancestor.name&.split("::")&.detect do |n|
+              FLAVOR_PUBID_MAP.key?(n)
+            end
             next unless ns
 
             mod = FLAVOR_PUBID_MAP[ns]

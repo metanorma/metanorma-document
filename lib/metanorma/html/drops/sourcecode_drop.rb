@@ -6,7 +6,8 @@ module Metanorma
       class SourcecodeDrop < BlockElementDrop
         attr_reader :lang, :name_html, :code_html
 
-        def initialize(id: nil, lang: nil, name_html: nil, code_html: nil, css_class: nil)
+        def initialize(id: nil, lang: nil, name_html: nil, code_html: nil,
+css_class: nil)
           @id = id
           @lang = lang
           @name_html = name_html
@@ -23,9 +24,9 @@ module Metanorma
                       end
 
           code_text = if sc.body&.content
-                        sc.body.content
+                        Array(sc.body.content).join
                       elsif sc.content
-                        sc.content
+                        Array(sc.content).join
                       else
                         ""
                       end

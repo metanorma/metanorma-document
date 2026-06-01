@@ -31,6 +31,7 @@ module Metanorma
               route "title-amd" => :title_amd
               route "title-amendment-prefix" => :title_amendment_prefix
               route "title-abbrev" => :title_full
+              route nil => :title_full
             end
           end
           map_attribute "semx-id", to: :semx_id

@@ -32,6 +32,9 @@ module Metanorma
         attribute :title_amendment_prefix, AbstractTitle
         attribute :semx_id, :string
 
+        # Fallback for plain titles without structured parts
+        attribute :content, :string
+
         # Compose all parts into a single title string
         def to_s
           parts = []
@@ -50,7 +53,7 @@ module Metanorma
           end
           return parts.join(" — ") unless parts.empty?
 
-          ""
+          content.to_s
         end
       end
     end

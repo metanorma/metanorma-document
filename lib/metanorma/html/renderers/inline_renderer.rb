@@ -19,7 +19,10 @@ module Metanorma
           xml_mapping.mapping_elements_hash.each_value do |rule_or_array|
             Array(rule_or_array).each do |rule|
               element_to_attr[rule.name] = rule.to
-              element_to_attr[rule.name.to_s] = rule.to if rule.name.is_a?(Symbol)
+              if rule.name.is_a?(Symbol)
+                element_to_attr[rule.name.to_s] =
+                  rule.to
+              end
             end
           end
 
@@ -95,11 +98,11 @@ module Metanorma
             when :tab
               parts << "  "
             when :element
-              if coordinator.block_element?(obj)
-                parts << (coordinator.render(obj) || "")
-              else
-                parts << (render_inline_element(obj) || "")
-              end
+              parts << if coordinator.block_element?(obj)
+                         coordinator.render(obj) || ""
+                       else
+                         render_inline_element(obj) || ""
+                       end
             end
           end
           unless walked
@@ -121,12 +124,12 @@ module Metanorma
           elsif node.is_a?(Lutaml::Model::Serializable)
             parts = []
             node.each_mixed_content do |child|
-              case child
-              when String
-                parts << escape_html(child)
-              else
-                parts << (render_inline_element(child) || "")
-              end
+              parts << case child
+                       when String
+                         escape_html(child)
+                       else
+                         render_inline_element(child) || ""
+                       end
             end
             parts.join
           else
@@ -155,12 +158,12 @@ module Metanorma
           end
           unless walked
             node.each_mixed_content do |child|
-              case child
-              when String
-                parts << escape_html(child)
-              else
-                parts << (render_inline_element(child) || "")
-              end
+              parts << case child
+                       when String
+                         escape_html(child)
+                       else
+                         render_inline_element(child) || ""
+                       end
             end
           end
           parts.join
@@ -221,7 +224,7 @@ module Metanorma
           render_fn(el)
         end
 
-        def render_stem(el)
+        def render_stem(_el)
           nil
         end
 
@@ -232,7 +235,8 @@ module Metanorma
         def render_fmt_xref(el)
           target = safe_attr(el, :target) || safe_attr(el, :to_attr)
           if target
-            attrs = element_attrs(href: "##{escape_html(target)}", class: "xref")
+            attrs = element_attrs(href: "##{escape_html(target)}",
+                                  class: "xref")
             content = render_mixed_inline(el)
             render_liquid("_link.html.liquid", {
                             "attrs" => attrs,
@@ -268,8 +272,8 @@ module Metanorma
           coordinator.render_note(el)
         end
 
-        def render_bookmark(bookmark, **opts)
-          coordinator.render_bookmark(bookmark, **opts)
+        def render_bookmark(bookmark, **)
+          coordinator.render_bookmark(bookmark, **)
         end
 
         def render_image(image)
@@ -285,11 +289,11 @@ module Metanorma
           texts = node.text
           if texts.is_a?(Array)
             texts.each do |t|
-              if t.is_a?(String)
-                parts << escape_html(t)
-              else
-                parts << (render_inline_element(t) || "")
-              end
+              parts << if t.is_a?(String)
+                         escape_html(t)
+                       else
+                         render_inline_element(t) || ""
+                       end
             end
           elsif texts.is_a?(String)
             parts << escape_html(texts)
@@ -342,11 +346,11 @@ module Metanorma
 
               if val.is_a?(Array)
                 val.each do |v|
-                  if v.is_a?(Metanorma::Document::Components::Paragraphs::ParagraphBlock)
-                    parts << (coordinator.render_paragraph(v) || "")
-                  else
-                    parts << (render_inline_element(v) || "")
-                  end
+                  parts << if v.is_a?(Metanorma::Document::Components::Paragraphs::ParagraphBlock)
+                             coordinator.render_paragraph(v) || ""
+                           else
+                             render_inline_element(v) || ""
+                           end
                 end
               elsif val.is_a?(String)
                 parts << escape_html(val)
@@ -383,7 +387,8 @@ module Metanorma
             target = el["target"] || el["href"]
             if target
               display_text = target.delete_prefix("mailto:")
-              a = doc.document.create_element("a", display_text, "href" => target)
+              a = doc.document.create_element("a", display_text,
+                                              "href" => target)
               el.replace(a)
             else
               el.replace(el.children)
@@ -481,9 +486,8 @@ module Metanorma
           label = safe_attr(fn, :fn_label) || safe_attr(fn, :reference)
           return nil unless label
 
-          popup_parts = []
-          Array(fn.p).each do |para|
-            popup_parts << (render_mixed_inline(para) || "")
+          popup_parts = Array(fn.p).map do |para|
+            render_mixed_inline(para) || ""
           end
           popup_html = popup_parts.join
 
@@ -523,16 +527,16 @@ module Metanorma
             content = math_items.map { |m| m.content.to_s }.join
             unless content.empty?
               return render_liquid("_math_container.html.liquid", {
-                                      "data_attrs" => data_attrs,
-                                      "content" => content,
-                                    })
+                                     "data_attrs" => data_attrs,
+                                     "content" => content,
+                                   })
             end
           elsif ascii_items.any?
             text = escape_html(ascii_items.map { |a| a.text.to_s.strip }.join)
             return render_liquid("_stem_span.html.liquid", {
-                                    "data_attrs" => data_attrs,
-                                    "text" => text,
-                                  })
+                                   "data_attrs" => data_attrs,
+                                   "text" => text,
+                                 })
           end
           nil
         end
@@ -557,31 +561,31 @@ module Metanorma
 
               text = escape_html(coordinator.extract_text_value(math_val))
               return render_liquid("_stem_span.html.liquid", {
-                                      "data_attrs" => "",
-                                      "text" => text,
-                                    })
+                                     "data_attrs" => "",
+                                     "text" => text,
+                                   })
             elsif stem.asciimath
               text = escape_html(coordinator.extract_text_value(stem.asciimath))
               return render_liquid("_stem_span.html.liquid", {
-                                      "data_attrs" => "",
-                                      "text" => text,
-                                    })
+                                     "data_attrs" => "",
+                                     "text" => text,
+                                   })
             end
             if stem.latexmath
               text = escape_html(coordinator.extract_text_value(stem.latexmath))
               return render_liquid("_stem_span.html.liquid", {
-                                      "data_attrs" => "",
-                                      "text" => text,
-                                    })
+                                     "data_attrs" => "",
+                                     "text" => text,
+                                   })
             end
           end
 
           text = coordinator.extract_text_value(stem)
           unless text.empty?
             return render_liquid("_stem_span.html.liquid", {
-                                    "data_attrs" => "",
-                                    "text" => escape_html(text),
-                                  })
+                                   "data_attrs" => "",
+                                   "text" => escape_html(text),
+                                 })
           end
           nil
         end
@@ -595,7 +599,7 @@ module Metanorma
 
           method = coordinator.lookup_dispatch(element.class, :inline_registry)
           if method
-            public_send(method, element)
+            coordinator.public_send(method, element)
           elsif element.is_a?(Lutaml::Model::Serializable) && element.mixed?
             render_mixed_inline(element)
           end
@@ -604,16 +608,16 @@ module Metanorma
         def render_mixed_content_in_order(node)
           parts = []
           node.each_mixed_content do |child|
-            case child
-            when String
-              parts << escape_html(child)
-            else
-              if coordinator.block_element?(child)
-                parts << (coordinator.render(child) || "")
-              else
-                parts << (render_inline_element(child) || "")
-              end
-            end
+            parts << case child
+                     when String
+                       escape_html(child)
+                     else
+                       if coordinator.block_element?(child)
+                         coordinator.render(child) || ""
+                       else
+                         render_inline_element(child) || ""
+                       end
+                     end
           end
           parts.join
         end

@@ -19,9 +19,10 @@ module Metanorma
           @tastes << [model_class, publisher_abbrev, renderer_class]
         end
 
-        def generate(document, **_options)
+        def generate(document, raw_xml: nil, **_options)
           setup! unless @setup
-          renderer_for(document).new.generate_full_document(document)
+          renderer_for(document).new.generate_full_document(document,
+                                                            raw_xml: raw_xml)
         end
 
         def renderer_for(document)
