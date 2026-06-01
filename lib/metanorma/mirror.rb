@@ -21,123 +21,123 @@ module Metanorma
       # Paragraphs
       registry.register(
         Metanorma::Document::Components::Paragraphs::ParagraphBlock,
-        Handlers::Paragraph
+        Handlers::Paragraph,
       )
 
       # Blocks
       registry.register(
         Metanorma::Document::Components::Blocks::NoteBlock,
-        Handlers::Note
+        Handlers::Note,
       )
       registry.register(
         Metanorma::Document::Components::MultiParagraph::AdmonitionBlock,
-        Handlers::Admonition
+        Handlers::Admonition,
       )
       registry.register(
         Metanorma::Document::Components::AncillaryBlocks::ExampleBlock,
-        Handlers::Example
+        Handlers::Example,
       )
       registry.register(
         Metanorma::Document::Components::AncillaryBlocks::FigureBlock,
-        Handlers::Figure
+        Handlers::Figure,
       )
       registry.register(
         Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock,
-        Handlers::Sourcecode
+        Handlers::Sourcecode,
       )
       registry.register(
         Metanorma::Document::Components::AncillaryBlocks::FormulaBlock,
-        Handlers::Formula
+        Handlers::Formula,
       )
       registry.register(
         Metanorma::Document::Components::MultiParagraph::QuoteBlock,
-        Handlers::Quote
+        Handlers::Quote,
       )
       registry.register(
         Metanorma::Document::Components::Tables::TableBlock,
-        Handlers::Table
+        Handlers::Table,
       )
       registry.register(
         Metanorma::Document::Components::MultiParagraph::ReviewBlock,
-        Handlers::Review
+        Handlers::Review,
       )
 
       # Lists
       registry.register(
         Metanorma::Document::Components::Lists::UnorderedList,
         Handlers::List,
-        method_name: :bullet
+        method_name: :bullet,
       )
       registry.register(
         Metanorma::Document::Components::Lists::OrderedList,
         Handlers::List,
-        method_name: :ordered
+        method_name: :ordered,
       )
       registry.register(
         Metanorma::Document::Components::Lists::DefinitionList,
         Handlers::List,
-        method_name: :definition
+        method_name: :definition,
       )
       registry.register(
         Metanorma::Document::Components::Lists::ListItem,
         Handlers::List,
-        method_name: :list_item
+        method_name: :list_item,
       )
 
       # Sections
       registry.register(
         Metanorma::StandardDocument::Sections::ClauseSection,
         Handlers::Section,
-        method_name: :clause
+        method_name: :clause,
       )
       registry.register(
         Metanorma::StandardDocument::Sections::AnnexSection,
         Handlers::Section,
-        method_name: :annex
+        method_name: :annex,
       )
       registry.register(
         Metanorma::StandardDocument::Sections::ContentSection,
         Handlers::Section,
-        method_name: :content_section
+        method_name: :content_section,
       )
       registry.register(
         Metanorma::StandardDocument::Sections::TermsSection,
         Handlers::Section,
-        method_name: :terms
+        method_name: :terms,
       )
       registry.register(
         Metanorma::StandardDocument::Sections::DefinitionSection,
         Handlers::Section,
-        method_name: :definitions
+        method_name: :definitions,
       )
       registry.register(
         Metanorma::StandardDocument::Sections::StandardReferencesSection,
         Handlers::Section,
-        method_name: :references
+        method_name: :references,
       )
 
       # Structural containers
       registry.register(
         Metanorma::StandardDocument::Sections::Preface,
         Handlers::Structural,
-        method_name: :preface
+        method_name: :preface,
       )
       registry.register(
         Metanorma::StandardDocument::Sections::Sections,
         Handlers::Structural,
-        method_name: :sections
+        method_name: :sections,
       )
       registry.register(
         Metanorma::StandardDocument::Sections::BibliographySection,
         Handlers::Structural,
-        method_name: :bibliography
+        method_name: :bibliography,
       )
 
       # Floating title
       registry.register(
         Metanorma::StandardDocument::Sections::FloatingTitle,
         Handlers::Section,
-        method_name: :floating_title
+        method_name: :floating_title,
       )
 
       registry

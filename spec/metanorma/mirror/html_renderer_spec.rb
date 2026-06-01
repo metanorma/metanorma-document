@@ -19,7 +19,10 @@ RSpec.describe Metanorma::Mirror::Output::HtmlRenderer do
 
   describe "#render" do
     context "paragraph" do
-      let(:guide) { build_guide({ "type" => "paragraph", "content" => [text_node("Hello world")] }) }
+      let(:guide) do
+        build_guide({ "type" => "paragraph",
+                      "content" => [text_node("Hello world")] })
+      end
 
       it "renders a paragraph with text" do
         html = renderer.render
@@ -30,10 +33,10 @@ RSpec.describe Metanorma::Mirror::Output::HtmlRenderer do
     context "paragraph with id" do
       let(:guide) do
         build_guide({
-          "type" => "paragraph",
-          "attrs" => { "id" => "p1" },
-          "content" => [text_node("text")],
-        })
+                      "type" => "paragraph",
+                      "attrs" => { "id" => "p1" },
+                      "content" => [text_node("text")],
+                    })
       end
 
       it "includes id attribute" do
@@ -45,17 +48,19 @@ RSpec.describe Metanorma::Mirror::Output::HtmlRenderer do
     context "clause with title and children" do
       let(:guide) do
         build_guide({
-          "type" => "clause",
-          "attrs" => { "id" => "s1", "title" => "Scope", "number" => "1" },
-          "content" => [
-            { "type" => "paragraph", "content" => [text_node("Content here")] },
-          ],
-        })
+                      "type" => "clause",
+                      "attrs" => { "id" => "s1", "title" => "Scope",
+                                   "number" => "1" },
+                      "content" => [
+                        { "type" => "paragraph",
+                          "content" => [text_node("Content here")] },
+                      ],
+                    })
       end
 
       it "renders section with heading" do
         html = renderer.render
-        html.should include('<section')
+        html.should include("<section")
         html.should include("mn-clause")
         html.should include("1 Scope")
         html.should include('<p class="mn-paragraph">Content here</p>')
@@ -65,12 +70,14 @@ RSpec.describe Metanorma::Mirror::Output::HtmlRenderer do
     context "bullet list" do
       let(:guide) do
         build_guide({
-          "type" => "bullet_list",
-          "content" => [
-            { "type" => "list_item", "content" => [text_node("Item 1")] },
-            { "type" => "list_item", "content" => [text_node("Item 2")] },
-          ],
-        })
+                      "type" => "bullet_list",
+                      "content" => [
+                        { "type" => "list_item",
+                          "content" => [text_node("Item 1")] },
+                        { "type" => "list_item",
+                          "content" => [text_node("Item 2")] },
+                      ],
+                    })
       end
 
       it "renders unordered list" do
@@ -85,11 +92,12 @@ RSpec.describe Metanorma::Mirror::Output::HtmlRenderer do
     context "ordered list" do
       let(:guide) do
         build_guide({
-          "type" => "ordered_list",
-          "content" => [
-            { "type" => "list_item", "content" => [text_node("First")] },
-          ],
-        })
+                      "type" => "ordered_list",
+                      "content" => [
+                        { "type" => "list_item",
+                          "content" => [text_node("First")] },
+                      ],
+                    })
       end
 
       it "renders ordered list" do
@@ -102,33 +110,35 @@ RSpec.describe Metanorma::Mirror::Output::HtmlRenderer do
     context "table" do
       let(:guide) do
         build_guide({
-          "type" => "table",
-          "attrs" => { "id" => "t1", "title" => "Table 1" },
-          "content" => [
-            {
-              "type" => "table_head",
-              "content" => [
-                {
-                  "type" => "table_row",
-                  "content" => [
-                    { "type" => "table_cell", "content" => [text_node("Header")] },
-                  ],
-                },
-              ],
-            },
-            {
-              "type" => "table_body",
-              "content" => [
-                {
-                  "type" => "table_row",
-                  "content" => [
-                    { "type" => "table_cell", "content" => [text_node("Cell")] },
-                  ],
-                },
-              ],
-            },
-          ],
-        })
+                      "type" => "table",
+                      "attrs" => { "id" => "t1", "title" => "Table 1" },
+                      "content" => [
+                        {
+                          "type" => "table_head",
+                          "content" => [
+                            {
+                              "type" => "table_row",
+                              "content" => [
+                                { "type" => "table_cell",
+                                  "content" => [text_node("Header")] },
+                              ],
+                            },
+                          ],
+                        },
+                        {
+                          "type" => "table_body",
+                          "content" => [
+                            {
+                              "type" => "table_row",
+                              "content" => [
+                                { "type" => "table_cell",
+                                  "content" => [text_node("Cell")] },
+                              ],
+                            },
+                          ],
+                        },
+                      ],
+                    })
       end
 
       it "renders table with thead and tbody" do
@@ -144,12 +154,13 @@ RSpec.describe Metanorma::Mirror::Output::HtmlRenderer do
     context "admonition" do
       let(:guide) do
         build_guide({
-          "type" => "admonition",
-          "attrs" => { "type" => "warning" },
-          "content" => [
-            { "type" => "paragraph", "content" => [text_node("Be careful")] },
-          ],
-        })
+                      "type" => "admonition",
+                      "attrs" => { "type" => "warning" },
+                      "content" => [
+                        { "type" => "paragraph",
+                          "content" => [text_node("Be careful")] },
+                      ],
+                    })
       end
 
       it "renders admonition with type" do
@@ -163,9 +174,10 @@ RSpec.describe Metanorma::Mirror::Output::HtmlRenderer do
     context "sourcecode" do
       let(:guide) do
         build_guide({
-          "type" => "sourcecode",
-          "attrs" => { "language" => "ruby", "text" => "puts 'hello'" },
-        })
+                      "type" => "sourcecode",
+                      "attrs" => { "language" => "ruby",
+                                   "text" => "puts 'hello'" },
+                    })
       end
 
       it "renders code block with language" do
@@ -179,12 +191,14 @@ RSpec.describe Metanorma::Mirror::Output::HtmlRenderer do
     context "figure" do
       let(:guide) do
         build_guide({
-          "type" => "figure",
-          "attrs" => { "title" => "My figure" },
-          "content" => [
-            { "type" => "image", "attrs" => { "src" => "img.png", "alt" => "alt text" } },
-          ],
-        })
+                      "type" => "figure",
+                      "attrs" => { "title" => "My figure" },
+                      "content" => [
+                        { "type" => "image",
+                          "attrs" => { "src" => "img.png",
+                                       "alt" => "alt text" } },
+                      ],
+                    })
       end
 
       it "renders figure with image and caption" do
@@ -198,14 +212,14 @@ RSpec.describe Metanorma::Mirror::Output::HtmlRenderer do
     context "definition list" do
       let(:guide) do
         build_guide({
-          "type" => "dl",
-          "content" => [
-            { "type" => "dt", "content" => [text_node("term1")] },
-            { "type" => "dd", "content" => [
-              { "type" => "paragraph", "content" => [text_node("definition")] },
-            ] },
-          ],
-        })
+                      "type" => "dl",
+                      "content" => [
+                        { "type" => "dt", "content" => [text_node("term1")] },
+                        { "type" => "dd", "content" => [
+                          { "type" => "paragraph", "content" => [text_node("definition")] },
+                        ] },
+                      ],
+                    })
       end
 
       it "renders definition list" do
@@ -220,9 +234,9 @@ RSpec.describe Metanorma::Mirror::Output::HtmlRenderer do
   describe "inline marks" do
     def render_inline(marks)
       guide = build_guide({
-        "type" => "paragraph",
-        "content" => [text_node("text", marks)],
-      })
+                            "type" => "paragraph",
+                            "content" => [text_node("text", marks)],
+                          })
       described_class.new(guide).render
     end
 
@@ -242,7 +256,8 @@ RSpec.describe Metanorma::Mirror::Output::HtmlRenderer do
     end
 
     it "renders link mark" do
-      html = render_inline([{ "type" => "link", "attrs" => { "href" => "https://example.com" } }])
+      html = render_inline([{ "type" => "link",
+                              "attrs" => { "href" => "https://example.com" } }])
       html.should include('<a href="https://example.com">text</a>')
     end
 
@@ -260,9 +275,9 @@ RSpec.describe Metanorma::Mirror::Output::HtmlRenderer do
   describe "XSS escaping" do
     it "escapes HTML in text content" do
       guide = build_guide({
-        "type" => "paragraph",
-        "content" => [text_node('<script>alert("xss")</script>')],
-      })
+                            "type" => "paragraph",
+                            "content" => [text_node('<script>alert("xss")</script>')],
+                          })
       html = described_class.new(guide).render
       html.should_not include("<script>")
       html.should include("&lt;script&gt;")
@@ -270,19 +285,19 @@ RSpec.describe Metanorma::Mirror::Output::HtmlRenderer do
 
     it "escapes HTML in attrs" do
       guide = build_guide({
-        "type" => "paragraph",
-        "attrs" => { "id" => '">"><script>' },
-        "content" => [text_node("text")],
-      })
+                            "type" => "paragraph",
+                            "attrs" => { "id" => '">"><script>' },
+                            "content" => [text_node("text")],
+                          })
       html = described_class.new(guide).render
       html.should_not include("<script>")
     end
 
     it "escapes sourcecode text" do
       guide = build_guide({
-        "type" => "sourcecode",
-        "attrs" => { "text" => '<img onerror="alert(1)">' },
-      })
+                            "type" => "sourcecode",
+                            "attrs" => { "text" => '<img onerror="alert(1)">' },
+                          })
       html = described_class.new(guide).render
       html.should include("&lt;img")
       html.should include("&quot;alert(1)&quot;")
@@ -300,7 +315,8 @@ RSpec.describe Metanorma::Mirror::Output::HtmlRenderer do
       described_class.register_node_renderer("custom_type", ->(node, renderer) {
         "<div class=\"custom\">#{renderer.send(:e, node.dig('attrs', 'value'))}</div>"
       })
-      guide = build_guide({ "type" => "custom_type", "attrs" => { "value" => "test" } })
+      guide = build_guide({ "type" => "custom_type",
+                            "attrs" => { "value" => "test" } })
       html = described_class.new(guide).render
       html.should include('<div class="custom">test</div>')
     end
@@ -310,9 +326,10 @@ RSpec.describe Metanorma::Mirror::Output::HtmlRenderer do
         "<mark>#{text}</mark>"
       })
       guide = build_guide({
-        "type" => "paragraph",
-        "content" => [text_node("hi", [{ "type" => "custom_mark" }])],
-      })
+                            "type" => "paragraph",
+                            "content" => [text_node("hi",
+                                                    [{ "type" => "custom_mark" }])],
+                          })
       html = described_class.new(guide).render
       html.should include("<mark>hi</mark>")
     end

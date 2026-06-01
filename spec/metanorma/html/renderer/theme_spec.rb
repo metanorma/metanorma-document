@@ -50,7 +50,8 @@ RSpec.describe Metanorma::Html::Theme do
       end
     end
 
-    %i[iso iec ieee ietf itu iho ogc bipm cc icc oiml ribose pdfa].each do |flavor|
+    %i[iso iec ieee ietf itu iho ogc bipm cc icc oiml ribose
+       pdfa].each do |flavor|
       context "#{flavor} flavor" do
         let(:theme) { described_class.load(flavor) }
 
@@ -180,7 +181,8 @@ RSpec.describe Metanorma::Html::Theme do
 
   describe "section ordering defaults" do
     it "has default preface_order" do
-      theme.preface_order.should eq(%w[foreword introduction abstract clause acknowledgements executivesummary])
+      theme.preface_order.should eq(%w[foreword introduction abstract clause
+                                       acknowledgements executivesummary])
     end
 
     it "has default clause_order" do
@@ -188,7 +190,7 @@ RSpec.describe Metanorma::Html::Theme do
     end
 
     it "has preface_wrap false by default" do
-      theme.preface_wrap.should eq(false)
+      theme.preface_wrap.should be(false)
     end
 
     it "has empty toc_filter_types by default" do
@@ -204,7 +206,7 @@ RSpec.describe Metanorma::Html::Theme do
     end
 
     it "has preface_wrap enabled" do
-      theme.preface_wrap.should eq(true)
+      theme.preface_wrap.should be(true)
     end
 
     it "filters toc clause types" do
@@ -217,7 +219,13 @@ RSpec.describe Metanorma::Html::Theme do
   end
 
   describe "directory-based theme loading" do
-    let(:tmpdir) { File.join(Dir.tmpdir, "metanorma_theme_test_#{Process.pid}") }
+    let(:tmpdir) do
+      File.join(Dir.tmpdir, "metanorma_theme_test_#{Process.pid}")
+    end
+    let(:theme) do
+      stub_const("Metanorma::Html::Theme::THEMES_DIR", tmpdir)
+      described_class.load(:testflavor)
+    end
 
     before do
       FileUtils.mkdir_p(File.join(tmpdir, "testflavor", "templates"))
@@ -243,11 +251,6 @@ RSpec.describe Metanorma::Html::Theme do
       FileUtils.rm_rf(tmpdir)
     end
 
-    let(:theme) do
-      stub_const("Metanorma::Html::Theme::THEMES_DIR", tmpdir)
-      described_class.load(:testflavor)
-    end
-
     it "loads from directory" do
       theme.should_not be_nil
     end
@@ -261,20 +264,24 @@ RSpec.describe Metanorma::Html::Theme do
     end
 
     it "exposes theme_templates_dir" do
-      theme.theme_templates_dir.should eq(File.join(tmpdir, "testflavor", "templates"))
+      theme.theme_templates_dir.should eq(File.join(tmpdir, "testflavor",
+                                                    "templates"))
     end
 
     it "exposes theme_assets_dir" do
-      theme.theme_assets_dir.should eq(File.join(tmpdir, "testflavor", "assets"))
+      theme.theme_assets_dir.should eq(File.join(tmpdir, "testflavor",
+                                                 "assets"))
     end
 
     it "exposes theme_css_path" do
-      theme.theme_css_path.should eq(File.join(tmpdir, "testflavor", "custom.css"))
+      theme.theme_css_path.should eq(File.join(tmpdir, "testflavor",
+                                               "custom.css"))
     end
 
     it "resolves flavor-specific template" do
       path = theme.resolve_template("_custom.html.liquid")
-      path.should eq(File.join(tmpdir, "testflavor", "templates", "_custom.html.liquid"))
+      path.should eq(File.join(tmpdir, "testflavor", "templates",
+                               "_custom.html.liquid"))
     end
 
     it "falls back to shared templates for unknown template" do
@@ -298,7 +305,7 @@ RSpec.describe Metanorma::Html::Theme do
 
     it "loads section ordering from directory theme" do
       theme.preface_order.should eq(%w[introduction clause])
-      theme.preface_wrap.should eq(true)
+      theme.preface_wrap.should be(true)
     end
   end
 
@@ -349,8 +356,9 @@ RSpec.describe Metanorma::Html::Theme do
     end
 
     it "has collection flag on array attributes" do
-      [:publishers, :preface_order, :clause_order, :toc_filter_types].each do |name|
-        described_class.attributes[name].collection?.should eq(true)
+      %i[publishers preface_order clause_order
+         toc_filter_types].each do |name|
+        described_class.attributes[name].collection?.should be(true)
       end
     end
 
@@ -360,7 +368,7 @@ RSpec.describe Metanorma::Html::Theme do
     end
 
     it "has string type for color attributes" do
-      [:primary, :accent, :note_bg, :dark_border].each do |name|
+      %i[primary accent note_bg dark_border].each do |name|
         described_class.attributes[name].type.should eq(Lutaml::Model::Type::String)
       end
     end
@@ -382,7 +390,7 @@ RSpec.describe Metanorma::Html::Theme do
       theme.accent.should eq("#ff6600")
       theme.publishers.should eq(["ISO"])
       theme.logos.should eq({ "ISO" => "iso-logo.svg" })
-      theme.preface_wrap.should eq(true)
+      theme.preface_wrap.should be(true)
       theme.toc_filter_types.should eq(["toc"])
       theme.text_color.should eq("#1a1a2e")
     end
@@ -392,7 +400,7 @@ RSpec.describe Metanorma::Html::Theme do
       theme = described_class.from_yaml(yaml)
       theme.primary.should eq("#ff0000")
       theme.accent.should eq("#9C60C1")
-      theme.preface_wrap.should eq(false)
+      theme.preface_wrap.should be(false)
       theme.publishers.should eq([])
       theme.toc_filter_types.should eq([])
     end

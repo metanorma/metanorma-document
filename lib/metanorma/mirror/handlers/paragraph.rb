@@ -16,7 +16,8 @@ module Metanorma
           attrs[:id] = SafeAttr.read(element, :id)
           attrs[:alignment] = SafeAttr.read(element, :alignment)
           attrs[:keep_with_next] = SafeAttr.read(element, :keep_with_next)
-          attrs[:keep_with_previous] = SafeAttr.read(element, :keep_with_previous)
+          attrs[:keep_with_previous] =
+            SafeAttr.read(element, :keep_with_previous)
           attrs[:semx_id] = SafeAttr.read(element, :semx_id)
           attrs.compact
         end

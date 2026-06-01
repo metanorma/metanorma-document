@@ -8,7 +8,8 @@ module Metanorma
         autoload :AdmonitionType, "#{__dir__}/multi_paragraph/admonition_type"
         autoload :ParagraphsBlock, "#{__dir__}/multi_paragraph/paragraphs_block"
         autoload :QuoteBlock, "#{__dir__}/multi_paragraph/quote_block"
-        autoload :QuoteAuthorElement, "#{__dir__}/multi_paragraph/quote_author_element"
+        autoload :QuoteAuthorElement,
+                 "#{__dir__}/multi_paragraph/quote_author_element"
         autoload :ReviewBlock, "#{__dir__}/multi_paragraph/review_block"
       end
     end

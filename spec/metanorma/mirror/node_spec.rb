@@ -21,7 +21,7 @@ RSpec.describe Metanorma::Mirror::Node do
     end
 
     it "maps each type to a Node subclass" do
-      described_class::NODES.each do |_type, klass|
+      described_class::NODES.each_value do |klass|
         klass.should be < described_class
       end
     end

@@ -38,7 +38,8 @@ module Metanorma
                  when Proc
                    entry.handler.call(model_element, context)
                  else
-                   entry.handler.public_send(entry.method_name, model_element, **kwargs)
+                   entry.handler.public_send(entry.method_name, model_element,
+                                             **kwargs)
                  end
 
         [result, entry.concat]
@@ -49,7 +50,7 @@ module Metanorma
       def ancestor_entry(model_element)
         model_element.class.ancestors.each do |ancestor|
           next if ancestor == model_element.class
-          break if ancestor == Lutaml::Model::Serializable || ancestor == Object
+          break if [Lutaml::Model::Serializable, Object].include?(ancestor)
 
           entry = @handlers[ancestor]
           return entry if entry

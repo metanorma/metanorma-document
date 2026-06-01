@@ -127,7 +127,7 @@ RSpec.describe Metanorma::Html::BaseRenderer do
     it "renders present child collections via the mapped method" do
       model = Struct.new(:paragraphs, :ul, :ol).new(nil, [ul_model], nil)
       output = renderer.render_block_children(model,
-                                               children: { ul: :render_unordered_list })
+                                              children: { ul: :render_unordered_list })
       output.should include("<ul>")
       output.should include("<li>")
     end
@@ -135,7 +135,7 @@ RSpec.describe Metanorma::Html::BaseRenderer do
     it "skips nil child collections" do
       model = Struct.new(:paragraphs, :ul).new(nil, nil)
       output = renderer.render_block_children(model,
-                                               children: { paragraphs: :render_paragraph })
+                                              children: { paragraphs: :render_paragraph })
       output.should be_empty
     end
   end
