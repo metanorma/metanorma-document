@@ -109,4 +109,7 @@
 .reading-mode .cover-stage {
   animation: none;
 }
+.reading-mode .doc-footer {
+  grid-column: 1 !important;
+}
 

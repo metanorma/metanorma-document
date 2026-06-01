@@ -36,15 +36,11 @@ extra_css: |
   mark.search-match.search-current { background: #00b1ff; color: #fff; }
   [data-theme="dark"] .sourcecode pre { background: #060e18; border-color: #0d2030; }
 
-# Logo transforms
-logo_white_fills:
-  "OGC": ["#00b1ff"]
-
 # Publisher metadata
 publishers:
   - "OGC"
 publisher_name: "OGC"
-logos:
+logos_light:
   "OGC": "ogc-logo.svg"
 
 # Section ordering

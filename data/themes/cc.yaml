@@ -30,7 +30,7 @@ cover_separator_color: "rgba(0,120,212,0.25)"
 publishers:
   - "CalConnect"
 publisher_name: "CalConnect"
-logos: {}
+logos_light: {}
 
 # Section ordering
 preface_order:

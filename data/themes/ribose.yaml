@@ -30,7 +30,7 @@ cover_separator_color: "rgba(124,58,237,0.25)"
 publishers:
   - "Ribose"
 publisher_name: "Ribose"
-logos: {}
+logos_light: {}
 
 # Section ordering
 preface_order:

@@ -32,12 +32,27 @@
 .brand-logo {
   display: inline-flex; align-items: center; justify-content: center;
   height: 26px; border-radius: var(--radius-sm); overflow: hidden;
-  margin-left: 0.3em; background: rgba(255,255,255,0.12);
+  margin-left: 0.3em; background: rgba(255,255,255,0.95);
   padding: 0 0.3em; flex-shrink: 0;
 }
 .brand-logo svg { height: 22px; width: auto; max-width: none; }
-.brand-logo svg path { fill: #fff; }
 .brand-logo + .brand-logo { margin-left: 0.2em; }
+
+/* Light/dark logo switching */
+.brand-logo-dark { display: none !important; }
+.brand-logo-light { display: inline-flex; }
+[data-theme="dark"] .brand-logo-light,
+[data-theme="oled"] .brand-logo-light { display: none !important; }
+[data-theme="dark"] .brand-logo-dark,
+[data-theme="oled"] .brand-logo-dark { display: inline-flex !important; }
+
+/* Cover logo light/dark switching */
+.cover-logo-dark { display: none !important; }
+.cover-logo-light { display: inline-flex; }
+[data-theme="dark"] .cover-logo-light,
+[data-theme="oled"] .cover-logo-light { display: none !important; }
+[data-theme="dark"] .cover-logo-dark,
+[data-theme="oled"] .cover-logo-dark { display: inline-flex !important; }
 .header-doc-id {
   font-family: var(--font-sans); font-size: 0.82em; opacity: 0.85;
   font-weight: 600; letter-spacing: 0.02em;

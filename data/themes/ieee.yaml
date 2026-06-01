@@ -30,7 +30,7 @@ cover_separator_color: "rgba(0,153,204,0.25)"
 publishers:
   - "IEEE"
 publisher_name: "IEEE"
-logos: {}
+logos_light: {}
 
 # Section ordering
 preface_order:

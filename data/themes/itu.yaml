@@ -31,7 +31,7 @@ cover_separator_color: "rgba(14,153,213,0.25)"
 publishers:
   - "ITU"
 publisher_name: "ITU"
-logos:
+logos_light:
   "ITU": "itu-logo.svg"
 
 # Section ordering

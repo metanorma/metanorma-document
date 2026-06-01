@@ -1,36 +1,49 @@
-primary: "#1a5c3a"
-accent: "#2e8b57"
-accent_deep: "#247049"
-gradient: "linear-gradient(135deg, #0d3d22 0%, #1a5c3a 50%, #2e8b57 100%)"
-primary_light: "#edf7f1"
-accent_light: "#e0f5e8"
+primary: "#004996"
+accent: "#194780"
+accent_deep: "#003a78"
+gradient: "linear-gradient(135deg, #002d5a 0%, #004996 50%, #1a6bcc 100%)"
+primary_light: "#edf3fa"
+accent_light: "#e0ecf8"
 warm: "#d4a017"
 warm_light: "#fdf6e8"
-font_body: '"Merriweather", "Georgia", serif'
-font_sans: '"Montserrat", "Helvetica Neue", Arial, sans-serif'
+font_body: "'Futura PT Book', 'Montserrat', 'Helvetica Neue', Arial, sans-serif"
+font_sans: "'Futura PT Demi', 'Montserrat', 'Helvetica Neue', Arial, sans-serif"
 font_mono: '"JetBrains Mono", "Fira Code", monospace'
-font_url: "https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Montserrat:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-header_background: "linear-gradient(135deg, #0d3d22 0%, #1a5c3a 50%, #2e8b57 100%)"
-cover_background: "linear-gradient(175deg, #071f14 0%, #0d3d22 30%, #1a5c3a 65%, #2e8b57 100%)"
-cover_before_bg: "background: radial-gradient(ellipse at 30% 20%, rgba(46,139,87,0.2) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(212,160,23,0.15) 0%, transparent 40%)"
+font_url: "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+header_background: "linear-gradient(135deg, #002d5a 0%, #004996 50%, #1a6bcc 100%)"
+cover_background: "linear-gradient(175deg, #001a3a 0%, #002d5a 25%, #004996 55%, #1a6bcc 85%, #d4a017 100%)"
+cover_before_bg: "background: radial-gradient(ellipse at 25% 20%, rgba(26,107,204,0.15) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(0,73,150,0.2) 0%, transparent 40%)"
 cover_after_bg: "height: 3px; background: linear-gradient(90deg, transparent, #d4a017, transparent)"
-progress_bar_color: "#2e8b57"
-note_border: "#2e8b57"
-note_bg: "#e0f5e8"
-note_color: "#2e8b57"
-example_border: "#1a5c3a"
-example_bg: "#edf7f1"
-example_color: "#1a5c3a"
+progress_bar_color: "#004996"
+note_border: "#1a6bcc"
+note_bg: "#e0ecf8"
+note_color: "#1a6bcc"
+example_border: "#004996"
+example_bg: "#edf3fa"
+example_color: "#004996"
 admonition_border: "#d4a017"
 admonition_color: "#d4a017"
-footer_border_color: "#2e8b57"
-cover_separator_color: "rgba(46,139,87,0.25)"
+footer_border_color: "#004996"
+cover_separator_color: "rgba(0,73,150,0.25)"
 
 # Publisher metadata
 publishers:
   - "OIML"
 publisher_name: "OIML"
-logos: {}
+logos_light:
+  OIML: "oiml-logo-icon-light.svg"
+logos_dark:
+  OIML: "oiml-logo-icon-dark.svg"
+
+# Doctype labels (OIML uses doc ID prefix to determine type)
+doctype_labels:
+  "R": "International Recommendation"
+  "G": "International Guide"
+  "D": "International Document"
+  "B": "International Basic Publication"
+  "E": "Expert Report"
+  "V": "Vocabulary"
+  "S": "Seminar Report"
 
 # Section ordering
 preface_order:

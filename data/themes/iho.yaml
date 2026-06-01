@@ -32,7 +32,7 @@ cover_separator_color: "rgba(0,170,169,0.3)"
 publishers:
   - "IHO"
 publisher_name: "IHO"
-logos:
+logos_light:
   "IHO": "iho-logo.svg"
 
 # Section ordering
