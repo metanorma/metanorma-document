@@ -2,8 +2,8 @@
 
 module Metanorma
   module Html
-    # IEC brand: #0061a9 blue from logo
     class IecRenderer < IsoRenderer
+      register_render Metanorma::IecDocument::Root, :render_document
     end
   end
 end

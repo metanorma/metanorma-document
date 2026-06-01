@@ -2,9 +2,8 @@
 
 module Metanorma
   module Html
-    # Renders IeeeDocument components to HTML.
-    # Extends IsoRenderer with IEEE branding.
     class IeeeRenderer < IsoRenderer
+      register_render Metanorma::IeeeDocument::Root, :render_document
     end
   end
 end

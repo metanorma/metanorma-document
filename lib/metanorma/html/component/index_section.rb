@@ -7,24 +7,28 @@ module Metanorma
         def render(collector, **_opts)
           return if collector.nil? || collector.empty?
 
-          output << tag(:div,
-                        %( id="index" class="index-section" data-component="index")) do
-            html = tag(:h2) { "Index" }
-            html << render_quicknav(collector.sorted_groups)
-            html << render_letter_groups(collector.sorted_groups)
-            html
-          end
+          quicknav = render_quicknav(collector.sorted_groups)
+          letter_groups = render_letter_groups(collector.sorted_groups)
+          content = quicknav + letter_groups
+
+          attrs = %( id="index" class="index-section" data-component="index")
+          index_html = render_liquid("_element.html.liquid", "tag" => "div",
+                                                             "extra_attrs" => attrs, "content" => content)
 
           renderer.register_toc_entry(id: "index", level: 1, text: "Index")
+          index_html
         end
 
         private
 
         def render_quicknav(groups)
           links = groups.filter_map do |g|
-            %(<a href="#index-letter-#{escape_html(g.letter)}">#{escape_html(g.letter)}</a>)
+            letter = escape_html(g.letter)
+            render_liquid("_link.html.liquid",
+                          "attrs" => %( href="#index-letter-#{letter}"), "display_text" => letter)
           end.join
-          %(<div class="index-quicknav">#{links}</div>)
+          render_liquid("_element.html.liquid", "tag" => "div",
+                                                "extra_attrs" => " class=\"index-quicknav\"", "content" => links)
         end
 
         def render_letter_groups(groups)
@@ -32,54 +36,48 @@ module Metanorma
         end
 
         def render_letter_group(group)
-          tag(:div,
-              %( class="index-letter-group" id="index-letter-#{escape_html(group.letter)}")) do
-            html = tag(:h3, %( class="index-letter")) { group.letter }
-            html << group.entries.map { |e| render_entry(e, "primary") }.join
-            html
-          end
+          letter = escape_html(group.letter)
+          heading = render_liquid("_heading.html.liquid", "tag" => "h3",
+                                                          "class_attr" => " class=\"index-letter\"", "content" => letter)
+          entries = group.entries.map { |e| render_entry(e, "primary") }.join
+          render_liquid("_element.html.liquid", "tag" => "div",
+                                                "extra_attrs" => %( class="index-letter-group" id="index-letter-#{letter}"), "content" => "#{heading}#{entries}")
         end
 
         def render_entry(entry, level)
-          tag(:div, %( class="index-entry index-entry--#{level}")) do
-            html = +""
-            html << tag(:span, %( class="index-term")) do
-              escape_html(entry.term)
-            end
-            html << render_locators(entry.locators)
-            html << render_see(entry.see) if entry.see
-            html << render_see_also(entry.see_also_entries) unless entry.see_also_entries.empty?
-            unless entry.children.empty?
-              html << entry.children.map { |c|
-                render_entry(c, next_level(level))
-              }.join
-            end
-            html
+          term_html = render_liquid("_element.html.liquid", "tag" => "span",
+                                                            "extra_attrs" => " class=\"index-term\"", "content" => escape_html(entry.term))
+          locators_html = render_locators(entry.locators)
+          inner = term_html + locators_html
+          inner << render_see(entry.see) if entry.see
+          inner << render_see_also(entry.see_also_entries) unless entry.see_also_entries.empty?
+          unless entry.children.empty?
+            inner << entry.children.map { |c|
+              render_entry(c, next_level(level))
+            }.join
           end
+          render_liquid("_element.html.liquid", "tag" => "div",
+                                                "extra_attrs" => %( class="index-entry index-entry--#{level}"), "content" => inner)
         end
 
         def render_locators(locators)
           links = locators.map do |loc|
-            tag(:a, %( href="##{escape_html(loc.id)}")) do
-              escape_html(loc.text)
-            end
-          end
-          tag(:span, %( class="index-locator")) { links.join(", ") }
+            render_liquid("_link.html.liquid",
+                          "attrs" => %( href="##{escape_html(loc.id)}"), "display_text" => escape_html(loc.text))
+          end.join(", ")
+          render_liquid("_element.html.liquid", "tag" => "span",
+                                                "extra_attrs" => " class=\"index-locator\"", "content" => links)
         end
 
         def render_see(term)
-          tag(:div, %( class="index-see")) do
-            "<em>see</em> #{escape_html(term)}"
-          end
+          render_liquid("_element.html.liquid", "tag" => "div",
+                                                "extra_attrs" => " class=\"index-see\"", "content" => "<em>see</em> #{escape_html(term)}")
         end
 
         def render_see_also(terms)
-          tag(:div,
-              %( class="index-see-also")) do
-            "<em>see also</em> #{terms.map do |t|
-              escape_html(t)
-            end.join(', ')}"
-          end
+          text = terms.map { |t| escape_html(t) }.join(", ")
+          render_liquid("_element.html.liquid", "tag" => "div",
+                                                "extra_attrs" => " class=\"index-see-also\"", "content" => "<em>see also</em> #{text}")
         end
 
         def next_level(level)

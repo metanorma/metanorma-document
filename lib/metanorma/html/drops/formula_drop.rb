@@ -28,17 +28,22 @@ module Metanorma
             if formula.key.dl
               where_parts << (renderer.render_definition_list(formula.key.dl) || "")
             end
-            formula.key.p&.each { |para| where_parts << (renderer.render_paragraph(para) || "") }
+            formula.key.p&.each do |para|
+              where_parts << (renderer.render_paragraph(para) || "")
+            end
           end
-          formula.dl&.then { |dl| where_parts << (renderer.render_definition_list(dl) || "") }
+          formula.dl&.then do |dl|
+            where_parts << (renderer.render_definition_list(dl) || "")
+          end
           formula.p&.each do |para|
             next if renderer.safe_attr(para, :keep_with_next)
+
             where_parts << (renderer.render_paragraph(para) || "")
           end
           where_html = where_parts.join
 
           needs_where_label = !formula.key.nil? || !formula.dl.nil? ||
-                              has_where_paragraph?(formula, renderer)
+            has_where_paragraph?(formula, renderer)
 
           name_el = renderer.safe_attr(formula,
                                        :fmt_name) || renderer.safe_attr(
@@ -62,7 +67,9 @@ module Metanorma
           private
 
           def has_where_paragraph?(formula, renderer)
-            Array(formula.p).any? { |para| renderer.safe_attr(para, :keep_with_next) }
+            Array(formula.p).any? do |para|
+              renderer.safe_attr(para, :keep_with_next)
+            end
           end
         end
       end

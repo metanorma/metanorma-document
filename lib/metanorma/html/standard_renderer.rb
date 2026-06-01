@@ -92,7 +92,8 @@ module Metanorma
         attrs = element_attrs(id: safe_attr(section, :id))
         parts = []
         if title_class
-          parts << (render_standard_title(section, level, default_class: title_class) || "")
+          parts << (render_standard_title(section, level,
+                                          default_class: title_class) || "")
         else
           parts << (render_standard_title(section, level) || "")
         end
@@ -162,9 +163,15 @@ module Metanorma
       def render_term(term, **_opts)
         attrs = element_attrs(id: safe_attr(term, :id))
         parts = []
-        term.preferred&.each { |d| parts << (render_term_designation(d, "preferred") || "") }
-        term.admitted&.each { |d| parts << (render_term_designation(d, "admitted") || "") }
-        term.deprecates&.each { |d| parts << (render_term_designation(d, "deprecated") || "") }
+        term.preferred&.each do |d|
+          parts << (render_term_designation(d, "preferred") || "")
+        end
+        term.admitted&.each do |d|
+          parts << (render_term_designation(d, "admitted") || "")
+        end
+        term.deprecates&.each do |d|
+          parts << (render_term_designation(d, "deprecated") || "")
+        end
 
         if term.domain
           domain_text = if term.domain.is_a?(String)
@@ -180,7 +187,9 @@ module Metanorma
         end
 
         if term.definition
-          Array(term.definition).each { |defn| parts << (render_term_definition(defn) || "") }
+          Array(term.definition).each do |defn|
+            parts << (render_term_definition(defn) || "")
+          end
         end
 
         term.note&.each_with_index do |note, i|
@@ -209,8 +218,12 @@ module Metanorma
         return nil unless name
 
         inner = escape_html(name)
-        dfn = render_liquid("_element.html.liquid", { "tag" => "dfn", "extra_attrs" => "", "content" => inner })
-        bold = render_liquid("_element.html.liquid", { "tag" => "b", "extra_attrs" => "", "content" => dfn })
+        dfn = render_liquid("_element.html.liquid",
+                            { "tag" => "dfn", "extra_attrs" => "",
+                              "content" => inner })
+        bold = render_liquid("_element.html.liquid",
+                             { "tag" => "b", "extra_attrs" => "",
+                               "content" => dfn })
         render_liquid("_element.html.liquid", {
                         "tag" => "p",
                         "extra_attrs" => " class=\"term-name\" style=\"text-align:left;\"",
@@ -248,7 +261,9 @@ module Metanorma
         label = extract_termnote_label(note)
         parts = []
         note_content_parts = []
-        note.p&.each { |para| note_content_parts << (render_mixed_inline(para) || "") }
+        note.p&.each do |para|
+          note_content_parts << (render_mixed_inline(para) || "")
+        end
         note_content = note_content_parts.join
         parts << render_liquid("_term_note.html.liquid", {
                                  "label" => escape_html(label),
@@ -269,7 +284,9 @@ module Metanorma
         label = extract_block_label(example, "EXAMPLE")
         parts = []
         ex_content_parts = []
-        example.p&.each { |para| ex_content_parts << (render_mixed_inline(para) || "") }
+        example.p&.each do |para|
+          ex_content_parts << (render_mixed_inline(para) || "")
+        end
         ex_content = ex_content_parts.join
         parts << render_liquid("_term_example.html.liquid", {
                                  "label" => escape_html(label),
@@ -301,7 +318,9 @@ module Metanorma
           if citeas && !citeas.to_s.empty?
             if bibitemid && !bibitemid.to_s.empty?
               parts << render_liquid("_link.html.liquid", {
-                                       "attrs" => element_attrs(href: "##{escape_html(bibitemid.to_s)}", class: "bibref"),
+                                       "attrs" => element_attrs(
+                                         href: "##{escape_html(bibitemid.to_s)}", class: "bibref",
+                                       ),
                                        "content" => escape_html(citeas.to_s),
                                      })
             else
@@ -338,7 +357,9 @@ module Metanorma
 
       def render_bibliography(bib, level: 1, **_opts)
         parts = []
-        bib.references&.each { |ref| parts << (render_references_section(ref, level: level) || "") }
+        bib.references&.each do |ref|
+          parts << (render_references_section(ref, level: level) || "")
+        end
         bib.clause&.each { |cl| parts << (render(cl, level: level) || "") }
         render_liquid("_element.html.liquid", {
                         "tag" => "div",
@@ -352,11 +373,12 @@ module Metanorma
         attrs = element_attrs(id: safe_attr(section, :id))
         parts = []
         parts << (render_standard_title(section, level,
-                        default_class: is_normative ? "" : "section-sub") || "")
+                                        default_class: is_normative ? "" : "section-sub") || "")
         section.p&.each { |para| parts << (render_paragraph(para) || "") }
         section.note&.each { |note| parts << (render_paragraph(note) || "") }
         section.references&.each_with_index do |bibitem, i|
-          parts << (render_bibitem(bibitem, i + 1, normative: is_normative) || "")
+          parts << (render_bibitem(bibitem, i + 1,
+                                   normative: is_normative) || "")
         end
         section.table&.each { |t| parts << (render_table(t) || "") }
         render_liquid("_element.html.liquid", {
@@ -374,7 +396,9 @@ module Metanorma
         if item.biblio_tag
           prefix, rest = split_biblio_tag(item.biblio_tag)
           ordinal_html = prefix.empty? ? nil : escape_html(prefix)
-          pubid_html = rest ? rest.filter_map { |child| render_inline_element(child) }.join : nil
+          pubid_html = rest&.filter_map do |child|
+            render_inline_element(child)
+          end&.join
         else
           ordinal_html = "[#{index}]"
           pubid_html = nil
@@ -402,7 +426,9 @@ module Metanorma
         found_boundary = false
 
         children.each do |child|
-          if !found_boundary
+          if found_boundary
+            rest << child
+          else
             case child
             when Metanorma::Document::Components::Inline::TabElement
               found_boundary = true
@@ -421,8 +447,6 @@ module Metanorma
               found_boundary = true
               rest << child
             end
-          else
-            rest << child
           end
         end
 
@@ -470,7 +494,9 @@ module Metanorma
 
         if item.title && !item.title.empty?
           titles = Array(item.title)
-          main_title = titles.find { |t| safe_attr(t, :type) == "main" } || titles.first
+          main_title = titles.find do |t|
+            safe_attr(t, :type) == "main"
+          end || titles.first
           if main_title
             title_content = render_mixed_inline(main_title)
             parts << render_liquid("_ref_title.html.liquid", {
@@ -522,7 +548,8 @@ module Metanorma
       # --- Standard section helpers ---
 
       def render_standard_title(section, level, default_class: "")
-        title_element = safe_attr(section, :fmt_title) || safe_attr(section, :title)
+        title_element = safe_attr(section,
+                                  :fmt_title) || safe_attr(section, :title)
         return nil unless title_element
 
         section_id = safe_attr(section, :id)
@@ -560,33 +587,39 @@ module Metanorma
       def render_section_block_collections(section, level)
         parts = []
         paragraphs = safe_attr(section, :paragraphs) || safe_attr(section, :p)
-        Array(paragraphs).each { |p| parts << (render_paragraph(p) || "") } if paragraphs
+        if paragraphs
+          Array(paragraphs).each do |p|
+            parts << (render_paragraph(p) || "")
+          end
+        end
 
         %i[unordered_lists ordered_lists definition_lists].each do |attr|
           values = safe_attr(section, attr)
-          Array(values).each { |v| parts << (render(v, level: level + 1) || "") } if values
+          if values
+            Array(values).each do |v|
+              parts << (render(v, level: level + 1) || "")
+            end
+          end
         end
 
         %i[tables figures formulas examples notes admonitions sourcecode_blocks
            quote_blocks].each do |attr|
           values = safe_attr(section, attr)
-          Array(values).each { |v| parts << (render(v, level: level + 1) || "") } if values
+          if values
+            Array(values).each do |v|
+              parts << (render(v, level: level + 1) || "")
+            end
+          end
         end
         parts.join
       end
 
       def render_subsections(section, level)
-        clauses = safe_attr(section, :clause) || safe_attr(section, :subsections)
+        clauses = safe_attr(section,
+                            :clause) || safe_attr(section, :subsections)
         return nil unless clauses
 
         clauses.filter_map { |cl| render(cl, level: level + 1) }.join
-      end
-
-      def is_title_element?(node, section)
-        title = safe_attr(section, :title)
-        return false unless title
-
-        node.equal?(title)
       end
 
       def extract_termnote_label(note)

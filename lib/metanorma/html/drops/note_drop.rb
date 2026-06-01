@@ -10,7 +10,9 @@ module Metanorma
 
           content_parts = []
           if note.content && !note.content.empty?
-            note.content.each { |para| content_parts << (renderer.render_paragraph(para) || "") }
+            note.content.each do |para|
+              content_parts << (renderer.render_paragraph(para) || "")
+            end
           else
             inline = renderer.render_mixed_inline(note)
             content_parts << inline if inline

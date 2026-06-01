@@ -2,9 +2,8 @@
 
 module Metanorma
   module Html
-    # Renders CcDocument (CalConnect) components to HTML.
-    # Extends IsoRenderer with CalConnect branding.
     class CcRenderer < IsoRenderer
+      register_render Metanorma::CcDocument::Root, :render_document
     end
   end
 end

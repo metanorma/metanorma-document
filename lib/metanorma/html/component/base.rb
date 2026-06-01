@@ -3,16 +3,6 @@
 module Metanorma
   module Html
     module Component
-      class OutputProxy
-        def initialize(renderer)
-          @renderer = renderer
-        end
-
-        def <<(html)
-          @renderer.append_output(html)
-        end
-      end
-
       class Base
         attr_reader :renderer
 
@@ -48,11 +38,6 @@ module Metanorma
           raise NotImplementedError, "#{self.class}#render not implemented"
         end
 
-        def output
-          OutputProxy.new(renderer)
-        end
-
-        def tag(...) = renderer.tag(...)
         def escape_html(...) = renderer.escape_html(...)
         def render_mixed_inline(...) = renderer.render_mixed_inline(...)
         def render_mixed_content_in_order(...) = renderer.render_mixed_content_in_order(...)
@@ -60,9 +45,9 @@ module Metanorma
         def safe_attr(obj, method_name) = renderer.safe_attr(obj, method_name)
         def extract_plain_text(node) = renderer.extract_plain_text(node)
         def extract_text_value(val) = renderer.extract_text_value(val)
+        def render_liquid(...) = renderer.render_liquid(...)
 
-        def extract_block_label(block,
-default)
+        def extract_block_label(block, default)
           renderer.extract_block_label(block, default)
         end
 

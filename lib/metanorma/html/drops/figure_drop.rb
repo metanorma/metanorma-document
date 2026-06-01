@@ -42,7 +42,9 @@ module Metanorma
                          end
 
           sub_figures_parts = []
-          figure.figure&.each { |sub| sub_figures_parts << (renderer.render_figure(sub) || "") }
+          figure.figure&.each do |sub|
+            sub_figures_parts << (renderer.render_figure(sub) || "")
+          end
           sub_figures_html = sub_figures_parts.join
 
           key_parts = []

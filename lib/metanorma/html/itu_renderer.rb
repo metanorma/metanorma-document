@@ -2,8 +2,8 @@
 
 module Metanorma
   module Html
-    # ITU brand: #0e99d5 blue from logo
     class ItuRenderer < IsoRenderer
+      register_render Metanorma::ItuDocument::Root, :render_document
     end
   end
 end
