@@ -16,7 +16,10 @@ module Metanorma
 
       def to_h
         result = { "type" => type }
-        result["attrs"] = attrs.transform_keys(&:to_s) unless attrs.nil? || attrs.empty?
+        unless attrs.nil? || attrs.empty?
+          result["attrs"] =
+            attrs.transform_keys(&:to_s)
+        end
         result["marks"] = marks.map(&:to_h) if marks && !marks.empty?
         result["content"] = content.map(&:to_h) if content && !content.empty?
         result

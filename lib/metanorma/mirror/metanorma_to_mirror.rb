@@ -90,6 +90,26 @@ module Metanorma
         content
       end
 
+      def extract_named_collections(element, collection_attrs)
+        content = []
+        collection_attrs.each do |attr|
+          collection = SafeAttr.read(element, attr)
+          next unless collection
+
+          collection.each do |child|
+            result = @registry.handle(child, context: self)
+            next unless result && result[0]
+
+            if result[1]
+              content.concat(Array(result[0]))
+            else
+              content << result[0]
+            end
+          end
+        end
+        content
+      end
+
       def text_node(text, marks: [])
         Node::Text.new(text: text, marks: marks)
       end

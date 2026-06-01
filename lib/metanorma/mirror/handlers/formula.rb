@@ -13,10 +13,21 @@ module Metanorma
 
           stem = SafeAttr.read(element, :stem)
           if stem
-            text = SafeAttr.read(stem, :text)
-            attrs[:math_text] = Array(text).join if text
             attrs[:stem_type] = SafeAttr.read(stem, :stem_type)
+
+            asciimath = SafeAttr.read(stem, :asciimath)
+            if asciimath&.value && !asciimath.value.strip.empty?
+              attrs[:asciimath] =
+                asciimath.value
+            end
+
+            math = SafeAttr.read(stem, :math)
+            attrs[:mathml] = math.to_xml.sub(/\A<\?xml[^?]*\?>\s?/, "") if math
           end
+
+          # Legacy fallback: some older documents store text directly
+          text = SafeAttr.read(element, :text)
+          attrs[:math_text] = Array(text).join if text && !attrs[:asciimath]
 
           Node::Formula.new(attrs: attrs.compact)
         end

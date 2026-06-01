@@ -56,7 +56,7 @@ RSpec.describe Metanorma::Mirror::HandlerRegistry do
 
     it "supports method_name option" do
       handler_mod = Module.new do
-        def self.transform(element, context:)
+        def self.transform(_element, context:)
           Metanorma::Mirror::Node::Paragraph.new
         end
       end

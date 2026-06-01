@@ -5,7 +5,7 @@ require "metanorma/mirror"
 
 RSpec.describe Metanorma::Mirror::MirrorToMetanorma do
   let(:forward) { Metanorma::Mirror::Transformer.new }
-  let(:reverse) { Metanorma::Mirror::MirrorToMetanorma.new }
+  let(:reverse) { described_class.new }
 
   describe "mirror node round-trip through to_h → from_h" do
     it "round-trips a document tree" do
@@ -13,32 +13,33 @@ RSpec.describe Metanorma::Mirror::MirrorToMetanorma do
         attrs: { flavor: "iso", title: "Test Doc" },
         content: [
           Metanorma::Mirror::Node::Preface.new(content: [
-            Metanorma::Mirror::Node::ContentSection.new(
-              attrs: { title: "Foreword" },
-              content: [
-                Metanorma::Mirror::Node::Paragraph.new(content: [
-                  Metanorma::Mirror::Node::Text.new(text: "Foreword text"),
-                ]),
-              ],
-            ),
-          ]),
+                                                 Metanorma::Mirror::Node::ContentSection.new(
+                                                   attrs: { title: "Foreword" },
+                                                   content: [
+                                                     Metanorma::Mirror::Node::Paragraph.new(content: [
+                                                                                              Metanorma::Mirror::Node::Text.new(text: "Foreword text"),
+                                                                                            ]),
+                                                   ],
+                                                 ),
+                                               ]),
           Metanorma::Mirror::Node::Sections.new(content: [
-            Metanorma::Mirror::Node::Clause.new(
-              attrs: { id: "s1", title: "Scope", number: "1" },
-              content: [
-                Metanorma::Mirror::Node::Paragraph.new(
-                  attrs: { id: "p1" },
-                  content: [
-                    Metanorma::Mirror::Node::Text.new(text: "Hello "),
-                    Metanorma::Mirror::Node::Text.new(
-                      text: "world",
-                      marks: [Metanorma::Mirror::Mark::Emphasis.new],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ]),
+                                                  Metanorma::Mirror::Node::Clause.new(
+                                                    attrs: { id: "s1",
+                                                             title: "Scope", number: "1" },
+                                                    content: [
+                                                      Metanorma::Mirror::Node::Paragraph.new(
+                                                        attrs: { id: "p1" },
+                                                        content: [
+                                                          Metanorma::Mirror::Node::Text.new(text: "Hello "),
+                                                          Metanorma::Mirror::Node::Text.new(
+                                                            text: "world",
+                                                            marks: [Metanorma::Mirror::Mark::Emphasis.new],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ]),
         ],
       )
 
@@ -68,18 +69,18 @@ RSpec.describe Metanorma::Mirror::MirrorToMetanorma do
         attrs: { flavor: "iso" },
         content: [
           Metanorma::Mirror::Node::Sections.new(content: [
-            Metanorma::Mirror::Node::Clause.new(
-              attrs: { id: "s1" },
-              content: [
-                Metanorma::Mirror::Node::Paragraph.new(content: [
-                  Metanorma::Mirror::Node::Text.new(
-                    text: "bold text",
-                    marks: [Metanorma::Mirror::Mark::Strong.new],
-                  ),
-                ]),
-              ],
-            ),
-          ]),
+                                                  Metanorma::Mirror::Node::Clause.new(
+                                                    attrs: { id: "s1" },
+                                                    content: [
+                                                      Metanorma::Mirror::Node::Paragraph.new(content: [
+                                                                                               Metanorma::Mirror::Node::Text.new(
+                                                                                                 text: "bold text",
+                                                                                                 marks: [Metanorma::Mirror::Mark::Strong.new],
+                                                                                               ),
+                                                                                             ]),
+                                                    ],
+                                                  ),
+                                                ]),
         ],
       )
 

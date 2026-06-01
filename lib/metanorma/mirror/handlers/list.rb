@@ -81,15 +81,19 @@ module Metanorma
             dt_attrs = {}
             dt_attrs[:id] = SafeAttr.read(dt, :id)
             dt_content = Inline.extract_inline(dt, context:)
-            items << Node::DefinitionTerm.new(attrs: dt_attrs.compact, content: dt_content)
+            items << Node::DefinitionTerm.new(attrs: dt_attrs.compact,
+                                              content: dt_content)
 
             dd = dds[idx]
             next unless dd
 
             dd_attrs = {}
             dd_attrs[:id] = SafeAttr.read(dd, :id)
-            dd_content = Inline.extract_inline(dd, context:)
-            items << Node::DefinitionDescription.new(attrs: dd_attrs.compact, content: dd_content)
+            dd_content = context.extract_named_collections(dd,
+                                                           %i[p ul ol
+                                                              sourcecode figure example note table formula quote dl])
+            items << Node::DefinitionDescription.new(attrs: dd_attrs.compact,
+                                                     content: dd_content)
           end
           items
         end

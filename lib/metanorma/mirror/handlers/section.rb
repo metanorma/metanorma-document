@@ -56,11 +56,57 @@ module Metanorma
           attrs[:normative] = SafeAttr.read(element, :normative)
           attrs[:hidden] = SafeAttr.read(element, :hidden)
 
-          content = []
-          paragraphs = SafeAttr.read(element, :paragraphs)
-          paragraphs&.each { |p| handle_child(p, content, context:) }
+          # Prefatory paragraphs (e.g. "The following documents are referred to...")
+          content = context.extract_named_collections(element,
+                                                      %i[p]).map do |node|
+            node
+          end
+
+          # Bibliographic items
+          refs = SafeAttr.read(element, :references)
+          refs&.each do |ref|
+            text = extract_biblio_text(ref)
+            next if text.strip.empty?
+
+            content << Node::Paragraph.new(
+              attrs: { id: SafeAttr.read(ref, :id) }.compact,
+              content: [context.text_node(text)],
+            )
+          end
 
           Node::References.new(attrs: attrs, content: content)
+        end
+
+        def self.extract_biblio_text(ref)
+          # Try formatted_ref first (the full formatted reference text)
+          formatted = SafeAttr.read(ref, :formatted_ref)
+          if formatted
+            text = Inline.extract_formatted_text(formatted)
+            return text unless text.strip.empty?
+          end
+
+          # Try biblio_tag (the short tag like "[1]")
+          tag = SafeAttr.read(ref, :biblio_tag)
+          if tag
+            tag_text = Inline.extract_formatted_text(tag)
+            unless tag_text.strip.empty?
+              docid = SafeAttr.read(ref, :docidentifier)
+              if docid
+                id_text = Inline.extract_formatted_text(docid)
+                return "#{tag_text} #{id_text}".strip unless id_text.strip.empty?
+              end
+              return tag_text
+            end
+          end
+
+          # Fallback: try docidentifier alone
+          docid = SafeAttr.read(ref, :docidentifier)
+          if docid
+            text = Inline.extract_formatted_text(docid)
+            return text unless text.strip.empty?
+          end
+
+          ""
         end
 
         def self.floating_title(element, context:)
@@ -111,7 +157,7 @@ module Metanorma
 
           content = SafeAttr.read(element, :content)
           if content.is_a?(Array)
-            joined = content.map(&:to_s).join
+            joined = content.join
             return joined unless joined.strip.empty?
           end
 

@@ -11,7 +11,9 @@ module Metanorma
           img = SafeAttr.read(element, :image)
           if img
             img_attrs = {}
-            img_attrs[:src] = SafeAttr.read(img, :src)
+            src = SafeAttr.read(img, :source)
+            img_attrs[:src] =
+              src && !src.strip.empty? ? src : SafeAttr.read(img, :filename)
             img_attrs[:alt] = SafeAttr.read(img, :alt)
             img_attrs[:height] = SafeAttr.read(img, :height)
             img_attrs[:width] = SafeAttr.read(img, :width)
@@ -55,6 +57,7 @@ module Metanorma
           text = SafeAttr.read(name, :text)
           return text.to_s if text.is_a?(String) && !text.strip.empty?
           return Array(text).join.strip if text.is_a?(Array) && !text.empty?
+
           ""
         end
       end

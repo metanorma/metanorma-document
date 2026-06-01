@@ -23,8 +23,8 @@ RSpec.describe Metanorma::Mirror::MirrorToMetanorma do
         attrs: { id: "s1", title: "Scope" },
         content: [
           Metanorma::Mirror::Node::Paragraph.new(content: [
-            Metanorma::Mirror::Node::Text.new(text: "Content"),
-          ]),
+                                                   Metanorma::Mirror::Node::Text.new(text: "Content"),
+                                                 ]),
         ],
       )
       result = transformer.call(node)
@@ -52,8 +52,8 @@ RSpec.describe Metanorma::Mirror::MirrorToMetanorma do
       node = Metanorma::Mirror::Node::BulletList.new(
         content: [
           Metanorma::Mirror::Node::ListItem.new(content: [
-            Metanorma::Mirror::Node::Text.new(text: "Item"),
-          ]),
+                                                  Metanorma::Mirror::Node::Text.new(text: "Item"),
+                                                ]),
         ],
       )
       result = transformer.call(node)
@@ -66,12 +66,12 @@ RSpec.describe Metanorma::Mirror::MirrorToMetanorma do
         attrs: { id: "t1" },
         content: [
           Metanorma::Mirror::Node::TableHead.new(content: [
-            Metanorma::Mirror::Node::TableRow.new(content: [
-              Metanorma::Mirror::Node::TableCell.new(content: [
-                Metanorma::Mirror::Node::Text.new(text: "Header"),
-              ]),
-            ]),
-          ]),
+                                                   Metanorma::Mirror::Node::TableRow.new(content: [
+                                                                                           Metanorma::Mirror::Node::TableCell.new(content: [
+                                                                                                                                    Metanorma::Mirror::Node::Text.new(text: "Header"),
+                                                                                                                                  ]),
+                                                                                         ]),
+                                                 ]),
         ],
       )
       result = transformer.call(node)
@@ -113,8 +113,8 @@ RSpec.describe Metanorma::Mirror::MirrorToMetanorma do
       node = Metanorma::Mirror::Node::DefinitionList.new(
         content: [
           Metanorma::Mirror::Node::DefinitionTerm.new(content: [
-            Metanorma::Mirror::Node::Text.new(text: "term"),
-          ]),
+                                                        Metanorma::Mirror::Node::Text.new(text: "term"),
+                                                      ]),
           Metanorma::Mirror::Node::DefinitionDescription.new(content: []),
         ],
       )
@@ -126,7 +126,8 @@ RSpec.describe Metanorma::Mirror::MirrorToMetanorma do
     end
 
     it "accepts a hash input" do
-      hash = { "type" => "paragraph", "attrs" => { "id" => "p1" }, "content" => [] }
+      hash = { "type" => "paragraph", "attrs" => { "id" => "p1" },
+               "content" => [] }
       result = transformer.call(hash)
       result[:type].should eq("paragraph")
     end

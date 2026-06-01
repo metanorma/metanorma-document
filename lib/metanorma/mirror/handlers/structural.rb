@@ -10,7 +10,8 @@ module Metanorma
           attrs[:displayorder] = SafeAttr.read(element, :displayorder)
 
           content = []
-          %i[abstract foreword introduction acknowledgements executivesummary].each do |attr|
+          %i[abstract foreword introduction acknowledgements
+             executivesummary].each do |attr|
             child = SafeAttr.read(element, attr)
             next unless child
 

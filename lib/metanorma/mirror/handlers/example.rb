@@ -11,7 +11,9 @@ module Metanorma
           attrs[:subsequence] = SafeAttr.read(element, :subsequence)
           attrs[:semx_id] = SafeAttr.read(element, :semx_id)
 
-          content = context.extract_blocks(element)
+          content = context.extract_named_collections(element,
+                                                      %i[paragraphs formula
+                                                         list ol ul quote sourcecode table figure dl])
 
           Node::Example.new(attrs: attrs.compact, content: content)
         end

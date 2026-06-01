@@ -37,7 +37,8 @@ RSpec.describe Metanorma::Mirror::Mark do
 
     it "includes attrs when present" do
       mark = described_class::Link.new(attrs: { href: "https://example.com" })
-      mark.to_h.should eq({ "type" => "link", "attrs" => { "href" => "https://example.com" } })
+      mark.to_h.should eq({ "type" => "link",
+                            "attrs" => { "href" => "https://example.com" } })
     end
 
     it "omits empty attrs" do
@@ -53,7 +54,8 @@ RSpec.describe Metanorma::Mirror::Mark do
     end
 
     it "reconstructs attrs" do
-      mark = described_class.from_h({ "type" => "link", "attrs" => { "href" => "https://example.com" } })
+      mark = described_class.from_h({ "type" => "link",
+                                      "attrs" => { "href" => "https://example.com" } })
       mark.should be_a(described_class::Link)
       mark.attrs[:href].should eq("https://example.com")
     end

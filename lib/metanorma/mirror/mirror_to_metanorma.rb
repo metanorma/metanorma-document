@@ -71,19 +71,23 @@ module Metanorma
       end
 
       def build_note(node)
-        { type: "note", attrs: node["attrs"] || {}, content: build_children(node) }
+        { type: "note", attrs: node["attrs"] || {},
+          content: build_children(node) }
       end
 
       def build_admonition(node)
-        { type: "admonition", attrs: node["attrs"] || {}, content: build_children(node) }
+        { type: "admonition", attrs: node["attrs"] || {},
+          content: build_children(node) }
       end
 
       def build_example(node)
-        { type: "example", attrs: node["attrs"] || {}, content: build_children(node) }
+        { type: "example", attrs: node["attrs"] || {},
+          content: build_children(node) }
       end
 
       def build_figure(node)
-        { type: "figure", attrs: node["attrs"] || {}, content: build_children(node) }
+        { type: "figure", attrs: node["attrs"] || {},
+          content: build_children(node) }
       end
 
       def build_image(node)
@@ -99,7 +103,8 @@ module Metanorma
       end
 
       def build_table(node)
-        { type: "table", attrs: node["attrs"] || {}, content: build_children(node) }
+        { type: "table", attrs: node["attrs"] || {},
+          content: build_children(node) }
       end
 
       def build_table_section(node)
@@ -107,15 +112,18 @@ module Metanorma
       end
 
       def build_table_row(node)
-        { type: "table_row", attrs: node["attrs"] || {}, content: build_children(node) }
+        { type: "table_row", attrs: node["attrs"] || {},
+          content: build_children(node) }
       end
 
       def build_table_cell(node)
-        { type: "table_cell", attrs: node["attrs"] || {}, content: build_inline_children(node) }
+        { type: "table_cell", attrs: node["attrs"] || {},
+          content: build_inline_children(node) }
       end
 
       def build_quote(node)
-        { type: "quote", attrs: node["attrs"] || {}, content: build_children(node) }
+        { type: "quote", attrs: node["attrs"] || {},
+          content: build_children(node) }
       end
 
       def build_review(node)
@@ -123,27 +131,33 @@ module Metanorma
       end
 
       def build_clause(node)
-        { type: "clause", attrs: node["attrs"] || {}, content: build_children(node) }
+        { type: "clause", attrs: node["attrs"] || {},
+          content: build_children(node) }
       end
 
       def build_annex(node)
-        { type: "annex", attrs: node["attrs"] || {}, content: build_children(node) }
+        { type: "annex", attrs: node["attrs"] || {},
+          content: build_children(node) }
       end
 
       def build_content_section(node)
-        { type: node["type"], attrs: node["attrs"] || {}, content: build_children(node) }
+        { type: node["type"], attrs: node["attrs"] || {},
+          content: build_children(node) }
       end
 
       def build_terms(node)
-        { type: "terms", attrs: node["attrs"] || {}, content: build_children(node) }
+        { type: "terms", attrs: node["attrs"] || {},
+          content: build_children(node) }
       end
 
       def build_definitions(node)
-        { type: "definitions", attrs: node["attrs"] || {}, content: build_children(node) }
+        { type: "definitions", attrs: node["attrs"] || {},
+          content: build_children(node) }
       end
 
       def build_references(node)
-        { type: "references", attrs: node["attrs"] || {}, content: build_children(node) }
+        { type: "references", attrs: node["attrs"] || {},
+          content: build_children(node) }
       end
 
       def build_floating_title(node)
@@ -151,39 +165,48 @@ module Metanorma
       end
 
       def build_bullet_list(node)
-        { type: "bullet_list", attrs: node["attrs"] || {}, content: build_children(node) }
+        { type: "bullet_list", attrs: node["attrs"] || {},
+          content: build_children(node) }
       end
 
       def build_ordered_list(node)
-        { type: "ordered_list", attrs: node["attrs"] || {}, content: build_children(node) }
+        { type: "ordered_list", attrs: node["attrs"] || {},
+          content: build_children(node) }
       end
 
       def build_list_item(node)
-        { type: "list_item", attrs: node["attrs"] || {}, content: build_children(node) }
+        { type: "list_item", attrs: node["attrs"] || {},
+          content: build_children(node) }
       end
 
       def build_dl(node)
-        { type: "dl", attrs: node["attrs"] || {}, content: build_children(node) }
+        { type: "dl", attrs: node["attrs"] || {},
+          content: build_children(node) }
       end
 
       def build_dt(node)
-        { type: "dt", attrs: node["attrs"] || {}, content: build_inline_children(node) }
+        { type: "dt", attrs: node["attrs"] || {},
+          content: build_inline_children(node) }
       end
 
       def build_dd(node)
-        { type: "dd", attrs: node["attrs"] || {}, content: build_children(node) }
+        { type: "dd", attrs: node["attrs"] || {},
+          content: build_children(node) }
       end
 
       def build_preface(node)
-        { type: "preface", attrs: node["attrs"] || {}, content: build_children(node) }
+        { type: "preface", attrs: node["attrs"] || {},
+          content: build_children(node) }
       end
 
       def build_sections(node)
-        { type: "sections", attrs: node["attrs"] || {}, content: build_children(node) }
+        { type: "sections", attrs: node["attrs"] || {},
+          content: build_children(node) }
       end
 
       def build_bibliography(node)
-        { type: "bibliography", attrs: node["attrs"] || {}, content: build_children(node) }
+        { type: "bibliography", attrs: node["attrs"] || {},
+          content: build_children(node) }
       end
 
       def build_footnotes(_node)

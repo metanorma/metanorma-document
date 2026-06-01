@@ -36,7 +36,6 @@ module Metanorma
     end
 
     module Html
-
       Lutaml::Xml::XmlElement.class_eval do
         remove_method :order
 

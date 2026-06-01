@@ -43,17 +43,17 @@ RSpec.describe Metanorma::Mirror::Serialization::JsonSerializer do
         attrs: { title: "Test", flavor: "iso" },
         content: [
           Metanorma::Mirror::Node::Preface.new(content: [
-            Metanorma::Mirror::Node::Paragraph.new(content: [
-              Metanorma::Mirror::Node::Text.new(text: "Foreword text"),
-            ]),
-          ]),
+                                                 Metanorma::Mirror::Node::Paragraph.new(content: [
+                                                                                          Metanorma::Mirror::Node::Text.new(text: "Foreword text"),
+                                                                                        ]),
+                                               ]),
           Metanorma::Mirror::Node::Sections.new(content: [
-            Metanorma::Mirror::Node::Clause.new(attrs: { id: "s1", title: "Scope" }, content: [
-              Metanorma::Mirror::Node::Paragraph.new(content: [
-                Metanorma::Mirror::Node::Text.new(text: "Scope content"),
-              ]),
-            ]),
-          ]),
+                                                  Metanorma::Mirror::Node::Clause.new(attrs: { id: "s1", title: "Scope" }, content: [
+                                                                                        Metanorma::Mirror::Node::Paragraph.new(content: [
+                                                                                                                                 Metanorma::Mirror::Node::Text.new(text: "Scope content"),
+                                                                                                                               ]),
+                                                                                      ]),
+                                                ]),
         ],
       )
 

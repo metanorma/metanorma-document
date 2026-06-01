@@ -5,7 +5,7 @@ require "spec_helper"
 RSpec.describe "Relaton-bib integration" do
   describe Metanorma::Document::Relaton::Phone do
     it "inherits from Relaton::Bib::Phone" do
-      described_class.ancestors.should include(::Relaton::Bib::Phone)
+      described_class.ancestors.should include(Relaton::Bib::Phone)
     end
 
     it "parses XML correctly" do
@@ -17,7 +17,7 @@ RSpec.describe "Relaton-bib integration" do
 
   describe Metanorma::Document::Relaton::PriceType do
     it "inherits from Relaton::Bib::Price" do
-      described_class.ancestors.should include(::Relaton::Bib::Price)
+      described_class.ancestors.should include(Relaton::Bib::Price)
     end
 
     it "parses XML correctly" do
@@ -29,7 +29,7 @@ RSpec.describe "Relaton-bib integration" do
 
   describe Metanorma::Document::Relaton::BibItemLocality do
     it "inherits from Relaton::Bib::Locality" do
-      described_class.ancestors.should include(::Relaton::Bib::Locality)
+      described_class.ancestors.should include(Relaton::Bib::Locality)
     end
 
     it "has type, reference_from, and reference_to attributes" do
@@ -40,7 +40,7 @@ RSpec.describe "Relaton-bib integration" do
 
   describe Metanorma::Document::Relaton::Edition do
     it "inherits from Relaton::Bib::Edition" do
-      described_class.ancestors.should include(::Relaton::Bib::Edition)
+      described_class.ancestors.should include(Relaton::Bib::Edition)
     end
 
     it "parses XML with extra language attribute" do
