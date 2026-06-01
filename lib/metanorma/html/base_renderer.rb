@@ -63,7 +63,10 @@ module Metanorma
         end
       end
 
-      attr_reader :inline_renderer, :block_renderer, :section_renderer, :pubid_renderer
+      attr_reader :inline_renderer, :block_renderer, :section_renderer,
+                  :pubid_renderer, :index_term_collector, :footnote_collector
+      private :inline_renderer, :block_renderer, :section_renderer,
+              :pubid_renderer
 
       def initialize
         @toc_entries = []
@@ -104,7 +107,7 @@ module Metanorma
         def render_image(...)       = @renderer.render_image(...)
         def render_stem_content(...)= @renderer.render_stem_content(...)
         def register_figure_entry(...)= @renderer.register_figure_entry(...)
-        def render_liquid(...)      = @renderer.render_liquid(...)
+        def render_liquid(...) = @renderer.render_liquid(...)
         def render_note_children(...) = @renderer.render_note_children(...)
         def render_simple_children(...) = @renderer.render_simple_children(...)
         def render_full_block_children(...) = @renderer.render_full_block_children(...)
@@ -118,8 +121,9 @@ module Metanorma
         @toc_entries
       end
 
-      def generate_full_document(document)
+      def generate_full_document(document, raw_xml: nil)
         @document = document
+        @raw_xml = raw_xml
         validate_presentation_xml!
 
         body = render(@document) || ""
@@ -157,7 +161,9 @@ module Metanorma
       def flavor_name
         return nil unless defined?(@document) && @document
 
-        @document.class.name&.split("::")&.detect { |ns| FLAVOR_MAP.key?(ns) }&.then { |ns| FLAVOR_MAP[ns] }
+        @document.class.name&.split("::")&.detect do |ns|
+          FLAVOR_MAP.key?(ns)
+        end&.then { |ns| FLAVOR_MAP[ns] }
       end
 
       def flavor_publishers(_doc_id)
@@ -169,7 +175,7 @@ module Metanorma
       end
 
       def publisher_logo_map
-        theme.logos
+        theme.logos_light
       end
 
       def flavor_font_url
@@ -237,7 +243,7 @@ module Metanorma
         logo_map = publisher_logo_map
         return "" if publishers.empty? && logo_map.empty?
 
-        white_fills = theme.logo_white_fills
+        dark_logo_map = theme.logos_dark
         display_pubs = publishers.empty? ? logo_map.keys : publishers
 
         display_pubs.filter_map do |pub|
@@ -247,8 +253,18 @@ module Metanorma
           svg = load_logo_svg(filename, height: 26)
           next unless svg
 
-          Array(white_fills[pub]).each { |fill| svg = svg.gsub("fill:#{fill}", "fill:white") }
-          "<span class=\"brand-logo\" aria-label=\"#{pub} logo\">#{svg}</span>"
+          light_span = "<span class=\"brand-logo brand-logo-light\" aria-label=\"#{pub} logo\">#{svg}</span>"
+
+          dark_span = ""
+          dark_filename = dark_logo_map[pub]
+          if dark_filename
+            dark_svg = load_logo_svg(dark_filename, height: 26)
+            if dark_svg
+              dark_span = "<span class=\"brand-logo brand-logo-dark\" aria-label=\"#{pub} logo\">#{dark_svg}</span>"
+            end
+          end
+
+          "#{light_span}\n#{dark_span}"
         end.join("\n")
       end
 
@@ -259,9 +275,6 @@ module Metanorma
         svg = File.read(path)
         svg = svg.sub(/\A<\?xml[^?]*\?>\s*/, "")
         svg = svg.sub(/\A\s*<!--.*?-->\s*/m, "")
-        theme.logo_strip_fills.each do |fill|
-          svg = svg.sub(/<path[^>]*style="fill:#{Regexp.escape(fill)}[^"]*"[^>]*\/>/, "")
-        end
         svg = svg.sub(/<svg\s/, '<svg class="header-logo" ')
         svg = if svg.match?(/<svg[^>]*\sheight="[^"]*"/)
                 svg.sub(/(<svg[^>]*?)(\sheight="[^"]*")/,
@@ -339,12 +352,11 @@ module Metanorma
         return false unless node
         return false if node.is_a?(String)
 
-        if node.is_a?(Metanorma::Document::Root) && node.type == "presentation"
-          return true
-        end
-
         if node.is_a?(Lutaml::Model::Serializable)
           node_attrs = node.class.attributes
+          if node_attrs.key?(:type) && node.type == "presentation"
+            return true
+          end
           if node_attrs.key?(:fmt_title) && node.fmt_title
             return true
           end
@@ -439,8 +451,6 @@ module Metanorma
         @table_entries << { id: id, text: text }
       end
 
-      attr_reader :index_term_collector, :footnote_collector
-
       def extract_plain_text(node)
         return node.to_s if node.is_a?(String)
         return extract_text_value(node).to_s unless node.is_a?(Lutaml::Model::Serializable)
@@ -479,8 +489,8 @@ module Metanorma
                       end
                 text = extract_plain_text(obj)
                 parts << (text.empty? ? " " : text)
-              else
-                parts << " " if el.name == "span"
+              elsif el.name == "span"
+                parts << " "
               end
             end
           end
@@ -680,14 +690,15 @@ module Metanorma
       # --- Delegation to sub-renderers ---
 
       # Inline rendering delegation
-      def walk_ordered(node, allow_filter: nil, &block)
-        @inline_renderer.walk_ordered(node, allow_filter: allow_filter, &block)
+      def walk_ordered(node, allow_filter: nil, &)
+        @inline_renderer.walk_ordered(node, allow_filter: allow_filter, &)
       end
 
       def render_mixed_inline(node)
         @inline_renderer.render_mixed_inline(node)
       end
 
+      def render_cell_content(cell) = @inline_renderer.render_cell_content(cell)
       def render_em(el) = @inline_renderer.render_em(el)
       def render_strong(el) = @inline_renderer.render_strong(el)
       def render_tt(el) = @inline_renderer.render_tt(el)
@@ -708,7 +719,12 @@ module Metanorma
       def render_asciimath(el) = @inline_renderer.render_asciimath(el)
       def render_index(el) = @inline_renderer.render_index(el)
       def render_note_inline(el) = @inline_renderer.render_note_inline(el)
-      def render_semx_content(el, **opts) = @inline_renderer.render_semx_content(el, **opts)
+
+      def render_semx_content(el,
+**)
+        @inline_renderer.render_semx_content(el, **)
+      end
+
       def render_stem_content(stem) = @inline_renderer.render_stem_content(stem)
       def render_link(link) = @inline_renderer.render_link(link)
       def render_xref(xref) = @inline_renderer.render_xref(xref)
@@ -719,46 +735,114 @@ module Metanorma
       def render_mixed_content_in_order(node) = @inline_renderer.render_mixed_content_in_order(node)
 
       # Block rendering delegation
-      def render_paragraph(p, **opts) = @block_renderer.render_paragraph(p, **opts)
-      def render_table(table, **opts) = @block_renderer.render_table(table, **opts)
-      def render_unordered_list(ul, **opts) = @block_renderer.render_unordered_list(ul, **opts)
-      def render_ordered_list(ol, **opts) = @block_renderer.render_ordered_list(ol, **opts)
-      def render_definition_list(dl, **opts) = @block_renderer.render_definition_list(dl, **opts)
-      def render_figure(figure, **opts) = @block_renderer.render_figure(figure, **opts)
+      def render_paragraph(p,
+**)
+        @block_renderer.render_paragraph(p, **)
+      end
+
+      def render_table(table,
+**)
+        @block_renderer.render_table(table, **)
+      end
+
+      def render_unordered_list(ul,
+**)
+        @block_renderer.render_unordered_list(ul, **)
+      end
+
+      def render_ordered_list(ol,
+**)
+        @block_renderer.render_ordered_list(ol, **)
+      end
+
+      def render_definition_list(dl,
+**)
+        @block_renderer.render_definition_list(dl, **)
+      end
+
+      def render_figure(figure,
+**)
+        @block_renderer.render_figure(figure, **)
+      end
+
       def render_image(image) = @block_renderer.render_image(image)
       def render_video(video) = @block_renderer.render_video(video)
       def render_audio(audio) = @block_renderer.render_audio(audio)
-      def render_note(note, **opts) = @block_renderer.render_note(note, **opts)
-      def render_example(example, **opts) = @block_renderer.render_example(example, **opts)
-      def render_sourcecode(sc, **opts) = @block_renderer.render_sourcecode(sc, **opts)
-      def render_formula(formula, **opts) = @block_renderer.render_formula(formula, **opts)
-      def render_quote(quote, **opts) = @block_renderer.render_quote(quote, **opts)
-      def render_admonition(admonition, **opts) = @block_renderer.render_admonition(admonition, **opts)
-      def render_bookmark(bookmark, **opts) = @block_renderer.render_bookmark(bookmark, **opts)
-      def render_block_children(model, children:) = @block_renderer.render_block_children(model, children: children)
+      def render_note(note, **) = @block_renderer.render_note(note, **)
+
+      def render_example(example,
+**)
+        @block_renderer.render_example(example, **)
+      end
+
+      def render_sourcecode(sc,
+**)
+        @block_renderer.render_sourcecode(sc, **)
+      end
+
+      def render_formula(formula,
+**)
+        @block_renderer.render_formula(formula, **)
+      end
+
+      def render_quote(quote,
+**)
+        @block_renderer.render_quote(quote, **)
+      end
+
+      def render_admonition(admonition,
+**)
+        @block_renderer.render_admonition(admonition, **)
+      end
+
+      def render_bookmark(bookmark,
+**)
+        @block_renderer.render_bookmark(bookmark, **)
+      end
+
+      def render_block_children(model,
+children:)
+        @block_renderer.render_block_children(model, children: children)
+      end
+
       def render_note_children(model) = @block_renderer.render_note_children(model)
       def render_simple_children(model) = @block_renderer.render_simple_children(model)
       def render_full_block_children(model) = @block_renderer.render_full_block_children(model)
 
       # Section rendering delegation
-      def render_basic_section(section, **opts) = @section_renderer.render_basic_section(section, **opts)
-      def render_hierarchical_section(section, **opts) = @section_renderer.render_hierarchical_section(section, **opts)
-      def render_content_section(section, **opts) = @section_renderer.render_content_section(section, **opts)
-      def render_ordered_content(section, level = 1) = @section_renderer.render_ordered_content(section, level)
+      def render_basic_section(section,
+**)
+        @section_renderer.render_basic_section(section, **)
+      end
+
+      def render_hierarchical_section(section,
+**)
+        @section_renderer.render_hierarchical_section(section, **)
+      end
+
+      def render_content_section(section,
+**)
+        @section_renderer.render_content_section(section, **)
+      end
+
+      def render_ordered_content(section,
+level = 1)
+        @section_renderer.render_ordered_content(section, level)
+      end
+
       def collect_ordered_children(section) = @section_renderer.collect_ordered_children(section)
       def sort_by_displayorder(children) = @section_renderer.sort_by_displayorder(children)
-      def render_preface(preface, **opts) = @section_renderer.render_preface(preface, **opts)
+
+      def render_preface(preface,
+**)
+        @section_renderer.render_preface(preface, **)
+      end
 
       # Pubid rendering delegation
       def parse_pubid(docidentifier_string) = @pubid_renderer.parse_pubid(docidentifier_string)
       def pubid_to_html(identifier) = @pubid_renderer.pubid_to_html(identifier)
 
       # --- Helper methods ---
-
-      def tag(name, attrs_str)
-        inner = yield
-        "<#{name}#{attrs_str}>#{inner}</#{name}>"
-      end
 
       def element_attrs(**attrs)
         parts = []
@@ -794,6 +878,22 @@ module Metanorma
 
       def block_element?(obj)
         BLOCK_TYPES[obj.class] || BLOCK_TYPES.any? { |type, _| obj.is_a?(type) }
+      end
+
+      def extract_inline_svg_for(image)
+        return nil unless @raw_xml
+
+        image_id = safe_attr(image, :id)
+        return nil unless image_id
+
+        escaped_id = Regexp.escape(image_id)
+        # Match <image id="..." ...> content, then extract <svg>...</svg>
+        if (match = @raw_xml.match(/<image[^>]*id="#{escaped_id}"[^>]*>(.*?)<\/image>/m))
+          inner = match[1]
+          if (svg_match = inner.match(/(<svg\s.*?<\/svg>)/m))
+            svg_match[1]
+          end
+        end
       end
 
       def safe_attr(obj, method_name)
@@ -891,13 +991,15 @@ module Metanorma
         drops = @footnote_collector.to_a.map do |entry|
           content_html = ""
           if entry.content && !entry.content.empty?
-            content_html = Array(entry.content).filter_map { |p| render_paragraph(p) }.join
+            content_html = Array(entry.content).filter_map do |p|
+              render_paragraph(p)
+            end.join
           end
           Drops::FootnoteDrop.new(entry, content_html)
         end
 
         render_liquid("_footnotes.html.liquid",
-                       { "footnotes" => drops })
+                      { "footnotes" => drops })
       end
     end
   end
