@@ -11,8 +11,12 @@ module Metanorma
         def render_basic_section(section, level: 1, **_opts)
           attrs = element_attrs(id: safe_attr(section, :id))
           title_html = render_section_title(section, level)
-          content = section.blocks&.filter_map { |block| coordinator.render(block) }.join
-          notes_html = section.notes&.filter_map { |note| coordinator.block_renderer.render_note(note) }.join
+          content = section.blocks&.filter_map do |block|
+            coordinator.render(block)
+          end&.join
+          notes_html = section.notes&.filter_map do |note|
+            coordinator.render_note(note)
+          end&.join
           render_liquid("_section.html.liquid", {
                           "attrs" => attrs,
                           "title" => title_html,
@@ -25,7 +29,9 @@ module Metanorma
           attrs = element_attrs(id: safe_attr(section, :id))
           title_html = render_section_title(section, level)
           content = render_section_content(section, level)
-          subsections_html = section.subsections&.filter_map { |sub| coordinator.render(sub, level: level + 1) }.join
+          subsections_html = section.subsections&.filter_map do |sub|
+            coordinator.render(sub, level: level + 1)
+          end&.join
           render_liquid("_section.html.liquid", {
                           "attrs" => attrs,
                           "title" => title_html,
@@ -44,20 +50,25 @@ module Metanorma
 
           h = "h#{[[level, 6].min, 1].max}"
           title_text = coordinator.extract_title_text(titles)
-          render_liquid("_heading.html.liquid", "tag" => h, "class_attr" => "", "content" => escape_html(title_text))
+          render_liquid("_heading.html.liquid", "tag" => h, "class_attr" => "",
+                                                "content" => escape_html(title_text))
         end
 
         def render_section_content(section, _level)
           parts = []
-          section.blocks&.each { |block| parts << (coordinator.render(block) || "") }
-          section.notes&.each { |note| parts << (coordinator.block_renderer.render_note(note) || "") }
+          section.blocks&.each do |block|
+            parts << (coordinator.render(block) || "")
+          end
+          section.notes&.each do |note|
+            parts << (coordinator.render_note(note) || "")
+          end
           parts.join
         end
 
         def collect_ordered_children(section)
           children = []
 
-          coordinator.inline_renderer.walk_ordered(section) do |type, obj|
+          coordinator.walk_ordered(section) do |type, obj|
             next if %i[text tab].include?(type)
 
             children << obj
@@ -117,7 +128,9 @@ module Metanorma
             case section_name
             when "clause"
               clauses = preface_clauses_filtered(preface, toc_filters)
-              clauses&.each { |cl| parts << (coordinator.render(cl, level: 1) || "") }
+              clauses&.each do |cl|
+                parts << (coordinator.render(cl, level: 1) || "")
+              end
             else
               value = safe_attr(preface, section_name.to_sym)
               parts << (coordinator.render(value) || "") if value
@@ -136,8 +149,11 @@ module Metanorma
 
           return nil if clauses.empty? && !has_others
 
-          coordinator.register_toc_entry(id: "preface", level: 1, text: "Preface")
-          content = clauses.filter_map { |cl| coordinator.render(cl, level: 2) }.join
+          coordinator.register_toc_entry(id: "preface", level: 1,
+                                         text: "Preface")
+          content = clauses.filter_map do |cl|
+            coordinator.render(cl, level: 2)
+          end.join
           render_liquid("_wrapped_preface.html.liquid", content: content)
         end
 

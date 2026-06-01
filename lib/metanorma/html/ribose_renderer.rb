@@ -2,9 +2,8 @@
 
 module Metanorma
   module Html
-    # Renders RiboseDocument components to HTML.
-    # Extends IsoRenderer with Ribose branding.
     class RiboseRenderer < IsoRenderer
+      register_render Metanorma::RiboseDocument::Root, :render_document
     end
   end
 end

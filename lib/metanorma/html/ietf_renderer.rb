@@ -2,9 +2,8 @@
 
 module Metanorma
   module Html
-    # Renders IetfDocument components to HTML.
-    # Extends IsoRenderer with IETF/RFC branding.
     class IetfRenderer < IsoRenderer
+      register_render Metanorma::IetfDocument::Root, :render_document
     end
   end
 end

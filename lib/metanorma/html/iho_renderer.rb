@@ -2,8 +2,8 @@
 
 module Metanorma
   module Html
-    # IHO brand: #00AAA9 teal + #05164D navy + #FEDC5B gold from logo
     class IhoRenderer < IsoRenderer
+      register_render Metanorma::IhoDocument::Root, :render_document
     end
   end
 end
