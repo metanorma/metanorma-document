@@ -17,6 +17,7 @@ TODO*
 **/output/
 output.html
 output-*.html
+output-*/
 /private-do-not-commit/
 
 # Frontend build artifacts (bundled into gem, not committed)
