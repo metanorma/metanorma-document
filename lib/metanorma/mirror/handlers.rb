@@ -17,6 +17,7 @@ module Metanorma
       autoload :Review, "#{__dir__}/handlers/review"
       autoload :Inline, "#{__dir__}/handlers/inline"
       autoload :Structural, "#{__dir__}/handlers/structural"
+      autoload :Term, "#{__dir__}/handlers/term"
     end
   end
 end

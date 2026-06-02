@@ -73,8 +73,29 @@ module Metanorma
         def self.extract_name_text(name)
           text = SafeAttr.read(name, :text)
           return text.to_s if text.is_a?(String) && !text.strip.empty?
+
+          stems = SafeAttr.read(name, :stem)
+          if stems.is_a?(Array) && !stems.empty?
+            parts = Array(text).dup
+            stems.each_with_index do |s, i|
+              stem_text = extract_stem_text(s)
+              parts.insert(i + 1, stem_text) if stem_text
+            end
+            joined = parts.join.strip
+            return joined unless joined.empty?
+          end
+
           return Array(text).join if text.is_a?(Array) && !text.empty?
 
+          ""
+        end
+
+        def self.extract_stem_text(stem)
+          asciimath = SafeAttr.read(stem, :asciimath)
+          if asciimath
+            val = SafeAttr.read(asciimath, :value)
+            return val.to_s if val && !val.to_s.strip.empty?
+          end
           ""
         end
       end
