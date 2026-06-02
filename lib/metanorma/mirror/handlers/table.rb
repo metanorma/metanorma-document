@@ -91,10 +91,10 @@ module Metanorma
         end
 
         def self.extract_stem_text(stem)
-          asciimath = SafeAttr.read(stem, :asciimath)
-          if asciimath
-            val = SafeAttr.read(asciimath, :value)
-            return val.to_s if val && !val.to_s.strip.empty?
+          math = SafeAttr.read(stem, :math)
+          if math
+            xml = math.is_a?(Array) ? math.map(&:to_xml).join : math.to_xml
+            return xml.sub(/\A<\?xml[^?]*\?>\s?/, "")
           end
           ""
         end
