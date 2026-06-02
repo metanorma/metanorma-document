@@ -7,9 +7,8 @@ module Metanorma
         def self.clause(element, context:)
           attrs = section_attrs(element)
           content = context.extract_blocks(element)
-          children = context.extract_section_children(element)
 
-          Node::Clause.new(attrs: attrs, content: content + children)
+          Node::Clause.new(attrs: attrs, content: content)
         end
 
         def self.annex(element, context:)
@@ -19,9 +18,8 @@ module Metanorma
           attrs[:script] = SafeAttr.read(element, :script)
 
           content = context.extract_blocks(element)
-          children = context.extract_section_children(element)
 
-          Node::Annex.new(attrs: attrs.compact, content: content + children)
+          Node::Annex.new(attrs: attrs.compact, content: content)
         end
 
         def self.content_section(element, context:)
@@ -39,9 +37,12 @@ module Metanorma
 
         def self.terms(element, context:)
           attrs = section_attrs(element)
-          content = context.extract_blocks(element)
+          content = context.extract_named_collections(element,
+                                                       %i[p term dl example
+                                                          admonition])
+          children = context.extract_section_children(element)
 
-          Node::Terms.new(attrs: attrs, content: content)
+          Node::Terms.new(attrs: attrs, content: content + children)
         end
 
         def self.definitions(element, context:)

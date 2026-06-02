@@ -104,6 +104,15 @@ module Metanorma
         method_name: :terms,
       )
       registry.register(
+        Metanorma::IsoDocument::Sections::IsoTermsSection,
+        Handlers::Section,
+        method_name: :terms,
+      )
+      registry.register(
+        Metanorma::IsoDocument::Terms::IsoTerm,
+        Handlers::Term,
+      )
+      registry.register(
         Metanorma::StandardDocument::Sections::DefinitionSection,
         Handlers::Section,
         method_name: :definitions,

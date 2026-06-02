@@ -112,6 +112,10 @@ module Metanorma
         PM_TYPE = "terms"
       end
 
+      class Term < Node
+        PM_TYPE = "term"
+      end
+
       class Definitions < Node
         PM_TYPE = "definitions"
       end
