@@ -73,7 +73,7 @@ module Metanorma
         def self.extract_name_text(name)
           text = SafeAttr.read(name, :text)
           return text.to_s if text.is_a?(String) && !text.strip.empty?
-          return Array(text).join.strip if text.is_a?(Array) && !text.empty?
+          return Array(text).join if text.is_a?(Array) && !text.empty?
 
           ""
         end

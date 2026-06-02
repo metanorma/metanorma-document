@@ -41,7 +41,7 @@ module Metanorma
           element.each_mixed_content do |node|
             case node
             when String
-              nodes << context.text_node(node) unless node.strip.empty?
+              nodes << context.text_node(node) unless node.empty?
             else
               handle_inline_element(node, nodes, context:)
             end
@@ -231,54 +231,22 @@ module Metanorma
           ""
         end
 
-        # Extract text from formatting elements preserving document order.
-        # Uses element_order directly because each_mixed_content skips whitespace.
         def self.extract_formatted_text(element)
           return "" unless element
+          return element.to_s unless element.is_a?(Lutaml::Model::Serializable)
 
-          if element.respond_to?(:element_order) && element.element_order
-            parts = []
-            collection_indices = ::Hash.new(0)
-            element.element_order.each do |el|
-              if el.text?
-                text = el.text_content
-                parts << text if text
-              elsif el.element?
-                child_text = resolve_ordered_child_text(element, el.name,
-                                                        collection_indices)
-                parts << child_text if child_text
-              end
+          parts = []
+          element.each_mixed_content do |node|
+            case node
+            when String
+              parts << node
+            when Lutaml::Model::Serializable
+              inner = extract_formatted_text(node)
+              parts << inner if inner && !inner.empty?
             end
-            return parts.join.strip
           end
-
-          extract_text_from_attrs(element)
-        end
-
-        def self.resolve_ordered_child_text(element, el_name, indices)
-          xml_mapping = element.class.mappings_for(:xml,
-                                                   element.lutaml_register)
-          return nil unless xml_mapping
-
-          attr_name = nil
-          xml_mapping.mapping_elements_hash.each_value do |rule_or_array|
-            Array(rule_or_array).each do |rule|
-              if rule.name.to_s == el_name || rule.name == el_name.to_sym
-                attr_name = rule.to
-                break
-              end
-            end
-            break if attr_name
-          end
-          return nil unless attr_name
-
-          collection = element.send(attr_name)
-          return nil unless collection.is_a?(Array) && !collection.empty?
-
-          idx = indices[attr_name]
-          indices[attr_name] += 1
-          child = collection[idx]
-          child ? extract_text_from_model(child) : nil
+          result = parts.join.strip
+          result.empty? ? extract_text_from_attrs(element) : result
         end
 
         def self.extract_text_from_model(node)
