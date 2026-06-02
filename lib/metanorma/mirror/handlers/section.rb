@@ -79,28 +79,22 @@ module Metanorma
         end
 
         def self.extract_biblio_text(ref)
-          # Try formatted_ref first (the full formatted reference text)
-          formatted = SafeAttr.read(ref, :formatted_ref)
-          if formatted
-            text = Inline.extract_formatted_text(formatted)
-            return text unless text.strip.empty?
-          end
+          parts = []
 
-          # Try biblio_tag (the short tag like "[1]")
           tag = SafeAttr.read(ref, :biblio_tag)
           if tag
-            tag_text = Inline.extract_formatted_text(tag)
-            unless tag_text.strip.empty?
-              docid = SafeAttr.read(ref, :docidentifier)
-              if docid
-                id_text = Inline.extract_formatted_text(docid)
-                return "#{tag_text} #{id_text}".strip unless id_text.strip.empty?
-              end
-              return tag_text
-            end
+            tag_text = Inline.extract_formatted_text(tag).strip
+            parts << tag_text unless tag_text.empty?
           end
 
-          # Fallback: try docidentifier alone
+          formatted = SafeAttr.read(ref, :formatted_ref)
+          if formatted
+            fmt_text = Inline.extract_formatted_text(formatted).strip
+            parts << fmt_text unless fmt_text.empty?
+          end
+
+          return parts.join(" ") unless parts.empty?
+
           docid = SafeAttr.read(ref, :docidentifier)
           if docid
             text = Inline.extract_formatted_text(docid)
