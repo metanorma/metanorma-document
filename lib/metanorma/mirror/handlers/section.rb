@@ -38,8 +38,8 @@ module Metanorma
         def self.terms(element, context:)
           attrs = section_attrs(element)
           content = context.extract_named_collections(element,
-                                                       %i[p term dl example
-                                                          admonition])
+                                                      %i[p term dl example
+                                                         admonition])
           children = context.extract_section_children(element)
 
           Node::Terms.new(attrs: attrs, content: content + children)
