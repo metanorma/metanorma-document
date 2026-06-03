@@ -91,12 +91,12 @@ module Metanorma
         with_subsections: false, with_terms: false)
         attrs = element_attrs(id: safe_attr(section, :id))
         parts = []
-        if title_class
-          parts << (render_standard_title(section, level,
-                                          default_class: title_class) || "")
-        else
-          parts << (render_standard_title(section, level) || "")
-        end
+        parts << if title_class
+                   render_standard_title(section, level,
+                                         default_class: title_class) || ""
+                 else
+                   render_standard_title(section, level) || ""
+                 end
         parts << (render_standard_section_blocks(section, level) || "")
         parts << (render_subsections(section, level) || "") if with_subsections
         if with_terms
@@ -315,20 +315,20 @@ module Metanorma
           citeas = safe_attr(origin, :citeas)
           bibitemid = safe_attr(origin, :bibitemid)
 
-          if citeas && !citeas.to_s.empty?
-            if bibitemid && !bibitemid.to_s.empty?
-              parts << render_liquid("_link.html.liquid", {
+          parts << if citeas && !citeas.to_s.empty?
+                     if bibitemid && !bibitemid.to_s.empty?
+                       render_liquid("_link.html.liquid", {
                                        "attrs" => element_attrs(
                                          href: "##{escape_html(bibitemid.to_s)}", class: "bibref",
                                        ),
                                        "content" => escape_html(citeas.to_s),
                                      })
-            else
-              parts << escape_html(citeas.to_s)
-            end
-          else
-            parts << (render_mixed_inline(origin) || "")
-          end
+                     else
+                       escape_html(citeas.to_s)
+                     end
+                   else
+                     render_mixed_inline(origin) || ""
+                   end
 
           modification = safe_attr(source, :modification)
           if modification && !modification.to_s.empty?

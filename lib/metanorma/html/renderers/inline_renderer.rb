@@ -331,11 +331,11 @@ module Metanorma
               end
               parts << escape_html(text)
             when :element
-              if obj.is_a?(Metanorma::Document::Components::Paragraphs::ParagraphBlock)
-                parts << (coordinator.render_paragraph(obj) || "")
-              else
-                parts << (render_inline_element(obj) || "")
-              end
+              parts << if obj.is_a?(Metanorma::Document::Components::Paragraphs::ParagraphBlock)
+                         coordinator.render_paragraph(obj) || ""
+                       else
+                         render_inline_element(obj) || ""
+                       end
             end
           end
 
