@@ -22,6 +22,7 @@ module Metanorma
                     collection: true
           attribute :smallcap, SmallCapElement, collection: true
           attribute :br, BrElement, collection: true
+          attribute :stem, TextElements::StemElement, collection: true
           attribute :xref, XrefElement, collection: true
           attribute :eref, ErefElement, collection: true
           attribute :link, LinkElement, collection: true
@@ -41,6 +42,7 @@ module Metanorma
             map_element "strike", to: :strike
             map_element "smallcap", to: :smallcap
             map_element "br", to: :br
+            map_element "stem", to: :stem
             map_element "xref", to: :xref
             map_element "eref", to: :eref
             map_element "link", to: :link

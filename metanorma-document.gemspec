@@ -38,6 +38,6 @@ Gem::Specification.new do |spec|
 
   # Uncomment to register a new dependency of your gem
   spec.add_dependency "lutaml-model", "~> 0.8.0"
-  spec.add_dependency "pubid", "~> 2.0"
+  spec.add_dependency "pubid", "~> 2.0.0.pre.alpha"
   spec.add_dependency "relaton-bib", "~> 2.1"
 end
