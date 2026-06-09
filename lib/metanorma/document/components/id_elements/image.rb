@@ -10,6 +10,7 @@ module Metanorma
           attribute :width, :string
           attribute :align, :string
           attribute :semx_id, :string
+          attribute :inline_svg, :string
 
           xml do
             element "image"
@@ -17,6 +18,7 @@ module Metanorma
             map_attribute "width", to: :width, render_empty: true
             map_attribute "align", to: :align
             map_attribute "semx-id", to: :semx_id
+            map_element "svg", to: :inline_svg, raw: :element
           end
         end
       end

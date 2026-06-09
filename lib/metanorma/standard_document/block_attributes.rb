@@ -52,14 +52,26 @@ module Metanorma
     end
 
     # Provides `blocks` method for ordered-content section types.
-    # Returns child nodes in document order via `each_mixed_content`.
+    # Returns child block-level nodes in document order via `each_mixed_content`,
+    # excluding metadata/inline elements like titles and annotations.
     module OrderedContent
+      NON_BLOCK_TYPES = [
+        Metanorma::Document::Components::Inline::TitleWithAnnotationElement,
+        Metanorma::Document::Components::Inline::FmtTitleElement,
+        Metanorma::Document::Components::Inline::VariantTitleElement,
+        Metanorma::Document::Components::Inline::FmtXrefLabelElement,
+        Metanorma::Document::Components::Inline::FmtAnnotationStartElement,
+        Metanorma::Document::Components::Inline::FmtAnnotationEndElement,
+      ].freeze
+
       def blocks
         @blocks ||=
           begin
             result = []
             each_mixed_content do |node|
-              result << node unless node.is_a?(String)
+              next if node.is_a?(String)
+              next if NON_BLOCK_TYPES.any? { |t| node.is_a?(t) }
+              result << node
             end
             result
           end
