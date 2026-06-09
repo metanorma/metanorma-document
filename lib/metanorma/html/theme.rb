@@ -143,6 +143,10 @@ module Metanorma
         theme
       end
 
+      def logos
+        logos_light
+      end
+
       def theme_templates_dir
         return nil unless theme_dir
 
