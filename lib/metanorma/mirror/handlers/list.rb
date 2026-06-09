@@ -8,7 +8,7 @@ module Metanorma
           attrs = list_attrs(element)
           items = extract_items(element, context:)
 
-          Node::BulletList.new(attrs: attrs, content: items)
+          Handlers.build_node("bullet_list", attrs: attrs, content: items)
         end
 
         def self.ordered(element, context:)
@@ -18,7 +18,7 @@ module Metanorma
           attrs[:group] = SafeAttr.read(element, :group)
           items = extract_items(element, context:)
 
-          Node::OrderedList.new(attrs: attrs.compact, content: items)
+          Handlers.build_node("ordered_list", attrs: attrs.compact, content: items)
         end
 
         def self.definition(element, context:)
@@ -26,7 +26,7 @@ module Metanorma
           attrs[:key] = SafeAttr.read(element, :key)
           items = extract_definition_items(element, context:)
 
-          Node::DefinitionList.new(attrs: attrs.compact, content: items)
+          Handlers.build_node("dl", attrs: attrs.compact, content: items)
         end
 
         def self.list_item(element, context:)
@@ -52,23 +52,17 @@ module Metanorma
 
             collection.each do |child|
               result = context.registry.handle(child, context: context)
-              next unless result && result[0]
-
-              if result[1]
-                content.concat(Array(result[0]))
-              else
-                content << result[0]
-              end
+              result.append_to(content)
             end
           end
 
-          Node::ListItem.new(attrs: attrs.compact, content: content)
+          Handlers.build_node("list_item", attrs: attrs.compact, content: content)
         end
 
         def self.extract_items(element, context:)
           Array(element.listitem).filter_map do |li|
             result = context.registry.handle(li, context: context)
-            result&.first
+            result.nodes
           end
         end
 
@@ -81,7 +75,7 @@ module Metanorma
             dt_attrs = {}
             dt_attrs[:id] = SafeAttr.read(dt, :id)
             dt_content = Inline.extract_inline(dt, context:)
-            items << Node::DefinitionTerm.new(attrs: dt_attrs.compact,
+            items << Handlers.build_node("dt", attrs: dt_attrs.compact,
                                               content: dt_content)
 
             dd = dds[idx]
@@ -92,7 +86,7 @@ module Metanorma
             dd_content = context.extract_named_collections(dd,
                                                            %i[p ul ol
                                                               sourcecode figure example note table formula quote dl])
-            items << Node::DefinitionDescription.new(attrs: dd_attrs.compact,
+            items << Handlers.build_node("dd", attrs: dd_attrs.compact,
                                                      content: dd_content)
           end
           items

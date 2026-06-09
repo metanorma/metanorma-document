@@ -4,22 +4,14 @@ module Metanorma
   module Mirror
     module Handlers
       module Paragraph
+        EXTRA = { alignment: nil, keep_with_next: nil,
+                  keep_with_previous: nil }.freeze
+
         def self.call(element, context:)
-          attrs = extract_attrs(element)
+          attrs = Handlers.extract_attrs(element, extra_attrs: EXTRA)
           content = Inline.extract_inline(element, context:)
 
-          Node::Paragraph.new(attrs: attrs, content: content)
-        end
-
-        def self.extract_attrs(element)
-          attrs = {}
-          attrs[:id] = SafeAttr.read(element, :id)
-          attrs[:alignment] = SafeAttr.read(element, :alignment)
-          attrs[:keep_with_next] = SafeAttr.read(element, :keep_with_next)
-          attrs[:keep_with_previous] =
-            SafeAttr.read(element, :keep_with_previous)
-          attrs[:semx_id] = SafeAttr.read(element, :semx_id)
-          attrs.compact
+          Handlers.build_node("paragraph", attrs: attrs, content: content)
         end
       end
     end

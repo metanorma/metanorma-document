@@ -4,18 +4,16 @@ module Metanorma
   module Mirror
     module Handlers
       module Example
-        def self.call(element, context:)
-          attrs = {}
-          attrs[:id] = SafeAttr.read(element, :id)
-          attrs[:unnumbered] = SafeAttr.read(element, :unnumbered)
-          attrs[:subsequence] = SafeAttr.read(element, :subsequence)
-          attrs[:semx_id] = SafeAttr.read(element, :semx_id)
+        EXTRA = { unnumbered: nil, subsequence: nil }.freeze
 
+        def self.call(element, context:)
+          attrs = Handlers.extract_attrs(element, extra_attrs: EXTRA)
           content = context.extract_named_collections(element,
                                                       %i[paragraphs formula
-                                                         list ol ul quote sourcecode table figure dl])
+                                                         ul ol quote sourcecode
+                                                         table figure dl])
 
-          Node::Example.new(attrs: attrs.compact, content: content)
+          Handlers.build_node("example", attrs: attrs, content: content)
         end
       end
     end

@@ -11,22 +11,22 @@ module Metanorma
           thead = SafeAttr.read(element, :thead)
           if thead
             rows = extract_rows(thead, context:)
-            content << Node::TableHead.new(content: rows) unless rows.empty?
+            content << Handlers.build_node("table_head", content: rows) unless rows.empty?
           end
 
           tbody = SafeAttr.read(element, :tbody)
           if tbody
             rows = extract_rows(tbody, context:)
-            content << Node::TableBody.new(content: rows) unless rows.empty?
+            content << Handlers.build_node("table_body", content: rows) unless rows.empty?
           end
 
           tfoot = SafeAttr.read(element, :tfoot)
           if tfoot
             rows = extract_rows(tfoot, context:)
-            content << Node::TableFoot.new(content: rows) unless rows.empty?
+            content << Handlers.build_node("table_foot", content: rows) unless rows.empty?
           end
 
-          Node::Table.new(attrs: attrs, content: content)
+          Handlers.build_node("table", attrs: attrs, content: content)
         end
 
         def self.extract_rows(table_section, context:)
@@ -36,7 +36,7 @@ module Metanorma
 
             row_attrs = {}
             row_attrs[:id] = SafeAttr.read(tr, :id)
-            Node::TableRow.new(attrs: row_attrs.compact, content: cells)
+            Handlers.build_node("table_row", attrs: row_attrs.compact, content: cells)
           end
         end
 
@@ -49,7 +49,7 @@ module Metanorma
 
           content = Inline.extract_inline(cell, context:)
 
-          Node::TableCell.new(attrs: attrs.compact, content: content)
+          Handlers.build_node("table_cell", attrs: attrs.compact, content: content)
         end
 
         def self.table_attrs(element)
@@ -61,42 +61,8 @@ module Metanorma
           attrs[:semx_id] = SafeAttr.read(element, :semx_id)
 
           name = SafeAttr.read(element, :name)
-          if name
-            attrs[:title] = case name
-                            when String then name
-                            else extract_name_text(name)
-                            end
-          end
+          attrs[:title] = Handlers.extract_name_text(name) if name
           attrs.compact
-        end
-
-        def self.extract_name_text(name)
-          text = SafeAttr.read(name, :text)
-          return text.to_s if text.is_a?(String) && !text.strip.empty?
-
-          stems = SafeAttr.read(name, :stem)
-          if stems.is_a?(Array) && !stems.empty?
-            parts = Array(text).dup
-            stems.each_with_index do |s, i|
-              stem_text = extract_stem_text(s)
-              parts.insert(i + 1, stem_text) if stem_text
-            end
-            joined = parts.join.strip
-            return joined unless joined.empty?
-          end
-
-          return Array(text).join if text.is_a?(Array) && !text.empty?
-
-          ""
-        end
-
-        def self.extract_stem_text(stem)
-          math = SafeAttr.read(stem, :math)
-          if math
-            xml = math.is_a?(Array) ? math.map(&:to_xml).join : math.to_xml
-            return xml.sub(/\A<\?xml[^?]*\?>\s?/, "")
-          end
-          ""
         end
       end
     end

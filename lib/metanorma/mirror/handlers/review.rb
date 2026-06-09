@@ -4,18 +4,14 @@ module Metanorma
   module Mirror
     module Handlers
       module Review
-        def self.call(element, context:)
-          attrs = {}
-          attrs[:id] = SafeAttr.read(element, :id)
-          attrs[:date] = SafeAttr.read(element, :date)
-          attrs[:from] = SafeAttr.read(element, :from)
-          attrs[:to] = SafeAttr.read(element, :to)
-          attrs[:reviewer] = SafeAttr.read(element, :reviewer)
-          attrs[:display] = SafeAttr.read(element, :display)
+        EXTRA = { date: nil, from: nil, to: nil, reviewer: nil,
+                  display: nil }.freeze
 
+        def self.call(element, context:)
+          attrs = Handlers.extract_attrs(element, extra_attrs: EXTRA)
           content = context.extract_blocks(element)
 
-          Node::Review.new(attrs: attrs.compact, content: content)
+          Handlers.build_node("review", attrs: attrs, content: content)
         end
       end
     end

@@ -4,13 +4,10 @@ module Metanorma
   module Mirror
     module Handlers
       module Sourcecode
+        EXTRA = { language: :lang, filename: nil, linenums: nil }.freeze
+
         def self.call(element, context:)
-          attrs = {}
-          attrs[:id] = SafeAttr.read(element, :id)
-          attrs[:language] = SafeAttr.read(element, :lang)
-          attrs[:filename] = SafeAttr.read(element, :filename)
-          attrs[:linenums] = SafeAttr.read(element, :linenums)
-          attrs[:semx_id] = SafeAttr.read(element, :semx_id)
+          attrs = Handlers.extract_attrs(element, extra_attrs: EXTRA)
 
           body = SafeAttr.read(element, :body)
           text = if body
@@ -22,7 +19,7 @@ module Metanorma
                  end
           attrs[:text] = text
 
-          Node::Sourcecode.new(attrs: attrs.compact)
+          Handlers.build_node("sourcecode", attrs: attrs.compact)
         end
       end
     end
