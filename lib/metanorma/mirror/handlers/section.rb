@@ -5,63 +5,61 @@ module Metanorma
     module Handlers
       module Section
         def self.clause(element, context:)
-          attrs = section_attrs(element)
+          attrs = section_attrs(element, context:)
           content = context.extract_blocks(element)
 
-          Node::Clause.new(attrs: attrs, content: content)
+          Handlers.build_node("clause", attrs: attrs, content: content)
         end
 
         def self.annex(element, context:)
-          attrs = section_attrs(element)
+          attrs = section_attrs(element, context:)
           attrs[:commentary] = SafeAttr.read(element, :commentary)
           attrs[:language] = SafeAttr.read(element, :language)
           attrs[:script] = SafeAttr.read(element, :script)
 
           content = context.extract_blocks(element)
 
-          Node::Annex.new(attrs: attrs.compact, content: content)
+          Handlers.build_node("annex", attrs: attrs.compact, content: content)
         end
 
         def self.content_section(element, context:)
-          attrs = section_attrs(element)
+          attrs = section_attrs(element, context:)
           content = context.extract_blocks(element)
 
           subsection = SafeAttr.read(element, :subsection)
           subsection&.each do |sub|
             result = context.registry.handle(sub, context: context)
-            content << result[0] if result && result[0]
+            result.append_to(content)
           end
 
-          Node::ContentSection.new(attrs: attrs, content: content)
+          Handlers.build_node("content_section", attrs: attrs, content: content)
         end
 
         def self.terms(element, context:)
-          attrs = section_attrs(element)
+          attrs = section_attrs(element, context:)
           content = context.extract_named_collections(element,
                                                       %i[p term dl example
                                                          admonition])
           children = context.extract_section_children(element)
 
-          Node::Terms.new(attrs: attrs, content: content + children)
+          Handlers.build_node("terms", attrs: attrs, content: content + children)
         end
 
         def self.definitions(element, context:)
-          attrs = section_attrs(element)
+          attrs = section_attrs(element, context:)
           content = context.extract_blocks(element)
 
-          Node::Definitions.new(attrs: attrs, content: content)
+          Handlers.build_node("definitions", attrs: attrs, content: content)
         end
 
         def self.references(element, context:)
-          attrs = section_attrs(element)
+          attrs = section_attrs(element, context:)
           attrs[:normative] = SafeAttr.read(element, :normative)
           attrs[:hidden] = SafeAttr.read(element, :hidden)
 
           # Prefatory paragraphs (e.g. "The following documents are referred to...")
           content = context.extract_named_collections(element,
-                                                      %i[p]).map do |node|
-            node
-          end
+                                                      %i[p])
 
           # Bibliographic items
           refs = SafeAttr.read(element, :references)
@@ -69,13 +67,13 @@ module Metanorma
             text = extract_biblio_text(ref)
             next if text.strip.empty?
 
-            content << Node::Paragraph.new(
+            content << Handlers.build_node("paragraph",
               attrs: { id: SafeAttr.read(ref, :id) }.compact,
               content: [context.text_node(text)],
             )
           end
 
-          Node::References.new(attrs: attrs, content: content)
+          Handlers.build_node("references", attrs: attrs, content: content)
         end
 
         def self.extract_biblio_text(ref)
@@ -106,19 +104,19 @@ module Metanorma
 
         def self.floating_title(element, context:)
           attrs = {}
-          attrs[:id] = SafeAttr.read(element, :id)
+          attrs[:id] = context.id_strategy.assign_id(element)
           attrs[:depth] = SafeAttr.read(element, :depth)
           attrs[:semx_id] = SafeAttr.read(element, :semx_id)
 
           title = extract_title(element)
           attrs[:title] = title if title
 
-          Node::FloatingTitle.new(attrs: attrs.compact)
+          Handlers.build_node("floating_title", attrs: attrs.compact)
         end
 
-        def self.section_attrs(element)
+        def self.section_attrs(element, context:)
           attrs = {}
-          attrs[:id] = SafeAttr.read(element, :id)
+          attrs[:id] = context.id_strategy.assign_id(element)
           attrs[:number] = SafeAttr.read(element, :number)
           attrs[:obligation] = SafeAttr.read(element, :obligation)
           attrs[:unnumbered] = SafeAttr.read(element, :unnumbered)
@@ -139,36 +137,12 @@ module Metanorma
 
           case title
           when String then title
-          else extract_text_from_element(title)
-          end
-        end
-
-        def self.extract_text_from_element(element)
-          text = SafeAttr.read(element, :text)
-          if text.is_a?(Array)
-            joined = text.join
-            return joined unless joined.strip.empty?
-          end
-
-          content = SafeAttr.read(element, :content)
-          if content.is_a?(Array)
-            joined = content.join
-            return joined unless joined.strip.empty?
-          end
-
-          element.to_s
-        end
-
-        def self.handle_child(child, content, context:)
-          result = context.registry.handle(child, context: context)
-          return unless result && result[0]
-
-          if result[1]
-            content.concat(Array(result[0]))
           else
-            content << result[0]
+            rich = Inline.extract_rich_html(title)
+            rich.empty? ? Inline.extract_element_text(title) : rich
           end
         end
+
       end
     end
   end

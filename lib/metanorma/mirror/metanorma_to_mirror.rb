@@ -3,18 +3,14 @@
 module Metanorma
   module Mirror
     class MetanormaToMirror
-      attr_reader :registry
+      attr_reader :registry, :id_strategy
 
-      def initialize(registry: Mirror.default_registry)
+      def initialize(registry: Mirror.default_registry, id_strategy: Mirror.DEFAULT_ID_STRATEGY)
         @registry = registry
-        @footnote_counter = 0
-        @footnotes = []
+        @id_strategy = id_strategy
       end
 
       def call(root)
-        @footnote_counter = 0
-        @footnotes = []
-
         attrs = {}
         attrs[:flavor] = root.flavor if root.flavor
         attrs[:type] = root.type if root.type
@@ -28,28 +24,28 @@ module Metanorma
         preface = root.preface
         if preface
           result = @registry.handle(preface, context: self)
-          content << result[0] if result && result[0]
+          result.append_to(content)
         end
 
         sections = root.sections
         if sections
           result = @registry.handle(sections, context: self)
-          content << result[0] if result && result[0]
+          result.append_to(content)
         end
 
         annex = root.annex
         annex&.each do |a|
           result = @registry.handle(a, context: self)
-          content << result[0] if result && result[0]
+          result.append_to(content)
         end
 
         bibliography = root.bibliography
         if bibliography
           result = @registry.handle(bibliography, context: self)
-          content << result[0] if result && result[0]
+          result.append_to(content)
         end
 
-        Node::Document.new(attrs: attrs, content: content)
+        Handlers.build_node("doc", attrs: attrs, content: content)
       end
 
       def extract_blocks(element)
@@ -59,13 +55,7 @@ module Metanorma
           next if node.is_a?(String)
 
           result = @registry.handle(node, context: self)
-          next unless result && result[0]
-
-          if result[1]
-            content.concat(Array(result[0]))
-          else
-            content << result[0]
-          end
+          result.append_to(content)
         end
         content
       end
@@ -78,13 +68,7 @@ module Metanorma
 
           collection.each do |child|
             result = @registry.handle(child, context: self)
-            next unless result && result[0]
-
-            if result[1]
-              content.concat(Array(result[0]))
-            else
-              content << result[0]
-            end
+            result.append_to(content)
           end
         end
         content
@@ -98,44 +82,18 @@ module Metanorma
 
           collection.each do |child|
             result = @registry.handle(child, context: self)
-            next unless result && result[0]
-
-            if result[1]
-              content.concat(Array(result[0]))
-            else
-              content << result[0]
-            end
+            result.append_to(content)
           end
         end
         content
       end
 
       def text_node(text, marks: [])
-        Node::Text.new(text: text, marks: marks)
+        Handlers.build_text(text, marks: marks)
       end
 
       def extract_root_title(root)
-        bibdata = root.bibdata
-        return nil unless bibdata
-
-        title = bibdata.title
-        return nil unless title
-
-        case title
-        when String then title
-        when Array
-          first = title.first
-          return first.to_s unless first
-
-          if first.is_a?(String)
-            first
-          elsif first.is_a?(Lutaml::Model::Serializable)
-            Array(first.content).join
-          else
-            first.to_s
-          end
-        else title.to_s
-        end
+        Handlers.extract_bibdata_title(root.bibdata)
       end
     end
   end

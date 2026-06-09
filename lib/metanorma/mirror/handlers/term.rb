@@ -31,7 +31,7 @@ module Metanorma
           if fmt_ts_list && !fmt_ts_list.empty?
             source_text = Inline.extract_formatted_text(fmt_ts_list.first)
             unless source_text.empty?
-              content << Node::Paragraph.new(
+              content << Handlers.build_node("paragraph",
                 attrs: { class: "source" },
                 content: [context.text_node(source_text)],
               )
@@ -47,7 +47,7 @@ module Metanorma
               note_attrs[:number] = num unless num.empty?
             end
             note_content = context.extract_named_collections(tn, %i[p ul ol dl])
-            content << Node::Note.new(attrs: note_attrs.compact,
+            content << Handlers.build_node("note", attrs: note_attrs.compact,
                                       content: note_content)
           end
 
@@ -55,17 +55,17 @@ module Metanorma
           SafeAttr.read(element, :termexample)&.each do |te|
             ex_attrs = { id: SafeAttr.read(te, :id) }
             ex_content = context.extract_named_collections(te, %i[p ul ol dl])
-            content << Node::Example.new(attrs: ex_attrs.compact,
+            content << Handlers.build_node("example", attrs: ex_attrs.compact,
                                          content: ex_content)
           end
 
           # Nested terms
           SafeAttr.read(element, :term)&.each do |t|
             result = context.registry.handle(t, context: context)
-            content << result[0] if result && result[0]
+            result.append_to(content)
           end
 
-          Node::Term.new(attrs: attrs.compact, content: content)
+          Handlers.build_node("term", attrs: attrs.compact, content: content)
         end
 
         def self.extract_fmt_paragraphs(element, attr_name, content, context)
@@ -78,7 +78,7 @@ module Metanorma
 
             ps.each do |p|
               result = context.registry.handle(p, context: context)
-              content << result[0] if result && result[0]
+              result.append_to(content)
             end
           end
         end
@@ -91,7 +91,7 @@ module Metanorma
           Array(semx_list).each do |s|
             SafeAttr.read(s, :p)&.each do |p|
               result = context.registry.handle(p, context: context)
-              content << result[0] if result && result[0]
+              result.append_to(content)
             end
           end
         end

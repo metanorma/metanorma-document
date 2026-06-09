@@ -6,17 +6,16 @@ module Metanorma
   module Mirror
     module Serialization
       class JsonSerializer
-        def self.serialize(node)
-          node.to_h.to_json
+        def self.serialize(data)
+          data.to_json
         end
 
-        def self.serialize_pretty(node)
-          JSON.pretty_generate(node.to_h)
+        def self.serialize_pretty(data)
+          JSON.pretty_generate(data)
         end
 
         def self.deserialize(json_string)
-          hash = JSON.parse(json_string)
-          Node.from_h(hash)
+          JSON.parse(json_string)
         end
       end
     end

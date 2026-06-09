@@ -4,17 +4,13 @@ module Metanorma
   module Mirror
     module Handlers
       module Admonition
-        def self.call(element, context:)
-          attrs = {}
-          attrs[:id] = SafeAttr.read(element, :id)
-          attrs[:type] = SafeAttr.read(element, :type)
-          attrs[:target] = SafeAttr.read(element, :target)
-          attrs[:unnumbered] = SafeAttr.read(element, :unnumbered)
-          attrs[:semx_id] = SafeAttr.read(element, :semx_id)
+        EXTRA = { type: nil, target: nil, unnumbered: nil }.freeze
 
+        def self.call(element, context:)
+          attrs = Handlers.extract_attrs(element, extra_attrs: EXTRA)
           content = context.extract_blocks(element)
 
-          Node::Admonition.new(attrs: attrs.compact, content: content)
+          Handlers.build_node("admonition", attrs: attrs, content: content)
         end
       end
     end

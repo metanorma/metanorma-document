@@ -4,18 +4,23 @@ module Metanorma
   module Mirror
     class Error < StandardError; end
 
-    autoload :Node, "#{__dir__}/mirror/node"
-    autoload :Mark, "#{__dir__}/mirror/mark"
+    autoload :SafeAttr, "#{__dir__}/mirror/safe_attr"
     autoload :Transformer, "#{__dir__}/mirror/transformer"
     autoload :MetanormaToMirror, "#{__dir__}/mirror/metanorma_to_mirror"
     autoload :MirrorToMetanorma, "#{__dir__}/mirror/mirror_to_metanorma"
     autoload :HandlerRegistry, "#{__dir__}/mirror/handler_registry"
-    autoload :SafeAttr, "#{__dir__}/mirror/safe_attr"
     autoload :Handlers, "#{__dir__}/mirror/handlers"
+    autoload :IdStrategy, "#{__dir__}/mirror/id_strategy"
     autoload :Output, "#{__dir__}/mirror/output"
     autoload :Serialization, "#{__dir__}/mirror/serialization"
 
+    DEFAULT_ID_STRATEGY = IdStrategy::Preserve.new
+
     def self.default_registry
+      @default_registry ||= build_default_registry
+    end
+
+    def self.build_default_registry
       registry = HandlerRegistry.new
 
       # Paragraphs

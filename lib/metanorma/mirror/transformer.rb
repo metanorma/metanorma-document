@@ -3,12 +3,14 @@
 module Metanorma
   module Mirror
     class Transformer
-      def initialize(registry: Mirror.default_registry)
+      def initialize(registry: Mirror.default_registry, id_strategy: Mirror::DEFAULT_ID_STRATEGY)
         @registry = registry
+        @id_strategy = id_strategy
       end
 
       def from_metanorma(root)
-        MetanormaToMirror.new(registry: @registry).call(root)
+        document = MetanormaToMirror.new(registry: @registry, id_strategy: @id_strategy).call(root)
+        @id_strategy.finalize!(document)
       end
 
       def to_metanorma(mirror_node)

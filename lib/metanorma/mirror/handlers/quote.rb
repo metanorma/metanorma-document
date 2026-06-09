@@ -5,13 +5,10 @@ module Metanorma
     module Handlers
       module Quote
         def self.call(element, context:)
-          attrs = {}
-          attrs[:id] = SafeAttr.read(element, :id)
-          attrs[:semx_id] = SafeAttr.read(element, :semx_id)
-
+          attrs = Handlers.extract_attrs(element)
           content = context.extract_blocks(element)
 
-          Node::Quote.new(attrs: attrs.compact, content: content)
+          Handlers.build_node("quote", attrs: attrs, content: content)
         end
       end
     end

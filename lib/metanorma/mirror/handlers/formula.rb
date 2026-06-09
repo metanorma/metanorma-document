@@ -4,12 +4,10 @@ module Metanorma
   module Mirror
     module Handlers
       module Formula
+        EXTRA = { unnumbered: nil, inequality: nil }.freeze
+
         def self.call(element, context:)
-          attrs = {}
-          attrs[:id] = SafeAttr.read(element, :id)
-          attrs[:unnumbered] = SafeAttr.read(element, :unnumbered)
-          attrs[:inequality] = SafeAttr.read(element, :inequality)
-          attrs[:semx_id] = SafeAttr.read(element, :semx_id)
+          attrs = Handlers.extract_attrs(element, extra_attrs: EXTRA)
 
           stem = SafeAttr.read(element, :stem)
           if stem
@@ -22,14 +20,14 @@ module Metanorma
             end
 
             math = SafeAttr.read(stem, :math)
-            attrs[:mathml] = math.to_xml.sub(/\A<\?xml[^?]*\?>\s?/, "") if math
+            attrs[:mathml] = Handlers.mathml_from_math(math) if math
           end
 
           # Legacy fallback: some older documents store text directly
           text = SafeAttr.read(element, :text)
           attrs[:math_text] = Array(text).join if text && !attrs[:asciimath]
 
-          Node::Formula.new(attrs: attrs.compact)
+          Handlers.build_node("formula", attrs: attrs.compact)
         end
       end
     end
