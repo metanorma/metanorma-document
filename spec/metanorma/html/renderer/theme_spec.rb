@@ -363,7 +363,7 @@ RSpec.describe Metanorma::Html::Theme do
     end
 
     it "has hash type for logos" do
-      attr = described_class.attributes[:logos]
+      attr = described_class.attributes[:logos_light]
       attr.type.should eq(Lutaml::Model::Type::Hash)
     end
 
@@ -379,7 +379,7 @@ RSpec.describe Metanorma::Html::Theme do
         accent: "#ff6600"
         publishers:
           - ISO
-        logos:
+        logos_light:
           ISO: iso-logo.svg
         preface_wrap: true
         toc_filter_types:
@@ -389,7 +389,7 @@ RSpec.describe Metanorma::Html::Theme do
       theme.primary.should eq("#b3000c")
       theme.accent.should eq("#ff6600")
       theme.publishers.should eq(["ISO"])
-      theme.logos.should eq({ "ISO" => "iso-logo.svg" })
+      theme.logos_light.should eq({ "ISO" => "iso-logo.svg" })
       theme.preface_wrap.should be(true)
       theme.toc_filter_types.should eq(["toc"])
       theme.text_color.should eq("#1a1a2e")

@@ -5,8 +5,14 @@ require "metanorma/mirror"
 
 RSpec.describe Metanorma::Mirror::Serialization::JsonSerializer do
   let(:node) do
-    text = Metanorma::Mirror::Node::Text.new(text: "hello", marks: [Metanorma::Mirror::Mark::Emphasis.new])
-    Metanorma::Mirror::Node::Paragraph.new(attrs: { id: "p1" }, content: [text])
+    {
+      "type" => "paragraph",
+      "attrs" => { "id" => "p1" },
+      "content" => [
+        { "type" => "text", "text" => "hello",
+          "marks" => [{ "type" => "emphasis" }] },
+      ],
+    }
   end
 
   describe ".serialize" do
@@ -27,53 +33,67 @@ RSpec.describe Metanorma::Mirror::Serialization::JsonSerializer do
   end
 
   describe ".deserialize" do
-    it "reconstructs the node tree" do
+    it "reconstructs the hash tree" do
       json = described_class.serialize(node)
       restored = described_class.deserialize(json)
-      restored.should be_a(Metanorma::Mirror::Node::Paragraph)
-      restored.attrs[:id].should eq("p1")
-      restored.content.first.text.should eq("hello")
-      restored.content.first.marks.first.type.should eq("emphasis")
+      restored["type"].should eq("paragraph")
+      restored["attrs"]["id"].should eq("p1")
+      restored["content"].first["text"].should eq("hello")
+      restored["content"].first["marks"].first["type"].should eq("emphasis")
     end
   end
 
   describe "round-trip" do
-    it "preserves data through serialize → deserialize" do
-      doc = Metanorma::Mirror::Node::Document.new(
-        attrs: { title: "Test", flavor: "iso" },
-        content: [
-          Metanorma::Mirror::Node::Preface.new(content: [
-                                                 Metanorma::Mirror::Node::Paragraph.new(content: [
-                                                                                          Metanorma::Mirror::Node::Text.new(text: "Foreword text"),
-                                                                                        ]),
-                                               ]),
-          Metanorma::Mirror::Node::Sections.new(content: [
-                                                  Metanorma::Mirror::Node::Clause.new(attrs: { id: "s1", title: "Scope" }, content: [
-                                                                                        Metanorma::Mirror::Node::Paragraph.new(content: [
-                                                                                                                                 Metanorma::Mirror::Node::Text.new(text: "Scope content"),
-                                                                                                                               ]),
-                                                                                      ]),
-                                                ]),
+    it "preserves data through serialize -> deserialize" do
+      doc = {
+        "type" => "doc",
+        "attrs" => { "title" => "Test", "flavor" => "iso" },
+        "content" => [
+          {
+            "type" => "preface",
+            "content" => [
+              {
+                "type" => "paragraph",
+                "content" => [{ "type" => "text", "text" => "Foreword text" }],
+              },
+            ],
+          },
+          {
+            "type" => "sections",
+            "content" => [
+              {
+                "type" => "clause",
+                "attrs" => { "id" => "s1", "title" => "Scope" },
+                "content" => [
+                  {
+                    "type" => "paragraph",
+                    "content" => [{ "type" => "text", "text" => "Scope content" }],
+                  },
+                ],
+              },
+            ],
+          },
         ],
-      )
+      }
 
       json = described_class.serialize(doc)
       restored = described_class.deserialize(json)
 
-      restored.should be_a(Metanorma::Mirror::Node::Document)
-      restored.attrs[:title].should eq("Test")
-      restored.content.size.should eq(2)
-      restored.content.first.should be_a(Metanorma::Mirror::Node::Preface)
+      restored["type"].should eq("doc")
+      restored["attrs"]["title"].should eq("Test")
+      restored["content"].size.should eq(2)
+      restored["content"].first["type"].should eq("preface")
     end
   end
 end
 
 RSpec.describe Metanorma::Mirror::Serialization::YamlSerializer do
   let(:node) do
-    Metanorma::Mirror::Node::Paragraph.new(
-      attrs: { id: "p1" },
-      content: [Metanorma::Mirror::Node::Text.new(text: "hello")],
-    )
+    {
+      "type" => "paragraph",
+      "attrs" => { "id" => "p1" },
+      "content" => [{ "type" => "text", "text" => "hello" }],
+    }
   end
 
   describe ".serialize" do
@@ -85,28 +105,29 @@ RSpec.describe Metanorma::Mirror::Serialization::YamlSerializer do
   end
 
   describe ".deserialize" do
-    it "reconstructs the node tree" do
+    it "reconstructs the hash tree" do
       yaml = described_class.serialize(node)
       restored = described_class.deserialize(yaml)
-      restored.should be_a(Metanorma::Mirror::Node::Paragraph)
-      restored.attrs[:id].should eq("p1")
-      restored.content.first.text.should eq("hello")
+      restored["type"].should eq("paragraph")
+      restored["attrs"]["id"].should eq("p1")
+      restored["content"].first["text"].should eq("hello")
     end
   end
 
   describe "round-trip" do
-    it "preserves data through serialize → deserialize" do
-      doc = Metanorma::Mirror::Node::Document.new(
-        attrs: { flavor: "iso" },
-        content: [
-          Metanorma::Mirror::Node::Sections.new(content: []),
+    it "preserves data through serialize -> deserialize" do
+      doc = {
+        "type" => "doc",
+        "attrs" => { "flavor" => "iso" },
+        "content" => [
+          { "type" => "sections", "content" => [] },
         ],
-      )
+      }
 
       yaml = described_class.serialize(doc)
       restored = described_class.deserialize(yaml)
-      restored.should be_a(Metanorma::Mirror::Node::Document)
-      restored.attrs[:flavor].should eq("iso")
+      restored["type"].should eq("doc")
+      restored["attrs"]["flavor"].should eq("iso")
     end
   end
 end
