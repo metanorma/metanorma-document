@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "base64"
+
 module Metanorma
   module Html
     module Renderers
@@ -221,10 +223,7 @@ module Metanorma
         end
 
         def render_image(image)
-          inline_svg = extract_inline_svg(image)
-          return inline_svg if inline_svg
-
-          src_val = safe_attr(image, :source)
+          src_val = image_source(image)
           attrs = element_attrs(
             id: safe_attr(image, :id),
             src: src_val,
@@ -235,22 +234,13 @@ module Metanorma
           render_liquid("_image.html.liquid", { "attrs" => attrs })
         end
 
-        def extract_inline_svg(image)
-          return nil unless image.is_a?(Lutaml::Model::Serializable) && image.element_order
-
-          svg_element = image.element_order.find do |e|
-            e.element? && e.name == "svg"
+        def image_source(image)
+          svg_xml = safe_attr(image, :inline_svg)
+          if svg_xml && !svg_xml.empty?
+            "data:image/svg+xml;base64,#{Base64.strict_encode64(svg_xml)}"
+          else
+            safe_attr(image, :source)
           end
-          return nil unless svg_element
-
-          svg_xml = coordinator.extract_inline_svg_for(image)
-          return nil unless svg_xml
-
-          require "base64"
-          data_uri = "data:image/svg+xml;base64,#{Base64.strict_encode64(svg_xml)}"
-          image_id = safe_attr(image, :id)
-          alt = safe_attr(image, :alt)
-          %(<img src="#{data_uri}"#{%{ id="#{image_id}"} if image_id}#{%{ alt="#{alt}"} if alt} />)
         end
 
         def render_video(video)

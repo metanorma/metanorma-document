@@ -121,9 +121,10 @@ module Metanorma
         @toc_entries
       end
 
-      def generate_full_document(document, raw_xml: nil)
+      attr_writer :document, :theme
+
+      def generate_full_document(document, **)
         @document = document
-        @raw_xml = raw_xml
         validate_presentation_xml!
 
         body = render(@document) || ""
@@ -878,22 +879,6 @@ level = 1)
 
       def block_element?(obj)
         BLOCK_TYPES[obj.class] || BLOCK_TYPES.any? { |type, _| obj.is_a?(type) }
-      end
-
-      def extract_inline_svg_for(image)
-        return nil unless @raw_xml
-
-        image_id = safe_attr(image, :id)
-        return nil unless image_id
-
-        escaped_id = Regexp.escape(image_id)
-        # Match <image id="..." ...> content, then extract <svg>...</svg>
-        if (match = @raw_xml.match(/<image[^>]*id="#{escaped_id}"[^>]*>(.*?)<\/image>/m))
-          inner = match[1]
-          if (svg_match = inner.match(/(<svg\s.*?<\/svg>)/m))
-            svg_match[1]
-          end
-        end
       end
 
       def safe_attr(obj, method_name)
