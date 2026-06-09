@@ -12,7 +12,7 @@ RSpec.describe "Config-driven flavor metadata" do
   let(:doc) { Metanorma::IsoDocument::Root.from_xml(xml) }
   let(:renderer) do
     r = Metanorma::Html::IsoRenderer.new
-    r.instance_variable_set(:@document, doc)
+    r.document = doc
     r
   end
 

@@ -2145,8 +2145,12 @@ RSpec.describe "Flavor Root classes" do
         math_element.rb
         semx_child_element.rb
         sourcecode_block.rb
+        sourcecode_body.rb
         organization.rb
         bipm_bibliographic_item.rb
+        bipm_depiction_element.rb
+        depiction_element.rb
+        logo_element.rb
         metanorma_extension.rb
       ]
       model_files = Dir.glob("lib/metanorma/{document,standard_document,*_document,basic_document}/**/*.rb")

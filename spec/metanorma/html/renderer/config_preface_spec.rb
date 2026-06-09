@@ -8,7 +8,7 @@ RSpec.describe "Config-driven preface rendering" do
   let(:theme) { Metanorma::Html::Theme.new }
   let(:renderer) do
     r = Metanorma::Html::BaseRenderer.new
-    r.instance_variable_set(:@theme, theme)
+    r.theme = theme
     r
   end
 

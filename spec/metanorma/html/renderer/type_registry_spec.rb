@@ -90,9 +90,11 @@ RSpec.describe "OCP type registry" do
       iso_reg.should_not equal(iec_reg)
     end
 
-    it "flavor registries are empty when no types registered" do
-      # IecRenderer doesn't register any types; lookup finds them in IsoRenderer via ancestors
-      Metanorma::Html::IecRenderer.render_registry.should be_empty
+    it "flavor registry contains only its own types, not parent types" do
+      # IecRenderer registers IecDocument::Root but not IsoDocument::Root
+      iec_reg = Metanorma::Html::IecRenderer.render_registry
+      iec_reg.should have_key(Metanorma::IecDocument::Root)
+      iec_reg.should_not have_key(Metanorma::IsoDocument::Root)
     end
 
     it "flavor renderer can register its own types independently" do

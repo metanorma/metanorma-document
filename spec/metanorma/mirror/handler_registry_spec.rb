@@ -8,9 +8,11 @@ RSpec.describe Metanorma::Mirror::HandlerRegistry do
 
   describe "#register" do
     it "stores a handler entry" do
-      handler = double("handler")
+      handler_mod = Module.new do
+        def self.call(_element, context:); end
+      end
       klass = Class.new
-      registry.register(klass, handler, method_name: :call)
+      registry.register(klass, handler_mod, method_name: :call)
       registry.registered?(klass).should be(true)
     end
   end
@@ -24,11 +26,13 @@ RSpec.describe Metanorma::Mirror::HandlerRegistry do
 
   describe "#entry_for" do
     it "returns entry for registered class" do
-      handler = double("handler")
+      handler_mod = Module.new do
+        def self.transform(_element, context:); end
+      end
       klass = Class.new
-      registry.register(klass, handler, method_name: :transform)
+      registry.register(klass, handler_mod, method_name: :transform)
       entry = registry.entry_for(klass.new)
-      entry.handler.should eq(handler)
+      entry.handler.should eq(handler_mod)
       entry.method_name.should eq(:transform)
     end
 
@@ -38,10 +42,10 @@ RSpec.describe Metanorma::Mirror::HandlerRegistry do
   end
 
   describe "#handle" do
-    it "dispatches to handler method" do
+    it "dispatches to handler method and returns HandlerResult" do
       handler_mod = Module.new do
         def self.call(element, context:)
-          Metanorma::Mirror::Node::Paragraph.new(attrs: { id: element.object_id.to_s })
+          Metanorma::Mirror::Handlers.build_node("paragraph", attrs: { id: element.object_id.to_s })
         end
       end
 
@@ -49,15 +53,17 @@ RSpec.describe Metanorma::Mirror::HandlerRegistry do
       registry.register(klass, handler_mod)
       element = klass.new
 
-      result, concat = registry.handle(element, context: nil)
-      result.should be_a(Metanorma::Mirror::Node::Paragraph)
-      concat.should be(false)
+      result = registry.handle(element, context: nil)
+      result.should be_a(Metanorma::Mirror::HandlerResult)
+      result.nodes.should be_a(Hash)
+      result.nodes["type"].should eq("paragraph")
+      result.concat?.should be(false)
     end
 
     it "supports method_name option" do
       handler_mod = Module.new do
         def self.transform(_element, context:)
-          Metanorma::Mirror::Node::Paragraph.new
+          Metanorma::Mirror::Handlers.build_node("paragraph")
         end
       end
 
@@ -65,18 +71,21 @@ RSpec.describe Metanorma::Mirror::HandlerRegistry do
       registry.register(klass, handler_mod, method_name: :transform)
       element = klass.new
 
-      result, _concat = registry.handle(element, context: nil)
-      result.should be_a(Metanorma::Mirror::Node::Paragraph)
+      result = registry.handle(element, context: nil)
+      result.nodes["type"].should eq("paragraph")
     end
 
-    it "returns nil for unregistered elements" do
-      registry.handle(Class.new.new, context: nil).should be_nil
+    it "returns nil HandlerResult for unregistered elements" do
+      result = registry.handle(Class.new.new, context: nil)
+      result.should be_a(Metanorma::Mirror::HandlerResult)
+      result.nil?.should be(true)
     end
 
     it "supports concat option" do
       handler_mod = Module.new do
         def self.call(_element, context:)
-          [Metanorma::Mirror::Node::Paragraph.new, Metanorma::Mirror::Node::Paragraph.new]
+          [Metanorma::Mirror::Handlers.build_node("paragraph"),
+           Metanorma::Mirror::Handlers.build_node("paragraph")]
         end
       end
 
@@ -84,9 +93,9 @@ RSpec.describe Metanorma::Mirror::HandlerRegistry do
       registry.register(klass, handler_mod, concat: true)
       element = klass.new
 
-      result, concat = registry.handle(element, context: nil)
-      result.should be_an(Array)
-      concat.should be(true)
+      result = registry.handle(element, context: nil)
+      result.nodes.should be_an(Array)
+      result.concat?.should be(true)
     end
   end
 end
