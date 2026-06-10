@@ -9,7 +9,7 @@ RSpec.describe Metanorma::Mirror::Handlers::List do
   let(:id_strategy) { Metanorma::Mirror::IdStrategy::Preserve.new }
   let(:context) do
     Metanorma::Mirror::MetanormaToMirror.new(registry: registry,
-                                              id_strategy: id_strategy)
+                                             id_strategy: id_strategy)
   end
 
   def parse_ul(xml)
