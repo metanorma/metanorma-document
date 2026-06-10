@@ -226,3 +226,18 @@ Style/ComparableClamp:
     - 'lib/metanorma/html/iso_renderer.rb'
     - 'lib/metanorma/html/renderers/section_renderer.rb'
     - 'lib/metanorma/html/standard_renderer.rb'
+
+# Offense count: 12
+Lint/UnusedMethodArgument:
+  Exclude:
+    - 'lib/metanorma/mirror/output/html_renderer.rb'
+
+# Offense count: 1
+Lint/MissingSuper:
+  Exclude:
+    - 'lib/metanorma/html/drops/**'
+    - 'lib/metanorma/mirror/id_strategy/positional.rb'
+
+# Offense count: 2
+Lint/UnusedMethodArgument:
+  AllowUnusedKeywordArguments: true
