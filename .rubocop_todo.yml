@@ -185,6 +185,7 @@ RSpec/LeakyConstantDeclaration:
 RSpec/MultipleDescribes:
   Exclude:
     - 'spec/metanorma/document_spec.rb'
+    - 'spec/metanorma/mirror/handlers/remaining_handlers_spec.rb'
     - 'spec/metanorma/mirror/serialization_spec.rb'
     - 'spec/metanorma/standard_document/sections_spec.rb'
 

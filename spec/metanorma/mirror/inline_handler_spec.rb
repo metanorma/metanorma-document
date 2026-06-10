@@ -9,7 +9,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
   let(:id_strategy) { Metanorma::Mirror::IdStrategy::Preserve.new }
   let(:context) do
     Metanorma::Mirror::MetanormaToMirror.new(registry: registry,
-                                              id_strategy: id_strategy)
+                                             id_strategy: id_strategy)
   end
 
   def parse_paragraph(xml)
@@ -19,7 +19,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
   describe "MARK_BUILDERS" do
     it "maps every inline element class to a callable builder" do
       map = described_class::MARK_BUILDERS
-      map.each do |_klass, builder|
+      map.each_value do |builder|
         builder.should be_a(Method).or be_a(Proc)
         result = builder.call(nil)
         result.should be_a(Hash)
@@ -171,7 +171,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
 
   describe "RICH_HTML_RENDERERS" do
     it "maps each element class to a valid tag or method" do
-      described_class::RICH_HTML_RENDERERS.each do |_klass, renderer|
+      described_class::RICH_HTML_RENDERERS.each_value do |renderer|
         if renderer.is_a?(Symbol)
           described_class.method(renderer).should_not be_nil
         else

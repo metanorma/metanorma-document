@@ -153,7 +153,7 @@ RSpec.describe Metanorma::Mirror::MirrorToMetanorma do
 
     it "converts a floating_title" do
       node = { "type" => "floating_title", "attrs" => { "id" => "ft1",
-                                                         "depth" => 3 } }
+                                                        "depth" => 3 } }
       result = transformer.call(node)
       result[:type].should eq("floating_title")
       result[:attrs]["depth"].should eq(3)
@@ -165,7 +165,7 @@ RSpec.describe Metanorma::Mirror::MirrorToMetanorma do
         "attrs" => { "id" => "a1", "title" => "Annex A" },
         "content" => [
           { "type" => "paragraph", "content" => [{ "type" => "text",
-                                                    "text" => "Text" }] },
+                                                   "text" => "Text" }] },
         ],
       }
       result = transformer.call(node)
@@ -211,7 +211,7 @@ RSpec.describe Metanorma::Mirror::MirrorToMetanorma do
 
     it "converts formula" do
       node = { "type" => "formula", "attrs" => { "id" => "f1",
-                                                   "mathml" => "<math/>" } }
+                                                 "mathml" => "<math/>" } }
       result = transformer.call(node)
       result[:type].should eq("formula")
       result[:attrs]["mathml"].should eq("<math/>")
@@ -236,7 +236,7 @@ RSpec.describe Metanorma::Mirror::MirrorToMetanorma do
         "attrs" => { "id" => "t1" },
         "content" => [
           { "type" => "paragraph", "content" => [{ "type" => "text",
-                                                    "text" => "def" }] },
+                                                   "text" => "def" }] },
         ],
       }
       result = transformer.call(node)

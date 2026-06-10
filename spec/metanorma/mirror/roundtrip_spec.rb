@@ -7,54 +7,57 @@ RSpec.describe Metanorma::Mirror::MirrorToMetanorma do
   let(:forward) { Metanorma::Mirror::Transformer.new }
   let(:reverse) { described_class.new }
 
+  let(:complex_doc) do
+    {
+      "type" => "doc",
+      "attrs" => { "flavor" => "iso", "title" => "Test Doc" },
+      "content" => [
+        {
+          "type" => "preface",
+          "content" => [
+            {
+              "type" => "content_section",
+              "attrs" => { "title" => "Foreword" },
+              "content" => [
+                {
+                  "type" => "paragraph",
+                  "content" => [{ "type" => "text", "text" => "Foreword text" }],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          "type" => "sections",
+          "content" => [
+            {
+              "type" => "clause",
+              "attrs" => { "id" => "s1", "title" => "Scope",
+                           "number" => "1" },
+              "content" => [
+                {
+                  "type" => "paragraph",
+                  "attrs" => { "id" => "p1" },
+                  "content" => [
+                    { "type" => "text", "text" => "Hello " },
+                    {
+                      "type" => "text",
+                      "text" => "world",
+                      "marks" => [{ "type" => "emphasis" }],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    }
+  end
+
   describe "mirror hash round-trip through serialization" do
     it "round-trips a document tree through JSON" do
-      doc = {
-        "type" => "doc",
-        "attrs" => { "flavor" => "iso", "title" => "Test Doc" },
-        "content" => [
-          {
-            "type" => "preface",
-            "content" => [
-              {
-                "type" => "content_section",
-                "attrs" => { "title" => "Foreword" },
-                "content" => [
-                  {
-                    "type" => "paragraph",
-                    "content" => [{ "type" => "text", "text" => "Foreword text" }],
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            "type" => "sections",
-            "content" => [
-              {
-                "type" => "clause",
-                "attrs" => { "id" => "s1", "title" => "Scope", "number" => "1" },
-                "content" => [
-                  {
-                    "type" => "paragraph",
-                    "attrs" => { "id" => "p1" },
-                    "content" => [
-                      { "type" => "text", "text" => "Hello " },
-                      {
-                        "type" => "text",
-                        "text" => "world",
-                        "marks" => [{ "type" => "emphasis" }],
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      }
-
-      json = Metanorma::Mirror::Serialization::JsonSerializer.serialize(doc)
+      json = Metanorma::Mirror::Serialization::JsonSerializer.serialize(complex_doc)
       restored = Metanorma::Mirror::Serialization::JsonSerializer.deserialize(json)
 
       restored["type"].should eq("doc")
