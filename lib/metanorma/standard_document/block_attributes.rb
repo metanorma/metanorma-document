@@ -71,6 +71,7 @@ module Metanorma
             each_mixed_content do |node|
               next if node.is_a?(String)
               next if NON_BLOCK_TYPES.any? { |t| node.is_a?(t) }
+
               result << node
             end
             result

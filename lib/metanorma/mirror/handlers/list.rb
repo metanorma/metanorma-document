@@ -76,7 +76,7 @@ module Metanorma
             dt_attrs[:id] = SafeAttr.read(dt, :id)
             dt_content = Inline.extract_inline(dt, context:)
             items << Handlers.build_node("dt", attrs: dt_attrs.compact,
-                                              content: dt_content)
+                                               content: dt_content)
 
             dd = dds[idx]
             next unless dd
@@ -87,7 +87,7 @@ module Metanorma
                                                            %i[p ul ol
                                                               sourcecode figure example note table formula quote dl])
             items << Handlers.build_node("dd", attrs: dd_attrs.compact,
-                                                     content: dd_content)
+                                               content: dd_content)
           end
           items
         end

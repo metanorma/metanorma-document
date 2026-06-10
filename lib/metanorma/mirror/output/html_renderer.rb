@@ -198,15 +198,15 @@ module Metanorma
           header = title ? %(<div class="mn-table__header">#{e(title)}</div>) : ""
 
           content = node["content"] || []
-          thead = render_table_section(content.select { |s|
+          thead = render_table_section(content.select do |s|
             s["type"] == "table_head"
-          }, "th")
-          tbody = render_table_section(content.select { |s|
+          end, "th")
+          tbody = render_table_section(content.select do |s|
             s["type"] == "table_body"
-          }, "td")
-          tfoot = render_table_section(content.select { |s|
+          end, "td")
+          tfoot = render_table_section(content.select do |s|
             s["type"] == "table_foot"
-          }, "td")
+          end, "td")
 
           %(<div#{id_attr} class="mn-table">#{header}\n  <table>\n#{thead}#{tbody}#{tfoot}\n  </table>\n</div>)
         end
