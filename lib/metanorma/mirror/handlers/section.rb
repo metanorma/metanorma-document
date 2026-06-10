@@ -69,8 +69,7 @@ module Metanorma
 
             content << Handlers.build_node("paragraph",
               attrs: { id: SafeAttr.read(ref, :id) }.compact,
-              content: [context.text_node(text)],
-            )
+              content: [context.text_node(text)])
           end
 
           Handlers.build_node("references", attrs: attrs, content: content)
@@ -142,7 +141,6 @@ module Metanorma
             rich.empty? ? Inline.extract_element_text(title) : rich
           end
         end
-
       end
     end
   end

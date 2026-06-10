@@ -39,7 +39,7 @@ module Metanorma
               @flavor_map ||= Metanorma.constants.each_with_object({}) do |c, map|
                 next unless c.to_s.end_with?("Document")
 
-                flavor = c.to_s.sub(/Document\z/, "").downcase
+                flavor = c.to_s.delete_suffix("Document").downcase
                 map[flavor] = c.to_s
               end.freeze
             end
@@ -90,7 +90,6 @@ module Metanorma
               guide["title"] = context.title
               guide
             end
-
           end
         end
       end

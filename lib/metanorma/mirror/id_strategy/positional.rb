@@ -59,8 +59,6 @@ module Metanorma
             "fig-#{number}"
           when :table
             "table-#{number}"
-          else
-            nil
           end
         end
 
@@ -85,6 +83,7 @@ module Metanorma
           if attrs.key?(:semx) && node.semx
             node.semx.each do |s|
               next unless s.element_attr == "autonum"
+
               text = s.text&.join
               parts << text if text && !text.empty?
             end
@@ -110,8 +109,6 @@ module Metanorma
             :figure
           when Metanorma::Document::Components::Tables::TableBlock
             :table
-          else
-            nil
           end
         end
 

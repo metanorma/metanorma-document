@@ -32,9 +32,8 @@ module Metanorma
             source_text = Inline.extract_formatted_text(fmt_ts_list.first)
             unless source_text.empty?
               content << Handlers.build_node("paragraph",
-                attrs: { class: "source" },
-                content: [context.text_node(source_text)],
-              )
+                                             attrs: { class: "source" },
+                                             content: [context.text_node(source_text)])
             end
           end
 
@@ -48,7 +47,7 @@ module Metanorma
             end
             note_content = context.extract_named_collections(tn, %i[p ul ol dl])
             content << Handlers.build_node("note", attrs: note_attrs.compact,
-                                      content: note_content)
+                                                   content: note_content)
           end
 
           # Term examples
@@ -56,7 +55,7 @@ module Metanorma
             ex_attrs = { id: SafeAttr.read(te, :id) }
             ex_content = context.extract_named_collections(te, %i[p ul ol dl])
             content << Handlers.build_node("example", attrs: ex_attrs.compact,
-                                         content: ex_content)
+                                                      content: ex_content)
           end
 
           # Nested terms
