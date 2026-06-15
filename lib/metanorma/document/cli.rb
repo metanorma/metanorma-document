@@ -6,6 +6,8 @@ require "fileutils"
 module Metanorma
   module Document
     class CLI
+      class Error < StandardError; end
+
       ToMirrorOptions = Struct.new(
         :xml_path,
         :output,
@@ -23,9 +25,7 @@ module Metanorma
         when nil, "-h", "--help"
           puts usage
         else
-          warn "Unknown command: #{command}"
-          puts usage
-          exit 1
+          raise Error, "Unknown command: #{command}"
         end
       end
 
@@ -55,8 +55,7 @@ module Metanorma
             when "preserve"
               options.id_strategy = Mirror::IdStrategy::Preserve.new
             else
-              warn "Unknown ID strategy: #{strategy}. Use 'preserve' or 'positional'."
-              exit 1
+              raise Error, "Unknown ID strategy: #{strategy}. Use 'preserve' or 'positional'."
             end
           end
 
@@ -68,16 +67,8 @@ module Metanorma
         parser.parse!(argv)
 
         xml_path = argv.shift
-        unless xml_path
-          warn "Error: XML path required"
-          warn parser
-          exit 1
-        end
-
-        unless File.exist?(xml_path)
-          warn "Error: File not found: #{xml_path}"
-          exit 1
-        end
+        raise Error, "XML path required" unless xml_path
+        raise Error, "File not found: #{xml_path}" unless File.exist?(xml_path)
 
         options.xml_path = xml_path
         options
@@ -90,9 +81,9 @@ module Metanorma
           title: options.title,
           id_strategy: options.id_strategy,
         )
-        pipeline.process
+        guide = pipeline.process
 
-        json = Mirror::Serialization::JsonSerializer.serialize_pretty(pipeline.context.content)
+        json = Mirror::Serialization::JsonSerializer.serialize_pretty(guide.content)
         write_output(json, options.output)
       end
 

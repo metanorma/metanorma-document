@@ -2,4 +2,10 @@
 # frozen_string_literal: true
 
 require "metanorma/document"
-Metanorma::Document::CLI.run(ARGV)
+
+begin
+  Metanorma::Document::CLI.run(ARGV)
+rescue Metanorma::Document::CLI::Error => e
+  warn "Error: #{e.message}"
+  exit 1
+end
