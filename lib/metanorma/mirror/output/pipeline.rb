@@ -11,28 +11,27 @@ module Metanorma
           @context = PipelineContext.new(
             xml_path: xml_path,
             flavor: flavor,
-            parsed: nil,
             title: title || File.basename(xml_path, ".*"),
-            content: nil,
             id_strategy: id_strategy,
           )
         end
 
         def process
-          guide = {}
-          @steps.reduce(guide) do |current, step_class|
-            step_class.new.call(current, @context)
-          end
+          @steps.each { |step_class| step_class.new.call(@context) }
+          Model::Guide.new(
+            content: @context.content,
+            meta: @context.meta,
+            title: @context.title,
+          )
         end
 
         module Steps
           class ParseXml
-            def call(guide, context)
+            def call(context)
               flavor = context.flavor || infer_flavor(context.xml_path)
               doc_class = flavor_class(flavor)
               xml_content = File.read(context.xml_path)
               context.parsed = doc_class.from_xml(xml_content)
-              guide
             end
 
             def self.flavor_map
@@ -64,31 +63,25 @@ module Metanorma
           end
 
           class TransformMirror
-            def call(guide, context)
+            def call(context)
               id_strategy = context.id_strategy || Mirror::DEFAULT_ID_STRATEGY
               transformer = Mirror::Transformer.new(id_strategy: id_strategy)
-              mirror_node = transformer.from_metanorma(context.parsed)
-              context.content = mirror_node
-              guide["content"] = mirror_node["content"] || []
-              guide
+              context.content = transformer.from_metanorma(context.parsed)
             end
           end
 
           class AttachMetadata
-            def call(guide, context)
+            def call(context)
               parsed = context.parsed
+              return unless parsed.is_a?(Metanorma::StandardDocument::Root)
 
-              if parsed.is_a?(Metanorma::StandardDocument::Root)
-                bibdata = parsed.bibdata
-                if bibdata
-                  guide["meta"] ||= {}
-                  guide["meta"]["title"] = Handlers.extract_bibdata_title(bibdata)
-                  guide["meta"]["flavor"] = context.flavor if context.flavor
-                end
-              end
+              bibdata = parsed.bibdata
+              return unless bibdata
 
-              guide["title"] = context.title
-              guide
+              meta = {}
+              meta["title"] = Handlers.extract_bibdata_title(bibdata)
+              meta["flavor"] = context.flavor if context.flavor
+              context.meta = meta
             end
           end
         end

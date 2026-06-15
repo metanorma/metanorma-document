@@ -6,6 +6,7 @@ module Metanorma
       autoload :Pipeline, "#{__dir__}/output/pipeline"
       autoload :PipelineContext, "#{__dir__}/output/pipeline_context"
       autoload :Builder, "#{__dir__}/output/builder"
+      autoload :HtmlRenderers, "#{__dir__}/output/html_renderers"
       autoload :HtmlRenderer, "#{__dir__}/output/html_renderer"
       autoload :Formats, "#{__dir__}/output/formats"
     end

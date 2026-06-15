@@ -5,6 +5,9 @@ module Metanorma
     class Error < StandardError; end
 
     autoload :SafeAttr, "#{__dir__}/mirror/safe_attr"
+    autoload :MathUtil, "#{__dir__}/mirror/math_util"
+    autoload :Model, "#{__dir__}/mirror/model"
+    autoload :HandlerResult, "#{__dir__}/mirror/handler_result"
     autoload :Transformer, "#{__dir__}/mirror/transformer"
     autoload :MetanormaToMirror, "#{__dir__}/mirror/metanorma_to_mirror"
     autoload :MirrorToMetanorma, "#{__dir__}/mirror/mirror_to_metanorma"
