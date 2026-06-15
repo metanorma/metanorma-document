@@ -2,38 +2,6 @@
 
 module Metanorma
   module Mirror
-    class HandlerResult
-      attr_reader :nodes
-
-      def self.nil
-        new(nil, concat: false)
-      end
-
-      def initialize(nodes, concat: false)
-        @nodes = nodes
-        @concat = concat
-      end
-
-      def nil?
-        @nodes.nil?
-      end
-
-      def concat?
-        @concat
-      end
-
-      def append_to(content)
-        return content if nil?
-
-        if concat?
-          content.concat(Array(@nodes))
-        else
-          content << @nodes
-        end
-        content
-      end
-    end
-
     class HandlerRegistry
       Entry = Struct.new(:handler, :method_name, :concat, :extra_kwargs,
                          keyword_init: true)
@@ -62,7 +30,7 @@ module Metanorma
 
       def handle(model_element, context:)
         entry = entry_for(model_element)
-        return HandlerResult.nil unless entry
+        return HandlerResult.none unless entry
 
         kwargs = { context: context }.merge(entry.extra_kwargs || {})
 

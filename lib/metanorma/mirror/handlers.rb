@@ -21,24 +21,20 @@ module Metanorma
 
       COMMON_ATTRS = %i[id semx_id].freeze
 
-      def self.build_node(type, attrs: {}, content: [], marks: [])
-        h = { "type" => type }
-        h["attrs"] = attrs.transform_keys(&:to_s) unless attrs.nil? || attrs.empty?
-        h["marks"] = marks unless marks.nil? || marks.empty?
-        h["content"] = content unless content.nil? || content.empty?
-        h
+      def self.build_node(type, attrs: {}, content: [])
+        if content.nil? || content.empty?
+          Model::Leaf.new(type: type, attrs: attrs)
+        else
+          Model::Container.new(type: type, attrs: attrs, content: content)
+        end
       end
 
       def self.build_text(text, marks: [])
-        h = { "type" => "text", "text" => text.to_s }
-        h["marks"] = marks unless marks.nil? || marks.empty?
-        h
+        Model::Text.new(text: text, marks: marks)
       end
 
       def self.build_mark(type, attrs: {})
-        h = { "type" => type }
-        h["attrs"] = attrs.transform_keys(&:to_s) unless attrs.nil? || attrs.empty?
-        h
+        Model::Mark.new(type: type, attrs: attrs)
       end
 
       def self.extract_attrs(element, extra_attrs: {})
@@ -53,58 +49,11 @@ module Metanorma
       end
 
       def self.extract_name_text(name)
-        return name if name.is_a?(String)
-
-        text = SafeAttr.read(name, :text)
-        return text.to_s if text.is_a?(String) && !text.strip.empty?
-
-        stems = SafeAttr.read(name, :stem)
-        if stems.is_a?(Array) && !stems.empty?
-          parts = Array(text).dup
-          stems.each_with_index do |s, i|
-            stem_text = extract_stem_text(s)
-            parts.insert(i + 1, stem_text) if stem_text
-          end
-          joined = parts.join.strip
-          return joined unless joined.empty?
-        end
-
-        return Array(text).join if text.is_a?(Array) && !text.empty?
-
-        ""
+        Inline::TextExtractor.extract_name_text(name)
       end
 
       def self.extract_bibdata_title(bibdata)
-        return nil unless bibdata
-
-        title = bibdata.title
-        return nil unless title
-
-        case title
-        when String then title
-        when Array
-          first = title.first
-          return nil unless first
-
-          if first.is_a?(String)
-            first
-          elsif first.is_a?(Lutaml::Model::Serializable)
-            Array(first.content).join
-          else
-            first.to_s
-          end
-        else title.to_s
-        end
-      end
-
-      def self.extract_stem_text(stem)
-        math = SafeAttr.read(stem, :math)
-        mathml_from_math(math) if math
-      end
-
-      def self.mathml_from_math(math)
-        xml = math.is_a?(Array) ? math.map(&:to_xml).join : math.to_xml
-        xml.sub(/\A<\?xml[^?]*\?>\s?/, "")
+        Inline::TextExtractor.extract_bibdata_title(bibdata)
       end
     end
   end
