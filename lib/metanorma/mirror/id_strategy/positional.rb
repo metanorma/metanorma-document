@@ -16,6 +16,45 @@ module Metanorma
       #   UUID element with number "A.2"  → id: "anx-A.2"
       #   Explicit id "sec-3.1.3.4"       → id: "sec-3.1.3.4" (unchanged)
       class Positional < Base
+        @categories = {}
+
+        class << self
+          # Registry of Metanorma model classes → positional-ID category
+          # (:section, :annex, :figure, :table). Adding new flavors or new
+          # model types requires only a new register_category call — no
+          # edits to derive/element_category (OCP).
+          def categories
+            @categories
+          end
+
+          def register_category(model_class, category)
+            categories[model_class] = category
+            self
+          end
+
+          def unregister_category(model_class)
+            categories.delete(model_class)
+            self
+          end
+
+          def category_for(element)
+            return categories[element.class] if categories.key?(element.class)
+
+            categories.each do |klass, category|
+              return category if element.is_a?(klass)
+            end
+            nil
+          end
+        end
+
+        register_category Metanorma::StandardDocument::Sections::ClauseSection, :section
+        register_category Metanorma::StandardDocument::Sections::ContentSection, :section
+        register_category Metanorma::StandardDocument::Sections::TermsSection, :section
+        register_category Metanorma::StandardDocument::Sections::DefinitionSection, :section
+        register_category Metanorma::StandardDocument::Sections::AnnexSection, :annex
+        register_category Metanorma::Document::Components::AncillaryBlocks::FigureBlock, :figure
+        register_category Metanorma::Document::Components::Tables::TableBlock, :table
+
         def initialize
           @id_map = {}
         end
@@ -32,7 +71,7 @@ module Metanorma
         end
 
         def finalize!(document)
-          translate_targets!(document)
+          translate_targets(document)
           document
         end
 
@@ -50,7 +89,7 @@ module Metanorma
           number = extract_number(element)
           return nil unless number && !number.strip.empty?
 
-          case element_category(element)
+          case self.class.category_for(element)
           when :section
             number.match?(/\A[\d.]+\z/) ? "sec-#{number}" : nil
           when :annex
@@ -96,39 +135,23 @@ module Metanorma
           parts
         end
 
-        def element_category(element)
-          case element
-          when Metanorma::StandardDocument::Sections::ClauseSection,
-               Metanorma::StandardDocument::Sections::ContentSection,
-               Metanorma::StandardDocument::Sections::TermsSection,
-               Metanorma::StandardDocument::Sections::DefinitionSection
-            :section
-          when Metanorma::StandardDocument::Sections::AnnexSection
-            :annex
-          when Metanorma::Document::Components::AncillaryBlocks::FigureBlock
-            :figure
-          when Metanorma::Document::Components::Tables::TableBlock
-            :table
+        def translate_targets(node)
+          case node
+          when Model::Text
+            node.marks.each { |mark| translate_mark_target(mark) }
+          when Model::Container
+            node.content.each { |child| translate_targets(child) }
           end
         end
 
-        def translate_targets!(node)
-          return unless node.is_a?(Hash)
+        def translate_mark_target(mark)
+          return unless mark.type == "xref"
 
-          Array(node["content"]).each do |child|
-            next unless child.is_a?(Hash)
+          target = mark["target"]
+          return unless target
 
-            if child["type"] == "text"
-              Array(child["marks"]).each do |mark|
-                next unless mark["type"] == "xref"
-
-                target = mark.dig("attrs", "target")
-                mark["attrs"] ||= {}
-                mark["attrs"]["target"] = @id_map[target] || target if target
-              end
-            end
-            translate_targets!(child)
-          end
+          translated = @id_map[target]
+          mark["target"] = translated if translated
         end
       end
     end
