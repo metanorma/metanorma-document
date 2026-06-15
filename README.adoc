@@ -210,6 +210,110 @@ This library targets the modern Metanorma XML format which uses `<metanorma>` as
 
 Legacy XML formats that use flavor-specific root elements (e.g. `<iso-standard>`, `<m3d-standard>`, `<csa-standard>`, `<un-standard>`) are *not supported*.
 
+== Mirror Format
+
+The `Metanorma::Mirror` module is a ProseMirror-style document model that captures the structural and inline content of a Metanorma document. It serves as an intermediate representation suitable for serialization, round-tripping, alternate rendering pipelines, and editor integrations.
+
+The mirror format is fully model-driven: every node, mark, and document is an instance of a `Model` class. There are no hashes at the API boundary.
+
+=== Model Layer
+
+[horizontal]
+`Model::Container` :: A node with children (`#content`)
+`Model::Leaf` :: A node without children (e.g. `image`, `sourcecode`)
+`Model::Text` :: Inline text carrying a string and a list of `Mark`s
+`Model::SoftBreak` :: A soft line break inside a paragraph
+`Model::Mark` :: An inline decoration (`emphasis`, `strong`, `link`, `xref`, `eref`, `footnote`, `stem`, ...)
+`Model::Guide` :: Output wrapper with `content`, `meta`, and `title`
+`Model::Factory.from_h(hash)` :: Rebuilds a model graph from a serialized hash
+
+Each model class encapsulates its attributes via bounded accessors. `Mark` exposes `[]`, `[]=`, `set_attr`, and `fetch` for safe attribute mutation. `#to_h` is the canonical serialization method.
+
+=== Forward Conversion (Metanorma → Mirror)
+
+[source,ruby]
+require "metanorma/document"
+require "metanorma/mirror"
+
+xml = File.read("spec/fixtures/iso/is/document-en.presentation.xml")
+doc = Metanorma::IsoDocument::Root.from_xml(xml)
+
+transformer = Metanorma::Mirror::Transformer.new
+document = transformer.from_metanorma(doc)
+document.class # => Metanorma::Mirror::Model::Container
+
+=== Reverse Conversion (Mirror → Metanorma)
+
+The reverse converter rebuilds a Model graph, applying skip rules and optional per-type customization:
+
+[source,ruby]
+reverse = Metanorma::Mirror::MirrorToMetanorma.new
+rebuilt = reverse.call(document)
+
+Customization is OCP-friendly:
+
+[source,ruby]
+Metanorma::Mirror::MirrorToMetanorma.skip("my_type")
+Metanorma::Mirror::MirrorToMetanorma.register("my_type") do |node, ctx|
+  Metanorma::Mirror::Model::Leaf.new(type: "customized")
+end
+
+=== Serialization
+
+Mirror documents round-trip cleanly through JSON and YAML:
+
+[source,ruby]
+json = Metanorma::Mirror::Serialization::JsonSerializer.serialize(document)
+restored = Metanorma::Mirror::Serialization::JsonSerializer.deserialize(json)
+
+=== ID Strategies
+
+ID assignment is pluggable via `Metanorma::Mirror::IdStrategy`:
+
+[horizontal]
+`IdStrategy::Preserve` :: Default. Keeps element IDs as-is.
+`IdStrategy::Positional` :: Rewrites UUID-style IDs to positional IDs (`sec-X.Y.Z`, `anx-X`, `fig-N`, `table-N`) and translates cross-reference targets.
+
+The `Positional` strategy exposes `register_category(model_class, category)` so new flavors can declare their model classes without editing dispatch code.
+
+=== HTML Rendering from Mirror
+
+`Metanorma::Mirror::Output::HtmlRenderer` produces SSR-ready HTML directly from a mirror Model graph. Renderer behavior is split into pluggable modules registered by node type (`clause`, `paragraph`, `bullet_list`, `table`, ...) and by mark type (`emphasis`, `link`, `xref`, ...). All dispatch is registry-driven (no `case/when` on types), so new node and mark types can be added without modifying core rendering code:
+
+[source,ruby]
+Metanorma::Mirror::Output::HtmlRenderer.register_node_renderer("callout",
+  ->(node, renderer) { "<callout>#{renderer.e(node.attrs['text'])}</callout>" })
+
+Metanorma::Mirror::Output::HtmlRenderer.register_mark_renderer("kbd",
+  ->(text, _mark) { "<kbd>#{text}</kbd>" })
+
+=== Output Pipeline
+
+`Metanorma::Mirror::Output::Pipeline` runs the full conversion: parse XML → forward transform → attach metadata. `Metanorma::Mirror::Output::Builder` orchestrates the pipeline and writes through a pluggable `Formats` registry (default: `InlineFormat`).
+
+[source,ruby]
+builder = Metanorma::Mirror::Output::Builder.new(
+  xml_path: "document.presentation.xml",
+  output_path: "output.html",
+  format: :inline,
+  flavor: "iso",
+)
+builder.build
+
+New formats register themselves without editing lookup code:
+
+[source,ruby]
+Metanorma::Mirror::Output::Formats.register(:pdf, MyPdfFormat)
+
+=== CLI
+
+[source,bash]
+# Convert presentation XML to mirror JSON
+metanorma-document to-mirror document.presentation.xml \
+  -o document.mirror.json \
+  --id-strategy positional \
+  --title "My Document"
+
 == Documentation
 
 Detailed architecture documentation is in the `docs/` directory:
