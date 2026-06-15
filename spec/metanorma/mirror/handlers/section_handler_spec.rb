@@ -24,26 +24,26 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
     it "returns a Clause hash" do
       el = parse_clause("<clause id='c1'><title>Scope</title><p>Text</p></clause>")
       result = described_class.clause(el, context: context)
-      result["type"].should eq("clause")
+      result.type.should eq("clause")
     end
 
     it "extracts id and title" do
       el = parse_clause("<clause id='c1'><title>Scope</title></clause>")
       result = described_class.clause(el, context: context)
-      result["attrs"]["id"].should eq("c1")
+      result.attrs["id"].should eq("c1")
     end
 
     it "extracts title text" do
       el = parse_clause("<clause id='c1'><title>Scope</title></clause>")
       result = described_class.clause(el, context: context)
-      result["attrs"]["title"].should eq("Scope")
+      result.attrs["title"].should eq("Scope")
     end
 
     it "extracts block content from mixed_content" do
       el = parse_clause("<clause id='c1'><p>Para 1</p><p>Para 2</p></clause>")
       result = described_class.clause(el, context: context)
-      result["content"].size.should eq(2)
-      result["content"].each { |c| c["type"].should eq("paragraph") }
+      result.content.size.should eq(2)
+      result.content.each { |c| c.type.should eq("paragraph") }
     end
   end
 
@@ -51,13 +51,13 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
     it "returns an Annex hash" do
       el = parse_annex("<annex id='a1'><title>Annex A</title><p>Text</p></annex>")
       result = described_class.annex(el, context: context)
-      result["type"].should eq("annex")
+      result.type.should eq("annex")
     end
 
     it "extracts annex-specific attributes" do
       el = parse_annex("<annex id='a1' language='en'><title>Notes</title></annex>")
       result = described_class.annex(el, context: context)
-      result["attrs"]["language"].should eq("en")
+      result.attrs["language"].should eq("en")
     end
   end
 
@@ -67,7 +67,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
         "<floating-title depth='3'>Subtitle</floating-title>",
       )
       result = described_class.floating_title(el, context: context)
-      result["type"].should eq("floating_title")
+      result.type.should eq("floating_title")
     end
 
     it "extracts depth" do
@@ -75,7 +75,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
         "<floating-title depth='3'>Subtitle</floating-title>",
       )
       result = described_class.floating_title(el, context: context)
-      result["attrs"]["depth"].should eq(3)
+      result.attrs["depth"].should eq(3)
     end
   end
 
@@ -106,8 +106,8 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
         "<foreword id='fw'><title>Foreword</title><p>Text</p></foreword>",
       )
       result = described_class.content_section(el, context: context)
-      result["type"].should eq("content_section")
-      result["attrs"]["id"].should eq("fw")
+      result.type.should eq("content_section")
+      result.attrs["id"].should eq("fw")
     end
   end
 
@@ -117,8 +117,8 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
         "<terms id='terms'><title>Terms</title></terms>",
       )
       result = described_class.terms(el, context: context)
-      result["type"].should eq("terms")
-      result["attrs"]["id"].should eq("terms")
+      result.type.should eq("terms")
+      result.attrs["id"].should eq("terms")
     end
   end
 
@@ -128,8 +128,8 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
         "<definitions id='defs'><title>Definitions</title></definitions>",
       )
       result = described_class.definitions(el, context: context)
-      result["type"].should eq("definitions")
-      result["attrs"]["id"].should eq("defs")
+      result.type.should eq("definitions")
+      result.attrs["id"].should eq("defs")
     end
   end
 
@@ -139,8 +139,8 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
         "<references id='refs' normative='true'><p>The following documents</p></references>",
       )
       result = described_class.references(el, context: context)
-      result["type"].should eq("references")
-      result["attrs"]["id"].should eq("refs")
+      result.type.should eq("references")
+      result.attrs["id"].should eq("refs")
     end
   end
 end

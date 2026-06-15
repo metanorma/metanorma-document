@@ -100,35 +100,21 @@ RSpec.describe Metanorma::Mirror::IdStrategy do
 
     describe "#finalize!" do
       it "remaps xref mark targets from UUID to positional IDs" do
-        # Run assign_id to populate the internal id_map
         section = Metanorma::StandardDocument::Sections::ClauseSection.new(id: "_abc123", number: "5.4")
         strategy.assign_id(section)
 
-        doc = {
-          "type" => "doc",
-          "content" => [
-            {
-              "type" => "paragraph",
-              "content" => [
-                {
-                  "type" => "text",
-                  "text" => "see section",
-                  "marks" => [
-                    { "type" => "xref", "attrs" => { "target" => "_abc123" } },
-                  ],
-                },
-              ],
-            },
-          ],
-        }
+        xref_mark = Metanorma::Mirror::Model::Mark.new(type: "xref", attrs: { "target" => "_abc123" })
+        text_node = Metanorma::Mirror::Model::Text.new(text: "see section", marks: [xref_mark])
+        paragraph = Metanorma::Mirror::Model::Container.new(type: "paragraph", content: [text_node])
+        doc = Metanorma::Mirror::Model::Container.new(type: "doc", content: [paragraph])
 
         result = strategy.finalize!(doc)
-        xref = result["content"][0]["content"][0]["marks"][0]
-        xref["attrs"]["target"].should eq("sec-5.4")
+        xref = result.content[0].content[0].marks[0]
+        xref.attrs["target"].should eq("sec-5.4")
       end
 
       it "returns the document unchanged when no IDs were remapped" do
-        doc = { "type" => "doc", "content" => [] }
+        doc = Metanorma::Mirror::Model::Container.new(type: "doc", content: [])
         result = strategy.finalize!(doc)
         result.should equal(doc)
       end
@@ -137,27 +123,33 @@ RSpec.describe Metanorma::Mirror::IdStrategy do
         section = Metanorma::StandardDocument::Sections::ClauseSection.new(id: "_mapped", number: "1.1")
         strategy.assign_id(section)
 
-        doc = {
-          "type" => "doc",
-          "content" => [
-            {
-              "type" => "paragraph",
-              "content" => [
-                {
-                  "type" => "text",
-                  "text" => "link",
-                  "marks" => [
-                    { "type" => "xref", "attrs" => { "target" => "sec-existing" } },
-                  ],
-                },
-              ],
-            },
-          ],
-        }
+        xref_mark = Metanorma::Mirror::Model::Mark.new(type: "xref", attrs: { "target" => "sec-existing" })
+        text_node = Metanorma::Mirror::Model::Text.new(text: "link", marks: [xref_mark])
+        paragraph = Metanorma::Mirror::Model::Container.new(type: "paragraph", content: [text_node])
+        doc = Metanorma::Mirror::Model::Container.new(type: "doc", content: [paragraph])
 
         result = strategy.finalize!(doc)
-        xref = result["content"][0]["content"][0]["marks"][0]
-        xref["attrs"]["target"].should eq("sec-existing")
+        xref = result.content[0].content[0].marks[0]
+        xref.attrs["target"].should eq("sec-existing")
+      end
+    end
+
+    describe ".register_category (OCP)" do
+      it "allows new categories to be registered without modifying dispatch" do
+        custom_class = Class.new
+        described_class.register_category(custom_class, :widget)
+        described_class.category_for(custom_class.new).should eq(:widget)
+      ensure
+        described_class.unregister_category(custom_class)
+      end
+
+      it "supports subclass categorization via is_a?" do
+        base = Class.new
+        sub = Class.new(base)
+        described_class.register_category(base, :custom)
+        described_class.category_for(sub.new).should eq(:custom)
+      ensure
+        described_class.unregister_category(base)
       end
     end
   end

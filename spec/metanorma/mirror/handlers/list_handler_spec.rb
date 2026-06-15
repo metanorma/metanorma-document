@@ -28,14 +28,14 @@ RSpec.describe Metanorma::Mirror::Handlers::List do
     it "returns a BulletList hash" do
       el = parse_ul("<ul><li>A</li><li>B</li></ul>")
       result = described_class.bullet(el, context: context)
-      result["type"].should eq("bullet_list")
+      result.type.should eq("bullet_list")
     end
 
     it "extracts list items" do
       el = parse_ul("<ul><li>First</li><li>Second</li></ul>")
       result = described_class.bullet(el, context: context)
-      result["content"].size.should eq(2)
-      result["content"].each { |c| c["type"].should eq("list_item") }
+      result.content.size.should eq(2)
+      result.content.each { |c| c.type.should eq("list_item") }
     end
   end
 
@@ -43,13 +43,13 @@ RSpec.describe Metanorma::Mirror::Handlers::List do
     it "returns an OrderedList hash" do
       el = parse_ol("<ol><li>Step 1</li><li>Step 2</li></ol>")
       result = described_class.ordered(el, context: context)
-      result["type"].should eq("ordered_list")
+      result.type.should eq("ordered_list")
     end
 
     it "extracts list items" do
       el = parse_ol("<ol><li>X</li></ol>")
       result = described_class.ordered(el, context: context)
-      result["content"].size.should eq(1)
+      result.content.size.should eq(1)
     end
   end
 
@@ -58,10 +58,10 @@ RSpec.describe Metanorma::Mirror::Handlers::List do
       xml = "<dl><dt>Term</dt><dd><p>Definition</p></dd></dl>"
       el = parse_dl(xml)
       result = described_class.definition(el, context: context)
-      result["type"].should eq("dl")
-      result["content"].size.should eq(2)
-      result["content"][0]["type"].should eq("dt")
-      result["content"][1]["type"].should eq("dd")
+      result.type.should eq("dl")
+      result.content.size.should eq(2)
+      result.content[0].type.should eq("dt")
+      result.content[1].type.should eq("dd")
     end
   end
 
@@ -69,8 +69,8 @@ RSpec.describe Metanorma::Mirror::Handlers::List do
     it "returns a ListItem hash with content from paragraphs" do
       el = Metanorma::Document::Components::Lists::ListItem.from_xml("<li><p>Text</p></li>")
       result = described_class.list_item(el, context: context)
-      result["type"].should eq("list_item")
-      result["content"].should_not be_empty
+      result.type.should eq("list_item")
+      result.content.should_not be_empty
     end
   end
 end

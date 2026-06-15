@@ -16,22 +16,22 @@ RSpec.describe Metanorma::Document::CLI do
       stdout.should include("Usage:")
     end
 
-    it "exits with error for unknown command" do
-      -> { described_class.run(["unknown"]) }.should raise_error(SystemExit)
+    it "raises error for unknown command" do
+      -> { described_class.run(["unknown"]) }.should raise_error(Metanorma::Document::CLI::Error, /Unknown command/)
     end
   end
 
   describe ".to_mirror" do
-    it "exits with error when no XML path provided" do
-      -> { described_class.to_mirror([]) }.should raise_error(SystemExit)
+    it "raises error when no XML path provided" do
+      -> { described_class.to_mirror([]) }.should raise_error(Metanorma::Document::CLI::Error, /XML path required/)
     end
 
-    it "exits with error when file not found" do
-      -> { described_class.to_mirror(["/nonexistent/file.xml"]) }.should raise_error(SystemExit)
+    it "raises error when file not found" do
+      -> { described_class.to_mirror(["/nonexistent/file.xml"]) }.should raise_error(Metanorma::Document::CLI::Error, /File not found/)
     end
 
-    it "exits with error for unknown id-strategy" do
-      -> { described_class.to_mirror(["--id-strategy", "bogus", "file.xml"]) }.should raise_error(SystemExit)
+    it "raises error for unknown id-strategy" do
+      -> { described_class.to_mirror(["--id-strategy", "bogus", "file.xml"]) }.should raise_error(Metanorma::Document::CLI::Error, /Unknown ID strategy/)
     end
   end
 

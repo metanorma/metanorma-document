@@ -20,7 +20,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Table do
     it "returns a Table hash" do
       el = parse_table("<table id='t1'><tbody><tr><td>Cell</td></tr></tbody></table>")
       result = described_class.call(el, context: context)
-      result["type"].should eq("table")
+      result.type.should eq("table")
     end
 
     it "extracts thead, tbody, and tfoot" do
@@ -34,20 +34,20 @@ RSpec.describe Metanorma::Mirror::Handlers::Table do
       el = parse_table(xml)
       result = described_class.call(el, context: context)
 
-      types = result["content"].map { |c| c["type"] }
+      types = result.content.map(&:type)
       types.should eq(%w[table_head table_body table_foot])
     end
 
     it "extracts table id" do
       el = parse_table("<table id='t1'><tbody><tr><td>X</td></tr></tbody></table>")
       result = described_class.call(el, context: context)
-      result["attrs"]["id"].should eq("t1")
+      result.attrs["id"].should eq("t1")
     end
 
     it "extracts table title from name" do
       el = parse_table("<table id='t1'><name>Table 1</name><tbody><tr><td>X</td></tr></tbody></table>")
       result = described_class.call(el, context: context)
-      result["attrs"]["title"].should eq("Table 1")
+      result.attrs["title"].should eq("Table 1")
     end
   end
 
@@ -57,9 +57,9 @@ RSpec.describe Metanorma::Mirror::Handlers::Table do
       tbody = el.tbody
       rows = described_class.extract_rows(tbody, context: context)
       rows.size.should eq(1)
-      rows.first["type"].should eq("table_row")
-      rows.first["content"].size.should eq(2)
-      rows.first["content"].each { |c| c["type"].should eq("table_cell") }
+      rows.first.type.should eq("table_row")
+      rows.first.content.size.should eq(2)
+      rows.first.content.each { |c| c.type.should eq("table_cell") }
     end
   end
 
@@ -68,8 +68,8 @@ RSpec.describe Metanorma::Mirror::Handlers::Table do
       el = parse_table("<table><tbody><tr><td colspan='2' rowspan='3'>X</td></tr></tbody></table>")
       td = el.tbody.tr.first.td.first
       cell = described_class.build_cell(td, context: context)
-      cell["attrs"]["colspan"].should eq(2)
-      cell["attrs"]["rowspan"].should eq(3)
+      cell.attrs["colspan"].should eq(2)
+      cell.attrs["rowspan"].should eq(3)
     end
   end
 end

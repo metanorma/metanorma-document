@@ -55,8 +55,8 @@ RSpec.describe Metanorma::Mirror::HandlerRegistry do
 
       result = registry.handle(element, context: nil)
       result.should be_a(Metanorma::Mirror::HandlerResult)
-      result.nodes.should be_a(Hash)
-      result.nodes["type"].should eq("paragraph")
+      result.nodes.should be_a(Metanorma::Mirror::Model::Node)
+      result.nodes.type.should eq("paragraph")
       result.concat?.should be(false)
     end
 
@@ -72,13 +72,13 @@ RSpec.describe Metanorma::Mirror::HandlerRegistry do
       element = klass.new
 
       result = registry.handle(element, context: nil)
-      result.nodes["type"].should eq("paragraph")
+      result.nodes.type.should eq("paragraph")
     end
 
-    it "returns nil HandlerResult for unregistered elements" do
+    it "returns none HandlerResult for unregistered elements" do
       result = registry.handle(Class.new.new, context: nil)
       result.should be_a(Metanorma::Mirror::HandlerResult)
-      result.nil?.should be(true)
+      result.none?.should be(true)
     end
 
     it "supports concat option" do

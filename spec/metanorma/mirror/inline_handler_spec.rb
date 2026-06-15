@@ -22,8 +22,8 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
       map.each_value do |builder|
         builder.should be_a(Method).or be_a(Proc)
         result = builder.call(nil)
-        result.should be_a(Hash)
-        result["type"].should be_a(String)
+        result.should be_a(Metanorma::Mirror::Model::Mark)
+        result.type.should be_a(String)
       end
     end
 
@@ -35,10 +35,10 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
       map[strong_class].should_not be_nil
 
       em_mark = map[em_class].call(nil)
-      em_mark["type"].should eq("emphasis")
+      em_mark.type.should eq("emphasis")
 
       strong_mark = map[strong_class].call(nil)
-      strong_mark["type"].should eq("strong")
+      strong_mark.type.should eq("strong")
     end
   end
 
@@ -47,53 +47,53 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
       p = parse_paragraph("<p>Hello world</p>")
       nodes = described_class.extract_inline(p, context:)
       nodes.size.should eq(1)
-      nodes.first["type"].should eq("text")
-      nodes.first["text"].should eq("Hello world")
+      nodes.first.should be_a(Metanorma::Mirror::Model::Text)
+      nodes.first.text.should eq("Hello world")
     end
 
     it "extracts emphasis marks" do
       p = parse_paragraph("<p>Some <em>important</em> text</p>")
       nodes = described_class.extract_inline(p, context:)
-      texts = nodes.select { |n| n.is_a?(Hash) && n["type"] == "text" }
-      em_node = texts.find { |n| Array(n["marks"]).any? { |m| m["type"] == "emphasis" } }
+      texts = nodes.grep(Metanorma::Mirror::Model::Text)
+      em_node = texts.find { |n| n.marks.any? { |m| m.type == "emphasis" } }
       em_node.should_not be_nil
-      em_node["text"].should eq("important")
+      em_node.text.should eq("important")
     end
 
     it "extracts strong marks" do
       p = parse_paragraph("<p>Some <strong>bold</strong> text</p>")
       nodes = described_class.extract_inline(p, context:)
-      texts = nodes.select { |n| n.is_a?(Hash) && n["type"] == "text" }
-      strong_node = texts.find { |n| Array(n["marks"]).any? { |m| m["type"] == "strong" } }
+      texts = nodes.grep(Metanorma::Mirror::Model::Text)
+      strong_node = texts.find { |n| n.marks.any? { |m| m.type == "strong" } }
       strong_node.should_not be_nil
-      strong_node["text"].should eq("bold")
+      strong_node.text.should eq("bold")
     end
 
     it "extracts subscript marks" do
       p = parse_paragraph("<p>H<sub>2</sub>O</p>")
       nodes = described_class.extract_inline(p, context:)
-      texts = nodes.select { |n| n.is_a?(Hash) && n["type"] == "text" }
-      sub_node = texts.find { |n| Array(n["marks"]).any? { |m| m["type"] == "subscript" } }
+      texts = nodes.grep(Metanorma::Mirror::Model::Text)
+      sub_node = texts.find { |n| n.marks.any? { |m| m.type == "subscript" } }
       sub_node.should_not be_nil
-      sub_node["text"].should eq("2")
+      sub_node.text.should eq("2")
     end
 
     it "extracts superscript marks" do
       p = parse_paragraph("<p>x<sup>2</sup></p>")
       nodes = described_class.extract_inline(p, context:)
-      texts = nodes.select { |n| n.is_a?(Hash) && n["type"] == "text" }
-      sup_node = texts.find { |n| Array(n["marks"]).any? { |m| m["type"] == "superscript" } }
+      texts = nodes.grep(Metanorma::Mirror::Model::Text)
+      sup_node = texts.find { |n| n.marks.any? { |m| m.type == "superscript" } }
       sup_node.should_not be_nil
-      sup_node["text"].should eq("2")
+      sup_node.text.should eq("2")
     end
 
     it "extracts code (tt) marks" do
       p = parse_paragraph("<p>Use <tt>monospace</tt></p>")
       nodes = described_class.extract_inline(p, context:)
-      texts = nodes.select { |n| n.is_a?(Hash) && n["type"] == "text" }
-      code_node = texts.find { |n| Array(n["marks"]).any? { |m| m["type"] == "code" } }
+      texts = nodes.grep(Metanorma::Mirror::Model::Text)
+      code_node = texts.find { |n| n.marks.any? { |m| m.type == "code" } }
       code_node.should_not be_nil
-      code_node["text"].should eq("monospace")
+      code_node.text.should eq("monospace")
     end
   end
 
@@ -126,18 +126,18 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
 
   describe ".filter_empty_crossrefs" do
     it "removes text nodes with empty text and crossref marks" do
-      xref = { "type" => "xref", "attrs" => { "target" => "s1" } }
-      empty_text = { "type" => "text", "text" => " ", "marks" => [xref] }
-      real_text = { "type" => "text", "text" => "keep" }
+      xref = Metanorma::Mirror::Model::Mark.new(type: "xref", attrs: { "target" => "s1" })
+      empty_text = Metanorma::Mirror::Model::Text.new(text: " ", marks: [xref])
+      real_text = Metanorma::Mirror::Model::Text.new(text: "keep")
 
       result = described_class.filter_empty_crossrefs([empty_text, real_text])
       result.size.should eq(1)
-      result.first["text"].should eq("keep")
+      result.first.text.should eq("keep")
     end
 
     it "does not mutate the input array" do
-      xref = { "type" => "xref", "attrs" => { "target" => "s1" } }
-      empty_text = { "type" => "text", "text" => " ", "marks" => [xref] }
+      xref = Metanorma::Mirror::Model::Mark.new(type: "xref", attrs: { "target" => "s1" })
+      empty_text = Metanorma::Mirror::Model::Text.new(text: " ", marks: [xref])
       input = [empty_text]
 
       described_class.filter_empty_crossrefs(input)
@@ -145,8 +145,8 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
     end
 
     it "keeps text nodes with non-crossref marks even if empty" do
-      em = { "type" => "emphasis" }
-      empty_text = { "type" => "text", "text" => " ", "marks" => [em] }
+      em = Metanorma::Mirror::Model::Mark.new(type: "emphasis")
+      empty_text = Metanorma::Mirror::Model::Text.new(text: " ", marks: [em])
 
       result = described_class.filter_empty_crossrefs([empty_text])
       result.size.should eq(1)
@@ -169,11 +169,11 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
     end
   end
 
-  describe "RICH_HTML_RENDERERS" do
+  describe "RichHtmlRenderer::RENDERERS" do
     it "maps each element class to a valid tag or method" do
-      described_class::RICH_HTML_RENDERERS.each_value do |renderer|
+      described_class::RichHtmlRenderer::RENDERERS.each_value do |renderer|
         if renderer.is_a?(Symbol)
-          described_class.method(renderer).should_not be_nil
+          described_class::RichHtmlRenderer.method(renderer).should_not be_nil
         else
           renderer.should be_a(String)
         end
