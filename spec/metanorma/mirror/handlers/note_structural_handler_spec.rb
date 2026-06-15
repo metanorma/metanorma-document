@@ -20,27 +20,27 @@ RSpec.describe Metanorma::Mirror::Handlers::Note do
     it "returns a Note hash" do
       el = parse_note("<note id='n1'><p>Some note text</p></note>")
       result = described_class.call(el, context: context)
-      result["type"].should eq("note")
+      result.type.should eq("note")
     end
 
     it "extracts id" do
       el = parse_note("<note id='n1'><p>Text</p></note>")
       result = described_class.call(el, context: context)
-      result["attrs"]["id"].should eq("n1")
+      result.attrs["id"].should eq("n1")
     end
 
     it "extracts content paragraphs" do
       el = parse_note("<note id='n1'><p>Line 1</p><p>Line 2</p></note>")
       result = described_class.call(el, context: context)
-      result["content"].size.should eq(2)
-      result["content"].each { |c| c["type"].should eq("paragraph") }
+      result.content.size.should eq(2)
+      result.content.each { |c| c.type.should eq("paragraph") }
     end
 
     it "works with no id" do
       el = parse_note("<note><p>Text</p></note>")
       result = described_class.call(el, context: context)
-      result["type"].should eq("note")
-      result.should_not have_key("attrs")
+      result.type.should eq("note")
+      result.attrs.should be_empty
     end
   end
 end

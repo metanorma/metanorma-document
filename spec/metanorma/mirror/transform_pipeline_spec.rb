@@ -12,14 +12,14 @@ RSpec.describe "Mirror forward transform pipeline" do
   let(:xml) { File.read(xml_path) }
 
   describe "full pipeline with real ISO document" do
-    it "parses XML and produces a mirror document hash" do
+    it "parses XML and produces a mirror Container model" do
       doc = Metanorma::IsoDocument::Root.from_xml(xml)
       transformer = Metanorma::Mirror::Transformer.new
       result = transformer.from_metanorma(doc)
 
-      result.should be_a(Hash)
-      result["type"].should eq("doc")
-      result["content"].should_not be_empty
+      result.should be_a(Metanorma::Mirror::Model::Container)
+      result.type.should eq("doc")
+      result.content.should_not be_empty
     end
 
     it "produces serializable output" do
@@ -28,9 +28,9 @@ RSpec.describe "Mirror forward transform pipeline" do
       result = transformer.from_metanorma(doc)
 
       json = Metanorma::Mirror::Serialization::JsonSerializer.serialize(result)
-      parsed = JSON.parse(json)
-      parsed["type"].should eq("doc")
-      parsed["content"].should be_an(Array)
+      parsed = Metanorma::Mirror::Serialization::JsonSerializer.deserialize(json)
+      parsed.type.should eq("doc")
+      parsed.content.should be_an(Array)
     end
 
     it "round-trips through JSON serialization" do
@@ -41,8 +41,8 @@ RSpec.describe "Mirror forward transform pipeline" do
       json = Metanorma::Mirror::Serialization::JsonSerializer.serialize(result)
       restored = Metanorma::Mirror::Serialization::JsonSerializer.deserialize(json)
 
-      restored["type"].should eq("doc")
-      restored["content"].size.should eq(result["content"].size)
+      restored.type.should eq("doc")
+      restored.content.size.should eq(result.content.size)
     end
   end
 
@@ -51,23 +51,23 @@ RSpec.describe "Mirror forward transform pipeline" do
     let(:mirror) { Metanorma::Mirror::Transformer.new.from_metanorma(doc) }
 
     it "contains preface and sections" do
-      types = mirror["content"].map { |n| n["type"] }
+      types = mirror.content.map(&:type)
       types.should include("preface")
       types.should include("sections")
     end
 
     it "preface contains content sections" do
-      preface = mirror["content"].find { |n| n["type"] == "preface" }
-      preface.should be_a(Hash)
-      preface["type"].should eq("preface")
-      preface["content"].should_not be_empty
+      preface = mirror.content.find { |n| n.type == "preface" }
+      preface.should be_a(Metanorma::Mirror::Model::Container)
+      preface.type.should eq("preface")
+      preface.content.should_not be_empty
     end
 
     it "sections contain clauses" do
-      sections = mirror["content"].find { |n| n["type"] == "sections" }
-      sections.should be_a(Hash)
-      sections["type"].should eq("sections")
-      clauses = sections["content"].select { |n| n["type"] == "clause" }
+      sections = mirror.content.find { |n| n.type == "sections" }
+      sections.should be_a(Metanorma::Mirror::Model::Container)
+      sections.type.should eq("sections")
+      clauses = sections.content.select { |n| n.type == "clause" }
       clauses.should_not be_empty
     end
   end
@@ -78,32 +78,32 @@ RSpec.describe "Mirror forward transform pipeline" do
 
     it "paragraphs contain text nodes" do
       paragraphs = []
-      mirror["content"].each do |node|
+      mirror.content.each do |node|
         collect_nodes_of_type(paragraphs, node, "paragraph")
       end
       paragraphs.should_not be_empty
 
       first_para = paragraphs.first
-      text_nodes = first_para["content"].select { |c| c.is_a?(Hash) && c["type"] == "text" }
+      text_nodes = first_para.content.grep(Metanorma::Mirror::Model::Text)
       text_nodes.should_not be_empty
     end
 
     it "preserves cross-reference marks" do
       marks = collect_all_marks(mirror)
-      xrefs = marks.select { |m| m["type"] == "xref" }
+      xrefs = marks.select { |m| m.type == "xref" }
       xrefs.should_not be_empty
-      xrefs.each { |x| x.dig("attrs", "target").should be_a(String) }
+      xrefs.each { |x| x.attrs["target"].should be_a(String) }
     end
 
     it "preserves eref marks with citation data" do
       marks = collect_all_marks(mirror)
-      erefs = marks.select { |m| m["type"] == "eref" }
+      erefs = marks.select { |m| m.type == "eref" }
       erefs.should_not be_empty
     end
 
     it "preserves footnote marks" do
       marks = collect_all_marks(mirror)
-      footnotes = marks.select { |m| m["type"] == "footnote" }
+      footnotes = marks.select { |m| m.type == "footnote" }
       footnotes.should_not be_empty
     end
   end
@@ -116,11 +116,11 @@ RSpec.describe "Mirror forward transform pipeline" do
       result = transformer.from_metanorma(doc)
 
       clauses = []
-      result["content"].each { |n| collect_nodes_of_type(clauses, n, "clause") }
+      result.content.each { |n| collect_nodes_of_type(clauses, n, "clause") }
       clauses.each do |clause|
-        next unless clause.dig("attrs", "id")
+        next unless clause.attrs["id"]
 
-        clause.dig("attrs", "id").should_not be_nil
+        clause.attrs["id"].should_not be_nil
       end
     end
 
@@ -130,8 +130,8 @@ RSpec.describe "Mirror forward transform pipeline" do
       transformer = Metanorma::Mirror::Transformer.new(id_strategy: strategy)
       result = transformer.from_metanorma(doc)
 
-      result.should be_a(Hash)
-      result["type"].should eq("doc")
+      result.should be_a(Metanorma::Mirror::Model::Container)
+      result.type.should eq("doc")
     end
   end
 
@@ -141,34 +141,34 @@ RSpec.describe "Mirror forward transform pipeline" do
 
     it "produces note nodes" do
       notes = []
-      mirror["content"].each { |n| collect_nodes_of_type(notes, n, "note") }
+      mirror.content.each { |n| collect_nodes_of_type(notes, n, "note") }
       notes.each do |note|
-        note["type"].should eq("note")
-        note["content"].should_not be_empty
+        note.type.should eq("note")
+        note.content.should_not be_empty
       end
     end
 
     it "produces ordered and bullet lists" do
       lists = []
-      mirror["content"].each do |n|
+      mirror.content.each do |n|
         collect_nodes_of_type(lists, n, "ordered_list")
         collect_nodes_of_type(lists, n, "bullet_list")
       end
       lists.each do |list|
-        list["content"].should_not be_empty
+        list.content.should_not be_empty
       end
     end
 
     it "produces table nodes with proper structure" do
       tables = []
-      mirror["content"].each { |n| collect_nodes_of_type(tables, n, "table") }
+      mirror.content.each { |n| collect_nodes_of_type(tables, n, "table") }
       tables.each do |table|
-        table["type"].should eq("table")
-        body = (table["content"] || []).find { |c| c["type"] == "table_body" }
+        table.type.should eq("table")
+        body = (table.content || []).find { |c| c.type == "table_body" }
         if body
-          body["type"].should eq("table_body")
-          body["content"].each do |row|
-            row["type"].should eq("table_row")
+          body.type.should eq("table_body")
+          body.content.each do |row|
+            row.type.should eq("table_row")
           end
         end
       end
@@ -178,20 +178,22 @@ RSpec.describe "Mirror forward transform pipeline" do
   private
 
   def collect_nodes_of_type(collection, node, type)
-    return unless node.is_a?(Hash)
+    return if node.is_a?(String)
 
-    collection << node if node["type"] == type
-    Array(node["content"]).each { |child| collect_nodes_of_type(collection, child, type) }
+    collection << node if node.type == type
+    children = node.is_a?(Metanorma::Mirror::Model::Container) ? node.content : []
+    children.each { |child| collect_nodes_of_type(collection, child, type) }
   end
 
   def collect_all_marks(node)
     marks = []
-    return marks unless node.is_a?(Hash)
+    return marks if node.is_a?(String)
 
-    if node["type"] == "text"
-      marks.concat(Array(node["marks"]))
+    if node.is_a?(Metanorma::Mirror::Model::Text)
+      marks.concat(Array(node.marks))
     end
-    Array(node["content"]).each { |child| marks.concat(collect_all_marks(child)) }
+    children = node.is_a?(Metanorma::Mirror::Model::Container) ? node.content : []
+    children.each { |child| marks.concat(collect_all_marks(child)) }
     marks
   end
 end

@@ -24,13 +24,13 @@ RSpec.describe Metanorma::Mirror::Handlers::Structural do
     it "returns a Preface hash" do
       el = parse_preface("<preface><foreword id='fw'><title>Foreword</title></foreword></preface>")
       result = described_class.preface(el, context: context)
-      result["type"].should eq("preface")
+      result.type.should eq("preface")
     end
 
     it "extracts child sections" do
       el = parse_preface("<preface><foreword id='fw'><title>Foreword</title></foreword></preface>")
       result = described_class.preface(el, context: context)
-      result["content"].should_not be_empty
+      result.content.should_not be_empty
     end
   end
 
@@ -38,14 +38,14 @@ RSpec.describe Metanorma::Mirror::Handlers::Structural do
     it "returns a Sections hash" do
       el = parse_sections("<sections><clause id='s1'><title>Scope</title></clause></sections>")
       result = described_class.sections(el, context: context)
-      result["type"].should eq("sections")
+      result.type.should eq("sections")
     end
 
     it "extracts child clauses" do
       el = parse_sections("<sections><clause id='s1'><title>Scope</title></clause></sections>")
       result = described_class.sections(el, context: context)
-      result["content"].size.should eq(1)
-      result["content"].first["type"].should eq("clause")
+      result.content.size.should eq(1)
+      result.content.first.type.should eq("clause")
     end
   end
 
@@ -54,7 +54,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Structural do
       xml = "<bibliography><references id='refs'><p>References text</p></references></bibliography>"
       el = Metanorma::StandardDocument::Sections::BibliographySection.from_xml(xml)
       result = described_class.bibliography(el, context: context)
-      result["type"].should eq("bibliography")
+      result.type.should eq("bibliography")
     end
   end
 end
