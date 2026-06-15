@@ -24,7 +24,7 @@ module Metanorma
 
           guide = pipeline.process
 
-          format_class = Formats::FORMAT_MAP[@format]
+          format_class = Formats.lookup(@format)
           raise ArgumentError, "Unknown format: #{@format}" unless format_class
 
           formatter = format_class.new(dist_dir: @options[:dist_dir])

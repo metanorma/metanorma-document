@@ -61,5 +61,7 @@ module Metanorma
   end
 end
 
-Metanorma::Mirror::Output::Formats::FORMAT_MAP[:inline] =
-  Metanorma::Mirror::Output::Formats::InlineFormat
+Metanorma::Mirror::Output::Formats.register(
+  :inline,
+  Metanorma::Mirror::Output::Formats::InlineFormat,
+)
