@@ -20,7 +20,7 @@ module Metanorma
             end
 
             math = SafeAttr.read(stem, :math)
-            attrs[:mathml] = Handlers.mathml_from_math(math) if math
+            attrs[:mathml] = MathUtil.mathml_from_math(math) if math
           end
 
           # Legacy fallback: some older documents store text directly
