@@ -14,7 +14,8 @@
 TODO*
 !TODO.finalize/
 /data/dist/
-**/output/
+/output/
+/output.*/
 output.html
 output-*.html
 output-*/
