@@ -14,9 +14,5 @@ permissions:
 jobs:
   rake:
     uses: metanorma/ci/.github/workflows/generic-rake.yml@main
-    with:
-      setup-tools: libreoffice
-      submodules: false
-      after-setup-ruby: cd frontend && npm install && npm run build
     secrets:
       pat_token: ${{ secrets.METANORMA_CI_PAT_TOKEN }}
