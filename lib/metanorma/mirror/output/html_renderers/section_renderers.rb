@@ -41,7 +41,7 @@ module Metanorma
                 if title
                   heading_attrs = { class: "mn-clause__title" }
                   heading_attrs[:id] = node.attrs["id"] if node.attrs["id"]
-                  doc.send(:"h#{depth + 2}", heading_attrs) do
+                  render_heading(doc, depth + 2, heading_attrs) do
                     doc.text "#{number} " if number
                     doc.text title
                   end
@@ -109,7 +109,17 @@ module Metanorma
             HtmlRenderers.build do |doc|
               attrs = { class: "mn-floating-title" }
               attrs[:id] = node.attrs["id"] if node.attrs["id"]
-              doc.send(:"h#{heading_depth}", attrs) { doc.text title }
+              render_heading(doc, heading_depth, attrs) { doc.text title }
+            end
+          end
+
+          def render_heading(doc, level, attrs, &)
+            case level.to_i
+            when 3 then doc.h3(attrs, &)
+            when 4 then doc.h4(attrs, &)
+            when 5 then doc.h5(attrs, &)
+            when 6 then doc.h6(attrs, &)
+            else doc.h2(attrs, &)
             end
           end
         end
