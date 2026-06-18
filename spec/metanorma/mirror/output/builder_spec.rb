@@ -2,6 +2,7 @@
 
 require "spec_helper"
 require "metanorma/mirror"
+require "metanorma/iso_document"
 require "tmpdir"
 require "fileutils"
 
@@ -29,6 +30,16 @@ RSpec.describe Metanorma::Mirror::Output::Builder do
       builder = described_class.new(xml_path: "/tmp/in.xml", output_path: "/tmp/out.html")
       builder.format.should eq(:inline)
     end
+
+    it "stores id_strategy in options" do
+      strategy = Metanorma::Mirror::IdStrategy::Positional.new
+      builder = described_class.new(
+        xml_path: "/tmp/in.xml",
+        output_path: "/tmp/out.html",
+        id_strategy: strategy,
+      )
+      builder.options[:id_strategy].should eq(strategy)
+    end
   end
 
   describe "#build" do
@@ -55,6 +66,37 @@ RSpec.describe Metanorma::Mirror::Output::Builder do
         File.exist?(output).should be(true)
         content = File.read(output)
         content.should include("<!DOCTYPE html>")
+        content.should include("window.METANORMA_DATA")
+      end
+    end
+
+    it "forwards id_strategy to the pipeline (positional IDs in output)" do
+      Dir.mktmpdir do |dir|
+        output = File.join(dir, "positional.html")
+        builder = described_class.new(
+          xml_path: xml_path,
+          output_path: output,
+          format: :inline,
+          flavor: "iso",
+          id_strategy: Metanorma::Mirror::IdStrategy::Positional.new,
+        )
+        builder.build
+        content = File.read(output)
+        content.should match(/"sec-\d/)
+      end
+    end
+
+    it "defaults to Preserve strategy when no id_strategy provided" do
+      Dir.mktmpdir do |dir|
+        output = File.join(dir, "preserve.html")
+        builder = described_class.new(
+          xml_path: xml_path,
+          output_path: output,
+          format: :inline,
+          flavor: "iso",
+        )
+        builder.build
+        content = File.read(output)
         content.should include("window.METANORMA_DATA")
       end
     end
