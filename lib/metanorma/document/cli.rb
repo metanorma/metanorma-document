@@ -35,27 +35,32 @@ module Metanorma
       end
 
       def self.parse_to_mirror_options(argv)
-        options = ToMirrorOptions.new(output: nil, flavor: nil, id_strategy: nil, title: nil)
+        options = ToMirrorOptions.new(output: nil, flavor: nil,
+                                      id_strategy: nil, title: nil)
 
         parser = OptionParser.new do |opts|
           opts.banner = "Usage: metanorma-document to-mirror <xml_path> [options]"
 
-          opts.on("-o", "--output PATH", "Output JSON path (default: stdout)") do |path|
+          opts.on("-o", "--output PATH",
+                  "Output JSON path (default: stdout)") do |path|
             options.output = path
           end
 
-          opts.on("-f", "--flavor FLAVOR", "Document flavor (default: auto-detect)") do |flavor|
+          opts.on("-f", "--flavor FLAVOR",
+                  "Document flavor (default: auto-detect)") do |flavor|
             options.flavor = flavor
           end
 
-          opts.on("--id-strategy STRATEGY", "ID strategy: preserve (default), positional") do |strategy|
+          opts.on("--id-strategy STRATEGY",
+                  "ID strategy: preserve (default), positional") do |strategy|
             case strategy
             when "positional"
               options.id_strategy = Mirror::IdStrategy::Positional.new
             when "preserve"
               options.id_strategy = Mirror::IdStrategy::Preserve.new
             else
-              raise Error, "Unknown ID strategy: #{strategy}. Use 'preserve' or 'positional'."
+              raise Error,
+                    "Unknown ID strategy: #{strategy}. Use 'preserve' or 'positional'."
             end
           end
 

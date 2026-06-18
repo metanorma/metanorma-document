@@ -11,19 +11,28 @@ module Metanorma
           thead = SafeAttr.read(element, :thead)
           if thead
             rows = extract_rows(thead, context:)
-            content << Handlers.build_node("table_head", content: rows) unless rows.empty?
+            unless rows.empty?
+              content << Handlers.build_node("table_head",
+                                             content: rows)
+            end
           end
 
           tbody = SafeAttr.read(element, :tbody)
           if tbody
             rows = extract_rows(tbody, context:)
-            content << Handlers.build_node("table_body", content: rows) unless rows.empty?
+            unless rows.empty?
+              content << Handlers.build_node("table_body",
+                                             content: rows)
+            end
           end
 
           tfoot = SafeAttr.read(element, :tfoot)
           if tfoot
             rows = extract_rows(tfoot, context:)
-            content << Handlers.build_node("table_foot", content: rows) unless rows.empty?
+            unless rows.empty?
+              content << Handlers.build_node("table_foot",
+                                             content: rows)
+            end
           end
 
           Handlers.build_node("table", attrs: attrs, content: content)
@@ -36,7 +45,8 @@ module Metanorma
 
             row_attrs = {}
             row_attrs[:id] = SafeAttr.read(tr, :id)
-            Handlers.build_node("table_row", attrs: row_attrs.compact, content: cells)
+            Handlers.build_node("table_row", attrs: row_attrs.compact,
+                                             content: cells)
           end
         end
 
@@ -49,7 +59,8 @@ module Metanorma
 
           content = Inline.extract_inline(cell, context:)
 
-          Handlers.build_node("table_cell", attrs: attrs.compact, content: content)
+          Handlers.build_node("table_cell", attrs: attrs.compact,
+                                            content: content)
         end
 
         def self.table_attrs(element)

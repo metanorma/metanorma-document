@@ -6,12 +6,18 @@ require "metanorma/mirror"
 RSpec.describe Metanorma::Mirror::Model::Factory do
   describe ".from_h" do
     it "raises ArgumentError for non-hash input" do
-      -> { described_class.from_h("string") }.should raise_error(ArgumentError, /Hash/)
-      -> { described_class.from_h(nil) }.should raise_error(ArgumentError, /Hash/)
+      -> {
+        described_class.from_h("string")
+      }.should raise_error(ArgumentError, /Hash/)
+      -> {
+        described_class.from_h(nil)
+      }.should raise_error(ArgumentError, /Hash/)
     end
 
     it "raises ArgumentError when type key is missing" do
-      -> { described_class.from_h({}) }.should raise_error(ArgumentError, /'type'/)
+      -> {
+        described_class.from_h({})
+      }.should raise_error(ArgumentError, /'type'/)
     end
 
     it "creates Text from text hash" do
@@ -39,7 +45,8 @@ RSpec.describe Metanorma::Mirror::Model::Factory do
       node = described_class.from_h({
                                       "type" => "clause",
                                       "attrs" => { "id" => "s1" },
-                                      "content" => [{ "type" => "paragraph", "content" => [] }],
+                                      "content" => [{ "type" => "paragraph",
+                                                      "content" => [] }],
                                     })
       node.should be_a(Metanorma::Mirror::Model::Container)
       node.type.should eq("clause")
@@ -79,7 +86,9 @@ RSpec.describe Metanorma::Mirror::Model::Factory do
     it "handles string content mixed with nodes" do
       node = described_class.from_h({
                                       "type" => "paragraph",
-                                      "content" => ["plain text", { "type" => "text", "text" => "styled" }],
+                                      "content" => ["plain text",
+                                                    { "type" => "text",
+                                                      "text" => "styled" }],
                                     })
       node.content.size.should eq(2)
       node.content[0].should eq("plain text")

@@ -6,17 +6,28 @@ module Metanorma
       module HtmlRenderers
         module SectionRenderers
           def self.register(registry)
-            registry.register_node_handler("clause", instance_method(:render_clause))
-            registry.register_node_handler("annex", instance_method(:render_annex))
-            registry.register_node_handler("content_section", instance_method(:render_content_section))
-            registry.register_node_handler("abstract", instance_method(:render_content_section))
-            registry.register_node_handler("foreword", instance_method(:render_content_section))
-            registry.register_node_handler("introduction", instance_method(:render_content_section))
-            registry.register_node_handler("acknowledgements", instance_method(:render_content_section))
-            registry.register_node_handler("terms", instance_method(:render_terms))
-            registry.register_node_handler("definitions", instance_method(:render_definitions))
-            registry.register_node_handler("references", instance_method(:render_references))
-            registry.register_node_handler("floating_title", instance_method(:render_floating_title))
+            registry.register_node_handler("clause",
+                                           instance_method(:render_clause))
+            registry.register_node_handler("annex",
+                                           instance_method(:render_annex))
+            registry.register_node_handler("content_section",
+                                           instance_method(:render_content_section))
+            registry.register_node_handler("abstract",
+                                           instance_method(:render_content_section))
+            registry.register_node_handler("foreword",
+                                           instance_method(:render_content_section))
+            registry.register_node_handler("introduction",
+                                           instance_method(:render_content_section))
+            registry.register_node_handler("acknowledgements",
+                                           instance_method(:render_content_section))
+            registry.register_node_handler("terms",
+                                           instance_method(:render_terms))
+            registry.register_node_handler("definitions",
+                                           instance_method(:render_definitions))
+            registry.register_node_handler("references",
+                                           instance_method(:render_references))
+            registry.register_node_handler("floating_title",
+                                           instance_method(:render_floating_title))
           end
 
           def render_clause(node, depth: 0)
@@ -35,7 +46,8 @@ module Metanorma
                     doc.text title
                   end
                 end
-                HtmlRenderers.embed(doc, render_children(node, depth: depth + 1))
+                HtmlRenderers.embed(doc,
+                                    render_children(node, depth: depth + 1))
               end
             end
           end
@@ -52,7 +64,8 @@ module Metanorma
                   heading_attrs[:id] = node.attrs["id"] if node.attrs["id"]
                   doc.h2(heading_attrs) { doc.text title }
                 end
-                HtmlRenderers.embed(doc, render_children(node, depth: depth + 1))
+                HtmlRenderers.embed(doc,
+                                    render_children(node, depth: depth + 1))
               end
             end
           end

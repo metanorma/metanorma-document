@@ -24,7 +24,9 @@ module Metanorma
         end
 
         def text_content
-          @content.map { |item| item.is_a?(String) ? item : item.text_content }.join
+          @content.map do |item|
+            item.is_a?(String) ? item : item.text_content
+          end.join
         end
 
         def accept_rewriter(rewriter)

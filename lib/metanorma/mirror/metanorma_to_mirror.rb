@@ -5,7 +5,8 @@ module Metanorma
     class MetanormaToMirror
       attr_reader :registry, :id_strategy
 
-      def initialize(registry: Mirror.default_registry, id_strategy: Mirror.DEFAULT_ID_STRATEGY)
+      def initialize(registry: Mirror.default_registry,
+id_strategy: Mirror.DEFAULT_ID_STRATEGY)
         @registry = registry
         @id_strategy = id_strategy
       end

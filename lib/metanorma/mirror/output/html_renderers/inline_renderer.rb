@@ -33,7 +33,9 @@ module Metanorma
 
           def render_text_node(node)
             inner_html = HtmlRenderers.escape_text(node.text)
-            node.marks.reduce(inner_html) { |current, mark| apply_mark(current, mark) }
+            node.marks.reduce(inner_html) do |current, mark|
+              apply_mark(current, mark)
+            end
           end
 
           def apply_mark(inner_html, mark)

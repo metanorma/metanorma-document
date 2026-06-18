@@ -9,7 +9,8 @@ module Metanorma
       end
 
       def from_metanorma(root)
-        document = MetanormaToMirror.new(registry: @registry, id_strategy: @id_strategy).call(root)
+        document = MetanormaToMirror.new(registry: @registry,
+                                         id_strategy: @id_strategy).call(root)
         @id_strategy.finalize!(document)
       end
 

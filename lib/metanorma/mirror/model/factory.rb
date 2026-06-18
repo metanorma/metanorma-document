@@ -7,7 +7,10 @@ module Metanorma
         INVALID_INPUT = "Factory.from_h expects a Hash, got %<class>s"
 
         def self.from_h(hash)
-          raise ArgumentError, format(INVALID_INPUT, class: hash.class) unless hash.is_a?(Hash)
+          unless hash.is_a?(Hash)
+            raise ArgumentError,
+                  format(INVALID_INPUT, class: hash.class)
+          end
 
           type = hash["type"]
 
@@ -17,7 +20,8 @@ module Metanorma
           when "soft_break"
             SoftBreak.new
           when nil
-            raise ArgumentError, "Factory.from_h requires a 'type' key, got #{hash.inspect}"
+            raise ArgumentError,
+                  "Factory.from_h requires a 'type' key, got #{hash.inspect}"
           else
             build_node(hash, type)
           end

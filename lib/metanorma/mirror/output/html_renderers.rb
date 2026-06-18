@@ -6,8 +6,10 @@ module Metanorma
   module Mirror
     module Output
       module HtmlRenderers
-        autoload :StructuralRenderers, "#{__dir__}/html_renderers/structural_renderers"
-        autoload :SectionRenderers, "#{__dir__}/html_renderers/section_renderers"
+        autoload :StructuralRenderers,
+                 "#{__dir__}/html_renderers/structural_renderers"
+        autoload :SectionRenderers,
+                 "#{__dir__}/html_renderers/section_renderers"
         autoload :BlockRenderers, "#{__dir__}/html_renderers/block_renderers"
         autoload :ListRenderers, "#{__dir__}/html_renderers/list_renderers"
         autoload :TableRenderers, "#{__dir__}/html_renderers/table_renderers"
@@ -25,7 +27,9 @@ module Metanorma
         ].freeze
 
         def self.register_all(renderer_class)
-          MODULES.each { |mod_name| const_get(mod_name).register(renderer_class) }
+          MODULES.each do |mod_name|
+            const_get(mod_name).register(renderer_class)
+          end
         end
 
         # Build a single HTML root element via Nokogiri::HTML4::Builder.
@@ -54,7 +58,9 @@ module Metanorma
         # Wrap a pre-rendered HTML string in a tag. Used by mark handlers.
         def self.wrap(tag, inner_html, **attrs)
           Nokogiri::HTML4::Builder.new do |doc|
-            doc.public_send(tag, attrs) { doc.parent.inner_html = inner_html.to_s }
+            doc.public_send(tag, attrs) do
+              doc.parent.inner_html = inner_html.to_s
+            end
           end.doc.root.to_html
         end
 

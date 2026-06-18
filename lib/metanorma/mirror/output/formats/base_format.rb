@@ -60,7 +60,8 @@ module Metanorma
           def build_head(doc, title:, head_extra:, script_data:)
             doc.head do
               doc.meta(charset: "UTF-8")
-              doc.meta(name: "viewport", content: "width=device-width, initial-scale=1.0")
+              doc.meta(name: "viewport",
+                       content: "width=device-width, initial-scale=1.0")
               doc.title { doc.text title.to_s }
               if script_data
                 doc.script { doc.text script_data }
