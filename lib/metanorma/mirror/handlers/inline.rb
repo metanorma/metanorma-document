@@ -81,12 +81,6 @@ module Metanorma
           },
         }.freeze
 
-        CUSTOM_TEXT_MARKS = {
-          "footnote" => :extract_fn_label,
-          "stem" => :extract_stem_text,
-          "span" => :extract_span_text,
-        }.freeze
-
         SEMX_MARK_CONFIG = {
           "xref" => { mark_type: "xref", target_attr: :target,
                       fmt_attr: :fmt_xref },
@@ -193,9 +187,17 @@ module Metanorma
           end
         end
 
+        def self.mark_text_extractors
+          @mark_text_extractors ||= {
+            "footnote" => TextExtractor.method(:extract_fn_label),
+            "stem" => TextExtractor.method(:extract_stem_text),
+            "span" => TextExtractor.method(:extract_span_text),
+          }
+        end
+
         def self.extract_marked_text(mark_type, element)
-          extractor = CUSTOM_TEXT_MARKS[mark_type]
-          return TextExtractor.public_send(extractor, element) if extractor
+          extractor = mark_text_extractors[mark_type]
+          return extractor.call(element) if extractor
 
           TextExtractor.extract_element_text(element)
         end

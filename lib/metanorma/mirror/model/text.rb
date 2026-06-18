@@ -20,6 +20,14 @@ module Metanorma
           h["marks"] = @marks.map(&:to_h) unless @marks.empty?
           h
         end
+
+        def text_content
+          @text
+        end
+
+        def accept_rewriter(rewriter)
+          rewriter.rewrite_text(self)
+        end
       end
     end
   end

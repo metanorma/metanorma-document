@@ -24,12 +24,11 @@ module Metanorma
         end
 
         def text_content
-          @content.filter_map do |item|
-            case item
-            when Text then item.text
-            when Container then item.text_content
-            end
-          end.join
+          @content.map { |item| item.is_a?(String) ? item : item.text_content }.join
+        end
+
+        def accept_rewriter(rewriter)
+          rewriter.rewrite_container(self)
         end
 
         private

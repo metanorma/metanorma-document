@@ -17,4 +17,11 @@ RSpec.describe Metanorma::Mirror::Model::Leaf do
     h = leaf.to_h
     h.should eq({ "type" => "image", "attrs" => { "src" => "img.png" } })
   end
+
+  describe "#text_content" do
+    it "returns empty string" do
+      leaf = described_class.new(type: "image")
+      leaf.text_content.should eq("")
+    end
+  end
 end

@@ -42,4 +42,17 @@ RSpec.describe Metanorma::Mirror::Model::Text do
     h = text.to_h
     h.should_not have_key("marks")
   end
+
+  describe "#text_content" do
+    it "returns its own text" do
+      text = described_class.new(text: "hello")
+      text.text_content.should eq("hello")
+    end
+
+    it "returns text regardless of marks" do
+      mark = Metanorma::Mirror::Model::Mark.new(type: "strong")
+      text = described_class.new(text: "bold", marks: [mark])
+      text.text_content.should eq("bold")
+    end
+  end
 end

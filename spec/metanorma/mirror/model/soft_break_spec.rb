@@ -19,4 +19,11 @@ RSpec.describe Metanorma::Mirror::Model::SoftBreak do
     sb.attrs.should eq({})
     sb.content.should eq([])
   end
+
+  describe "#text_content" do
+    it "returns empty string" do
+      sb = described_class.new
+      sb.text_content.should eq("")
+    end
+  end
 end

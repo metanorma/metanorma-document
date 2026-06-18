@@ -7,6 +7,10 @@ module Metanorma
         def leaf?
           true
         end
+
+        def accept_rewriter(rewriter)
+          rewriter.rewrite_leaf(self)
+        end
       end
     end
   end
