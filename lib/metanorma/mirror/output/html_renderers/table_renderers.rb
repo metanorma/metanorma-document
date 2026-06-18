@@ -12,10 +12,14 @@ module Metanorma
           }.freeze
 
           def self.register(registry)
-            registry.register_node_handler("table", instance_method(:render_table))
-            registry.register_node_handler("table_head", instance_method(:render_table_section))
-            registry.register_node_handler("table_body", instance_method(:render_table_section))
-            registry.register_node_handler("table_foot", instance_method(:render_table_section))
+            registry.register_node_handler("table",
+                                           instance_method(:render_table))
+            registry.register_node_handler("table_head",
+                                           instance_method(:render_table_section))
+            registry.register_node_handler("table_body",
+                                           instance_method(:render_table_section))
+            registry.register_node_handler("table_foot",
+                                           instance_method(:render_table_section))
           end
 
           def render_table(node, depth: 0)
@@ -26,10 +30,14 @@ module Metanorma
               attrs[:id] = node.attrs["id"] if node.attrs["id"]
               doc.div(attrs) do
                 if node.attrs["title"]
-                  doc.div(class: "mn-table__header") { doc.text node.attrs["title"] }
+                  doc.div(class: "mn-table__header") do
+                    doc.text node.attrs["title"]
+                  end
                 end
                 doc.table do
-                  sections.each { |section| HtmlRenderers.embed(doc, build_table_section(section)) }
+                  sections.each do |section|
+                    HtmlRenderers.embed(doc, build_table_section(section))
+                  end
                 end
               end
             end

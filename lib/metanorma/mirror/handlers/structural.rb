@@ -44,7 +44,8 @@ module Metanorma
             end
           end
 
-          Handlers.build_node("sections", attrs: attrs.compact, content: content)
+          Handlers.build_node("sections", attrs: attrs.compact,
+                                          content: content)
         end
 
         def self.bibliography(element, context:)
@@ -58,7 +59,8 @@ module Metanorma
             result.append_to(content)
           end
 
-          Handlers.build_node("bibliography", attrs: attrs.compact, content: content)
+          Handlers.build_node("bibliography", attrs: attrs.compact,
+                                              content: content)
         end
       end
     end

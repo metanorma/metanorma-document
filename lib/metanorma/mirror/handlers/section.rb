@@ -42,7 +42,8 @@ module Metanorma
                                                          admonition])
           children = context.extract_section_children(element)
 
-          Handlers.build_node("terms", attrs: attrs, content: content + children)
+          Handlers.build_node("terms", attrs: attrs,
+                                       content: content + children)
         end
 
         def self.definitions(element, context:)
@@ -68,8 +69,9 @@ module Metanorma
             next if text.strip.empty?
 
             content << Handlers.build_node("paragraph",
-              attrs: { id: SafeAttr.read(ref, :id) }.compact,
-              content: [context.text_node(text)])
+                                           attrs: { id: SafeAttr.read(ref,
+                                                                      :id) }.compact,
+                                           content: [context.text_node(text)])
           end
 
           Handlers.build_node("references", attrs: attrs, content: content)

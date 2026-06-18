@@ -29,7 +29,8 @@ RSpec.describe Metanorma::Mirror::Model::Container do
 
   it "serializes to hash with content" do
     child = described_class.new(type: "paragraph", attrs: { id: "p1" })
-    container = described_class.new(type: "clause", attrs: { id: "s1" }, content: [child])
+    container = described_class.new(type: "clause", attrs: { id: "s1" },
+                                    content: [child])
     h = container.to_h
     h["type"].should eq("clause")
     h["attrs"].should eq("id" => "s1")

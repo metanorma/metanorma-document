@@ -346,9 +346,12 @@ RSpec.describe Metanorma::Mirror::Rewriter do
     it "accepts custom skip and builders via initializer" do
       custom_skip = Set.new(%w[review])
       custom_builders = {
-        "special" => ->(_n, _r) { Metanorma::Mirror::Model::Leaf.new(type: "leaf") },
+        "special" => ->(_n, _r) {
+          Metanorma::Mirror::Model::Leaf.new(type: "leaf")
+        },
       }
-      rewriter = described_class.new(skip: custom_skip, builders: custom_builders)
+      rewriter = described_class.new(skip: custom_skip,
+                                     builders: custom_builders)
       rewriter.skipped?("review").should be(true)
       rewriter.skipped?("footnotes").should be(false)
       rewriter.builders.key?("special").should be(true)

@@ -47,13 +47,20 @@ module Metanorma
           end
         end
 
-        register_category Metanorma::StandardDocument::Sections::ClauseSection, :section
-        register_category Metanorma::StandardDocument::Sections::ContentSection, :section
-        register_category Metanorma::StandardDocument::Sections::TermsSection, :section
-        register_category Metanorma::StandardDocument::Sections::DefinitionSection, :section
-        register_category Metanorma::StandardDocument::Sections::AnnexSection, :annex
-        register_category Metanorma::Document::Components::AncillaryBlocks::FigureBlock, :figure
-        register_category Metanorma::Document::Components::Tables::TableBlock, :table
+        register_category Metanorma::StandardDocument::Sections::ClauseSection,
+                          :section
+        register_category Metanorma::StandardDocument::Sections::ContentSection,
+                          :section
+        register_category Metanorma::StandardDocument::Sections::TermsSection,
+                          :section
+        register_category Metanorma::StandardDocument::Sections::DefinitionSection,
+                          :section
+        register_category Metanorma::StandardDocument::Sections::AnnexSection,
+                          :annex
+        register_category Metanorma::Document::Components::AncillaryBlocks::FigureBlock,
+                          :figure
+        register_category Metanorma::Document::Components::Tables::TableBlock,
+                          :table
 
         def initialize
           @id_map = {}

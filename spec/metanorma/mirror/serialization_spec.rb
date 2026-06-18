@@ -79,7 +79,8 @@ RSpec.describe Metanorma::Mirror::Serialization::JsonSerializer do
                 "content" => [
                   {
                     "type" => "paragraph",
-                    "content" => [{ "type" => "text", "text" => "Scope content" }],
+                    "content" => [{ "type" => "text",
+                                    "text" => "Scope content" }],
                   },
                 ],
               },

@@ -27,7 +27,8 @@ RSpec.describe Metanorma::Mirror::Output::Builder do
     end
 
     it "defaults format to :inline" do
-      builder = described_class.new(xml_path: "/tmp/in.xml", output_path: "/tmp/out.html")
+      builder = described_class.new(xml_path: "/tmp/in.xml",
+                                    output_path: "/tmp/out.html")
       builder.format.should eq(:inline)
     end
 

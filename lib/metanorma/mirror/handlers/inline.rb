@@ -168,7 +168,8 @@ module Metanorma
           end
 
           text = extract_formatted_text(fmt_child || element)
-          mark = Handlers.build_mark(config[:mark_type], attrs: mark_attrs.compact)
+          mark = Handlers.build_mark(config[:mark_type],
+                                     attrs: mark_attrs.compact)
           nodes << context.text_node(text, marks: [mark])
         end
 

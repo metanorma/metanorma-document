@@ -5,7 +5,8 @@ require "metanorma/mirror"
 
 RSpec.describe Metanorma::Mirror::Model::Mark do
   it "stores type and attrs" do
-    mark = described_class.new(type: "link", attrs: { href: "https://example.com" })
+    mark = described_class.new(type: "link",
+                               attrs: { href: "https://example.com" })
     mark.type.should eq("link")
     mark.attrs.should eq("href" => "https://example.com")
   end
@@ -27,7 +28,8 @@ RSpec.describe Metanorma::Mirror::Model::Mark do
 
   describe ".from_h" do
     it "creates mark from hash" do
-      mark = described_class.from_h({ "type" => "link", "attrs" => { "href" => "http://x.co" } })
+      mark = described_class.from_h({ "type" => "link",
+                                      "attrs" => { "href" => "http://x.co" } })
       mark.type.should eq("link")
       mark.attrs["href"].should eq("http://x.co")
     end
@@ -86,7 +88,10 @@ RSpec.describe Metanorma::Mirror::Model::Mark do
 
   describe "round-trip" do
     it "to_h then from_h yields equivalent mark" do
-      original = described_class.new(type: "link", attrs: { "href" => "http://x.co", "title" => "X" })
+      original = described_class.new(type: "link",
+                                     attrs: {
+                                       "href" => "http://x.co", "title" => "X"
+                                     })
       restored = described_class.from_h(original.to_h)
       restored.type.should eq(original.type)
       restored.attrs.should eq(original.attrs)

@@ -23,7 +23,8 @@ RSpec.describe Metanorma::Mirror::Output::Pipeline do
         end
       end
 
-      pipeline = described_class.new(xml_path: "/tmp/test.xml", steps: [custom_step])
+      pipeline = described_class.new(xml_path: "/tmp/test.xml",
+                                     steps: [custom_step])
       pipeline.steps.size.should eq(1)
     end
   end
@@ -31,7 +32,8 @@ RSpec.describe Metanorma::Mirror::Output::Pipeline do
   describe "id_strategy threading" do
     it "passes id_strategy through PipelineContext" do
       strategy = Metanorma::Mirror::IdStrategy::Positional.new
-      pipeline = described_class.new(xml_path: "/tmp/test.xml", id_strategy: strategy)
+      pipeline = described_class.new(xml_path: "/tmp/test.xml",
+                                     id_strategy: strategy)
       pipeline.context.id_strategy.should eq(strategy)
     end
 
@@ -44,7 +46,8 @@ RSpec.describe Metanorma::Mirror::Output::Pipeline do
   describe Metanorma::Mirror::Output::PipelineContext do
     it "accepts id_strategy as keyword argument" do
       strategy = Metanorma::Mirror::IdStrategy::Preserve.new
-      ctx = described_class.new(xml_path: "/tmp/test.xml", id_strategy: strategy)
+      ctx = described_class.new(xml_path: "/tmp/test.xml",
+                                id_strategy: strategy)
       ctx.id_strategy.should eq(strategy)
     end
 

@@ -116,7 +116,8 @@ module Metanorma
           end
 
           def self.for_link(element)
-            href = SafeAttr.read(element, :target) || SafeAttr.read(element, :href) || ""
+            href = SafeAttr.read(element,
+                                 :target) || SafeAttr.read(element, :href) || ""
             label = TextExtractor.extract_formatted_text(element)
             wrap { |d| d.a(href: href) { d.text label } }
           end

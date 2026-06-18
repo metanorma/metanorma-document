@@ -30,7 +30,8 @@ module Metanorma
         end
 
         def accept_rewriter(_rewriter)
-          raise NotImplementedError, "#{self.class}#accept_rewriter not implemented"
+          raise NotImplementedError,
+                "#{self.class}#accept_rewriter not implemented"
         end
 
         private

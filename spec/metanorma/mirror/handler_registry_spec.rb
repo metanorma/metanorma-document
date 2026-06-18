@@ -44,7 +44,8 @@ RSpec.describe Metanorma::Mirror::HandlerRegistry do
     it "dispatches to handler method and returns HandlerResult" do
       handler_mod = Module.new do
         def self.call(element, context:)
-          Metanorma::Mirror::Handlers.build_node("paragraph", attrs: { id: element.object_id.to_s })
+          Metanorma::Mirror::Handlers.build_node("paragraph",
+                                                 attrs: { id: element.object_id.to_s })
         end
       end
 

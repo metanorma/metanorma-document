@@ -21,7 +21,8 @@ RSpec.describe Metanorma::Mirror::Rewriter do
               "content" => [
                 {
                   "type" => "paragraph",
-                  "content" => [{ "type" => "text", "text" => "Foreword text" }],
+                  "content" => [{ "type" => "text",
+                                  "text" => "Foreword text" }],
                 },
               ],
             },

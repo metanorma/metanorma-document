@@ -325,7 +325,8 @@ RSpec.describe Metanorma::Mirror::Output::HtmlRenderer do
         end
       end
       described_class.include(custom_method)
-      described_class.register_node_handler("custom", custom_method.instance_method(:render_custom))
+      described_class.register_node_handler("custom",
+                                            custom_method.instance_method(:render_custom))
       guide = build_guide(
         build_node("custom", attrs: { "text" => "test" }),
       )
@@ -348,7 +349,10 @@ RSpec.describe Metanorma::Mirror::Output::HtmlRenderer do
 
   describe "render_node class dispatch (case/when)" do
     it "raises ArgumentError on unknown guide type" do
-      -> { described_class.new(Object.new) }.should raise_error(ArgumentError, /guide type/)
+      -> {
+        described_class.new(Object.new)
+      }.should raise_error(ArgumentError,
+                           /guide type/)
     end
   end
 end

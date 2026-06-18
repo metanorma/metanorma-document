@@ -6,7 +6,8 @@ module Metanorma
       class Pipeline
         attr_reader :steps, :context
 
-        def initialize(xml_path:, steps: nil, flavor: nil, title: nil, id_strategy: nil)
+        def initialize(xml_path:, steps: nil, flavor: nil, title: nil,
+id_strategy: nil)
           @steps = steps || [Steps::ParseXml, Steps::TransformMirror, Steps::AttachMetadata]
           @context = PipelineContext.new(
             xml_path: xml_path,

@@ -18,7 +18,8 @@ module Metanorma
           attrs[:group] = SafeAttr.read(element, :group)
           items = extract_items(element, context:)
 
-          Handlers.build_node("ordered_list", attrs: attrs.compact, content: items)
+          Handlers.build_node("ordered_list", attrs: attrs.compact,
+                                              content: items)
         end
 
         def self.definition(element, context:)
@@ -56,7 +57,8 @@ module Metanorma
             end
           end
 
-          Handlers.build_node("list_item", attrs: attrs.compact, content: content)
+          Handlers.build_node("list_item", attrs: attrs.compact,
+                                           content: content)
         end
 
         def self.extract_items(element, context:)

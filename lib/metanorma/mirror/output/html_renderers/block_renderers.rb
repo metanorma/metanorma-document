@@ -15,24 +15,37 @@ module Metanorma
           }.freeze
 
           def self.register(registry)
-            registry.register_node_handler("paragraph", instance_method(:render_paragraph))
-            registry.register_node_handler("note", instance_method(:render_note))
-            registry.register_node_handler("admonition", instance_method(:render_admonition))
-            registry.register_node_handler("example", instance_method(:render_example))
-            registry.register_node_handler("figure", instance_method(:render_figure))
-            registry.register_node_handler("image", instance_method(:render_image))
-            registry.register_node_handler("sourcecode", instance_method(:render_sourcecode))
-            registry.register_node_handler("formula", instance_method(:render_formula))
-            registry.register_node_handler("quote", instance_method(:render_quote))
-            registry.register_node_handler("review", instance_method(:render_review))
-            registry.register_node_handler("term", instance_method(:render_term))
+            registry.register_node_handler("paragraph",
+                                           instance_method(:render_paragraph))
+            registry.register_node_handler("note",
+                                           instance_method(:render_note))
+            registry.register_node_handler("admonition",
+                                           instance_method(:render_admonition))
+            registry.register_node_handler("example",
+                                           instance_method(:render_example))
+            registry.register_node_handler("figure",
+                                           instance_method(:render_figure))
+            registry.register_node_handler("image",
+                                           instance_method(:render_image))
+            registry.register_node_handler("sourcecode",
+                                           instance_method(:render_sourcecode))
+            registry.register_node_handler("formula",
+                                           instance_method(:render_formula))
+            registry.register_node_handler("quote",
+                                           instance_method(:render_quote))
+            registry.register_node_handler("review",
+                                           instance_method(:render_review))
+            registry.register_node_handler("term",
+                                           instance_method(:render_term))
           end
 
           def render_paragraph(node, depth: 0)
             HtmlRenderers.build do |doc|
               attrs = { class: "mn-paragraph" }
               attrs[:id] = node.attrs["id"] if node.attrs["id"]
-              doc.p(attrs) { HtmlRenderers.embed(doc, render_inline(node.content)) }
+              doc.p(attrs) do
+                HtmlRenderers.embed(doc, render_inline(node.content))
+              end
             end
           end
 
@@ -67,7 +80,9 @@ module Metanorma
             HtmlRenderers.build do |doc|
               attrs = { class: "mn-example" }
               attrs[:id] = node.attrs["id"] if node.attrs["id"]
-              doc.div(attrs) { HtmlRenderers.embed(doc, render_children(node, depth:)) }
+              doc.div(attrs) do
+                HtmlRenderers.embed(doc, render_children(node, depth:))
+              end
             end
           end
 
@@ -136,7 +151,9 @@ module Metanorma
             HtmlRenderers.build do |doc|
               attrs = { class: "mn-quote" }
               attrs[:id] = node.attrs["id"] if node.attrs["id"]
-              doc.blockquote(attrs) { HtmlRenderers.embed(doc, render_children(node)) }
+              doc.blockquote(attrs) do
+                HtmlRenderers.embed(doc, render_children(node))
+              end
             end
           end
 
@@ -148,7 +165,10 @@ module Metanorma
             HtmlRenderers.build do |doc|
               attrs = { class: "mn-term" }
               attrs[:id] = node.attrs["id"] if node.attrs["id"]
-              doc.div(attrs) { HtmlRenderers.embed(doc, render_children(node, depth: depth + 1)) }
+              doc.div(attrs) do
+                HtmlRenderers.embed(doc,
+                                    render_children(node, depth: depth + 1))
+              end
             end
           end
         end

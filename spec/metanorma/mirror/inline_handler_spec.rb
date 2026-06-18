@@ -126,7 +126,8 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
 
   describe ".filter_empty_crossrefs" do
     it "removes text nodes with empty text and crossref marks" do
-      xref = Metanorma::Mirror::Model::Mark.new(type: "xref", attrs: { "target" => "s1" })
+      xref = Metanorma::Mirror::Model::Mark.new(type: "xref",
+                                                attrs: { "target" => "s1" })
       empty_text = Metanorma::Mirror::Model::Text.new(text: " ", marks: [xref])
       real_text = Metanorma::Mirror::Model::Text.new(text: "keep")
 
@@ -136,7 +137,8 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
     end
 
     it "does not mutate the input array" do
-      xref = Metanorma::Mirror::Model::Mark.new(type: "xref", attrs: { "target" => "s1" })
+      xref = Metanorma::Mirror::Model::Mark.new(type: "xref",
+                                                attrs: { "target" => "s1" })
       empty_text = Metanorma::Mirror::Model::Text.new(text: " ", marks: [xref])
       input = [empty_text]
 
