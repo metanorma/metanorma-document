@@ -53,7 +53,7 @@ module Metanorma
       end
 
       def self.extract_bibdata_title(bibdata)
-        Inline::TextExtractor.extract_bibdata_title(bibdata)
+        Metadata.title_from_bibdata(bibdata)
       end
     end
   end

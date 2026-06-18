@@ -3,7 +3,7 @@
 require "spec_helper"
 require "metanorma/mirror"
 
-RSpec.describe Metanorma::Mirror::MirrorToMetanorma do
+RSpec.describe Metanorma::Mirror::Rewriter do
   let(:forward) { Metanorma::Mirror::Transformer.new }
   let(:reverse) { described_class.new }
 

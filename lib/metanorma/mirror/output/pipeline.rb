@@ -73,13 +73,13 @@ module Metanorma
           class AttachMetadata
             def call(context)
               parsed = context.parsed
-              return unless parsed.is_a?(Metanorma::StandardDocument::Root)
+              return unless parsed
 
-              bibdata = parsed.bibdata
+              bibdata = SafeAttr.read(parsed, :bibdata)
               return unless bibdata
 
               meta = {}
-              meta["title"] = Handlers.extract_bibdata_title(bibdata)
+              meta["title"] = Metadata.title_from_bibdata(bibdata)
               meta["flavor"] = context.flavor if context.flavor
               context.meta = meta
             end
