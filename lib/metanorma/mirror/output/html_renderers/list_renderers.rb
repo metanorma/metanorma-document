@@ -6,12 +6,12 @@ module Metanorma
       module HtmlRenderers
         module ListRenderers
           def self.register(registry)
-            registry.register("bullet_list", :render_bullet_list)
-            registry.register("ordered_list", :render_ordered_list)
-            registry.register("dl", :render_dl)
-            registry.register("list_item", :render_list_item)
-            registry.register("dt", :render_dt)
-            registry.register("dd", :render_dd)
+            registry.register_node_handler("bullet_list", instance_method(:render_bullet_list))
+            registry.register_node_handler("ordered_list", instance_method(:render_ordered_list))
+            registry.register_node_handler("dl", instance_method(:render_dl))
+            registry.register_node_handler("list_item", instance_method(:render_list_item))
+            registry.register_node_handler("dt", instance_method(:render_dt))
+            registry.register_node_handler("dd", instance_method(:render_dd))
           end
 
           def render_bullet_list(node, depth: 0)
@@ -22,44 +22,59 @@ module Metanorma
             render_list(node, "ol", "mn-ordered-list")
           end
 
-          def render_list(node, tag, css_class)
-            items = node.content.filter_map do |item|
-              next render_node(item) unless item.is_a?(Model::Container) && item.type == "list_item"
-
-              content = render_inline(item.content)
-              %(<li class="mn-list-item">#{content}</li>)
-            end.join("\n")
-            %(<#{tag} class="#{css_class}">\n  #{items}\n</#{tag}>)
-          end
-
           def render_list_item(node, depth: 0)
-            content = render_inline(node.content)
-            %(<li class="mn-list-item">#{content}</li>)
+            HtmlRenderers.build do |doc|
+              doc.li(class: "mn-list-item") { HtmlRenderers.embed(doc, render_inline(node.content)) }
+            end
           end
 
           def render_dl(node, depth: 0)
-            items = node.content.filter_map do |item|
-              case item
-              when Model::Container, Model::Leaf
-                case item.type
-                when "dt"
-                  %(<dt class="mn-dt">#{render_inline(item.content)}</dt>)
-                when "dd"
-                  %(<dd class="mn-dd">#{render_children(item)}</dd>)
-                else
-                  render_node(item)
+            HtmlRenderers.build do |doc|
+              doc.dl(class: "mn-definition-list") do
+                node.content.each do |item|
+                  next unless item.is_a?(Model::Container) || item.is_a?(Model::Leaf)
+
+                  case item.type
+                  when "dt"
+                    doc.dt(class: "mn-dt") { HtmlRenderers.embed(doc, render_inline(item.content)) }
+                  when "dd"
+                    doc.dd(class: "mn-dd") { HtmlRenderers.embed(doc, render_children(item)) }
+                  else
+                    HtmlRenderers.embed(doc, render_node(item))
+                  end
                 end
               end
-            end.join("\n")
-            %(<dl class="mn-definition-list">\n  #{items}\n</dl>)
+            end
           end
 
           def render_dt(node, depth: 0)
-            %(<dt class="mn-dt">#{render_inline(node.content)}</dt>)
+            HtmlRenderers.build do |doc|
+              doc.dt(class: "mn-dt") { HtmlRenderers.embed(doc, render_inline(node.content)) }
+            end
           end
 
           def render_dd(node, depth: 0)
-            %(<dd class="mn-dd">#{render_children(node)}</dd>)
+            HtmlRenderers.build do |doc|
+              doc.dd(class: "mn-dd") { HtmlRenderers.embed(doc, render_children(node)) }
+            end
+          end
+
+          private
+
+          def render_list(node, tag, css_class)
+            HtmlRenderers.build do |doc|
+              doc.public_send(tag, class: css_class) do
+                node.content.each do |item|
+                  if item.is_a?(Model::Container) && item.type == "list_item"
+                    doc.li(class: "mn-list-item") do
+                      HtmlRenderers.embed(doc, render_inline(item.content))
+                    end
+                  else
+                    HtmlRenderers.embed(doc, render_node(item))
+                  end
+                end
+              end
+            end
           end
         end
       end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "fileutils"
-require "json"
+require "nokogiri"
 
 module Metanorma
   module Mirror
@@ -13,16 +13,18 @@ module Metanorma
 
             data_script = "window.METANORMA_DATA = #{safe_json(guide)};"
             ssr_body = HtmlRenderer.new(guide).render
-            css_inline = read_css_inline
             head_parts = []
-
-            head_parts << "<style>\n#{css_inline}\n</style>" unless css_inline.empty?
-            head_parts << %(<script src="app.iife.js"></script>) if iife_bundle_exists?
+            css_inline = read_css_inline
+            if css_inline && !css_inline.empty?
+              head_parts << build_style(css_inline)
+            end
+            head_parts << build_script_src("app.iife.js") if iife_bundle_exists?
+            head_extra = head_parts.join("\n")
 
             html = html_boilerplate(
               title: title,
               body_content: ssr_body,
-              head_extra: head_parts.join("\n"),
+              head_extra: head_extra,
               script_data: data_script,
               app_mount_id: iife_bundle_exists? ? "metanorma-app" : nil,
             )
@@ -39,6 +41,18 @@ module Metanorma
           end
 
           private
+
+          def build_style(css)
+            Nokogiri::HTML5::Builder.new do |doc|
+              doc.style { doc.text css }
+            end.doc.root.to_html
+          end
+
+          def build_script_src(src)
+            Nokogiri::HTML5::Builder.new do |doc|
+              doc.script(src: src)
+            end.doc.root.to_html
+          end
 
           def read_css_inline
             path = iife_css_path
