@@ -20,6 +20,7 @@ module Metanorma
             xml_path: @xml_path,
             flavor: @options[:flavor],
             title: @options[:title] || File.basename(@xml_path, ".*"),
+            id_strategy: @options[:id_strategy],
           )
 
           guide = pipeline.process
