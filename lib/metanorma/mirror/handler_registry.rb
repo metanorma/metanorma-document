@@ -3,8 +3,7 @@
 module Metanorma
   module Mirror
     class HandlerRegistry
-      Entry = Struct.new(:handler, :method_name, :concat, :extra_kwargs,
-                         keyword_init: true)
+      Entry = Struct.new(:callable, :concat, :extra_kwargs, keyword_init: true)
 
       def initialize
         @handlers = {}
@@ -12,9 +11,9 @@ module Metanorma
 
       def register(model_class, handler, method_name: :call, concat: false,
                    extra_kwargs: {})
+        callable = resolve_callable(handler, method_name)
         @handlers[model_class] = Entry.new(
-          handler: handler,
-          method_name: method_name,
+          callable: callable,
           concat: concat,
           extra_kwargs: extra_kwargs,
         )
@@ -33,24 +32,23 @@ module Metanorma
         return HandlerResult.none unless entry
 
         kwargs = { context: context }.merge(entry.extra_kwargs || {})
-
-        result = case entry.handler
-                 when Proc
-                   entry.handler.call(model_element, context)
-                 else
-                   entry.handler.public_send(entry.method_name, model_element,
-                                             **kwargs)
-                 end
-
+        result = entry.callable.call(model_element, **kwargs)
         HandlerResult.new(result, concat: entry.concat)
       end
 
       private
 
+      def resolve_callable(handler, method_name)
+        return handler if handler.is_a?(Proc)
+        return handler.method(:call) if method_name == :call
+
+        handler.method(method_name)
+      end
+
       def ancestor_entry(model_element)
         model_element.class.ancestors.each do |ancestor|
           next if ancestor == model_element.class
-          break if [Lutaml::Model::Serializable, Object].include?(ancestor)
+          break if ancestor == Object
 
           entry = @handlers[ancestor]
           return entry if entry

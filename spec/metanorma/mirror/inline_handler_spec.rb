@@ -170,13 +170,9 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
   end
 
   describe "RichHtmlRenderer::RENDERERS" do
-    it "maps each element class to a valid tag or method" do
+    it "maps each element class to a callable" do
       described_class::RichHtmlRenderer::RENDERERS.each_value do |renderer|
-        if renderer.is_a?(Symbol)
-          described_class::RichHtmlRenderer.method(renderer).should_not be_nil
-        else
-          renderer.should be_a(String)
-        end
+        renderer.should be_a(Proc)
       end
     end
   end

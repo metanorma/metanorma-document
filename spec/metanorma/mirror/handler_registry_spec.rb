@@ -32,8 +32,7 @@ RSpec.describe Metanorma::Mirror::HandlerRegistry do
       klass = Class.new
       registry.register(klass, handler_mod, method_name: :transform)
       entry = registry.entry_for(klass.new)
-      entry.handler.should eq(handler_mod)
-      entry.method_name.should eq(:transform)
+      entry.callable.should eq(handler_mod.method(:transform))
     end
 
     it "returns nil for unregistered class" do

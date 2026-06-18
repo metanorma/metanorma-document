@@ -25,6 +25,14 @@ module Metanorma
           false
         end
 
+        def text_content
+          ""
+        end
+
+        def accept_rewriter(_rewriter)
+          raise NotImplementedError, "#{self.class}#accept_rewriter not implemented"
+        end
+
         private
 
         def normalize_attrs(attrs)

@@ -19,6 +19,14 @@ module Metanorma
         def content
           []
         end
+
+        def text_content
+          ""
+        end
+
+        def accept_rewriter(rewriter)
+          rewriter.rewrite_soft_break(self)
+        end
       end
     end
   end
