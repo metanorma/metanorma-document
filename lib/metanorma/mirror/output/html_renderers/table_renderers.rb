@@ -5,78 +5,72 @@ module Metanorma
     module Output
       module HtmlRenderers
         module TableRenderers
+          WRAPPER_TAGS = {
+            "table_head" => "thead",
+            "table_foot" => "tfoot",
+            "table_body" => "tbody",
+          }.freeze
+
           def self.register(registry)
-            registry.register("table", :render_table)
-            registry.register("table_head", :render_table_section)
-            registry.register("table_body", :render_table_section)
-            registry.register("table_foot", :render_table_section)
+            registry.register_node_handler("table", instance_method(:render_table))
+            registry.register_node_handler("table_head", instance_method(:render_table_section))
+            registry.register_node_handler("table_body", instance_method(:render_table_section))
+            registry.register_node_handler("table_foot", instance_method(:render_table_section))
           end
 
           def render_table(node, depth: 0)
-            id_attr = build_id_attr(node)
-            title = node.attrs["title"]
-            header = title ? %(<div class="mn-table__header">#{e(title)}</div>) : ""
+            sections = node.content.grep(Model::Container)
 
-            content = node.content
-            thead = render_table_sections(content.select { |s| s.is_a?(Model::Container) && s.type == "table_head" }, "th")
-            tbody = render_table_sections(content.select { |s| s.is_a?(Model::Container) && s.type == "table_body" }, "td")
-            tfoot = render_table_sections(content.select { |s| s.is_a?(Model::Container) && s.type == "table_foot" }, "td")
-
-            %(<div#{id_attr} class="mn-table">#{header}\n  <table>\n#{thead}#{tbody}#{tfoot}\n  </table>\n</div>)
+            HtmlRenderers.build do |doc|
+              attrs = { class: "mn-table" }
+              attrs[:id] = node.attrs["id"] if node.attrs["id"]
+              doc.div(attrs) do
+                if node.attrs["title"]
+                  doc.div(class: "mn-table__header") { doc.text node.attrs["title"] }
+                end
+                doc.table do
+                  sections.each { |section| HtmlRenderers.embed(doc, build_table_section(section)) }
+                end
+              end
+            end
           end
 
           def render_table_section(node, depth: 0)
-            wrapper_tag = case node.type
-                          when "table_head" then "thead"
-                          when "table_foot" then "tfoot"
-                          else "tbody"
-                          end
-            cell_tag = wrapper_tag == "thead" ? "th" : "td"
-
-            rows = node.content.filter_map do |row|
-              next unless row.is_a?(Model::Container) && row.type == "table_row"
-
-              cells = row.content.filter_map do |cell|
-                next unless cell.is_a?(Model::Container)
-
-                cell_attrs = cell.attrs
-                colspan = cell_attrs["colspan"] ? %( colspan="#{cell_attrs['colspan']}") : ""
-                rowspan = cell_attrs["rowspan"] ? %( rowspan="#{cell_attrs['rowspan']}") : ""
-                content = render_inline(cell.content)
-                %(<#{cell_tag}#{colspan}#{rowspan}>#{content}</#{cell_tag}>)
-              end.join
-              %(<tr>#{cells}</tr>)
-            end.join("\n")
-            %(    <#{wrapper_tag}>\n      #{rows}\n    </#{wrapper_tag}>\n)
+            build_table_section(node)
           end
 
           private
 
-          def render_table_sections(sections, cell_tag)
-            sections.map { |s| render_table_section_content(s, cell_tag) }.join
+          def build_table_section(section)
+            wrapper_tag = WRAPPER_TAGS[section.type] || "tbody"
+            cell_tag = wrapper_tag == "thead" ? "th" : "td"
+
+            HtmlRenderers.build do |doc|
+              doc.public_send(wrapper_tag) do
+                section.content.each do |row|
+                  next unless row.is_a?(Model::Container) && row.type == "table_row"
+
+                  doc.tr do
+                    row.content.each do |cell|
+                      next unless cell.is_a?(Model::Container)
+
+                      HtmlRenderers.embed(doc, build_table_cell(cell, cell_tag))
+                    end
+                  end
+                end
+              end
+            end
           end
 
-          def render_table_section_content(section, cell_tag)
-            rows = section.content.filter_map do |row|
-              next unless row.is_a?(Model::Container) && row.type == "table_row"
-
-              cells = row.content.filter_map do |cell|
-                next unless cell.is_a?(Model::Container)
-
-                cell_attrs = cell.attrs
-                colspan = cell_attrs["colspan"] ? %( colspan="#{cell_attrs['colspan']}") : ""
-                rowspan = cell_attrs["rowspan"] ? %( rowspan="#{cell_attrs['rowspan']}") : ""
-                content = render_inline(cell.content)
-                %(<#{cell_tag}#{colspan}#{rowspan}>#{content}</#{cell_tag}>)
-              end.join
-              %(<tr>#{cells}</tr>)
-            end.join("\n")
-            wrapper_tag = case section.type
-                          when "table_head" then "thead"
-                          when "table_foot" then "tfoot"
-                          else "tbody"
-                          end
-            %(    <#{wrapper_tag}>\n      #{rows}\n    </#{wrapper_tag}>\n)
+          def build_table_cell(cell, cell_tag)
+            HtmlRenderers.build do |doc|
+              attrs = {}
+              attrs[:colspan] = cell.attrs["colspan"] if cell.attrs["colspan"]
+              attrs[:rowspan] = cell.attrs["rowspan"] if cell.attrs["rowspan"]
+              doc.public_send(cell_tag, attrs) do
+                HtmlRenderers.embed(doc, render_inline(cell.content))
+              end
+            end
           end
         end
       end

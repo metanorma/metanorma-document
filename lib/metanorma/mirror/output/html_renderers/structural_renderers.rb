@@ -6,47 +6,59 @@ module Metanorma
       module HtmlRenderers
         module StructuralRenderers
           def self.register(registry)
-            registry.register("doc", :render_doc)
-            registry.register("preface", :render_preface)
-            registry.register("sections", :render_sections)
-            registry.register("bibliography", :render_bibliography)
-            registry.register("footnotes", :render_footnotes)
-            registry.register("soft_break", :render_soft_break)
+            registry.register_node_handler("doc", instance_method(:render_doc))
+            registry.register_node_handler("preface", instance_method(:render_preface))
+            registry.register_node_handler("sections", instance_method(:render_sections))
+            registry.register_node_handler("bibliography", instance_method(:render_bibliography))
+            registry.register_node_handler("footnotes", instance_method(:render_footnotes))
+            registry.register_node_handler("soft_break", instance_method(:render_soft_break))
           end
 
           def render_doc(node, depth: 0)
-            render_children(node, depth:)
+            HtmlRenderers.build { |doc| HtmlRenderers.embed(doc, render_children(node, depth:)) }
           end
 
           def render_preface(node, depth: 0)
-            content = render_children(node, depth:)
-            %(<section class="mn-preface">\n  #{content}\n</section>)
+            HtmlRenderers.build do |doc|
+              doc.section(class: "mn-preface") { HtmlRenderers.embed(doc, render_children(node, depth:)) }
+            end
           end
 
           def render_sections(node, depth: 0)
-            content = render_children(node, depth:)
-            %(<section class="mn-sections">\n  #{content}\n</section>)
+            HtmlRenderers.build do |doc|
+              doc.section(class: "mn-sections") { HtmlRenderers.embed(doc, render_children(node, depth:)) }
+            end
           end
 
           def render_bibliography(node, depth: 0)
-            content = render_children(node, depth:)
-            %(<section class="mn-bibliography">\n  #{content}\n</section>)
+            HtmlRenderers.build do |doc|
+              doc.section(class: "mn-bibliography") { HtmlRenderers.embed(doc, render_children(node, depth:)) }
+            end
           end
 
           def render_footnotes(node, depth: 0)
-            items = node.content.filter_map do |fn|
-              id = fn.attrs["id"]
-              ref_id = fn.attrs["ref_id"]
-              id_attr = id ? %( id="#{e(id)}") : ""
-              backref = ref_id ? %( <a href="##{e(ref_id)}">&#8617;</a>) : ""
-              content = render_children(fn)
-              %(<li#{id_attr}>#{content}#{backref}</li>)
-            end.join("\n")
-            %(<div class="footnotes"><ol>\n  #{items}\n</ol></div>)
+            HtmlRenderers.build do |doc|
+              doc.div(class: "footnotes") do
+                doc.ol do
+                  node.content.each do |fn|
+                    next unless fn.is_a?(Model::Container)
+
+                    fn_attrs = {}
+                    fn_attrs[:id] = fn.attrs["id"] if fn.attrs["id"]
+                    doc.li(fn_attrs) do
+                      HtmlRenderers.embed(doc, render_children(fn))
+                      if fn.attrs["ref_id"]
+                        doc.a(href: "##{fn.attrs['ref_id']}") { doc.text "↩" }
+                      end
+                    end
+                  end
+                end
+              end
+            end
           end
 
           def render_soft_break(_node, depth: 0)
-            "<br />"
+            HtmlRenderers.build(&:br)
           end
         end
       end

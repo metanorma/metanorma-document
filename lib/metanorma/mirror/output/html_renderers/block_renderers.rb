@@ -15,92 +15,129 @@ module Metanorma
           }.freeze
 
           def self.register(registry)
-            registry.register("paragraph", :render_paragraph)
-            registry.register("note", :render_note)
-            registry.register("admonition", :render_admonition)
-            registry.register("example", :render_example)
-            registry.register("figure", :render_figure)
-            registry.register("image", :render_image)
-            registry.register("sourcecode", :render_sourcecode)
-            registry.register("formula", :render_formula)
-            registry.register("quote", :render_quote)
-            registry.register("review", :render_review)
-            registry.register("term", :render_term)
+            registry.register_node_handler("paragraph", instance_method(:render_paragraph))
+            registry.register_node_handler("note", instance_method(:render_note))
+            registry.register_node_handler("admonition", instance_method(:render_admonition))
+            registry.register_node_handler("example", instance_method(:render_example))
+            registry.register_node_handler("figure", instance_method(:render_figure))
+            registry.register_node_handler("image", instance_method(:render_image))
+            registry.register_node_handler("sourcecode", instance_method(:render_sourcecode))
+            registry.register_node_handler("formula", instance_method(:render_formula))
+            registry.register_node_handler("quote", instance_method(:render_quote))
+            registry.register_node_handler("review", instance_method(:render_review))
+            registry.register_node_handler("term", instance_method(:render_term))
           end
 
           def render_paragraph(node, depth: 0)
-            id_attr = build_id_attr(node)
-            content = render_inline(node.content)
-            %(<p#{id_attr} class="mn-paragraph">#{content}</p>)
+            HtmlRenderers.build do |doc|
+              attrs = { class: "mn-paragraph" }
+              attrs[:id] = node.attrs["id"] if node.attrs["id"]
+              doc.p(attrs) { HtmlRenderers.embed(doc, render_inline(node.content)) }
+            end
           end
 
           def render_note(node, depth: 0)
-            id_attr = build_id_attr(node)
-            content = render_children(node, depth:)
-            %(<div#{id_attr} class="mn-note">\n  <div class="note-title">Note</div>\n  #{content}\n</div>)
+            HtmlRenderers.build do |doc|
+              attrs = { class: "mn-note" }
+              attrs[:id] = node.attrs["id"] if node.attrs["id"]
+              doc.div(attrs) do
+                doc.div(class: "note-title") { doc.text "Note" }
+                HtmlRenderers.embed(doc, render_children(node, depth:))
+              end
+            end
           end
 
           def render_admonition(node, depth: 0)
             adm_type = node.attrs["type"] || "note"
-            id_attr = build_id_attr(node)
             title = ADMONITION_TITLES[adm_type] || adm_type.capitalize
-            content = render_children(node, depth:)
-            <<~HTML
-              <div#{id_attr} class="mn-admonition mn-admonition--#{e(adm_type)}">
-              <div class="admonition-content">
-              <div class="admonition-title">#{e(title)}</div>
-              #{content}
-              </div></div>
-            HTML
+
+            HtmlRenderers.build do |doc|
+              attrs = { class: "mn-admonition mn-admonition--#{adm_type}" }
+              attrs[:id] = node.attrs["id"] if node.attrs["id"]
+              doc.div(attrs) do
+                doc.div(class: "admonition-content") do
+                  doc.div(class: "admonition-title") { doc.text title }
+                  HtmlRenderers.embed(doc, render_children(node, depth:))
+                end
+              end
+            end
           end
 
           def render_example(node, depth: 0)
-            id_attr = build_id_attr(node)
-            content = render_children(node, depth:)
-            %(<div#{id_attr} class="mn-example">\n  #{content}\n</div>)
+            HtmlRenderers.build do |doc|
+              attrs = { class: "mn-example" }
+              attrs[:id] = node.attrs["id"] if node.attrs["id"]
+              doc.div(attrs) { HtmlRenderers.embed(doc, render_children(node, depth:)) }
+            end
           end
 
           def render_figure(node, depth: 0)
-            id_attr = build_id_attr(node)
-            title = node.attrs["title"]
-            content = render_children(node, depth:)
-            caption = title ? %(<figcaption>#{e(title)}</figcaption>) : ""
-            %(<figure#{id_attr} class="mn-figure">\n  #{content}\n  #{caption}\n</figure>)
+            HtmlRenderers.build do |doc|
+              attrs = { class: "mn-figure" }
+              attrs[:id] = node.attrs["id"] if node.attrs["id"]
+              doc.figure(attrs) do
+                HtmlRenderers.embed(doc, render_children(node, depth:))
+                if node.attrs["title"]
+                  doc.figcaption { doc.text node.attrs["title"] }
+                end
+              end
+            end
           end
 
           def render_image(node, depth: 0)
-            src = node.attrs["src"] || ""
-            alt = node.attrs["alt"] || ""
-            height = node.attrs["height"] ? %( height="#{e(node.attrs['height'])}") : ""
-            width = node.attrs["width"] ? %( width="#{e(node.attrs['width'])}") : ""
-            %(<img src="#{e(src)}" alt="#{e(alt)}"#{height}#{width} loading="lazy" />)
+            HtmlRenderers.build do |doc|
+              attrs = {
+                src: node.attrs["src"] || "",
+                alt: node.attrs["alt"] || "",
+                loading: "lazy",
+              }
+              attrs[:height] = node.attrs["height"] if node.attrs["height"]
+              attrs[:width] = node.attrs["width"] if node.attrs["width"]
+              doc.img(attrs)
+            end
           end
 
           def render_sourcecode(node, depth: 0)
-            id_attr = build_id_attr(node)
             lang = node.attrs["language"]
             lang_class = lang ? " language-#{lang}" : ""
-            lang_badge = lang ? %(  <span class="code-language-badge">#{e(lang)}</span>\n) : ""
-            code = e(node.attrs["text"] || "")
-            %(<div#{id_attr} class="mn-sourcecode#{lang_class}">#{lang_badge}\n  <pre class="code-block"><code>#{code}</code></pre>\n</div>)
+
+            HtmlRenderers.build do |doc|
+              attrs = { class: "mn-sourcecode#{lang_class}" }
+              attrs[:id] = node.attrs["id"] if node.attrs["id"]
+              doc.div(attrs) do
+                doc.span(class: "code-language-badge") { doc.text lang } if lang
+                doc.pre(class: "code-block") do
+                  doc.code { doc.text node.attrs["text"] || "" }
+                end
+              end
+            end
           end
 
           def render_formula(node, depth: 0)
-            id_attr = build_id_attr(node)
-            math = if node.attrs["mathml"]
-                     node.attrs["mathml"]
-                   elsif node.attrs["asciimath"]
-                     e(node.attrs["asciimath"])
-                   else
-                     e(node.attrs["math_text"] || "")
-                   end
-            %(<div#{id_attr} class="mn-formula">\n  <span class="formula-math">#{math}</span>\n</div>)
+            HtmlRenderers.build do |doc|
+              attrs = { class: "mn-formula" }
+              attrs[:id] = node.attrs["id"] if node.attrs["id"]
+              doc.div(attrs) do
+                doc.span(class: "formula-math") do
+                  math = node.attrs["mathml"]
+                  if math
+                    HtmlRenderers.embed(doc, math)
+                  elsif node.attrs["asciimath"]
+                    doc.text node.attrs["asciimath"]
+                  else
+                    doc.text node.attrs["math_text"] || ""
+                  end
+                end
+              end
+            end
           end
 
           def render_quote(node, depth: 0)
-            id_attr = build_id_attr(node)
-            content = render_children(node)
-            %(<blockquote#{id_attr} class="mn-quote">\n  #{content}\n</blockquote>)
+            HtmlRenderers.build do |doc|
+              attrs = { class: "mn-quote" }
+              attrs[:id] = node.attrs["id"] if node.attrs["id"]
+              doc.blockquote(attrs) { HtmlRenderers.embed(doc, render_children(node)) }
+            end
           end
 
           def render_review(_node, depth: 0)
@@ -108,9 +145,11 @@ module Metanorma
           end
 
           def render_term(node, depth: 0)
-            id_attr = node.attrs["id"] ? %( id="#{e(node.attrs['id'])}") : ""
-            content = render_children(node, depth: depth + 1)
-            %(<div#{id_attr} class="mn-term">\n  #{content}\n</div>)
+            HtmlRenderers.build do |doc|
+              attrs = { class: "mn-term" }
+              attrs[:id] = node.attrs["id"] if node.attrs["id"]
+              doc.div(attrs) { HtmlRenderers.embed(doc, render_children(node, depth: depth + 1)) }
+            end
           end
         end
       end

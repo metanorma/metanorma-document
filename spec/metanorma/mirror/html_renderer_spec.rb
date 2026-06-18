@@ -306,21 +306,26 @@ RSpec.describe Metanorma::Mirror::Output::HtmlRenderer do
       )
       html = described_class.new(guide).render
       html.should include("&lt;img")
-      html.should include("&quot;alert(1)&quot;")
       html.should_not include("<img onerror")
     end
   end
 
   describe "custom renderer registration" do
     after do
-      described_class.custom_node_renderers.delete("custom")
-      described_class.custom_mark_renderers.delete("custom_mark")
+      described_class.node_handlers.delete("custom")
+      described_class.mark_handlers.delete("custom_mark")
     end
 
-    it "allows custom node renderer" do
-      described_class.register_node_renderer("custom", ->(node, renderer) {
-        "<custom>#{renderer.e(node.attrs['text'])}</custom>"
-      })
+    it "allows custom node handler" do
+      custom_method = Module.new do
+        def render_custom(node, depth: 0)
+          Metanorma::Mirror::Output::HtmlRenderers.build do |doc|
+            doc.custom { doc.text node.attrs["text"] }
+          end
+        end
+      end
+      described_class.include(custom_method)
+      described_class.register_node_handler("custom", custom_method.instance_method(:render_custom))
       guide = build_guide(
         build_node("custom", attrs: { "text" => "test" }),
       )
@@ -328,8 +333,8 @@ RSpec.describe Metanorma::Mirror::Output::HtmlRenderer do
       html.should include("<custom>test</custom>")
     end
 
-    it "allows custom mark renderer" do
-      described_class.register_mark_renderer("custom_mark", ->(text, _mark) {
+    it "allows custom mark handler" do
+      described_class.register_mark_handler("custom_mark", ->(text, _mark) {
         "<mark>#{text}</mark>"
       })
       guide = build_guide(
@@ -341,24 +346,7 @@ RSpec.describe Metanorma::Mirror::Output::HtmlRenderer do
     end
   end
 
-  describe ".register_class (OCP)" do
-    after do
-      described_class.class_dispatch.delete(String)
-    end
-
-    it "allows new Model classes to dispatch without editing render_node" do
-      custom_class = Class.new
-      described_class.register_class(custom_class, :custom_render)
-      instance = described_class.allocate
-      def instance.custom_render(node, depth: 0)
-        "<custom-dispatch>#{node.inspect}</custom-dispatch>"
-      end
-      instance.send(:initialize, build_guide(build_node("paragraph")))
-      result = instance.render_node(custom_class.new)
-      result.should include("<custom-dispatch>")
-      result.should include("</custom-dispatch>")
-    end
-
+  describe "render_node class dispatch (case/when)" do
     it "raises ArgumentError on unknown guide type" do
       -> { described_class.new(Object.new) }.should raise_error(ArgumentError, /guide type/)
     end

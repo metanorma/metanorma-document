@@ -5,42 +5,58 @@ module Metanorma
     module Output
       module HtmlRenderers
         module MarkRenderers
-          def self.register(registry); end
-
-          MARK_RENDERERS = {
-            "emphasis" => ->(text, _mark) { "<em>#{text}</em>" },
-            "strong" => ->(text, _mark) { "<strong>#{text}</strong>" },
-            "subscript" => ->(text, _mark) { "<sub>#{text}</sub>" },
-            "superscript" => ->(text, _mark) { "<sup>#{text}</sup>" },
-            "code" => ->(text, _mark) { "<code>#{text}</code>" },
-            "underline" => ->(text, _mark) { "<u>#{text}</u>" },
-            "strike" => ->(text, _mark) { "<s>#{text}</s>" },
-            "smallcap" => ->(text, _mark) {
-              "<span style=\"font-variant: small-caps\">#{text}</span>"
-            },
-            "link" => ->(text, mark) {
-              %(<a href="#{Output::HtmlRenderer.escape_attr(mark.attrs['href'] || '#')}">#{text}</a>)
-            },
-            "xref" => ->(text, mark) {
-              %(<a href="##{Output::HtmlRenderer.escape_attr(mark.attrs['target'] || '')}">#{text}</a>)
-            },
-            "eref" => ->(text, mark) {
-              %(<a class="eref" cite="#{Output::HtmlRenderer.escape_attr(mark.attrs['citeas'] || '')}">#{text}</a>)
-            },
-            "footnote" => ->(text, _mark) {
-              %(<sup class="footnote-inline">#{text}</sup>)
-            },
-            "stem" => ->(text, _mark) { %(<span class="stem">#{text}</span>) },
-            "concept" => ->(text, _mark) {
-              %(<span class="concept">#{text}</span>)
-            },
-            "bcp14" => ->(text, _mark) { %(<span class="bcp14">#{text}</span>) },
-            "span" => ->(text, mark) {
+          def self.register(registry)
+            registry.register_mark_handler("emphasis", ->(inner, _mark) {
+              HtmlRenderers.wrap(:em, inner)
+            })
+            registry.register_mark_handler("strong", ->(inner, _mark) {
+              HtmlRenderers.wrap(:strong, inner)
+            })
+            registry.register_mark_handler("subscript", ->(inner, _mark) {
+              HtmlRenderers.wrap(:sub, inner)
+            })
+            registry.register_mark_handler("superscript", ->(inner, _mark) {
+              HtmlRenderers.wrap(:sup, inner)
+            })
+            registry.register_mark_handler("code", ->(inner, _mark) {
+              HtmlRenderers.wrap(:code, inner)
+            })
+            registry.register_mark_handler("underline", ->(inner, _mark) {
+              HtmlRenderers.wrap(:u, inner)
+            })
+            registry.register_mark_handler("strike", ->(inner, _mark) {
+              HtmlRenderers.wrap(:s, inner)
+            })
+            registry.register_mark_handler("smallcap", ->(inner, _mark) {
+              HtmlRenderers.wrap(:span, inner, style: "font-variant: small-caps")
+            })
+            registry.register_mark_handler("link", ->(inner, mark) {
+              HtmlRenderers.wrap(:a, inner, href: mark.attrs["href"] || "#")
+            })
+            registry.register_mark_handler("xref", ->(inner, mark) {
+              HtmlRenderers.wrap(:a, inner, href: "##{mark.attrs['target'] || ''}")
+            })
+            registry.register_mark_handler("eref", ->(inner, mark) {
+              HtmlRenderers.wrap(:a, inner, class: "eref", cite: mark.attrs["citeas"] || "")
+            })
+            registry.register_mark_handler("footnote", ->(inner, _mark) {
+              HtmlRenderers.wrap(:sup, inner, class: "footnote-inline")
+            })
+            registry.register_mark_handler("stem", ->(inner, _mark) {
+              HtmlRenderers.wrap(:span, inner, class: "stem")
+            })
+            registry.register_mark_handler("concept", ->(inner, _mark) {
+              HtmlRenderers.wrap(:span, inner, class: "concept")
+            })
+            registry.register_mark_handler("bcp14", ->(inner, _mark) {
+              HtmlRenderers.wrap(:span, inner, class: "bcp14")
+            })
+            registry.register_mark_handler("span", ->(inner, mark) {
               cls = mark.attrs["class_attr"]
-              cls_attr = cls ? %( class="#{Output::HtmlRenderer.escape_attr(cls)}") : ""
-              %(<span#{cls_attr}>#{text}</span>)
-            },
-          }.freeze
+              attrs = cls ? { class: cls } : {}
+              HtmlRenderers.wrap(:span, inner, **attrs)
+            })
+          end
         end
       end
     end

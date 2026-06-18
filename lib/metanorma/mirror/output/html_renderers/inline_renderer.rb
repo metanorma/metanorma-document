@@ -11,48 +11,46 @@ module Metanorma
             return "" unless content
             return "" if content.empty?
 
-            content.filter_map do |node|
-              case node
-              when String
-                e(node)
-              when Model::Text
-                render_text_node(node)
-              when Model::SoftBreak
-                "<br />"
-              when Model::Container
-                if node.type == "footnote_marker"
-                  render_footnote_marker(node)
-                else
-                  render_node(node)
+            HtmlRenderers.build_fragment do |doc|
+              content.each do |node|
+                case node
+                when String
+                  doc.text node
+                when Model::Text
+                  HtmlRenderers.embed(doc, render_text_node(node))
+                when Model::SoftBreak
+                  doc.br
+                when Model::Container
+                  if node.type == "footnote_marker"
+                    HtmlRenderers.embed(doc, render_footnote_marker(node))
+                  else
+                    HtmlRenderers.embed(doc, render_node(node))
+                  end
                 end
-              else
-                ""
               end
-            end.join
+            end
           end
 
           def render_text_node(node)
-            text = e(node.text)
-            node.marks.reduce(text) { |current, mark| apply_mark(current, mark) }
+            inner_html = HtmlRenderers.escape_text(node.text)
+            node.marks.reduce(inner_html) { |current, mark| apply_mark(current, mark) }
           end
 
-          def apply_mark(text, mark)
-            mark_type = mark.type
-
-            custom = self.class.custom_mark_renderers[mark_type]
-            return custom.call(text, mark) if custom
-
-            handler = MarkRenderers::MARK_RENDERERS[mark_type]
-            return handler.call(text, mark) if handler
-
-            text
+          def apply_mark(inner_html, mark)
+            handler = self.class.mark_handlers[mark.type]
+            handler ? handler.call(inner_html, mark) : inner_html
           end
 
           def render_footnote_marker(node)
-            id = node.attrs["id"]
-            ref_id = node.attrs["ref_id"]
-            id_attr = id ? %( id="#{e(id)}") : ""
-            %(<sup class="footnote-marker"><a#{id_attr} href="##{e(ref_id || '')}">#{e(node.attrs['number'] || '*')}</a></sup>)
+            HtmlRenderers.build do |doc|
+              doc.sup(class: "footnote-marker") do
+                attrs = {}
+                attrs[:id] = node.attrs["id"] if node.attrs["id"]
+                doc.a(attrs.merge(href: "##{node.attrs['ref_id'] || ''}")) do
+                  doc.text node.attrs["number"] || "*"
+                end
+              end
+            end
           end
         end
       end
