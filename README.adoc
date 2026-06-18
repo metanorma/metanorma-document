@@ -242,21 +242,44 @@ transformer = Metanorma::Mirror::Transformer.new
 document = transformer.from_metanorma(doc)
 document.class # => Metanorma::Mirror::Model::Container
 
-=== Reverse Conversion (Mirror → Metanorma)
+=== Reverse Conversion (Mirror → Mirror, with Rewriting)
 
-The reverse converter rebuilds a Model graph, applying skip rules and optional per-type customization:
-
-[source,ruby]
-reverse = Metanorma::Mirror::MirrorToMetanorma.new
-rebuilt = reverse.call(document)
-
-Customization is OCP-friendly:
+The `Rewriter` walks a Model graph and produces a new Model graph, applying skip rules and optional per-type customization. (The historical name `MirrorToMetanorma` is no longer accurate: the output is a Model graph, not Metanorma XML. The class was renamed to `Rewriter` to reflect this.)
 
 [source,ruby]
-Metanorma::Mirror::MirrorToMetanorma.skip("my_type")
-Metanorma::Mirror::MirrorToMetanorma.register("my_type") do |node, ctx|
+rewriter = Metanorma::Mirror::Rewriter.new
+rebuilt = rewriter.call(document)
+
+Each `Rewriter` instance seeds its skip set and builder map from class-level defaults at `new` time, so two instances never share state. Instance-level mutation does not leak back to the class, and class-level mutation does not retroactively affect existing instances.
+
+[source,ruby]
+# Instance API — only affects this instance
+rewriter.skip("my_type")
+rewriter.register("my_type") do |node, _rewriter|
   Metanorma::Mirror::Model::Leaf.new(type: "customized")
 end
+
+# Class API — seeds defaults copied into future instances
+Metanorma::Mirror::Rewriter.skip("always_skip")
+Metanorma::Mirror::Rewriter.register("always_customize") { |n, _r| ... }
+
+Model dispatch is polymorphic: each `Model::*` class implements `accept_rewriter(rewriter)`, which calls the matching `rewriter#rewrite_container` / `#rewrite_leaf` / `#rewrite_text` / `#rewrite_soft_break`. There is no `case/when` on node classes in the dispatch path.
+
+=== Default Handler Registry
+
+`Metanorma::Mirror::DefaultRegistry.build` returns a fresh `HandlerRegistry` pre-populated with the standard Metanorma → Mirror mappings (paragraphs, blocks, lists, sections, terms, structural containers). It is the single source of truth for the default handler set — adding a new model-to-handler mapping is a single `register` call here, with no edits to `HandlerRegistry` itself.
+
+[source,ruby]
+Metanorma::Mirror.build_default_registry
+# => #<Metanorma::Mirror::HandlerRegistry> (fresh instance each call)
+
+=== Metadata Service
+
+`Metanorma::Mirror::Metadata` is a standalone service that extracts document metadata (title, etc.) from a parsed bibdata object. It is consumed by both the forward pipeline (`Output::Pipeline::AttachMetadata`) and the forward transformer (`MetanormaToMirror#extract_root_title`), keeping title-extraction logic in one place rather than duplicated across the Handlers layer.
+
+[source,ruby]
+Metanorma::Mirror::Metadata.title_from_bibdata(doc.bibdata)
+# => "First title string"
 
 === Serialization
 
@@ -278,14 +301,30 @@ The `Positional` strategy exposes `register_category(model_class, category)` so 
 
 === HTML Rendering from Mirror
 
-`Metanorma::Mirror::Output::HtmlRenderer` produces SSR-ready HTML directly from a mirror Model graph. Renderer behavior is split into pluggable modules registered by node type (`clause`, `paragraph`, `bullet_list`, `table`, ...) and by mark type (`emphasis`, `link`, `xref`, ...). All dispatch is registry-driven (no `case/when` on types), so new node and mark types can be added without modifying core rendering code:
+`Metanorma::Mirror::Output::HtmlRenderer` produces SSR-ready HTML directly from a mirror Model graph. Renderer behavior is split into pluggable modules registered by node type (`clause`, `paragraph`, `bullet_list`, `table`, ...) and by mark type (`emphasis`, `link`, `xref`, ...). All dispatch is registry-driven (no `case/when` on types), so new node and mark types can be added without modifying core rendering code.
+
+All HTML construction goes through `Nokogiri::HTML4::Builder` (or `Nokogiri::HTML5::Builder` for full documents). String concatenation of HTML is not permitted anywhere in the renderer layer. The `HtmlRenderers` module exposes shared helpers (`build`, `build_fragment`, `embed`, `wrap`, `escape_text`) so each renderer stays declarative.
+
+Node handlers are stored as `UnboundMethod`s bound to the renderer instance at dispatch time. Register a new node handler by passing an instance method reference:
 
 [source,ruby]
-Metanorma::Mirror::Output::HtmlRenderer.register_node_renderer("callout",
-  ->(node, renderer) { "<callout>#{renderer.e(node.attrs['text'])}</callout>" })
+module MyRenderers
+  def self.register(registry)
+    registry.register_node_handler("callout",
+      instance_method(:render_callout))
+  end
 
-Metanorma::Mirror::Output::HtmlRenderer.register_mark_renderer("kbd",
-  ->(text, _mark) { "<kbd>#{text}</kbd>" })
+  def render_callout(node, depth: 0)
+    HtmlRenderers.build { |doc| doc.span(class: "callout") { doc.text node.attrs["text"] } }
+  end
+end
+MyRenderers.register(Metanorma::Mirror::Output::HtmlRenderer)
+
+Mark handlers are stored as `Proc`s that receive the already-rendered inner HTML and the `Mark` instance:
+
+[source,ruby]
+Metanorma::Mirror::Output::HtmlRenderer.register_mark_handler("kbd",
+  ->(inner_html, _mark) { HtmlRenderers.wrap(:kbd, inner_html) })
 
 === Output Pipeline
 
@@ -297,6 +336,7 @@ builder = Metanorma::Mirror::Output::Builder.new(
   output_path: "output.html",
   format: :inline,
   flavor: "iso",
+  id_strategy: Metanorma::Mirror::IdStrategy::Positional.new,
 )
 builder.build
 
