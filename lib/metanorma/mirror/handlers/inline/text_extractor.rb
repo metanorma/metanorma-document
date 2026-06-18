@@ -107,26 +107,7 @@ module Metanorma
           end
 
           def self.extract_bibdata_title(bibdata)
-            return nil unless bibdata
-
-            title = bibdata.title
-            return nil unless title
-
-            case title
-            when String then title
-            when Array
-              first = title.first
-              return nil unless first
-
-              if first.is_a?(String)
-                first
-              elsif first.is_a?(Lutaml::Model::Serializable)
-                Array(first.content).join
-              else
-                first.to_s
-              end
-            else title.to_s
-            end
+            Metadata.title_from_bibdata(bibdata)
           end
         end
       end

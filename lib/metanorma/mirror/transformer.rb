@@ -13,8 +13,8 @@ module Metanorma
         @id_strategy.finalize!(document)
       end
 
-      def to_metanorma(mirror_node)
-        MirrorToMetanorma.new.call(mirror_node)
+      def rewrite(mirror_node)
+        Rewriter.new.call(mirror_node)
       end
     end
   end

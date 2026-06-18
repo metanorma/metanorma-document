@@ -93,7 +93,7 @@ module Metanorma
       end
 
       def extract_root_title(root)
-        Handlers.extract_bibdata_title(root.bibdata)
+        Metadata.title_from_bibdata(SafeAttr.read(root, :bibdata))
       end
     end
   end
