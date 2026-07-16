@@ -10,7 +10,6 @@ module Metanorma
     autoload :Model, "#{__dir__}/mirror/model"
     autoload :HandlerResult, "#{__dir__}/mirror/handler_result"
     autoload :Transformer, "#{__dir__}/mirror/transformer"
-    autoload :MetanormaToMirror, "#{__dir__}/mirror/metanorma_to_mirror"
     autoload :Rewriter, "#{__dir__}/mirror/rewriter"
     autoload :HandlerRegistry, "#{__dir__}/mirror/handler_registry"
     autoload :Handlers, "#{__dir__}/mirror/handlers"
