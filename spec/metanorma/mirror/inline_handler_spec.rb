@@ -171,9 +171,9 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
     end
   end
 
-  describe "RichHtmlRenderer::RENDERERS" do
+  describe "RichHtmlRenderer::COMPLEX_RENDERERS" do
     it "maps each element class to a callable" do
-      described_class::RichHtmlRenderer::RENDERERS.each_value do |renderer|
+      described_class::RichHtmlRenderer::COMPLEX_RENDERERS.each_value do |renderer|
         renderer.should be_a(Proc)
       end
     end

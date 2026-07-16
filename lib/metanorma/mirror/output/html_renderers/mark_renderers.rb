@@ -6,30 +6,18 @@ module Metanorma
       module HtmlRenderers
         module MarkRenderers
           def self.register(registry)
-            registry.register_mark_handler("emphasis", ->(inner, _mark) {
-              HtmlRenderers.wrap(:em, inner)
-            })
-            registry.register_mark_handler("strong", ->(inner, _mark) {
-              HtmlRenderers.wrap(:strong, inner)
-            })
-            registry.register_mark_handler("subscript", ->(inner, _mark) {
-              HtmlRenderers.wrap(:sub, inner)
-            })
-            registry.register_mark_handler("superscript", ->(inner, _mark) {
-              HtmlRenderers.wrap(:sup, inner)
-            })
-            registry.register_mark_handler("code", ->(inner, _mark) {
-              HtmlRenderers.wrap(:code, inner)
-            })
-            registry.register_mark_handler("underline", ->(inner, _mark) {
-              HtmlRenderers.wrap(:u, inner)
-            })
-            registry.register_mark_handler("strike", ->(inner, _mark) {
-              HtmlRenderers.wrap(:s, inner)
-            })
-            registry.register_mark_handler("smallcap", ->(inner, _mark) {
-              HtmlRenderers.wrap(:span, inner, style: "font-variant: small-caps")
-            })
+            # Simple-wrap marks: tag and attrs come from the shared Catalog
+            # so the Model-side renderer and the XML-side RichHtmlRenderer
+            # agree on HTML output.
+            Handlers::Inline::Catalog::SIMPLE_WRAPS.each do |mark_type, spec|
+              tag = spec[:tag]
+              attrs = spec.except(:tag)
+              registry.register_mark_handler(mark_type, ->(inner, _mark) {
+                HtmlRenderers.wrap(tag, inner, **attrs)
+              })
+            end
+
+            # Dynamic marks: attrs come from mark.attrs per instance.
             registry.register_mark_handler("link", ->(inner, mark) {
               HtmlRenderers.wrap(:a, inner, href: mark.attrs["href"] || "#")
             })
@@ -37,19 +25,8 @@ module Metanorma
               HtmlRenderers.wrap(:a, inner, href: "##{mark.attrs['target'] || ''}")
             })
             registry.register_mark_handler("eref", ->(inner, mark) {
-              HtmlRenderers.wrap(:a, inner, class: "eref", cite: mark.attrs["citeas"] || "")
-            })
-            registry.register_mark_handler("footnote", ->(inner, _mark) {
-              HtmlRenderers.wrap(:sup, inner, class: "footnote-inline")
-            })
-            registry.register_mark_handler("stem", ->(inner, _mark) {
-              HtmlRenderers.wrap(:span, inner, class: "stem")
-            })
-            registry.register_mark_handler("concept", ->(inner, _mark) {
-              HtmlRenderers.wrap(:span, inner, class: "concept")
-            })
-            registry.register_mark_handler("bcp14", ->(inner, _mark) {
-              HtmlRenderers.wrap(:span, inner, class: "bcp14")
+              HtmlRenderers.wrap(:a, inner, class: "eref",
+                                         cite: mark.attrs["citeas"] || "")
             })
             registry.register_mark_handler("span", ->(inner, mark) {
               cls = mark.attrs["class_attr"]
