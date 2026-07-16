@@ -8,7 +8,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Paragraph do
   let(:registry) { Metanorma::Mirror.build_default_registry }
   let(:id_strategy) { Metanorma::Mirror::IdStrategy::Preserve.new }
   let(:context) do
-    Metanorma::Mirror::MetanormaToMirror.new(registry: registry,
+    Metanorma::Mirror::Transformer.new(registry: registry,
                                              id_strategy: id_strategy)
   end
 
@@ -41,7 +41,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Admonition do
   let(:registry) { Metanorma::Mirror.build_default_registry }
   let(:id_strategy) { Metanorma::Mirror::IdStrategy::Preserve.new }
   let(:context) do
-    Metanorma::Mirror::MetanormaToMirror.new(registry: registry,
+    Metanorma::Mirror::Transformer.new(registry: registry,
                                              id_strategy: id_strategy)
   end
 
@@ -68,7 +68,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Example do
   let(:registry) { Metanorma::Mirror.build_default_registry }
   let(:id_strategy) { Metanorma::Mirror::IdStrategy::Preserve.new }
   let(:context) do
-    Metanorma::Mirror::MetanormaToMirror.new(registry: registry,
+    Metanorma::Mirror::Transformer.new(registry: registry,
                                              id_strategy: id_strategy)
   end
 
@@ -95,7 +95,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Sourcecode do
   let(:registry) { Metanorma::Mirror.build_default_registry }
   let(:id_strategy) { Metanorma::Mirror::IdStrategy::Preserve.new }
   let(:context) do
-    Metanorma::Mirror::MetanormaToMirror.new(registry: registry,
+    Metanorma::Mirror::Transformer.new(registry: registry,
                                              id_strategy: id_strategy)
   end
 
@@ -122,7 +122,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Formula do
   let(:registry) { Metanorma::Mirror.build_default_registry }
   let(:id_strategy) { Metanorma::Mirror::IdStrategy::Preserve.new }
   let(:context) do
-    Metanorma::Mirror::MetanormaToMirror.new(registry: registry,
+    Metanorma::Mirror::Transformer.new(registry: registry,
                                              id_strategy: id_strategy)
   end
 
@@ -149,7 +149,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Quote do
   let(:registry) { Metanorma::Mirror.build_default_registry }
   let(:id_strategy) { Metanorma::Mirror::IdStrategy::Preserve.new }
   let(:context) do
-    Metanorma::Mirror::MetanormaToMirror.new(registry: registry,
+    Metanorma::Mirror::Transformer.new(registry: registry,
                                              id_strategy: id_strategy)
   end
 
@@ -176,7 +176,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Review do
   let(:registry) { Metanorma::Mirror.build_default_registry }
   let(:id_strategy) { Metanorma::Mirror::IdStrategy::Preserve.new }
   let(:context) do
-    Metanorma::Mirror::MetanormaToMirror.new(registry: registry,
+    Metanorma::Mirror::Transformer.new(registry: registry,
                                              id_strategy: id_strategy)
   end
 

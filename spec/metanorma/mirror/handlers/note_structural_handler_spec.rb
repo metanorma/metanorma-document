@@ -8,7 +8,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Note do
   let(:registry) { Metanorma::Mirror.build_default_registry }
   let(:id_strategy) { Metanorma::Mirror::IdStrategy::Preserve.new }
   let(:context) do
-    Metanorma::Mirror::MetanormaToMirror.new(registry: registry,
+    Metanorma::Mirror::Transformer.new(registry: registry,
                                              id_strategy: id_strategy)
   end
 

@@ -275,7 +275,7 @@ Metanorma::Mirror.build_default_registry
 
 === Metadata Service
 
-`Metanorma::Mirror::Metadata` is a standalone service that extracts document metadata (title, etc.) from a parsed bibdata object. It is consumed by both the forward pipeline (`Output::Pipeline::AttachMetadata`) and the forward transformer (`MetanormaToMirror#extract_root_title`), keeping title-extraction logic in one place rather than duplicated across the Handlers layer.
+`Metanorma::Mirror::Metadata` is a standalone service that extracts document metadata (title, etc.) from a parsed bibdata object. It is consumed by both the forward pipeline (`Output::Pipeline::AttachMetadata`) and the forward transformer (`Transformer#extract_root_title`), keeping title-extraction logic in one place rather than duplicated across the Handlers layer.
 
 [source,ruby]
 Metanorma::Mirror::Metadata.title_from_bibdata(doc.bibdata)
