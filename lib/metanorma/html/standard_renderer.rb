@@ -454,11 +454,13 @@ module Metanorma
         [prefix_text, rest.empty? ? nil : rest]
       end
 
+      PREFERRED_LINK_TYPES = %w[src citation].freeze
+
       def bibitem_url(item)
         links = Array(item.link)
         return nil if links.empty?
 
-        preferred = links.find { |l| ["src", "citation"].include?(l.type) }
+        preferred = links.find { |l| PREFERRED_LINK_TYPES.include?(l.type) }
         return preferred.content.to_s if preferred && !preferred.content.to_s.empty?
 
         non_rss = links.find do |l|
