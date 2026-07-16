@@ -9,7 +9,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Paragraph do
   let(:id_strategy) { Metanorma::Mirror::IdStrategy::Preserve.new }
   let(:context) do
     Metanorma::Mirror::Transformer.new(registry: registry,
-                                             id_strategy: id_strategy)
+                                       id_strategy: id_strategy)
   end
 
   def parse_paragraph(xml)
@@ -42,7 +42,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Admonition do
   let(:id_strategy) { Metanorma::Mirror::IdStrategy::Preserve.new }
   let(:context) do
     Metanorma::Mirror::Transformer.new(registry: registry,
-                                             id_strategy: id_strategy)
+                                       id_strategy: id_strategy)
   end
 
   def parse_admonition(xml)
@@ -69,7 +69,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Example do
   let(:id_strategy) { Metanorma::Mirror::IdStrategy::Preserve.new }
   let(:context) do
     Metanorma::Mirror::Transformer.new(registry: registry,
-                                             id_strategy: id_strategy)
+                                       id_strategy: id_strategy)
   end
 
   def parse_example(xml)
@@ -96,7 +96,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Sourcecode do
   let(:id_strategy) { Metanorma::Mirror::IdStrategy::Preserve.new }
   let(:context) do
     Metanorma::Mirror::Transformer.new(registry: registry,
-                                             id_strategy: id_strategy)
+                                       id_strategy: id_strategy)
   end
 
   def parse_sourcecode(xml)
@@ -123,7 +123,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Formula do
   let(:id_strategy) { Metanorma::Mirror::IdStrategy::Preserve.new }
   let(:context) do
     Metanorma::Mirror::Transformer.new(registry: registry,
-                                             id_strategy: id_strategy)
+                                       id_strategy: id_strategy)
   end
 
   def parse_formula(xml)
@@ -150,7 +150,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Quote do
   let(:id_strategy) { Metanorma::Mirror::IdStrategy::Preserve.new }
   let(:context) do
     Metanorma::Mirror::Transformer.new(registry: registry,
-                                             id_strategy: id_strategy)
+                                       id_strategy: id_strategy)
   end
 
   def parse_quote(xml)
@@ -177,7 +177,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Review do
   let(:id_strategy) { Metanorma::Mirror::IdStrategy::Preserve.new }
   let(:context) do
     Metanorma::Mirror::Transformer.new(registry: registry,
-                                             id_strategy: id_strategy)
+                                       id_strategy: id_strategy)
   end
 
   def parse_review(xml)

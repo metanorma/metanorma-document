@@ -9,7 +9,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
   let(:id_strategy) { Metanorma::Mirror::IdStrategy::Preserve.new }
   let(:context) do
     Metanorma::Mirror::Transformer.new(registry: registry,
-                                             id_strategy: id_strategy)
+                                       id_strategy: id_strategy)
   end
 
   def parse_clause(xml)

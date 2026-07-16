@@ -20,18 +20,18 @@ module Metanorma
         # those.
         module Catalog
           SIMPLE_WRAPS = {
-            "emphasis"    => { tag: :em },
-            "strong"      => { tag: :strong },
-            "subscript"   => { tag: :sub },
+            "emphasis" => { tag: :em },
+            "strong" => { tag: :strong },
+            "subscript" => { tag: :sub },
             "superscript" => { tag: :sup },
-            "code"        => { tag: :code },
-            "underline"   => { tag: :u },
-            "strike"      => { tag: :s },
-            "smallcap"    => { tag: :span, style: "font-variant: small-caps" },
-            "concept"     => { tag: :span, class: "concept" },
-            "bcp14"       => { tag: :span, class: "bcp14" },
-            "footnote"    => { tag: :sup, class: "footnote-inline" },
-            "stem"        => { tag: :span, class: "stem" },
+            "code" => { tag: :code },
+            "underline" => { tag: :u },
+            "strike" => { tag: :s },
+            "smallcap" => { tag: :span, style: "font-variant: small-caps" },
+            "concept" => { tag: :span, class: "concept" },
+            "bcp14" => { tag: :span, class: "bcp14" },
+            "footnote" => { tag: :sup, class: "footnote-inline" },
+            "stem" => { tag: :span, class: "stem" },
           }.freeze
 
           # XML element classes that render via SIMPLE_WRAPS without

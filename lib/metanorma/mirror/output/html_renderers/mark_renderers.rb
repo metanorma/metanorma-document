@@ -26,7 +26,7 @@ module Metanorma
             })
             registry.register_mark_handler("eref", ->(inner, mark) {
               HtmlRenderers.wrap(:a, inner, class: "eref",
-                                         cite: mark.attrs["citeas"] || "")
+                                            cite: mark.attrs["citeas"] || "")
             })
             registry.register_mark_handler("span", ->(inner, mark) {
               cls = mark.attrs["class_attr"]
