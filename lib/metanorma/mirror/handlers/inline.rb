@@ -6,6 +6,7 @@ module Metanorma
       module Inline
         autoload :TextExtractor, "#{__dir__}/inline/text_extractor"
         autoload :RichHtmlRenderer, "#{__dir__}/inline/rich_html_renderer"
+        autoload :Catalog, "#{__dir__}/inline/catalog"
 
         MARK_BUILDERS = {
           Metanorma::Document::Components::Inline::EmRawElement => ->(_el) {

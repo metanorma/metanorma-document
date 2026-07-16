@@ -10,35 +10,15 @@ module Metanorma
         # representation of inline content is required (e.g., attribute values,
         # fallback rendering). All HTML construction goes through
         # Nokogiri::HTML5::Builder to guarantee well-formed, escaped output.
+        #
+        # Simple-wrap elements (em, strong, sub, sup, code, u, s, smallcap,
+        # bcp14, concept) share their tag-and-attrs mapping with the Model-side
+        # renderer via Inline::Catalog, so the XML→HTML and Model→HTML paths
+        # produce visually equivalent output for the same mark type.
         module RichHtmlRenderer
-          RENDERERS = {
-            Metanorma::Document::Components::Inline::EmRawElement => ->(el) {
-              wrap { |d| d.em { d << raw(extract(el)) } }
-            },
-            Metanorma::Document::Components::Inline::StrongRawElement => ->(el) {
-              wrap { |d| d.strong { d << raw(extract(el)) } }
-            },
-            Metanorma::Document::Components::Inline::SubElement => ->(el) {
-              wrap { |d| d.sub { d << raw(extract(el)) } }
-            },
-            Metanorma::Document::Components::Inline::SupElement => ->(el) {
-              wrap { |d| d.sup { d << raw(extract(el)) } }
-            },
-            Metanorma::Document::Components::Inline::TtElement => ->(el) {
-              wrap { |d| d.code { d << raw(extract(el)) } }
-            },
-            Metanorma::Document::Components::TextElements::UnderlineElement => ->(el) {
-              wrap { |d| d.u { d << raw(extract(el)) } }
-            },
-            Metanorma::Document::Components::TextElements::StrikeElement => ->(el) {
-              wrap { |d| d.s { d << raw(extract(el)) } }
-            },
-            Metanorma::Document::Components::Inline::SmallCapElement => ->(el) {
-              wrap { |d| d.span { d << raw(extract(el)) } }
-            },
-            Metanorma::Document::Components::Inline::Bcp14Element => ->(el) {
-              wrap { |d| d.span { d << raw(extract(el)) } }
-            },
+          # Complex element handlers — these have per-instance attrs or
+          # multi-step rendering and bypass the shared Catalog.
+          COMPLEX_RENDERERS = {
             Metanorma::Document::Components::Inline::StemInlineElement => ->(el) {
               for_stem(el)
             },
@@ -56,9 +36,6 @@ module Metanorma
             },
             Metanorma::Document::Components::Inline::FnElement => ->(el) {
               for_fn(el)
-            },
-            Metanorma::Document::Components::Inline::ConceptElement => ->(el) {
-              wrap { |d| d.span(class: "concept") { d << raw(extract(el)) } }
             },
             Metanorma::Document::Components::Inline::SpanElement => ->(el) {
               for_span(el)
@@ -93,8 +70,25 @@ module Metanorma
           end
 
           def self.render_element(element)
-            renderer = RENDERERS[element.class]
-            renderer ? renderer.call(element) : extract(element)
+            complex = COMPLEX_RENDERERS[element.class]
+            return complex.call(element) if complex
+
+            mark_type = Catalog::SIMPLE_ELEMENTS[element.class]
+            return render_simple(mark_type, element) if mark_type
+
+            extract(element)
+          end
+
+          def self.render_simple(mark_type, element)
+            spec = Catalog::SIMPLE_WRAPS[mark_type]
+            attrs = spec.except(:tag)
+            wrap do |d|
+              if attrs.empty?
+                d.public_send(spec[:tag]) { d << raw(extract(element)) }
+              else
+                d.public_send(spec[:tag], attrs) { d << raw(extract(element)) }
+              end
+            end
           end
 
           def self.for_stem(element)
@@ -105,7 +99,10 @@ module Metanorma
               .sub(/\s*xmlns(:\w+)?="[^"]*"\s*/, " ")
               .gsub(/\s+/, " ")
               .strip
-            wrap { |d| d.span(class: "inline-math") { d << raw(mathml) } }
+            spec = Catalog::SIMPLE_WRAPS["stem"]
+            wrap do |d|
+              d.public_send(spec[:tag], spec.except(:tag)) { d << raw(mathml) }
+            end
           end
 
           def self.for_xref(element)
@@ -130,7 +127,10 @@ module Metanorma
 
           def self.for_fn(element)
             reference = SafeAttr.read(element, :reference) || ""
-            wrap { |d| d.sup(class: "footnote-inline") { d.text reference } }
+            spec = Catalog::SIMPLE_WRAPS["footnote"]
+            wrap do |d|
+              d.public_send(spec[:tag], spec.except(:tag)) { d.text reference }
+            end
           end
 
           def self.for_span(element)

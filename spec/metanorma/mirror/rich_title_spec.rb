@@ -71,10 +71,10 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline, ".extract_rich_html" do
       result.should include("<s>deleted</s>")
     end
 
-    it "extracts smallcap as span tag" do
+    it "extracts smallcap as span tag with font-variant style" do
       title = parse_title("<title><smallcap>SC</smallcap> text</title>")
       result = described_class.extract_rich_html(title)
-      result.should include("<span>SC</span>")
+      result.should include('<span style="font-variant: small-caps">SC</span>')
     end
   end
 
@@ -104,12 +104,12 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline, ".extract_rich_html" do
   end
 
   describe "stem (math) elements" do
-    it "extracts stem as inline-math span" do
+    it "extracts stem as stem span" do
       title = parse_title(<<~XML)
         <title>Value (<stem type="MathML"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>D</mi><mtext>min</mtext></msub></math></stem>) test</title>
       XML
       result = described_class.extract_rich_html(title)
-      result.should include('<span class="inline-math">')
+      result.should include('<span class="stem">')
       result.should include("<math")
       result.should include("D")
     end
