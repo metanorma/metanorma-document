@@ -13,7 +13,7 @@ module Metanorma
           attribute :fmt_concept, "Metanorma::Document::Components::Inline::FmtConceptElement",
                     collection: true
           attribute :asciimath, AsciimathElement, collection: true
-          attribute :math, MathElement, collection: true
+          attribute :math, RenderedMathElement, collection: true
           attribute :p, "Metanorma::Document::Components::Paragraphs::ParagraphBlock",
                     collection: true
           attribute :semx, "Metanorma::Document::Components::Inline::SemxElement",
