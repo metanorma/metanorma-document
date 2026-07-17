@@ -94,6 +94,18 @@ module Metanorma
                  "metanorma/document/components/inline/display_text_element"
         autoload :Bcp14Element,
                  "metanorma/document/components/inline/bcp14_element"
+        autoload :Vocabulary,
+                 "metanorma/document/components/inline/vocabulary"
+        autoload :RenderedDisplay,
+                 "metanorma/document/components/inline/rendered_display"
+        autoload :SemanticContent,
+                 "metanorma/document/components/inline/semantic_content"
+        autoload :LocationElement,
+                 "metanorma/document/components/inline/location_element"
+        autoload :SemanticMathElement,
+                 "metanorma/document/components/inline/semantic_math_element"
+        autoload :RenderedMathElement,
+                 "metanorma/document/components/inline/rendered_math_element"
       end
     end
   end
