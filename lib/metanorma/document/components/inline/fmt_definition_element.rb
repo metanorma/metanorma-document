@@ -5,6 +5,8 @@ module Metanorma
     module Components
       module Inline
         class FmtDefinitionElement < Lutaml::Model::Serializable
+          include RenderedDisplay
+
           attribute :id, :string
           attribute :semx, SemxElement, collection: true
 

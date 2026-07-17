@@ -5,6 +5,8 @@ module Metanorma
     module Components
       module Inline
         class FmtPreferredElement < Lutaml::Model::Serializable
+          include RenderedDisplay
+
           attribute :p, "Metanorma::Document::Components::Paragraphs::ParagraphBlock",
                     collection: true
 

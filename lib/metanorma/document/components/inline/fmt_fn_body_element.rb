@@ -5,6 +5,8 @@ module Metanorma
     module Components
       module Inline
         class FmtFnBodyElement < Lutaml::Model::Serializable
+          include RenderedDisplay
+
           attribute :id, :string
           attribute :target, :string
           attribute :reference, :string

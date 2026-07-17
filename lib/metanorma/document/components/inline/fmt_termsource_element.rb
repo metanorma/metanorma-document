@@ -5,6 +5,8 @@ module Metanorma
     module Components
       module Inline
         class FmtTermsourceElement < Lutaml::Model::Serializable
+          include RenderedDisplay
+
           attribute :status, :string
           attribute :type, :string
           attribute :semx, SemxElement

@@ -5,6 +5,8 @@ module Metanorma
     module Components
       module Inline
         class FmtFootnoteContainerElement < Lutaml::Model::Serializable
+          include RenderedDisplay
+
           attribute :fmt_fn_body, FmtFnBodyElement, collection: true
 
           xml do

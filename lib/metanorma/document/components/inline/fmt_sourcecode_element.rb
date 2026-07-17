@@ -5,6 +5,8 @@ module Metanorma
     module Components
       module Inline
         class FmtSourcecodeElement < Lutaml::Model::Serializable
+          include RenderedDisplay
+
           attribute :lang, :string
           attribute :id, :string
           attribute :semx_id, :string
