@@ -4,6 +4,12 @@ module Metanorma
   module Document
     module Components
       module Inline
+        # A cross-reference to another part of the document.
+        #
+        # Multi-target cross-references carry one or more `<location>`
+        # children — secondary targets joined by connectives
+        # (e.g. "see Figure 4, 5.1.6 and 5.1.7"). The primary target is
+        # in the `target` attribute; secondary targets are in `location`.
         class XrefElement < Lutaml::Model::Serializable
           attribute :id, :string
           attribute :target, :string
@@ -14,6 +20,7 @@ module Metanorma
           attribute :nopage, :string
           attribute :alt, :string
           attribute :text, :string, collection: true
+          attribute :location, LocationElement, collection: true
 
           xml do
             element "xref"
@@ -26,6 +33,7 @@ module Metanorma
             map_attribute "nopage", to: :nopage
             map_attribute "alt", to: :alt
             map_content to: :text
+            map_element "location", to: :location
           end
         end
       end
