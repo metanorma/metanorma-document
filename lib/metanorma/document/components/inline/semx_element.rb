@@ -4,6 +4,16 @@ module Metanorma
   module Document
     module Components
       module Inline
+        # <semx> wraps a rendered-display slice of an inline element.
+        #
+        # Known limitation (BUGS.sts 06, filed upstream against
+        # lutaml-model): when this element is parsed nested inside
+        # another mixed_content parent, the direct text content of
+        # <semx> may be captured by the parent's text attribute rather
+        # than by SemxElement#text. Standalone parsing works correctly.
+        # See TODO.bugs/06-nested-mixed-content-text-ownership.md and
+        # https://github.com/lutaml/lutaml-model bug
+        # "nested-mixed-content-text-ownership".
         class SemxElement < Lutaml::Model::Serializable
           attribute :element_attr, :string
           attribute :source, :string
