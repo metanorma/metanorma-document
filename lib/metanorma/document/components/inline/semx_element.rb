@@ -6,14 +6,13 @@ module Metanorma
       module Inline
         # <semx> wraps a rendered-display slice of an inline element.
         #
-        # Known limitation (BUGS.sts 06, filed upstream against
-        # lutaml-model): when this element is parsed nested inside
-        # another mixed_content parent, the direct text content of
-        # <semx> may be captured by the parent's text attribute rather
-        # than by SemxElement#text. Standalone parsing works correctly.
-        # See TODO.bugs/06-nested-mixed-content-text-ownership.md and
-        # https://github.com/lutaml/lutaml-model bug
-        # "nested-mixed-content-text-ownership".
+        # History: BUGS.sts 06 reported that direct text content of
+        # <semx> was captured by the parent's text attribute rather
+        # than SemxElement#text when parsed nested. Verified
+        # non-reproducible at lutaml-model commit 38f90b7a (which
+        # added regression coverage for nested mixed_content text
+        # ownership in PR lutaml/lutaml-model#732). Likely resolved
+        # upstream between metanorma-document 0.2.9 and current HEAD.
         class SemxElement < Lutaml::Model::Serializable
           attribute :element_attr, :string
           attribute :source, :string
