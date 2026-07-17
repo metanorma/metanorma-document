@@ -5,6 +5,8 @@ module Metanorma
     module Components
       module Inline
         class FmtAnnotationBodyElement < Lutaml::Model::Serializable
+          include RenderedDisplay
+
           attribute :id, :string
           attribute :date, :string
           attribute :from, :string

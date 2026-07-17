@@ -5,6 +5,8 @@ module Metanorma
     module Components
       module Inline
         class FmtTitleElement < Lutaml::Model::Serializable
+          include RenderedDisplay
+
           attribute :depth, :string
           attribute :id, :string
           attribute :text, :string, collection: true

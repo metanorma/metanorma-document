@@ -5,6 +5,8 @@ module Metanorma
     module Components
       module Inline
         class FmtConceptElement < Lutaml::Model::Serializable
+          include RenderedDisplay
+
           attribute :text, :string, collection: true
           attribute :semx, SemxElement, collection: true
           attribute :eref, ErefElement, collection: true

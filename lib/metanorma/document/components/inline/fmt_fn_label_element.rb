@@ -5,6 +5,8 @@ module Metanorma
     module Components
       module Inline
         class FmtFnLabelElement < Lutaml::Model::Serializable
+          include RenderedDisplay
+
           attribute :text, :string, collection: true
           attribute :span, SpanElement, collection: true
           attribute :semx, SemxElement, collection: true

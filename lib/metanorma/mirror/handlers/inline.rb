@@ -110,10 +110,12 @@ module Metanorma
           RichHtmlRenderer.extract(element)
         end
 
-        # Primary entry point: extract inline content from a mixed-content element
+        # Primary entry point: extract inline content from a mixed-content element.
+        # Iterates semantic children only — `fmt-*` rendered siblings are skipped
+        # to avoid emitting duplicate marks for the same logical content.
         def self.extract_inline(element, context:)
           nodes = []
-          element.each_mixed_content do |node|
+          Metanorma::Document::Components::Inline::SemanticContent.each(element) do |node|
             case node
             when String
               nodes << context.text_node(node) unless node.empty?

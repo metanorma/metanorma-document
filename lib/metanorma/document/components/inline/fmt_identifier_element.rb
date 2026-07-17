@@ -5,6 +5,8 @@ module Metanorma
     module Components
       module Inline
         class FmtIdentifierElement < Lutaml::Model::Serializable
+          include RenderedDisplay
+
           attribute :tt, TtElement, collection: true
 
           xml do
