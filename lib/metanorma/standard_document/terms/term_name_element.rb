@@ -3,21 +3,16 @@
 module Metanorma
   module StandardDocument
     module Terms
+      # A `<name>` element contains the rendered form of a term's
+      # designation. It accepts arbitrary inline content (formatting,
+      # math symbols, footnotes) — see `Inline::Vocabulary` for the
+      # full set.
       class TermNameElement < Lutaml::Model::Serializable
+        include Metanorma::Document::Components::Inline::Vocabulary
+
         attribute :id, :string
         attribute :semx_id, :string
         attribute :lang, :string
-        attribute :text, :string, collection: true
-        attribute :strike, Metanorma::Document::Components::TextElements::StrikeElement,
-                  collection: true
-        attribute :em, Metanorma::Document::Components::Inline::EmRawElement,
-                  collection: true
-        attribute :strong, Metanorma::Document::Components::Inline::StrongRawElement,
-                  collection: true
-        attribute :sup, Metanorma::Document::Components::Inline::SupElement,
-                  collection: true
-        attribute :sub, Metanorma::Document::Components::Inline::SubElement,
-                  collection: true
 
         xml do
           element "name"
@@ -25,12 +20,8 @@ module Metanorma
           map_attribute "semx-id", to: :semx_id
           map_attribute "lang", to: :lang
           mixed_content
-          map_content to: :text
-          map_element "strike", to: :strike
-          map_element "em", to: :em
-          map_element "strong", to: :strong
-          map_element "sup", to: :sup
-          map_element "sub", to: :sub
+          Metanorma::Document::Components::Inline::Vocabulary::VocabularyXmlMapping
+            .apply_inline_mappings(self)
         end
       end
     end
