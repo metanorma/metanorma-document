@@ -11,6 +11,8 @@ module Metanorma
       autoload :BlockRenderer, "metanorma/html/renderers/block_renderer"
       autoload :SectionRenderer, "metanorma/html/renderers/section_renderer"
       autoload :PubidRenderer, "metanorma/html/renderers/pubid_renderer"
+      autoload :ElementOrderTraversal,
+               "metanorma/html/renderers/element_order_traversal"
     end
 
     class BaseRenderer
@@ -450,12 +452,8 @@ module Metanorma
         xml_mapping = node.class.mappings_for(:xml, node.lutaml_register)
 
         if node.element_order.is_a?(Array) && xml_mapping
-          element_to_attr = {}
-          xml_mapping.mapping_elements_hash.each_value do |rule_or_array|
-            Array(rule_or_array).each do |rule|
-              element_to_attr[rule.name.to_s] = rule.to
-            end
-          end
+          element_to_attr =
+            Renderers::ElementOrderTraversal.element_to_attr_map(xml_mapping)
 
           indices = Hash.new(0)
           node.element_order.each do |el|
