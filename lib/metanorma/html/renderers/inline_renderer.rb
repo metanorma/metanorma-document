@@ -542,50 +542,42 @@ module Metanorma
           nil
         end
 
+        # Stem content formats in priority order. Each entry binds an
+        # attribute reader on the stem element to the value-render path
+        # (raw XML when serializable, escaped text otherwise). Adding a
+        # new format = one entry here.
+        STEM_FORMATS = [
+          { attr: :math, raw_xml: true },
+          { attr: :asciimath },
+          { attr: :latexmath },
+        ].freeze
+
         def render_stem_content(stem)
           return nil if stem.nil?
 
-          if stem.is_a?(Metanorma::Document::Components::Inline::StemInlineElement)
-            return nil
-          end
+          return nil if stem.is_a?(Metanorma::Document::Components::Inline::StemInlineElement) ||
+                        stem.is_a?(Metanorma::Document::Components::Inline::FmtStemElement)
 
-          if stem.is_a?(Metanorma::Document::Components::Inline::FmtStemElement)
-            return nil
-          end
-
-          if stem.is_a?(Metanorma::Document::Components::TextElements::StemElement)
-            if stem.math
-              math_val = stem.math
-              if math_val.is_a?(Lutaml::Model::Serializable)
-                return math_val.to_xml
-              end
-
-              text = escape_html(coordinator.extract_text_value(math_val))
-              return render_liquid("_stem_span.html.liquid", {
-                                     "data_attrs" => "",
-                                     "text" => text,
-                                   })
-            elsif stem.asciimath
-              text = escape_html(coordinator.extract_text_value(stem.asciimath))
-              return render_liquid("_stem_span.html.liquid", {
-                                     "data_attrs" => "",
-                                     "text" => text,
-                                   })
-            end
-            if stem.latexmath
-              text = escape_html(coordinator.extract_text_value(stem.latexmath))
-              return render_liquid("_stem_span.html.liquid", {
-                                     "data_attrs" => "",
-                                     "text" => text,
-                                   })
-            end
-          end
-
-          text = coordinator.extract_text_value(stem)
-          unless text.empty?
+          unless stem.is_a?(Metanorma::Document::Components::TextElements::StemElement)
+            text = coordinator.extract_text_value(stem)
             return render_liquid("_stem_span.html.liquid", {
                                    "data_attrs" => "",
                                    "text" => escape_html(text),
+                                 }) unless text.empty?
+            return nil
+          end
+
+          STEM_FORMATS.each do |format|
+            value = stem.public_send(format[:attr])
+            next unless value
+
+            if format[:raw_xml] && value.is_a?(Lutaml::Model::Serializable)
+              return value.to_xml
+            end
+
+            return render_liquid("_stem_span.html.liquid", {
+                                   "data_attrs" => "",
+                                   "text" => escape_html(coordinator.extract_text_value(value)),
                                  })
           end
           nil
