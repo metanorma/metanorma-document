@@ -299,13 +299,14 @@ module Metanorma
             parts << escape_html(texts)
           end
 
-          inline_attrs = %i[em strong smallcap sub sup tt underline strike
-                            xref eref link span stem concept fn br tab keyword
-                            fmt_annotation_start fmt_annotation_end
-                            fmt_stem fmt_fn_label fmt_concept
-                            bookmark image semx fmt_xref_label]
-          inline_attrs.each do |attr|
-            values = safe_attr(node, attr)
+          # Derive the element-mapped attribute list from the node's own
+          # xml_mapping rather than maintaining a parallel hardcoded list.
+          # The model is the single source of truth; adding a new inline
+          # element type via map_element on the model class is enough.
+          node.class.mappings[:xml].elements.each do |rule|
+            next if rule.to == :text
+
+            values = safe_attr(node, rule.to)
             next if values.nil?
 
             Array(values).each { |v| parts << (render_inline_element(v) || "") }
