@@ -21,8 +21,8 @@ module Metanorma
         self
       end
 
-      def each(&block)
-        @flavors.each(&block)
+      def each(&)
+        @flavors.each(&)
       end
 
       # Returns the most-specific Flavor whose model_class matches the

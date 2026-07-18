@@ -77,7 +77,7 @@ RSpec.describe Metanorma::Html::FlavorRegistry do
       # document has been parsed. Verify the resolution mechanism by
       # checking that const-get either succeeds or returns nil.
       result = registry.pubid_module_for(Metanorma::IsoDocument::Root)
-      result.should satisfy { |v| v.nil? || v.is_a?(Module) }
+      result.should(satisfy { |v| v.nil? || v.is_a?(Module) })
     end
 
     it "returns nil when flavor has no Pubid module" do
@@ -87,8 +87,7 @@ RSpec.describe Metanorma::Html::FlavorRegistry do
 
   describe "#each (Enumerable)" do
     it "yields every registered flavor in registration order" do
-      yielded = []
-      registry.each { |f| yielded << f }
+      yielded = registry.map { |f| f }
       yielded.should eq([base_flavor, standard_flavor, iso_flavor])
     end
   end
@@ -122,7 +121,7 @@ RSpec.describe Metanorma::Html::Flavor do
   describe "#pubid_module_const" do
     it "resolves the module constant when loadable, nil otherwise" do
       result = flavor.pubid_module_const
-      result.should satisfy { |v| v.nil? || v.is_a?(Module) }
+      result.should(satisfy { |v| v.nil? || v.is_a?(Module) })
     end
 
     it "returns nil when no pubid_module" do

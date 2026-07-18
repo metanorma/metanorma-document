@@ -548,14 +548,16 @@ module Metanorma
           return nil if stem.nil?
 
           return nil if stem.is_a?(Metanorma::Document::Components::Inline::StemInlineElement) ||
-                        stem.is_a?(Metanorma::Document::Components::Inline::FmtStemElement)
+            stem.is_a?(Metanorma::Document::Components::Inline::FmtStemElement)
 
           unless stem.is_a?(Metanorma::Document::Components::TextElements::StemElement)
             text = coordinator.extract_text_value(stem)
-            return render_liquid("_stem_span.html.liquid", {
-                                   "data_attrs" => "",
-                                   "text" => escape_html(text),
-                                 }) unless text.empty?
+            unless text.empty?
+              return render_liquid("_stem_span.html.liquid", {
+                                     "data_attrs" => "",
+                                     "text" => escape_html(text),
+                                   })
+            end
             return nil
           end
 
