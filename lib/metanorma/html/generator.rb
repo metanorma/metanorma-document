@@ -95,7 +95,6 @@ module Metanorma
           IhoRenderer
           ItuRenderer
           OgcRenderer
-          OimlRenderer
           PdfaRenderer
           RiboseRenderer
 
@@ -176,12 +175,6 @@ module Metanorma
                                 name: :ogc,
                                 model_class: Metanorma::OgcDocument::Root,
                                 renderer_class: OgcRenderer,
-                              ))
-            registry.register(Flavor.new(
-                                name: :oiml,
-                                model_class: Metanorma::OimlDocument::Root,
-                                renderer_class: OimlRenderer,
-                                pubid_module: :"Pubid::Oiml",
                               ))
             registry.register(Flavor.new(
                                 name: :pdfa,

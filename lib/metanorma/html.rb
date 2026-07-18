@@ -35,7 +35,6 @@ module Metanorma
     autoload :IhoRenderer, "metanorma/html/iho_renderer"
     autoload :ItuRenderer, "metanorma/html/itu_renderer"
     autoload :OgcRenderer, "metanorma/html/ogc_renderer"
-    autoload :OimlRenderer, "metanorma/html/oiml_renderer"
     autoload :RiboseRenderer, "metanorma/html/ribose_renderer"
   end
 end

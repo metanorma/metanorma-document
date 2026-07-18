@@ -5,7 +5,6 @@ require_relative "../../spec_helper"
 # Load all flavor modules before referencing their constants in describe blocks
 require "metanorma/iso_document"
 require "metanorma/iec_document"
-require "metanorma/oiml_document"
 require "metanorma/bsi_document"
 require "metanorma/jis_document"
 require "metanorma/gb_document"
@@ -37,7 +36,6 @@ RSpec.describe "Flavor Root classes" do
     {
       iso: "Metanorma::IsoDocument::Root",
       iec: "Metanorma::IecDocument::Root",
-      oiml: "Metanorma::OimlDocument::Root",
       gb: "Metanorma::GbDocument::Root",
       csa: "Metanorma::CsaDocument::Root",
     }.each do |flavor, class_name|
@@ -1004,7 +1002,6 @@ RSpec.describe "Flavor Root classes" do
     {
       "Metanorma::IsoDocument::Root" => :iso_document,
       "Metanorma::IecDocument::Root" => :iec_document,
-      "Metanorma::OimlDocument::Root" => :oiml_document,
       "Metanorma::CsaDocument::Root" => :csa_document,
       "Metanorma::BsiDocument::Root" => :bsi_document,
       "Metanorma::JisDocument::Root" => :jis_document,
@@ -1153,14 +1150,6 @@ RSpec.describe "Flavor Root classes" do
 
     describe "GB register fallback" do
       let(:register) { Lutaml::Model::GlobalRegister.lookup(:gb_document) }
-
-      it "falls back to :iso_document" do
-        expect(register.fallback).to include(:iso_document)
-      end
-    end
-
-    describe "OIML register fallback" do
-      let(:register) { Lutaml::Model::GlobalRegister.lookup(:oiml_document) }
 
       it "falls back to :iso_document" do
         expect(register.fallback).to include(:iso_document)
@@ -2464,17 +2453,6 @@ RSpec.describe "Flavor Root classes" do
         expect(doc.annex.length).to eq(1)
         expect(reparsed.sections.clause.length).to eq(1)
         expect(output).to include("semantic")
-      end
-    end
-
-    describe "OIML" do
-      it "round-trips using ISO fallback" do
-        doc, reparsed, = round_trip(
-          Metanorma::OimlDocument::Root, standard_doc_with_annex_xml
-        )
-        expect(doc.sections.clause.length).to eq(1)
-        expect(doc.annex.length).to eq(1)
-        expect(reparsed.sections.clause.length).to eq(1)
       end
     end
 
