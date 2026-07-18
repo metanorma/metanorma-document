@@ -4,6 +4,8 @@ module Metanorma
   module Html
     module Component
       class Base
+        include Metanorma::Html::RendererDelegation
+
         attr_reader :renderer
 
         def initialize(renderer)
@@ -38,18 +40,9 @@ module Metanorma
           raise NotImplementedError, "#{self.class}#render not implemented"
         end
 
-        def escape_html(...) = renderer.escape_html(...)
-        def render_mixed_inline(...) = renderer.render_mixed_inline(...)
         def render_mixed_content_in_order(...) = renderer.render_mixed_content_in_order(...)
         def element_attrs(...) = renderer.element_attrs(...)
-        def safe_attr(obj, method_name) = renderer.safe_attr(obj, method_name)
-        def extract_plain_text(node) = renderer.extract_plain_text(node)
         def extract_text_value(val) = renderer.extract_text_value(val)
-        def render_liquid(...) = renderer.render_liquid(...)
-
-        def extract_block_label(block, default)
-          renderer.extract_block_label(block, default)
-        end
 
         def self.register_in(registry)
           handled_classes.each do |klass|
