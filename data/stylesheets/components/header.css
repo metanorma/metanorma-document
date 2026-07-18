@@ -46,13 +46,11 @@
 [data-theme="dark"] .brand-logo-dark,
 [data-theme="oled"] .brand-logo-dark { display: inline-flex !important; }
 
-/* Cover logo light/dark switching */
+/* Cover logo: the pill behind it is always light
+   (rgba(255,255,255,0.92)), so the cover always uses the
+   for-light-background logo file regardless of page theme. */
 .cover-logo-dark { display: none !important; }
 .cover-logo-light { display: inline-flex; }
-[data-theme="dark"] .cover-logo-light,
-[data-theme="oled"] .cover-logo-light { display: none !important; }
-[data-theme="dark"] .cover-logo-dark,
-[data-theme="oled"] .cover-logo-dark { display: inline-flex !important; }
 .header-doc-id {
   font-family: var(--font-sans); font-size: 0.82em; opacity: 0.85;
   font-weight: 600; letter-spacing: 0.02em;
