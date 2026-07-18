@@ -15,16 +15,8 @@ module Metanorma
           xml_mapping = node.class.mappings_for(:xml, node.lutaml_register)
           return false unless xml_mapping
 
-          element_to_attr = {}
-          xml_mapping.mapping_elements_hash.each_value do |rule_or_array|
-            Array(rule_or_array).each do |rule|
-              element_to_attr[rule.name] = rule.to
-              if rule.name.is_a?(Symbol)
-                element_to_attr[rule.name.to_s] =
-                  rule.to
-              end
-            end
-          end
+          element_to_attr =
+            Renderers::ElementOrderTraversal.element_to_attr_map(xml_mapping)
 
           skip_indices = build_semx_skip_set(node)
 
