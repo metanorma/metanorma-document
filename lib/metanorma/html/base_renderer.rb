@@ -624,50 +624,40 @@ module Metanorma
                              :render_index
       register_inline_render Metanorma::Document::Components::Blocks::NoteBlock,
                              :render_note_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtNameElement,
-                             :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtTitleElement,
-                             :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtXrefLabelElement,
-                             :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtFnLabelElement,
-                             :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtConceptElement,
-                             :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtAnnotationStartElement,
-                             :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtAnnotationEndElement,
-                             :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtAnnotationBodyElement,
-                             :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::VariantTitleElement,
-                             :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::LocalizedStringElement,
-                             :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::TitleWithAnnotationElement,
-                             :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::BiblioTagElement,
-                             :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::NameWithIdElement,
-                             :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::DisplayTextElement,
-                             :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtFootnoteContainerElement,
-                             :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtFnBodyElement,
-                             :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtPreferredElement,
-                             :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtDefinitionElement,
-                             :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtTermsourceElement,
-                             :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtAdmittedElement,
-                             :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtIdentifierElement,
-                             :render_mixed_inline
-      register_inline_render Metanorma::Document::Components::Inline::FmtSourcecodeElement,
-                             :render_mixed_inline
+
+      # Transparent inline wrappers: element classes whose render
+      # semantics are "iterate mixed_content and render each child".
+      # Grouped here so adding a new transparent wrapper is one entry,
+      # not another register_inline_render line. Classes with a more
+      # specific handler register themselves above.
+      TRANSPARENT_INLINE_WRAPPERS = [
+        Metanorma::Document::Components::Inline::FmtNameElement,
+        Metanorma::Document::Components::Inline::FmtTitleElement,
+        Metanorma::Document::Components::Inline::FmtXrefLabelElement,
+        Metanorma::Document::Components::Inline::FmtFnLabelElement,
+        Metanorma::Document::Components::Inline::FmtConceptElement,
+        Metanorma::Document::Components::Inline::FmtAnnotationStartElement,
+        Metanorma::Document::Components::Inline::FmtAnnotationEndElement,
+        Metanorma::Document::Components::Inline::FmtAnnotationBodyElement,
+        Metanorma::Document::Components::Inline::VariantTitleElement,
+        Metanorma::Document::Components::Inline::LocalizedStringElement,
+        Metanorma::Document::Components::Inline::TitleWithAnnotationElement,
+        Metanorma::Document::Components::Inline::BiblioTagElement,
+        Metanorma::Document::Components::Inline::NameWithIdElement,
+        Metanorma::Document::Components::Inline::DisplayTextElement,
+        Metanorma::Document::Components::Inline::FmtFootnoteContainerElement,
+        Metanorma::Document::Components::Inline::FmtFnBodyElement,
+        Metanorma::Document::Components::Inline::FmtPreferredElement,
+        Metanorma::Document::Components::Inline::FmtDefinitionElement,
+        Metanorma::Document::Components::Inline::FmtTermsourceElement,
+        Metanorma::Document::Components::Inline::FmtAdmittedElement,
+        Metanorma::Document::Components::Inline::FmtIdentifierElement,
+        Metanorma::Document::Components::Inline::FmtSourcecodeElement,
+      ].freeze
+
+      TRANSPARENT_INLINE_WRAPPERS.each do |klass|
+        register_inline_render klass, :render_mixed_inline
+      end
 
       def lookup_dispatch(type_class, registry_method)
         self.class.ancestors.each do |ancestor|
