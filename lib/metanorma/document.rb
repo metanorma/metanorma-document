@@ -21,6 +21,7 @@ module Metanorma
     autoload :Relaton, "metanorma/document/relaton"
     autoload :Root, "metanorma/document/root"
     autoload :Version, "metanorma/document/version"
+    autoload :VERSION, "metanorma/document/version"
     autoload :CLI, "metanorma/document/cli"
 
     module_function
