@@ -65,6 +65,8 @@ module Metanorma
     end
 
     autoload :BaseRenderer, "metanorma/html/base_renderer"
+    autoload :Flavor, "metanorma/html/flavor"
+    autoload :FlavorRegistry, "metanorma/html/flavor_registry"
     autoload :Generator, "metanorma/html/generator"
     autoload :Theme, "metanorma/html/theme"
     autoload :AssetPipeline, "metanorma/html/asset_pipeline"

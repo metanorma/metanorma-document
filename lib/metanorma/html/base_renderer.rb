@@ -134,22 +134,6 @@ module Metanorma
 
       # --- Flavor configuration hooks ---
 
-      FLAVOR_MAP = {
-        "IsoDocument" => :iso,
-        "IecDocument" => :iec,
-        "IeeeDocument" => :ieee,
-        "IetfDocument" => :ietf,
-        "ItuDocument" => :itu,
-        "IhoDocument" => :iho,
-        "BipmDocument" => :bipm,
-        "OgcDocument" => :ogc,
-        "OimlDocument" => :oiml,
-        "CcDocument" => :cc,
-        "IccDocument" => :icc,
-        "RiboseDocument" => :ribose,
-        "PdfaDocument" => :pdfa,
-      }.freeze
-
       def theme
         @theme ||= resolve_theme
       end
@@ -162,9 +146,15 @@ module Metanorma
       def flavor_name
         return nil unless defined?(@document) && @document
 
-        @document.class.name&.split("::")&.detect do |ns|
-          FLAVOR_MAP.key?(ns)
-        end&.then { |ns| FLAVOR_MAP[ns] }
+        Metanorma::Html::Generator.flavors.name_for(@document.class)
+      end
+
+      # Pubid module for the current document's flavor, or nil if the
+      # flavor has no Pubid support. Queries the shared FlavorRegistry.
+      def pubid_module
+        return nil unless defined?(@document) && @document
+
+        Metanorma::Html::Generator.flavors.pubid_module_for(@document.class)
       end
 
       def flavor_publishers(_doc_id)
