@@ -133,8 +133,9 @@ module Metanorma
 
       attr_writer :document, :theme
 
-      def generate_full_document(document, **)
+      def generate_full_document(document, theme: nil, **)
         @document = document
+        @theme_override = theme
         validate_presentation_xml!
 
         body = render(@document) || ""
@@ -157,8 +158,25 @@ module Metanorma
       end
 
       def resolve_theme
+        return load_theme_override(@theme_override) if @theme_override
+
         flavor = flavor_name
         flavor ? Theme.load(flavor) : Theme.new
+      end
+
+      # A theme override given to Generator.generate: a Theme instance,
+      # a path to a theme directory (theme.yaml with assets/, templates/
+      # and custom.css alongside), or a path to a bare theme.yaml file.
+      # This is how an organization customizes the output without
+      # changing any code.
+      def load_theme_override(override)
+        return override if override.is_a?(Theme)
+
+        if File.directory?(override)
+          Theme.from_theme_dir(override)
+        else
+          Theme.from_file(override)
+        end
       end
 
       def flavor_name
@@ -579,7 +597,7 @@ module Metanorma
       def render_fn(fn) = @inline_renderer.render_fn(fn)
       def render_concept(concept) = @inline_renderer.render_concept(concept)
       def render_fmt_stem(fmt_stem) = @inline_renderer.render_fmt_stem(fmt_stem)
-      def render_mixed_content_in_order(node) = @inline_renderer.render_mixed_content_in_order(node)
+      def render_mixed_content_in_order(node, **) = @inline_renderer.render_mixed_content_in_order(node, **)
 
       # Block rendering delegation
       def render_paragraph(p,

@@ -120,26 +120,53 @@ module Metanorma
       # --- Non-YAML state (set programmatically) ---
       attr_accessor :theme_dir
 
-      def self.load(flavor)
-        dir_theme = File.join(THEMES_DIR, flavor.to_s, "theme.yaml")
-        flat_theme = File.join(THEMES_DIR, "#{flavor}.yaml")
+      # Additional theme directories registered by flavor gems (e.g.
+      # metanorma-oiml). Searched before the built-in THEMES_DIR so a
+      # flavor can ship its own `themes/<flavor>/theme.yaml` (directory
+      # form, with assets/templates/custom.css alongside) outside this gem.
+      @extra_themes_dirs = []
 
-        if File.exist?(dir_theme)
-          from_directory(dir_theme, flavor)
-        elsif File.exist?(flat_theme)
-          from_file(flat_theme)
-        else
-          new
+      class << self
+        attr_reader :extra_themes_dirs
+
+        def register_themes_dir(dir)
+          @extra_themes_dirs.unshift(File.expand_path(dir))
         end
+
+        def themes_dirs
+          @extra_themes_dirs + [THEMES_DIR]
+        end
+      end
+
+      def self.load(flavor)
+        themes_dirs.each do |themes_dir|
+          dir_theme = File.join(themes_dir, flavor.to_s, "theme.yaml")
+          flat_theme = File.join(themes_dir, "#{flavor}.yaml")
+
+          return from_directory(dir_theme, flavor, themes_dir) if File.exist?(dir_theme)
+          return from_file(flat_theme) if File.exist?(flat_theme)
+        end
+
+        new
       end
 
       def self.from_file(path)
         from_yaml(File.read(path))
       end
 
-      def self.from_directory(path, flavor)
+      def self.from_directory(path, flavor, themes_dir = THEMES_DIR)
         theme = from_yaml(File.read(path))
-        theme.theme_dir = File.join(THEMES_DIR, flavor.to_s)
+        theme.theme_dir = File.join(themes_dir, flavor.to_s)
+        theme
+      end
+
+      # Load a theme from an external theme directory: `dir/theme.yaml`
+      # with optional `assets/`, `templates/` and `custom.css` resolved
+      # relative to `dir`. This is the entry point for organization-local
+      # themes living outside any gem.
+      def self.from_theme_dir(dir)
+        theme = from_yaml(File.read(File.join(dir, "theme.yaml")))
+        theme.theme_dir = dir
         theme
       end
 
