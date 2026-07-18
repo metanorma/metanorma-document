@@ -68,6 +68,7 @@ module Metanorma
     autoload :Flavor, "metanorma/html/flavor"
     autoload :FlavorRegistry, "metanorma/html/flavor_registry"
     autoload :Generator, "metanorma/html/generator"
+    autoload :RendererDelegation, "metanorma/html/renderer_delegation"
     autoload :Theme, "metanorma/html/theme"
     autoload :AssetPipeline, "metanorma/html/asset_pipeline"
     autoload :Component, "metanorma/html/component"

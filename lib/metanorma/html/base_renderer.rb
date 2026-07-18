@@ -86,16 +86,13 @@ module Metanorma
       end
 
       class RendererContext
+        include RendererDelegation
+
         def initialize(renderer)
           @renderer = renderer
         end
 
-        def safe_attr(...)        = @renderer.safe_attr(...)
-        def escape_html(...)      = @renderer.escape_html(...)
-        def extract_block_label(...)= @renderer.extract_block_label(...)
-        def extract_plain_text(...)= @renderer.extract_plain_text(...)
         def render_paragraph(...) = @renderer.render_paragraph(...)
-        def render_mixed_inline(...)= @renderer.render_mixed_inline(...)
         def render_inline_element(...)= @renderer.render_inline_element(...)
         def render_unordered_list(...)= @renderer.render_unordered_list(...)
         def render_ordered_list(...)= @renderer.render_ordered_list(...)
@@ -109,7 +106,6 @@ module Metanorma
         def render_image(...)       = @renderer.render_image(...)
         def render_stem_content(...)= @renderer.render_stem_content(...)
         def register_figure_entry(...)= @renderer.register_figure_entry(...)
-        def render_liquid(...) = @renderer.render_liquid(...)
         def render_note_children(...) = @renderer.render_note_children(...)
         def render_simple_children(...) = @renderer.render_simple_children(...)
         def render_full_block_children(...) = @renderer.render_full_block_children(...)
