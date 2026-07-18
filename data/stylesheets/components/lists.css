@@ -1,0 +1,14 @@
+/* Labeled lists: the item markers (bullets, numbers) come from the
+   presentation XML (fmt-name / autonum), so the browser's own
+   list-style markers are suppressed to avoid double markers. */
+
+.mn-labeled-list {
+  list-style: none;
+  padding-left: 2.25em;
+}
+
+.mn-labeled-list .li-label {
+  display: inline-block;
+  width: 2.25em;
+  margin-left: -2.25em;
+}

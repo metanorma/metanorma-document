@@ -154,9 +154,11 @@ module Metanorma
         end
 
         def render_unordered_list(ul, **_opts)
-          attrs = element_attrs(id: safe_attr(ul, :id))
+          labeled = ul.listitem&.any? { |li| list_label(li) } || false
+          attrs = element_attrs(id: safe_attr(ul, :id),
+                                class: labeled ? "mn-labeled-list" : nil)
           items = ul.listitem&.filter_map do |li|
-            render_list_item_content(li)
+            render_list_item_content(li, labeled: labeled)
           end || []
           render_liquid("_list.html.liquid", {
                           "list_tag" => "ul",
@@ -182,10 +184,12 @@ module Metanorma
         end
 
         def render_ordered_list(ol, **_opts)
+          labeled = ol.listitem&.any? { |li| list_label(li) } || false
           attrs = element_attrs(id: safe_attr(ol, :id),
+                                class: labeled ? "mn-labeled-list" : nil,
                                 start: safe_attr(ol, :start), type: safe_attr(ol, :type_attr))
           items = ol.listitem&.filter_map do |li|
-            render_list_item_content(li)
+            render_list_item_content(li, labeled: labeled)
           end || []
           render_liquid("_list.html.liquid", {
                           "list_tag" => "ol",
@@ -194,12 +198,34 @@ module Metanorma
                         })
         end
 
-        def render_list_item_content(li)
+        def render_list_item_content(li, labeled: false)
           li_id = safe_attr(li, :id)
           attrs = li_id ? %( id="#{escape_html(li_id)}") : ""
-          inner = coordinator.render_mixed_content_in_order(li)
+          label = labeled ? list_label(li) : nil
+          inner = if label
+                    coordinator.render_mixed_content_in_order(
+                      li,
+                      skip_classes: [Metanorma::Document::Components::Inline::FmtNameElement],
+                    )
+                  else
+                    coordinator.render_mixed_content_in_order(li)
+                  end
           render_liquid("_list_item.html.liquid", "attrs" => attrs,
+                                                  "label" => label && escape_html(label),
                                                   "content" => inner)
+        end
+
+        # Label glyph for a list item, taken from the presentation XML
+        # (the item's fmt-name/autonum). The presentation XML is
+        # authoritative for the bullet or number; when present it is
+        # rendered as the item marker and the browser's own list-style
+        # marker is suppressed (see components/lists.css).
+        def list_label(li)
+          fmt_name = coordinator.safe_attr(li, :fmt_name)
+          return nil unless fmt_name
+
+          label = coordinator.extract_plain_text(fmt_name).strip
+          label.empty? ? nil : label
         end
 
         def render_definition_list(dl, **_opts)

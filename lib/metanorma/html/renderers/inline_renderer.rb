@@ -530,9 +530,11 @@ module Metanorma
           end
         end
 
-        def render_mixed_content_in_order(node)
+        def render_mixed_content_in_order(node, skip_classes: nil)
           parts = []
           node.each_mixed_content do |child|
+            next if skip_classes&.any? { |klass| child.is_a?(klass) }
+
             parts << case child
                      when String
                        escape_html(child)

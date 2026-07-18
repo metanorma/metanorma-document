@@ -47,6 +47,7 @@ module Metanorma
         components/formula
         components/admonition
         components/table
+        components/lists
         components/footnote
         components/figure
         components/term
