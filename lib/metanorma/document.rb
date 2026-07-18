@@ -44,7 +44,6 @@ module Metanorma
   autoload :IeeeDocument, "metanorma/ieee_document"
   autoload :IetfDocument, "metanorma/ietf_document"
   autoload :IhoDocument, "metanorma/iho_document"
-  autoload :OimlDocument, "metanorma/oiml_document"
   autoload :CcDocument, "metanorma/cc_document"
   autoload :CsaDocument, "metanorma/csa_document"
   autoload :BipmDocument, "metanorma/bipm_document"

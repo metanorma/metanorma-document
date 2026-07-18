@@ -38,12 +38,6 @@ module Metanorma
           Lutaml::Model::GlobalRegister.register(reg)
         end
 
-        def setup_oiml_register
-          reg = Lutaml::Model::Register.new(:oiml_document,
-                                            fallback: [:iso_document])
-          Lutaml::Model::GlobalRegister.register(reg)
-        end
-
         def setup_csa_register
           reg = Lutaml::Model::Register.new(:csa_document,
                                             fallback: [:iso_document])
