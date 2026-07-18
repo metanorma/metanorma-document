@@ -4,15 +4,6 @@ module Metanorma
   module Html
     module Renderers
       class PubidRenderer
-        FLAVOR_PUBID_MAP = {
-          "IsoDocument" => :"Pubid::Iso",
-          "IecDocument" => :"Pubid::Iec",
-          "IeeeDocument" => :"Pubid::Ieee",
-          "IhoDocument" => :"Pubid::Iho",
-          "ItuDocument" => :"Pubid::Ithu",
-          "OimlDocument" => :"Pubid::Oiml",
-        }.freeze
-
         def initialize(coordinator)
           @coordinator = coordinator
         end
@@ -44,24 +35,11 @@ module Metanorma
           @coordinator.escape_html(text)
         end
 
+        # Flavor identity comes from the shared FlavorRegistry via the
+        # coordinator — no local duplicate of the flavor-to-pubid-module
+        # map.
         def resolve_pubid_module
-          flavor_name = @coordinator.flavor_name
-          return nil unless flavor_name
-
-          @coordinator.class.ancestors.each do |ancestor|
-            next unless ancestor.is_a?(Class)
-
-            ns = ancestor.name&.split("::")&.detect do |n|
-              FLAVOR_PUBID_MAP.key?(n)
-            end
-            next unless ns
-
-            mod = FLAVOR_PUBID_MAP[ns]
-            return Object.const_get(mod.to_s)
-          end
-          nil
-        rescue NameError
-          nil
+          @coordinator.pubid_module
         end
       end
     end
