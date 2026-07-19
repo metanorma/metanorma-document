@@ -23,22 +23,19 @@ css_class: nil)
                         renderer.render_inline_element(sc.name)
                       end
 
-          code_text = if sc.body&.content
-                        Array(sc.body.content).join
+          code_text = if sc.body
+                        sc.body.decoded_content
                       elsif sc.content
                         Array(sc.content).join
                       else
                         ""
                       end
-          raw_text = code_text.gsub("&lt;", "<").gsub("&gt;", ">").gsub("&amp;", "&").gsub(
-            "&quot;", "\""
-          )
 
           new(
             id: id,
             lang: lang,
             name_html: name_html,
-            code_html: renderer.escape_html(raw_text),
+            code_html: renderer.escape_html(code_text),
             css_class: "sourcecode",
           )
         end

@@ -11,7 +11,7 @@ module Metanorma
 
           body = SafeAttr.read(element, :body)
           text = if body
-                   Array(body.content).join
+                   body.decoded_content
                  elsif SafeAttr.read(element, :content).is_a?(String)
                    SafeAttr.read(element, :content)
                  else
