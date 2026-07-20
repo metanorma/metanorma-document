@@ -3,6 +3,10 @@
 module Metanorma
   module Document
     module Relaton
+      # A pre-formatted postal address with explicit line breaks.
+      # Keep-forever (wave-5 sweep): structured content + br elements —
+      # relaton-bib 2.2.0.pre.alpha.1 types formattedAddress as a raw string;
+      # not a migration candidate.
       class FormattedAddress < Lutaml::Model::Serializable
         attribute :content, :string, collection: true
         attribute :br, Metanorma::Document::Components::Inline::BrElement,

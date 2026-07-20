@@ -4,6 +4,14 @@ module Metanorma
   module Document
     module Relaton
       # Relation between a bibliographic item and another bibliographic item.
+      # Keeps its own mapping: relaton-bib 2.2.0.pre.alpha.1 Relation types
+      # description as a singular sanitized LocalizedMarkedUpString (ours is
+      # a FormattedString collection), bibitem as relaton's own ItemBase tree
+      # (fixtures nest full Metanorma bibitems — fetched, multi-language
+      # titles, typed uris, primary docidentifiers — modeled by our
+      # BibliographicItem), and replaces the localityStack/
+      # sourceLocalityStack-only shape with choice(locality|localityStack)
+      # under different attribute names.
       class DocumentRelation < Lutaml::Model::Serializable
         attribute :type, :string
         attribute :description,

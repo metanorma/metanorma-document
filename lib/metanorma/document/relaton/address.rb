@@ -3,6 +3,11 @@
 module Metanorma
   module Document
     module Relaton
+      # An address of a person or organization.
+      # Keeps its own mapping: relaton-bib 2.2.0.pre.alpha.1 Address has no
+      # formatted-address attribute and types formattedAddress as a raw
+      # string — fixtures carry structured formattedAddress content with
+      # <br/> line breaks (ietf), kept queryable via FormattedAddress.
       class Address < Lutaml::Model::Serializable
         attribute :formatted_address_attr, :string
         attribute :formatted_address, FormattedAddress
