@@ -84,6 +84,8 @@ module Metanorma
                     collection: true
           attribute :bookmark, Metanorma::Document::Components::IdElements::Bookmark,
                     collection: true
+          attribute :input, Metanorma::Document::Elements::Input,
+                    collection: true
           attribute :fmt_annotation_start,
                     Metanorma::Document::Components::Inline::FmtAnnotationStartElement, collection: true
           attribute :fmt_annotation_end,
@@ -130,6 +132,7 @@ module Metanorma
             map_element "semx", to: :semx
             map_element "span", to: :span
             map_element "bookmark", to: :bookmark
+            map_element "input", to: :input
             map_element "fmt-annotation-start", to: :fmt_annotation_start
             map_element "fmt-annotation-end", to: :fmt_annotation_end
           end

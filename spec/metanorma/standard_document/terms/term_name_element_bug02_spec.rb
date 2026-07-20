@@ -29,7 +29,7 @@ RSpec.describe "BUGS.sts 02: TermNameElement preserves <stem> children" do
     XML
     name = Array(term.preferred).first.expression.name.first
     children = child_classes(name)
-    children.should include(Metanorma::Document::Components::Inline::StemInlineElement)
+    expect(children).to include(Metanorma::Document::Components::Inline::StemInlineElement)
   end
 
   # NOTE: text-ownership in deeply-nested mixed_content is BUGS.sts 06,
@@ -52,7 +52,7 @@ RSpec.describe "BUGS.sts 02: TermNameElement preserves <stem> children" do
       </term>
     XML
     serialized = term.to_xml
-    serialized.should include("maximum capacity")
+    expect(serialized).to include("maximum capacity")
   end
 
   it "preserves em children inside name" do
@@ -67,6 +67,6 @@ RSpec.describe "BUGS.sts 02: TermNameElement preserves <stem> children" do
     XML
     name = Array(term.preferred).first.expression.name.first
     children = child_classes(name)
-    children.should include(Metanorma::Document::Components::Inline::EmRawElement)
+    expect(children).to include(Metanorma::Document::Components::Inline::EmRawElement)
   end
 end

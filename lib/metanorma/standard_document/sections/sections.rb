@@ -27,11 +27,18 @@ module Metanorma
         attribute :semx_id, :string
         attribute :displayorder, :integer
 
+        # Loose paragraphs directly under <sections> (e.g. the ITU
+        # zzSTDTitle1 title paragraph at the start of sections).
+        attribute :p,
+                  Metanorma::Document::Components::Paragraphs::ParagraphBlock,
+                  collection: true
+
         xml do
           element "sections"
           ordered
 
           Metanorma::StandardDocument::SectionXmlMapping.apply_sections_elements(self)
+          map_element "p", to: :p
           Metanorma::StandardDocument::SectionXmlMapping.apply_sections_attributes(self)
         end
       end

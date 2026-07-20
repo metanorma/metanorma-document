@@ -16,12 +16,12 @@ RSpec.describe "StandardDocument section models" do
 
       clause = described_class.from_xml(xml)
 
-      clause.id.should eq("_c1")
-      clause.type.should eq("scope")
-      clause.obligation.should eq("normative")
-      clause.paragraphs.length.should eq(1)
-      clause.tables.length.should eq(1)
-      clause.figures.length.should eq(1)
+      expect(clause.id).to eq("_c1")
+      expect(clause.type).to eq("scope")
+      expect(clause.obligation).to eq("normative")
+      expect(clause.paragraphs.length).to eq(1)
+      expect(clause.tables.length).to eq(1)
+      expect(clause.figures.length).to eq(1)
     end
 
     it "parses nested clauses recursively" do
@@ -38,10 +38,10 @@ RSpec.describe "StandardDocument section models" do
 
       clause = described_class.from_xml(xml)
 
-      clause.id.should eq("_c1")
-      clause.clause.length.should eq(1)
-      clause.clause.first.id.should eq("_c1_1")
-      clause.clause.first.paragraphs.length.should eq(1)
+      expect(clause.id).to eq("_c1")
+      expect(clause.clause.length).to eq(1)
+      expect(clause.clause.first.id).to eq("_c1_1")
+      expect(clause.clause.first.paragraphs.length).to eq(1)
     end
 
     it "parses terms and definitions inside a clause" do
@@ -62,8 +62,8 @@ RSpec.describe "StandardDocument section models" do
 
       clause = described_class.from_xml(xml)
 
-      clause.terms.length.should eq(1)
-      clause.definitions.length.should eq(1)
+      expect(clause.terms.length).to eq(1)
+      expect(clause.definitions.length).to eq(1)
     end
   end
 
@@ -81,11 +81,11 @@ RSpec.describe "StandardDocument section models" do
 
       sections = described_class.from_xml(xml)
 
-      sections.clause.length.should eq(1)
-      sections.terms.length.should eq(1)
-      sections.definitions.length.should eq(1)
-      sections.floating_title.length.should eq(1)
-      sections.references.length.should eq(1)
+      expect(sections.clause.length).to eq(1)
+      expect(sections.terms.length).to eq(1)
+      expect(sections.definitions.length).to eq(1)
+      expect(sections.floating_title.length).to eq(1)
+      expect(sections.references.length).to eq(1)
     end
   end
 
@@ -101,9 +101,9 @@ RSpec.describe "StandardDocument section models" do
 
       preface = described_class.from_xml(xml)
 
-      preface.abstract.should_not be_nil
-      preface.foreword.should_not be_nil
-      preface.introduction.should_not be_nil
+      expect(preface.abstract).not_to be_nil
+      expect(preface.foreword).not_to be_nil
+      expect(preface.introduction).not_to be_nil
     end
 
     it "parses generic clause content in preface" do
@@ -116,7 +116,7 @@ RSpec.describe "StandardDocument section models" do
 
       preface = described_class.from_xml(xml)
 
-      preface.content.length.should eq(1)
+      expect(preface.content.length).to eq(1)
     end
   end
 
@@ -135,10 +135,10 @@ RSpec.describe "StandardDocument section models" do
 
       annex = described_class.from_xml(xml)
 
-      annex.id.should eq("_a1")
-      annex.obligation.should eq("informative")
-      annex.paragraphs.length.should eq(1)
-      annex.clause.length.should eq(1)
+      expect(annex.id).to eq("_a1")
+      expect(annex.obligation).to eq("informative")
+      expect(annex.paragraphs.length).to eq(1)
+      expect(annex.clause.length).to eq(1)
     end
 
     it "parses an annex with recursive sub-annexes" do
@@ -155,7 +155,7 @@ RSpec.describe "StandardDocument section models" do
 
       annex = described_class.from_xml(xml)
 
-      annex.clause.first.clause.length.should eq(1)
+      expect(annex.clause.first.clause.length).to eq(1)
     end
   end
 
@@ -174,8 +174,8 @@ RSpec.describe "StandardDocument section models" do
 
       section = described_class.from_xml(xml)
 
-      section.paragraphs.length.should eq(1)
-      section.subsection.length.should eq(1)
+      expect(section.paragraphs.length).to eq(1)
+      expect(section.subsection.length).to eq(1)
     end
   end
 
@@ -195,9 +195,9 @@ RSpec.describe "StandardDocument section models" do
 
       defs = described_class.from_xml(xml)
 
-      defs.id.should eq("_defs")
-      defs.type.should eq("symbols")
-      defs.definition_lists.length.should eq(1)
+      expect(defs.id).to eq("_defs")
+      expect(defs.type).to eq("symbols")
+      expect(defs.definition_lists.length).to eq(1)
     end
   end
 
@@ -215,16 +215,16 @@ RSpec.describe "StandardDocument section models" do
 
       terms = described_class.from_xml(xml)
 
-      terms.id.should eq("_terms")
-      terms.paragraphs.length.should eq(1)
-      terms.terms.length.should eq(1)
+      expect(terms.id).to eq("_terms")
+      expect(terms.paragraphs.length).to eq(1)
+      expect(terms.terms.length).to eq(1)
     end
   end
 
   describe Metanorma::StandardDocument::Sections::BibliographySection do
     it "references ClauseSection, not IsoClauseSection" do
       described_class.new
-      described_class.attributes.keys.should include(:references, :clause)
+      expect(described_class.attributes.keys).to include(:references, :clause)
     end
 
     it "parses a bibliography with references" do
@@ -237,9 +237,9 @@ RSpec.describe "StandardDocument section models" do
 
       bib = described_class.from_xml(xml)
 
-      bib.references.length.should eq(2)
-      bib.references.first.normative.should be(true)
-      bib.references.last.normative.should be(false)
+      expect(bib.references.length).to eq(2)
+      expect(bib.references.first.normative).to be(true)
+      expect(bib.references.last.normative).to be(false)
     end
   end
 end
@@ -252,9 +252,9 @@ RSpec.describe "StandardDocument shared modules" do
       end
 
       attrs = klass.attributes.keys
-      attrs.should include(:paragraphs, :tables, :figures, :formulas,
-                           :examples, :notes, :admonitions,
-                           :sourcecode_blocks, :quote_blocks, :definition_lists)
+      expect(attrs).to include(:paragraphs, :tables, :figures, :formulas,
+                               :examples, :notes, :admonitions,
+                               :sourcecode_blocks, :quote_blocks, :definition_lists)
     end
   end
 
@@ -265,9 +265,9 @@ RSpec.describe "StandardDocument shared modules" do
       end
 
       attrs = klass.attributes.keys
-      attrs.should include(:version, :type, :schema_version, :flavor,
-                           :bibliography, :boilerplate, :metanorma_extension,
-                           :autonum, :fmt_xref_label)
+      expect(attrs).to include(:version, :type, :schema_version, :flavor,
+                               :bibliography, :boilerplate, :metanorma_extension,
+                               :autonum, :fmt_xref_label)
     end
   end
 
@@ -285,11 +285,11 @@ RSpec.describe "StandardDocument shared modules" do
 
       clause = Metanorma::StandardDocument::Sections::ClauseSection.from_xml(clause_xml)
 
-      clause.paragraphs.length.should eq(1)
-      clause.tables.length.should eq(1)
-      clause.figures.length.should eq(1)
-      clause.formulas.length.should eq(1)
-      clause.notes.length.should eq(1)
+      expect(clause.paragraphs.length).to eq(1)
+      expect(clause.tables.length).to eq(1)
+      expect(clause.figures.length).to eq(1)
+      expect(clause.formulas.length).to eq(1)
+      expect(clause.notes.length).to eq(1)
     end
   end
 end

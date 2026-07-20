@@ -10,6 +10,7 @@ module Metanorma
         attribute :to, :string
         attribute :type, :string
         attribute :date, :string
+        attribute :semx_id, :string
         attribute :paragraphs,
                   Metanorma::Document::Components::Paragraphs::ParagraphBlock,
                   collection: true
@@ -22,6 +23,7 @@ module Metanorma
           map_attribute "to", to: :to
           map_attribute "type", to: :type
           map_attribute "date", to: :date
+          map_attribute "semx-id", to: :semx_id
           map_element "p", to: :paragraphs
         end
       end
