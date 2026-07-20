@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "pubid"
+
 module Metanorma
   module Html
     # A flavor ties together the four concepts that identify a Metanorma
@@ -38,7 +40,10 @@ module Metanorma
 
         Object.const_get(pubid_module.to_s)
       rescue NameError
-        nil
+        raise ArgumentError,
+              "Flavor #{name.inspect}: pubid module #{pubid_module} could " \
+              "not be resolved — fix the registration in " \
+              "Html::Generator.build_flavor_registry"
       end
     end
   end

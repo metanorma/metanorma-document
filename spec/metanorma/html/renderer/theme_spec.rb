@@ -10,35 +10,35 @@ RSpec.describe Metanorma::Html::Theme do
 
   describe "defaults" do
     it "has a primary color" do
-      theme.primary.should eq("#28388A")
+      expect(theme.primary).to eq("#28388A")
     end
 
     it "has accent color" do
-      theme.accent.should eq("#9C60C1")
+      expect(theme.accent).to eq("#9C60C1")
     end
 
     it "has font stacks" do
-      theme.font_body.should include("serif")
-      theme.font_sans.should include("sans-serif")
-      theme.font_mono.should include("monospace")
+      expect(theme.font_body).to include("serif")
+      expect(theme.font_sans).to include("sans-serif")
+      expect(theme.font_mono).to include("monospace")
     end
 
     it "has block element defaults" do
-      theme.note_border.should_not be_nil
-      theme.example_border.should_not be_nil
-      theme.admonition_border.should_not be_nil
+      expect(theme.note_border).not_to be_nil
+      expect(theme.example_border).not_to be_nil
+      expect(theme.admonition_border).not_to be_nil
     end
 
     it "has empty publishers by default" do
-      theme.publishers.should eq([])
+      expect(theme.publishers).to eq([])
     end
 
     it "has nil publisher_name by default" do
-      theme.publisher_name.should be_nil
+      expect(theme.publisher_name).to be_nil
     end
 
     it "has empty logos by default" do
-      theme.logos.should eq({})
+      expect(theme.logos).to eq({})
     end
   end
 
@@ -46,7 +46,7 @@ RSpec.describe Metanorma::Html::Theme do
     context "with unknown flavor" do
       it "returns default theme" do
         t = described_class.load(:nonexistent)
-        t.primary.should eq("#28388A")
+        expect(t.primary).to eq("#28388A")
       end
     end
 
@@ -56,21 +56,21 @@ RSpec.describe Metanorma::Html::Theme do
         let(:theme) { described_class.load(flavor) }
 
         it "loads without error" do
-          theme.should_not be_nil
+          expect(theme).not_to be_nil
         end
 
         it "has a primary color" do
-          theme.primary.should_not be_nil
+          expect(theme.primary).not_to be_nil
         end
 
         it "has an accent color" do
-          theme.accent.should_not be_nil
+          expect(theme.accent).not_to be_nil
         end
 
         it "has fonts" do
-          theme.font_body.should_not be_nil
-          theme.font_sans.should_not be_nil
-          theme.font_mono.should_not be_nil
+          expect(theme.font_body).not_to be_nil
+          expect(theme.font_sans).not_to be_nil
+          expect(theme.font_mono).not_to be_nil
         end
       end
     end
@@ -79,19 +79,19 @@ RSpec.describe Metanorma::Html::Theme do
       let(:theme) { described_class.load(:iso) }
 
       it "has red primary color" do
-        theme.primary.should eq("#b3000c")
+        expect(theme.primary).to eq("#b3000c")
       end
 
       it "has publisher metadata" do
-        theme.publishers.should include("ISO")
+        expect(theme.publishers).to include("ISO")
       end
 
       it "has publisher_name" do
-        theme.publisher_name.should eq("ISO")
+        expect(theme.publisher_name).to eq("ISO")
       end
 
       it "has logo map" do
-        theme.logos.should include("ISO")
+        expect(theme.logos).to include("ISO")
       end
     end
 
@@ -99,7 +99,7 @@ RSpec.describe Metanorma::Html::Theme do
       let(:theme) { described_class.load(:iec) }
 
       it "has publisher metadata" do
-        theme.publishers.should include("IEC")
+        expect(theme.publishers).to include("IEC")
       end
     end
 
@@ -107,7 +107,7 @@ RSpec.describe Metanorma::Html::Theme do
       let(:theme) { described_class.load(:bipm) }
 
       it "has publisher metadata" do
-        theme.publishers.should include("BIPM")
+        expect(theme.publishers).to include("BIPM")
       end
     end
   end
@@ -116,58 +116,58 @@ RSpec.describe Metanorma::Html::Theme do
     let(:css) { theme.to_css_root }
 
     it "emits :root CSS block" do
-      css.should include(":root {")
+      expect(css).to include(":root {")
     end
 
     it "includes primary color variable" do
-      css.should include("--mn-primary: #28388A")
+      expect(css).to include("--mn-primary: #28388A")
     end
 
     it "includes accent color variable" do
-      css.should include("--mn-accent: #9C60C1")
+      expect(css).to include("--mn-accent: #9C60C1")
     end
 
     it "includes font variables" do
-      css.should include("--font-body:")
-      css.should include("--font-sans:")
-      css.should include("--font-mono:")
+      expect(css).to include("--font-body:")
+      expect(css).to include("--font-sans:")
+      expect(css).to include("--font-mono:")
     end
 
     it "includes block element variables" do
-      css.should include("--note-bg:")
-      css.should include("--example-border:")
-      css.should include("--admonition-color:")
+      expect(css).to include("--note-bg:")
+      expect(css).to include("--example-border:")
+      expect(css).to include("--admonition-color:")
     end
 
     it "includes dark mode overrides" do
-      css.should include('[data-theme="dark"]')
-      css.should include("--color-bg: #0f1118")
+      expect(css).to include('[data-theme="dark"]')
+      expect(css).to include("--color-bg: #0f1118")
     end
 
     it "omits header_background when nil" do
       theme.header_background = nil
-      css.should_not include("--mn-header-bg")
+      expect(css).not_to include("--mn-header-bg")
     end
 
     it "includes header_background when set" do
       theme.header_background = "linear-gradient(red, blue)"
-      css.should include("--mn-header-bg: linear-gradient(red, blue)")
+      expect(css).to include("--mn-header-bg: linear-gradient(red, blue)")
     end
   end
 
   describe "#to_css_extras" do
     it "returns empty string when no extras set" do
-      theme.to_css_extras.strip.should be_empty
+      expect(theme.to_css_extras.strip).to be_empty
     end
 
     it "includes cover_before_bg when set" do
       theme.cover_before_bg = "background: red"
-      theme.to_css_extras.should include("title-section::before")
+      expect(theme.to_css_extras).to include("title-section::before")
     end
 
     it "includes extra_css when set" do
       theme.extra_css = ".foo { color: red }"
-      theme.to_css_extras.should include(".foo { color: red }")
+      expect(theme.to_css_extras).to include(".foo { color: red }")
     end
   end
 
@@ -175,26 +175,26 @@ RSpec.describe Metanorma::Html::Theme do
     it "allows changing colors" do
       t = described_class.new
       t.primary = "#ff0000"
-      t.primary.should eq("#ff0000")
+      expect(t.primary).to eq("#ff0000")
     end
   end
 
   describe "section ordering defaults" do
     it "has default preface_order" do
-      theme.preface_order.should eq(%w[foreword introduction abstract clause
-                                       acknowledgements executivesummary])
+      expect(theme.preface_order).to eq(%w[foreword introduction abstract clause
+                                           acknowledgements executivesummary])
     end
 
     it "has default clause_order" do
-      theme.clause_order.should eq(%w[sections annex bibliography indexsect])
+      expect(theme.clause_order).to eq(%w[sections annex bibliography indexsect])
     end
 
     it "has preface_wrap false by default" do
-      theme.preface_wrap.should be(false)
+      expect(theme.preface_wrap).to be(false)
     end
 
     it "has empty toc_filter_types by default" do
-      theme.toc_filter_types.should eq([])
+      expect(theme.toc_filter_types).to eq([])
     end
   end
 
@@ -202,19 +202,19 @@ RSpec.describe Metanorma::Html::Theme do
     let(:theme) { described_class.load(:ogc) }
 
     it "has clause-only preface_order" do
-      theme.preface_order.should eq(%w[clause])
+      expect(theme.preface_order).to eq(%w[clause])
     end
 
     it "has preface_wrap enabled" do
-      theme.preface_wrap.should be(true)
+      expect(theme.preface_wrap).to be(true)
     end
 
     it "filters toc clause types" do
-      theme.toc_filter_types.should eq(%w[toc])
+      expect(theme.toc_filter_types).to eq(%w[toc])
     end
 
     it "has nil theme_dir when loaded from flat file" do
-      theme.theme_dir.should be_nil
+      expect(theme.theme_dir).to be_nil
     end
   end
 
@@ -252,74 +252,74 @@ RSpec.describe Metanorma::Html::Theme do
     end
 
     it "loads from directory" do
-      theme.should_not be_nil
+      expect(theme).not_to be_nil
     end
 
     it "reads config from theme.yaml" do
-      theme.primary.should eq("#ff0000")
+      expect(theme.primary).to eq("#ff0000")
     end
 
     it "sets theme_dir to the flavor directory" do
-      theme.theme_dir.should eq(File.join(tmpdir, "testflavor"))
+      expect(theme.theme_dir).to eq(File.join(tmpdir, "testflavor"))
     end
 
     it "exposes theme_templates_dir" do
-      theme.theme_templates_dir.should eq(File.join(tmpdir, "testflavor",
-                                                    "templates"))
+      expect(theme.theme_templates_dir).to eq(File.join(tmpdir, "testflavor",
+                                                        "templates"))
     end
 
     it "exposes theme_assets_dir" do
-      theme.theme_assets_dir.should eq(File.join(tmpdir, "testflavor",
-                                                 "assets"))
+      expect(theme.theme_assets_dir).to eq(File.join(tmpdir, "testflavor",
+                                                     "assets"))
     end
 
     it "exposes theme_css_path" do
-      theme.theme_css_path.should eq(File.join(tmpdir, "testflavor",
-                                               "custom.css"))
+      expect(theme.theme_css_path).to eq(File.join(tmpdir, "testflavor",
+                                                   "custom.css"))
     end
 
     it "resolves flavor-specific template" do
       path = theme.resolve_template("_custom.html.liquid")
-      path.should eq(File.join(tmpdir, "testflavor", "templates",
-                               "_custom.html.liquid"))
+      expect(path).to eq(File.join(tmpdir, "testflavor", "templates",
+                                   "_custom.html.liquid"))
     end
 
     it "falls back to shared templates for unknown template" do
       path = theme.resolve_template("_nonexistent.html.liquid")
-      path.should include("templates")
+      expect(path).to include("templates")
     end
 
     it "resolves flavor-specific asset" do
       path = theme.resolve_asset("test-logo.svg")
-      path.should eq(File.join(tmpdir, "testflavor", "assets", "test-logo.svg"))
+      expect(path).to eq(File.join(tmpdir, "testflavor", "assets", "test-logo.svg"))
     end
 
     it "returns nil for missing asset" do
-      theme.resolve_asset("nonexistent.svg").should be_nil
+      expect(theme.resolve_asset("nonexistent.svg")).to be_nil
     end
 
     it "loads publisher metadata from directory theme" do
-      theme.publishers.should eq(["TEST"])
-      theme.publisher_name.should eq("TestPub")
+      expect(theme.publishers).to eq(["TEST"])
+      expect(theme.publisher_name).to eq("TestPub")
     end
 
     it "loads section ordering from directory theme" do
-      theme.preface_order.should eq(%w[introduction clause])
-      theme.preface_wrap.should be(true)
+      expect(theme.preface_order).to eq(%w[introduction clause])
+      expect(theme.preface_wrap).to be(true)
     end
   end
 
   describe "flat file fallback" do
     it "still loads flat YAML themes" do
       theme = described_class.load(:iso)
-      theme.should_not be_nil
-      theme.theme_dir.should be_nil
+      expect(theme).not_to be_nil
+      expect(theme.theme_dir).to be_nil
     end
 
     it "returns default theme for unknown flavor" do
       theme = described_class.load(:nonexistent)
-      theme.primary.should eq("#28388A")
-      theme.theme_dir.should be_nil
+      expect(theme.primary).to eq("#28388A")
+      expect(theme.theme_dir).to be_nil
     end
   end
 
@@ -328,48 +328,48 @@ RSpec.describe Metanorma::Html::Theme do
 
     it "returns shared template path" do
       path = theme.resolve_template("_note.html.liquid")
-      path.should include("templates")
+      expect(path).to include("templates")
     end
 
     it "returns nil for asset resolution" do
-      theme.resolve_asset("logo.svg").should be_nil
+      expect(theme.resolve_asset("logo.svg")).to be_nil
     end
 
     it "returns nil for css path" do
-      theme.theme_css_path.should be_nil
+      expect(theme.theme_css_path).to be_nil
     end
   end
 
   describe "lutaml-model schema" do
     it "is a Lutaml::Model::Serializable" do
-      described_class.ancestors.should include(Lutaml::Model::Serializable)
+      expect(described_class.ancestors).to include(Lutaml::Model::Serializable)
     end
 
     it "has 68 typed attributes" do
-      described_class.attributes.size.should eq(68)
+      expect(described_class.attributes.size).to eq(68)
     end
 
     it "has boolean type for preface_wrap" do
       attr = described_class.attributes[:preface_wrap]
-      attr.should_not be_nil
-      attr.type.should eq(Lutaml::Model::Type::Boolean)
+      expect(attr).not_to be_nil
+      expect(attr.type).to eq(Lutaml::Model::Type::Boolean)
     end
 
     it "has collection flag on array attributes" do
       %i[publishers preface_order clause_order
          toc_filter_types].each do |name|
-        described_class.attributes[name].collection?.should be(true)
+        expect(described_class.attributes[name].collection?).to be(true)
       end
     end
 
     it "has hash type for logos" do
       attr = described_class.attributes[:logos_light]
-      attr.type.should eq(Lutaml::Model::Type::Hash)
+      expect(attr.type).to eq(Lutaml::Model::Type::Hash)
     end
 
     it "has string type for color attributes" do
       %i[primary accent note_bg dark_border].each do |name|
-        described_class.attributes[name].type.should eq(Lutaml::Model::Type::String)
+        expect(described_class.attributes[name].type).to eq(Lutaml::Model::Type::String)
       end
     end
 
@@ -386,23 +386,23 @@ RSpec.describe Metanorma::Html::Theme do
           - toc
       YAML
       theme = described_class.from_yaml(yaml)
-      theme.primary.should eq("#b3000c")
-      theme.accent.should eq("#ff6600")
-      theme.publishers.should eq(["ISO"])
-      theme.logos_light.should eq({ "ISO" => "iso-logo.svg" })
-      theme.preface_wrap.should be(true)
-      theme.toc_filter_types.should eq(["toc"])
-      theme.text_color.should eq("#1a1a2e")
+      expect(theme.primary).to eq("#b3000c")
+      expect(theme.accent).to eq("#ff6600")
+      expect(theme.publishers).to eq(["ISO"])
+      expect(theme.logos_light).to eq({ "ISO" => "iso-logo.svg" })
+      expect(theme.preface_wrap).to be(true)
+      expect(theme.toc_filter_types).to eq(["toc"])
+      expect(theme.text_color).to eq("#1a1a2e")
     end
 
     it "preserves defaults for missing keys" do
       yaml = "primary: \"#ff0000\""
       theme = described_class.from_yaml(yaml)
-      theme.primary.should eq("#ff0000")
-      theme.accent.should eq("#9C60C1")
-      theme.preface_wrap.should be(false)
-      theme.publishers.should eq([])
-      theme.toc_filter_types.should eq([])
+      expect(theme.primary).to eq("#ff0000")
+      expect(theme.accent).to eq("#9C60C1")
+      expect(theme.preface_wrap).to be(false)
+      expect(theme.publishers).to eq([])
+      expect(theme.toc_filter_types).to eq([])
     end
   end
 end

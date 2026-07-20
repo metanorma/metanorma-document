@@ -8,62 +8,62 @@ RSpec.describe Metanorma::Html::BaseRenderer do
 
   describe "#escape_html" do
     it "escapes ampersands" do
-      renderer.escape_html("a&b").should eq("a&amp;b")
+      expect(renderer.escape_html("a&b")).to eq("a&amp;b")
     end
 
     it "escapes angle brackets" do
-      renderer.escape_html("<em>").should eq("&lt;em&gt;")
+      expect(renderer.escape_html("<em>")).to eq("&lt;em&gt;")
     end
 
     it "escapes double quotes" do
-      renderer.escape_html('a "b" c').should eq("a &quot;b&quot; c")
+      expect(renderer.escape_html('a "b" c')).to eq("a &quot;b&quot; c")
     end
 
     it "handles nil" do
-      renderer.escape_html(nil).should eq("")
+      expect(renderer.escape_html(nil)).to eq("")
     end
   end
 
   describe "#element_attrs" do
     it "builds attribute string" do
       result = renderer.element_attrs(id: "foo", class: "bar")
-      result.should include('id="foo"')
-      result.should include('class="bar"')
+      expect(result).to include('id="foo"')
+      expect(result).to include('class="bar"')
     end
 
     it "skips nil values" do
       result = renderer.element_attrs(id: "foo", class: nil)
-      result.should include('id="foo"')
-      result.should_not include("class")
+      expect(result).to include('id="foo"')
+      expect(result).not_to include("class")
     end
 
     it "skips empty strings" do
       result = renderer.element_attrs(id: "", class: "bar")
-      result.should_not include("id=")
-      result.should include('class="bar"')
+      expect(result).not_to include("id=")
+      expect(result).to include('class="bar"')
     end
 
     it "skips false values" do
       result = renderer.element_attrs(disabled: false)
-      result.should be_empty
+      expect(result).to be_empty
     end
   end
 
   describe "#html_class_for_span" do
     it "maps known XML roles to HTML class names" do
-      renderer.html_class_for_span("boldtitle").should eq("title-text")
-      renderer.html_class_for_span("citesec").should eq("xref-section")
-      renderer.html_class_for_span("fmt-obligation").should eq("obligation-text")
+      expect(renderer.html_class_for_span("boldtitle")).to eq("title-text")
+      expect(renderer.html_class_for_span("citesec")).to eq("xref-section")
+      expect(renderer.html_class_for_span("fmt-obligation")).to eq("obligation-text")
     end
 
     it "generates prefixed class for unknown roles" do
-      renderer.html_class_for_span("custom-thing").should eq("span-custom-thing")
+      expect(renderer.html_class_for_span("custom-thing")).to eq("span-custom-thing")
     end
   end
 
   describe "SPAN_ROLE_CLASSES" do
     it "is frozen" do
-      described_class::SPAN_ROLE_CLASSES.should be_frozen
+      expect(described_class::SPAN_ROLE_CLASSES).to be_frozen
     end
 
     it "maps all expected XML roles" do
@@ -72,22 +72,22 @@ RSpec.describe Metanorma::Html::BaseRenderer do
                          std_publisher stdpublisher stddocNumber stddocTitle
                          stddocPartNumber stdyear smallcap date]
       expected_keys.each do |key|
-        described_class::SPAN_ROLE_CLASSES.should have_key(key),
-                                                  "Expected SPAN_ROLE_CLASSES to have key #{key}"
+        expect(described_class::SPAN_ROLE_CLASSES).to have_key(key),
+                                                      "Expected SPAN_ROLE_CLASSES to have key #{key}"
       end
     end
   end
 
   describe "BLOCK_TYPES" do
     it "is a frozen Hash" do
-      described_class::BLOCK_TYPES.should be_frozen
-      described_class::BLOCK_TYPES.should be_a(Hash)
+      expect(described_class::BLOCK_TYPES).to be_frozen
+      expect(described_class::BLOCK_TYPES).to be_a(Hash)
     end
 
     it "includes all block element types" do
-      described_class::BLOCK_TYPES.should have_key(Metanorma::Document::Components::Paragraphs::ParagraphBlock)
-      described_class::BLOCK_TYPES.should have_key(Metanorma::Document::Components::Tables::TableBlock)
-      described_class::BLOCK_TYPES.should have_key(Metanorma::Document::Components::Blocks::NoteBlock)
+      expect(described_class::BLOCK_TYPES).to have_key(Metanorma::Document::Components::Paragraphs::ParagraphBlock)
+      expect(described_class::BLOCK_TYPES).to have_key(Metanorma::Document::Components::Tables::TableBlock)
+      expect(described_class::BLOCK_TYPES).to have_key(Metanorma::Document::Components::Blocks::NoteBlock)
     end
   end
 
@@ -97,19 +97,19 @@ RSpec.describe Metanorma::Html::BaseRenderer do
     it "delegates render_note_children" do
       model = Struct.new(:paragraphs, :ul, :ol).new(nil, nil, nil)
       result = renderer.render_note_children(model)
-      result.should eq("")
+      expect(result).to eq("")
     end
 
     it "delegates render_simple_children" do
       model = Struct.new(:paragraphs, :ul, :ol).new(nil, nil, nil)
       result = renderer.render_simple_children(model)
-      result.should eq("")
+      expect(result).to eq("")
     end
 
     it "delegates render_full_block_children" do
       model = Struct.new(:paragraphs, :ul, :ol).new(nil, nil, nil)
       result = renderer.render_full_block_children(model)
-      result.should eq("")
+      expect(result).to eq("")
     end
   end
 
@@ -128,15 +128,75 @@ RSpec.describe Metanorma::Html::BaseRenderer do
       model = Struct.new(:paragraphs, :ul, :ol).new(nil, [ul_model], nil)
       output = renderer.render_block_children(model,
                                               children: { ul: :render_unordered_list })
-      output.should include("<ul>")
-      output.should include("<li>")
+      expect(output).to include("<ul>")
+      expect(output).to include("<li>")
     end
 
     it "skips nil child collections" do
       model = Struct.new(:paragraphs, :ul).new(nil, nil)
       output = renderer.render_block_children(model,
                                               children: { paragraphs: :render_paragraph })
-      output.should be_empty
+      expect(output).to be_empty
+    end
+  end
+
+  describe "#safe_attr" do
+    it "returns nil for a method the object does not respond to" do
+      obj = Struct.new(:name).new("x")
+      expect(renderer.safe_attr(obj, :missing_method)).to be_nil
+    end
+
+    it "re-raises a NoMethodError raised inside the getter" do
+      obj = Object.new
+      def obj.broken
+        nil.no_such_method
+      end
+      expect { renderer.safe_attr(obj, :broken) }.to raise_error(NoMethodError)
+    end
+  end
+
+  describe "#render with an unregistered node class" do
+    it "warns about the unregistered class" do
+      node = Struct.new(:x).new(1)
+      expect { renderer.render(node) }
+        .to output(/no renderer registered/).to_stderr
+    end
+
+    it "returns an empty string" do
+      node = Struct.new(:x).new(1)
+      expect(renderer.render(node)).to eq("")
+    end
+
+    it "does not repeat the same warning" do
+      node = Struct.new(:x).new(1)
+      renderer.render(node)
+      expect { renderer.render(node) }.not_to output.to_stderr
+    end
+  end
+
+  describe "block-dispatch registrations for inline-ish fmt classes" do
+    it "renders fmt-xref-label through as mixed inline content" do
+      method = renderer.lookup_dispatch(
+        Metanorma::Document::Components::Inline::FmtXrefLabelElement,
+        :render_registry,
+      )
+      expect(method).to eq(:render_block_inline_content)
+    end
+
+    it "skips fmt-title (the semantic title attribute renders instead)" do
+      method = renderer.lookup_dispatch(
+        Metanorma::Document::Components::Inline::FmtTitleElement,
+        :render_registry,
+      )
+      expect(method).to eq(:render_noop)
+    end
+
+    it "skips variant-title (toc variant, not body content)" do
+      method = renderer.lookup_dispatch(
+        Metanorma::Document::Components::Inline::VariantTitleElement,
+        :render_registry,
+      )
+      expect(method).to eq(:render_noop)
     end
   end
 end

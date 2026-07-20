@@ -87,6 +87,7 @@ module Metanorma
           IsoRenderer
           BipmRenderer
           CcRenderer
+          CsaRenderer
           IccRenderer
           IecRenderer
           IeeeRenderer
@@ -137,6 +138,12 @@ module Metanorma
                                 renderer_class: CcRenderer,
                               ))
             registry.register(Flavor.new(
+                                name: :csa,
+                                model_class: Metanorma::CsaDocument::Root,
+                                renderer_class: CsaRenderer,
+                                pubid_module: :"Pubid::Csa",
+                              ))
+            registry.register(Flavor.new(
                                 name: :iec,
                                 model_class: Metanorma::IecDocument::Root,
                                 renderer_class: IecRenderer,
@@ -163,7 +170,7 @@ module Metanorma
                                 name: :itu,
                                 model_class: Metanorma::ItuDocument::Root,
                                 renderer_class: ItuRenderer,
-                                pubid_module: :"Pubid::Ithu",
+                                pubid_module: :"Pubid::Itu",
                               ))
             registry.register(Flavor.new(
                                 name: :ogc,

@@ -16,15 +16,15 @@ RSpec.describe Metanorma::Html::StandardRenderer do
   describe "#render_section" do
     it "renders clause sections with nested headings" do
       headings = page.css("main div[id] h2, main div[id] h3")
-      headings.length.should be > 0
+      expect(headings.length).to be > 0
     end
 
     it "renders terms sections with term-number entries" do
-      page.at_css(".term-number").should_not be_nil
+      expect(page.at_css(".term-number")).not_to be_nil
     end
 
     it "renders foreword with foreword-title class" do
-      page.at_css(".foreword-title").should_not be_nil
+      expect(page.at_css(".foreword-title")).not_to be_nil
     end
 
     it "does not emit raw XML class names in sections" do
@@ -32,13 +32,13 @@ RSpec.describe Metanorma::Html::StandardRenderer do
       all_classes = page.css("[class]").flat_map do |el|
         el["class"].split(/\s+/)
       end.uniq
-      (all_classes & xml_classes).should be_empty
+      expect(all_classes & xml_classes).to be_empty
     end
 
     it "renders all main sections inside main element" do
       main = page.at_css("main")
-      main.should_not be_nil
-      main.inner_html.length.should be > 100
+      expect(main).not_to be_nil
+      expect(main.inner_html.length).to be > 100
     end
   end
 end

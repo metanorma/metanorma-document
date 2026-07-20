@@ -47,23 +47,46 @@ module Metanorma
           end
           sub_figures_html = sub_figures_parts.join
 
-          key_parts = []
-          renderer.safe_attr(figure, :note)&.each do |n|
-            key_parts << (renderer.render_note(n) || "")
-          end
-          renderer.safe_attr(figure, :dl)&.then do |dl|
-            key_parts << (renderer.render_definition_list(dl) || "")
-          end
-          key_html = key_parts.join
-
           new(
             id: id,
             image_html: image_html,
             caption_html: caption_html,
-            key_html: key_html,
+            key_html: build_key_html(figure, renderer),
             sub_figures_html: sub_figures_html,
             css_class: "figure",
           )
+        end
+
+        class << self
+          private
+
+          # Notes, plain definition lists, and figure.key (e.g.
+          # <key class="formula_dl">) — symbol/footnote definitions
+          # belonging to the figure.
+          def build_key_html(figure, renderer)
+            parts = []
+            renderer.safe_attr(figure, :note)&.each do |n|
+              parts << (renderer.render_note(n) || "")
+            end
+            renderer.safe_attr(figure, :dl)&.then do |dl|
+              parts << (renderer.render_definition_list(dl) || "")
+            end
+            append_figure_key(parts, renderer.safe_attr(figure, :key), renderer)
+            parts.join
+          end
+
+          def append_figure_key(parts, key, renderer)
+            return unless key
+
+            name = renderer.safe_attr(key, :name)
+            parts << (renderer.render_inline_element(name) || "") if name
+            if renderer.safe_attr(key, :dl)
+              parts << (renderer.render_definition_list(key.dl) || "")
+            end
+            renderer.safe_attr(key, :p)&.each do |para|
+              parts << (renderer.render_paragraph(para) || "")
+            end
+          end
         end
       end
     end

@@ -22,7 +22,7 @@ RSpec.describe "Config-driven preface rendering" do
     it "returns empty string when preface has no sections" do
       preface = Metanorma::IsoDocument::Sections::IsoPreface.new
       result = renderer.render_preface(preface)
-      result.should eq("")
+      expect(result).to eq("")
     end
 
     it "renders sections in config order" do
@@ -34,7 +34,7 @@ RSpec.describe "Config-driven preface rendering" do
       )
 
       result = renderer.render_preface(preface)
-      result.should be_a(String)
+      expect(result).to be_a(String)
     end
   end
 
@@ -50,14 +50,14 @@ RSpec.describe "Config-driven preface rendering" do
       preface = Metanorma::IsoDocument::Sections::IsoPreface.new(clause: [clause1])
 
       result = renderer.render_preface(preface)
-      result.should include("preface")
+      expect(result).to include("preface")
     end
 
     it "returns nil when no content" do
       preface = Metanorma::IsoDocument::Sections::IsoPreface.new
 
       result = renderer.render_preface(preface)
-      result.should be_nil
+      expect(result).to be_nil
     end
   end
 end

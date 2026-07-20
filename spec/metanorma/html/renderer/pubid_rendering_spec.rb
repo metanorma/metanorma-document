@@ -8,18 +8,18 @@ RSpec.describe "Pubid rendering" do
 
   describe "#parse_pubid" do
     it "returns nil for nil input" do
-      renderer.parse_pubid(nil).should be_nil
+      expect(renderer.parse_pubid(nil)).to be_nil
     end
 
     it "returns nil for empty string" do
-      renderer.parse_pubid("").should be_nil
-      renderer.parse_pubid("  ").should be_nil
+      expect(renderer.parse_pubid("")).to be_nil
+      expect(renderer.parse_pubid("  ")).to be_nil
     end
   end
 
   describe "#pubid_to_html" do
     it "returns nil for nil identifier" do
-      renderer.pubid_to_html(nil).should be_nil
+      expect(renderer.pubid_to_html(nil)).to be_nil
     end
   end
 end
