@@ -271,6 +271,16 @@ module Metanorma
           render_liquid("_example.html.liquid", { "block" => drop })
         end
 
+        def render_form(form, **_opts)
+          attrs = element_attrs(id: safe_attr(form, :id), class: "form")
+          content = coordinator.render_ordered_content(form)
+          render_liquid("_element.html.liquid", {
+                          "tag" => "div",
+                          "extra_attrs" => attrs,
+                          "content" => content,
+                        })
+        end
+
         def render_sourcecode(sc, **_opts)
           drop = Drops::SourcecodeDrop.from_model(sc,
                                                   renderer: coordinator.renderer_context)

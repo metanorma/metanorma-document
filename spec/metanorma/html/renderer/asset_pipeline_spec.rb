@@ -10,22 +10,22 @@ RSpec.describe Metanorma::Html::AssetPipeline do
     let(:css) { pipeline.compile_css }
 
     it "returns a non-empty string" do
-      css.should be_a(String)
-      css.should_not be_empty
+      expect(css).to be_a(String)
+      expect(css).not_to be_empty
     end
 
     it "includes base reset styles" do
-      css.should include("box-sizing")
+      expect(css).to include("box-sizing")
     end
 
     it "includes typography styles" do
-      css.should include("font-family")
+      expect(css).to include("font-family")
     end
 
     it "includes component styles" do
-      css.should include(".doc-header")
-      css.should include(".note-block")
-      css.should include(".example")
+      expect(css).to include(".doc-header")
+      expect(css).to include(".note-block")
+      expect(css).to include(".example")
     end
   end
 
@@ -33,16 +33,16 @@ RSpec.describe Metanorma::Html::AssetPipeline do
     let(:js) { pipeline.compile_js }
 
     it "returns a non-empty string" do
-      js.should be_a(String)
-      js.should_not be_empty
+      expect(js).to be_a(String)
+      expect(js).not_to be_empty
     end
 
     it "wraps each module in IIFE" do
-      js.should include("(function()")
+      expect(js).to include("(function()")
     end
 
     it "includes core reader module" do
-      js.should include("mn-reader")
+      expect(js).to include("mn-reader")
     end
   end
 
@@ -50,12 +50,12 @@ RSpec.describe Metanorma::Html::AssetPipeline do
     it "includes flavor CSS when present" do
       # Flavor module doesn't exist, should not error
       css = pipeline.compile_css(flavor_css: "iso")
-      css.should be_a(String)
+      expect(css).to be_a(String)
     end
 
     it "includes flavor JS when present" do
       js = pipeline.compile_js(flavor_js: "iso")
-      js.should be_a(String)
+      expect(js).to be_a(String)
     end
   end
 end

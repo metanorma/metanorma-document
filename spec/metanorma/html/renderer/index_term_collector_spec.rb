@@ -8,12 +8,12 @@ RSpec.describe Metanorma::Html::Component::IndexTermCollector do
 
   describe "#empty?" do
     it "is true initially" do
-      collector.should be_empty
+      expect(collector).to be_empty
     end
 
     it "is false after adding a term" do
       collector.add(primary: "Rice")
-      collector.should_not be_empty
+      expect(collector).not_to be_empty
     end
   end
 
@@ -24,7 +24,7 @@ RSpec.describe Metanorma::Html::Component::IndexTermCollector do
       collector.add(primary: "Beta", target_id: "sec3")
 
       groups = collector.sorted_groups
-      groups.map(&:letter).should eq(%w[A B])
+      expect(groups.map(&:letter)).to eq(%w[A B])
     end
 
     it "merges duplicate primaries" do
@@ -32,9 +32,9 @@ RSpec.describe Metanorma::Html::Component::IndexTermCollector do
       collector.add(primary: "rice", target_id: "sec2")
 
       groups = collector.sorted_groups
-      groups.length.should eq(1)
-      groups.first.entries.length.should eq(1)
-      groups.first.entries.first.locators.length.should eq(2)
+      expect(groups.length).to eq(1)
+      expect(groups.first.entries.length).to eq(1)
+      expect(groups.first.entries.first.locators.length).to eq(2)
     end
 
     it "supports secondary and tertiary terms" do
@@ -42,10 +42,10 @@ RSpec.describe Metanorma::Html::Component::IndexTermCollector do
                     target_id: "sec1")
 
       groups = collector.sorted_groups
-      groups.length.should eq(1)
+      expect(groups.length).to eq(1)
       entry = groups.first.entries.first
-      entry.children.length.should eq(1)
-      entry.children.first.children.length.should eq(1)
+      expect(entry.children.length).to eq(1)
+      expect(entry.children.first.children.length).to eq(1)
     end
   end
 end

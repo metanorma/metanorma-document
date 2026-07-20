@@ -15,7 +15,23 @@ module Metanorma
                "metanorma/html/renderers/element_order_traversal"
     end
 
+    module Concerns
+      autoload :MetadataExtraction,
+               "metanorma/html/concerns/metadata_extraction"
+      autoload :PresentationValidation,
+               "metanorma/html/concerns/presentation_validation"
+      autoload :SvgProcessing, "metanorma/html/concerns/svg_processing"
+      autoload :TextExtraction, "metanorma/html/concerns/text_extraction"
+      autoload :TocRegistry, "metanorma/html/concerns/toc_registry"
+    end
+
     class BaseRenderer
+      include Concerns::MetadataExtraction
+      include Concerns::PresentationValidation
+      include Concerns::SvgProcessing
+      include Concerns::TextExtraction
+      include Concerns::TocRegistry
+
       LOGO_DIR = File.expand_path("../../../data/logos", __dir__)
 
       SPAN_ROLE_CLASSES = {
@@ -115,10 +131,6 @@ module Metanorma
         @renderer_context ||= RendererContext.new(self)
       end
 
-      def toc_entries
-        @toc_entries
-      end
-
       attr_writer :document, :theme
 
       def generate_full_document(document, **)
@@ -128,6 +140,14 @@ module Metanorma
         body = render(@document) || ""
 
         assemble_document(body)
+      end
+
+      # Renders only the document body content (no html/head/styles
+      # assembly) — for embedding classic-rendered content into a host page.
+      def generate_body(document, **)
+        @document = document
+        validate_presentation_xml!
+        render(@document) || ""
       end
 
       # --- Flavor configuration hooks ---
@@ -257,46 +277,11 @@ module Metanorma
         end.join("\n")
       end
 
-      def load_logo_svg(filename, height: 32)
-        path = theme.resolve_asset(filename) || File.join(LOGO_DIR, filename)
-        return nil unless File.exist?(path)
-
-        svg = File.read(path)
-        svg = svg.sub(/\A<\?xml[^?]*\?>\s*/, "")
-        svg = svg.sub(/\A\s*<!--.*?-->\s*/m, "")
-        svg = svg.sub(/<svg\s/, '<svg class="header-logo" ')
-        svg = if svg.match?(/<svg[^>]*\sheight="[^"]*"/)
-                svg.sub(/(<svg[^>]*?)(\sheight="[^"]*")/,
-                        "\\1 height=\"#{height}\"")
-              else
-                svg.sub(/(<svg\b)/, "\\1 height=\"#{height}\"")
-              end
-        svg.sub(/(<svg[^>]*?)\swidth="[^"]*"/, '\1')
-      rescue StandardError
-        nil
-      end
-
       def build_footer
         mn_logo = load_logo_svg(METANORMA_LOGO, height: 20)
         render_liquid("_footer.html.liquid", {
                         "mn_logo" => mn_logo,
                         "generated_at" => Time.now.strftime("%Y-%m-%d %H:%M"),
-                      })
-      end
-
-      # --- ToC generation ---
-
-      def build_toc_html(entries)
-        entry_drops = entries.map { |e| Drops::TocEntryDrop.new(e) }
-        figure_drops = @figure_entries.map { |f| Drops::FigureListEntryDrop.new(f) }
-        table_drops = @table_entries.map { |t| Drops::FigureListEntryDrop.new(t) }
-        has_special_lists = !@figure_entries.empty? || !@table_entries.empty?
-
-        render_liquid("_toc.html.liquid", {
-                        "entries" => entry_drops,
-                        "figures" => figure_drops,
-                        "tables" => table_drops,
-                        "has_special_lists" => has_special_lists,
                       })
       end
 
@@ -325,177 +310,28 @@ module Metanorma
         parts.join("\n")
       end
 
-      # --- Validation ---
-
-      def validate_presentation_xml!
-        has_presentation = check_presentation_markers(@document)
-        return if has_presentation
-
-        raise ArgumentError,
-              "HTML generation requires Presentation XML input. " \
-              "Semantic XML does not contain formatting data needed for HTML. " \
-              "Use a '.presentation.xml' file instead."
-      end
-
-      def check_presentation_markers(node)
-        return false unless node
-        return false if node.is_a?(String)
-
-        if node.is_a?(Lutaml::Model::Serializable)
-          node_attrs = node.class.attributes
-          if node_attrs.key?(:type) && node.type == "presentation"
-            return true
-          end
-          if node_attrs.key?(:fmt_title) && node.fmt_title
-            return true
-          end
-          if node_attrs.key?(:displayorder) && node.displayorder
-            return true
-          end
-
-          %i[preface sections annex bibliography].each do |attr|
-            next unless node_attrs.key?(attr)
-
-            val = node.public_send(attr)
-            next unless val
-
-            Array(val).each { |v| return true if check_presentation_markers(v) }
-          end
-
-          node.each_mixed_content do |child|
-            next if child.is_a?(String)
-            return true if check_presentation_markers(child)
-          end
-        end
-
-        false
-      end
-
-      # --- Metadata extraction ---
-
-      def language
-        bibdata = @document.bibdata
-        return "en" unless bibdata
-
-        langs = bibdata.language
-        if langs && !langs.empty?
-          lang = langs.find { |l| l.current == "true" } || langs.first
-          lang.value || lang.to_s
-        else
-          "en"
-        end
-      end
-
-      def html_title
-        extract_display_title(@document.bibdata) || "Document"
-      end
-
-      def extract_display_title(bibdata)
-        return nil unless bibdata
-
-        title = bibdata.title_for("en") if bibdata.is_a?(Metanorma::Document::Components::BibData::BibData)
-        return title.to_s if title && !title.to_s.empty?
-
-        titles = safe_attr(bibdata, :title)
-        return nil unless titles && !titles.is_a?(String) && !titles.empty?
-
-        en = titles.find { |t| safe_attr(t, :language) == "en" }
-        found = en || titles.first
-        extract_text_value(found).to_s
-      end
-
-      def extract_primary_doc_id
-        bibdata = @document.bibdata
-        return nil unless bibdata
-
-        identifiers = bibdata.doc_identifier
-        return nil unless identifiers && !identifiers.empty?
-
-        first_id = identifiers.first
-        text = if first_id.is_a?(String)
-                 first_id
-               elsif first_id.is_a?(Lutaml::Model::Serializable)
-                 Array(first_id.value).join
-               else
-                 first_id.to_s
-               end
-        text.strip.empty? ? nil : text.strip
-      end
-
-      # --- Registration helpers ---
-
-      def register_toc_entry(id:, level:, text:)
-        @toc_entries << { id: id, level: level, text: text }
-      end
-
-      def register_figure_entry(id:, text:)
-        @figure_entries << { id: id, text: text }
-      end
-
-      def figure_entries
-        @figure_entries
-      end
-
-      def register_table_entry(id:, text:)
-        @table_entries << { id: id, text: text }
-      end
-
-      def extract_plain_text(node)
-        return node.to_s if node.is_a?(String)
-        return extract_text_value(node).to_s unless node.is_a?(Lutaml::Model::Serializable)
-
-        parts = []
-        xml_mapping = node.class.mappings_for(:xml, node.lutaml_register)
-
-        if node.element_order.is_a?(Array) && xml_mapping
-          element_to_attr =
-            Renderers::ElementOrderTraversal.element_to_attr_map(xml_mapping)
-
-          indices = Hash.new(0)
-          node.element_order.each do |el|
-            next unless el.is_a?(Lutaml::Xml::Element)
-
-            if el.text?
-              parts << el.text_content.to_s
-            elsif el.name == "tab"
-              parts << " "
-            elsif el.name == "br"
-              parts << " "
-            elsif el.element?
-              attr_name = element_to_attr[el.name]
-              if attr_name
-                coll = node.public_send(attr_name)
-                obj = if coll.is_a?(Array)
-                        idx = indices[attr_name]
-                        indices[attr_name] += 1
-                        coll[idx]
-                      else
-                        coll
-                      end
-                text = extract_plain_text(obj)
-                parts << (text.empty? ? " " : text)
-              elsif el.name == "span"
-                parts << " "
-              end
-            end
-          end
-        end
-
-        if parts.join.strip.empty?
-          t = safe_attr(node, :text)
-          parts << (t.is_a?(Array) ? t.join : t.to_s) if t
-        end
-
-        parts.join.strip.gsub(" ", " ")
-      end
-
       # --- Dispatch ---
 
       def render(node, **)
         return escape_html(node) if node.is_a?(String)
 
         method = lookup_dispatch(node.class, :render_registry)
-        method ? public_send(method, node, **) : ""
+        return public_send(method, node, **) if method
+
+        record_render_warning(
+          "no renderer registered for #{node.class} — content skipped",
+        )
+        ""
+      end
+
+      # Emit a render warning once per distinct message. Warnings mark
+      # content that was skipped or degraded rather than rendered.
+      def record_render_warning(message)
+        @render_warnings ||= {}
+        return if @render_warnings.key?(message)
+
+        @render_warnings[message] = true
+        warn "metanorma-document: #{message}"
       end
 
       def render_inline_element(element, **)
@@ -527,6 +363,8 @@ module Metanorma
                       :render_note
       register_render Metanorma::Document::Components::AncillaryBlocks::ExampleBlock,
                       :render_example
+      register_render Metanorma::StandardDocument::Blocks::Form,
+                      :render_form
       register_render Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock,
                       :render_sourcecode
       register_render Metanorma::Document::Components::AncillaryBlocks::FormulaBlock,
@@ -592,6 +430,8 @@ module Metanorma
                              :render_fmt_stem
       register_inline_render Metanorma::Document::Components::Inline::CommaElement,
                              :render_comma
+      register_inline_render Metanorma::StandardDocument::Elements::Input,
+                             :render_input
       register_inline_render Metanorma::Document::Components::Inline::EnumCommaElement,
                              :render_comma
       register_inline_render Metanorma::Document::Components::IdElements::Bookmark,
@@ -643,7 +483,31 @@ module Metanorma
         register_inline_render klass, :render_mixed_inline
       end
 
+      # Inline-ish classes that are also reached through the BLOCK
+      # dispatch (as direct children of block containers, e.g. fmt-title
+      # as a child of clause). fmt-title and variant-title duplicate the
+      # semantic `title` attribute that sections render — skip them.
+      register_render Metanorma::Document::Components::Inline::FmtTitleElement,
+                      :render_noop
+      register_render Metanorma::Document::Components::Inline::VariantTitleElement,
+                      :render_noop
+      # fmt-xref-label carries the cross-reference link label; render it
+      # through when it appears in block context.
+      register_render Metanorma::Document::Components::Inline::FmtXrefLabelElement,
+                      :render_block_inline_content
+
       def lookup_dispatch(type_class, registry_method)
+        # Registry contents are fixed once renderer classes are loaded, so
+        # the resolved method per (registry, node class) is memoized for
+        # the lifetime of this renderer instance.
+        cache = (@dispatch_cache ||= {})
+        key = [registry_method, type_class]
+        return cache[key] if cache.key?(key)
+
+        cache[key] = resolve_dispatch(type_class, registry_method)
+      end
+
+      def resolve_dispatch(type_class, registry_method)
         self.class.ancestors.each do |ancestor|
           next unless ancestor.is_a?(Class) && (ancestor == BaseRenderer || ancestor < BaseRenderer)
 
@@ -656,6 +520,13 @@ module Metanorma
 
       def render_noop(*)
         ""
+      end
+
+      # Block-dispatch entry point for inline content reached as a direct
+      # child of a block container (render passes keyword args; the inline
+      # pipeline does not accept them).
+      def render_block_inline_content(el, **)
+        render_mixed_inline(el)
       end
 
       def render_noop_inline(*)
@@ -690,6 +561,7 @@ module Metanorma
       def render_semx_inline(el) = @inline_renderer.render_semx_inline(el)
       def render_fmt_xref(el) = @inline_renderer.render_fmt_xref(el)
       def render_comma(*) = @inline_renderer.render_comma
+      def render_input(el) = @inline_renderer.render_input(el)
       def render_math(el) = @inline_renderer.render_math(el)
       def render_asciimath(el) = @inline_renderer.render_asciimath(el)
       def render_index(el) = @inline_renderer.render_index(el)
@@ -749,6 +621,8 @@ module Metanorma
 **)
         @block_renderer.render_example(example, **)
       end
+
+      def render_form(form, **) = @block_renderer.render_form(form, **)
 
       def render_sourcecode(sc,
 **)
@@ -861,7 +735,12 @@ level = 1)
         end
 
         obj.public_send(method_name)
-      rescue NoMethodError
+      rescue NoMethodError => e
+        # Only swallow "method missing on this object" (duck-typing across
+        # model classes). A NoMethodError raised *inside* the getter is a
+        # real bug — let it surface.
+        raise unless e.receiver.equal?(obj)
+
         nil
       end
 
@@ -876,7 +755,8 @@ level = 1)
           target_id: @current_section_id,
           target_text: @current_section_number,
         )
-      rescue StandardError
+      rescue StandardError => e
+        record_render_warning("index term dropped: #{e.class}: #{e.message}")
         nil
       end
 
@@ -914,34 +794,6 @@ level = 1)
 
       def escape_html(text)
         CGI.escapeHTML(text.to_s)
-      end
-
-      def extract_text_value(val)
-        return nil if val.nil?
-        return val if val.is_a?(String)
-
-        if val.is_a?(Array)
-          val.map { |v| extract_text_value(v) }.join
-        elsif val.is_a?(Lutaml::Model::Serializable)
-          c = safe_attr(val, :content)
-          if c && !c.equal?(val)
-            extract_text_value(c)
-          else
-            t = safe_attr(val, :text)
-            if t
-              extract_text_value(t)
-            else
-              v = safe_attr(val, :value)
-              if v
-                extract_text_value(v)
-              else
-                val.to_s
-              end
-            end
-          end
-        else
-          val.to_s
-        end
       end
 
       def render_footnotes_section

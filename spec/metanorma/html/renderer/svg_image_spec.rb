@@ -18,32 +18,32 @@ RSpec.describe "SVG image capture and rendering" do
 
       it "captures the full SVG element as inline_svg" do
         image = described_class.from_xml(svg_xml)
-        image.inline_svg.should include("<svg")
-        image.inline_svg.should include("</svg>")
+        expect(image.inline_svg).to include("<svg")
+        expect(image.inline_svg).to include("</svg>")
       end
 
       it "preserves SVG namespace attribute" do
         image = described_class.from_xml(svg_xml)
-        image.inline_svg.should include("xmlns=\"http://www.w3.org/2000/svg\"")
+        expect(image.inline_svg).to include("xmlns=\"http://www.w3.org/2000/svg\"")
       end
 
       it "preserves SVG child elements" do
         image = described_class.from_xml(svg_xml)
-        image.inline_svg.should include("<rect")
-        image.inline_svg.should include("fill=\"red\"")
+        expect(image.inline_svg).to include("<rect")
+        expect(image.inline_svg).to include("fill=\"red\"")
       end
 
       it "preserves SVG element attributes" do
         image = described_class.from_xml(svg_xml)
-        image.inline_svg.should include("viewBox")
+        expect(image.inline_svg).to include("viewBox")
       end
 
       it "parses image attributes normally alongside SVG" do
         image = described_class.from_xml(svg_xml)
-        image.source.should eq("test.png")
-        image.height.should eq("100")
-        image.width.should eq("200")
-        image.alt.should eq("Test")
+        expect(image.source).to eq("test.png")
+        expect(image.height).to eq("100")
+        expect(image.width).to eq("200")
+        expect(image.alt).to eq("Test")
       end
     end
 
@@ -54,13 +54,13 @@ RSpec.describe "SVG image capture and rendering" do
 
       it "has nil inline_svg" do
         image = described_class.from_xml(plain_xml)
-        image.inline_svg.should be_nil
+        expect(image.inline_svg).to be_nil
       end
 
       it "parses image attributes" do
         image = described_class.from_xml(plain_xml)
-        image.source.should eq("photo.jpg")
-        image.height.should eq("300")
+        expect(image.source).to eq("photo.jpg")
+        expect(image.height).to eq("300")
       end
     end
   end
@@ -80,15 +80,15 @@ RSpec.describe "SVG image capture and rendering" do
       image = Metanorma::Document::Components::IdElements::Image.from_xml(svg_xml)
       renderer = Metanorma::Html::BaseRenderer.new
       html = renderer.render_image(image)
-      html.should include("data:image/svg+xml;base64,")
-      html.should include("<img")
+      expect(html).to include("data:image/svg+xml;base64,")
+      expect(html).to include("<img")
     end
 
     it "does not include file source when SVG is present" do
       image = Metanorma::Document::Components::IdElements::Image.from_xml(svg_xml)
       renderer = Metanorma::Html::BaseRenderer.new
       html = renderer.render_image(image)
-      html.should_not include("test.png")
+      expect(html).not_to include("test.png")
     end
 
     it "renders regular images with file source" do
@@ -96,15 +96,15 @@ RSpec.describe "SVG image capture and rendering" do
       image = Metanorma::Document::Components::IdElements::Image.from_xml(plain_xml)
       renderer = Metanorma::Html::BaseRenderer.new
       html = renderer.render_image(image)
-      html.should include("photo.jpg")
-      html.should_not include("data:")
+      expect(html).to include("photo.jpg")
+      expect(html).not_to include("data:")
     end
 
     it "preserves image id in rendered output" do
       image = Metanorma::Document::Components::IdElements::Image.from_xml(svg_xml)
       renderer = Metanorma::Html::BaseRenderer.new
       html = renderer.render_image(image)
-      html.should include("fig1")
+      expect(html).to include("fig1")
     end
   end
 end

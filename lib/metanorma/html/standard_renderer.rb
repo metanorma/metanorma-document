@@ -160,57 +160,217 @@ module Metanorma
 
       # --- Term rendering ---
 
+      # Unified term entry renderer. Handles both semantic-only term models
+      # (StandardDocument::Terms::Term) and presentation-aware models with
+      # fmt-* attributes (IsoDocument::Terms::IsoTerm): safe_attr returns nil
+      # for attributes a model does not declare, so the fmt-* branches are
+      # skipped automatically on semantic-only models.
       def render_term(term, **_opts)
-        attrs = element_attrs(id: safe_attr(term, :id))
+        attrs = element_attrs(id: safe_attr(term, :id), **term_data_attrs(term))
+        fmt_definition = safe_attr(term, :fmt_definition)
+
         parts = []
-        term.preferred&.each do |d|
-          parts << (render_term_designation(d, "preferred") || "")
+        parts << (render_term_number(term) || "")
+        parts << render_term_designations(term, :fmt_preferred, :preferred,
+                                          "preferred")
+        parts << render_term_designations(term, :fmt_admitted, :admitted,
+                                          "admitted")
+        parts << render_term_designations(term, :fmt_deprecates, :deprecates,
+                                          "deprecated")
+        parts << (render_term_domain(term, fmt_definition) || "")
+        parts << render_term_definitions(term, fmt_definition)
+        parts << render_term_note_parts(term)
+        parts << render_term_example_parts(term)
+        parts << render_term_source_parts(term)
+        safe_attr(term, :admonition)&.each do |admonition|
+          parts << (render_admonition(admonition) || "")
         end
-        term.admitted&.each do |d|
-          parts << (render_term_designation(d, "admitted") || "")
-        end
-        term.deprecates&.each do |d|
-          parts << (render_term_designation(d, "deprecated") || "")
-        end
-
-        if term.domain
-          domain_text = if term.domain.is_a?(String)
-                          term.domain
-                        else
-                          safe_attr(term.domain, :text).to_s
-                        end
-          unless domain_text.to_s.empty?
-            parts << render_liquid("_term_domain.html.liquid", {
-                                     "text" => escape_html(domain_text),
-                                   }).to_s
-          end
-        end
-
-        if term.definition
-          Array(term.definition).each do |defn|
-            parts << (render_term_definition(defn) || "")
-          end
-        end
-
-        term.note&.each_with_index do |note, i|
-          if note.is_a?(String)
-            label = "Note #{i + 1} to entry: "
-            parts << render_liquid("_term_text_note.html.liquid", {
-                                     "label" => label,
-                                     "content" => escape_html(note),
-                                   }).to_s
-          else
-            parts << (render_note(note) || "")
-          end
-        end
-
-        term.example&.each { |ex| parts << (render_paragraph(ex) || "") }
-        term.source&.each { |src| parts << (render_term_source(src) || "") }
+        safe_attr(term, :term)&.each { |sub| parts << (render_term(sub) || "") }
         render_liquid("_element.html.liquid", {
                         "tag" => "div",
                         "extra_attrs" => attrs,
                         "content" => parts.join,
                       })
+      end
+
+      def term_data_attrs(term)
+        term_name = extract_term_name(term)
+        term_definition = extract_term_definition(term)
+        data_attrs = {}
+        if term_name && !term_name.empty?
+          data_attrs["data-term-name"] = term_name
+        end
+        if term_definition && !term_definition.empty?
+          data_attrs["data-term-definition"] = term_definition
+        end
+        data_attrs
+      end
+
+      def render_term_number(term)
+        fmt_name = safe_attr(term, :fmt_name)
+        term_number = safe_attr(term, :term_number)
+        if fmt_name
+          render_liquid("_term_number.html.liquid", {
+                          "content" => render_inline_element(fmt_name),
+                        })
+        elsif term_number
+          number_text = if term_number.is_a?(String)
+                          term_number
+                        else
+                          extract_text_value(term_number)
+                        end
+          render_liquid("_term_number.html.liquid", {
+                          "content" => escape_html(number_text),
+                        })
+        end
+      end
+
+      # Designations (preferred/admitted/deprecated): fmt-* presentation
+      # elements win when present; otherwise render semantic designations.
+      def render_term_designations(term, fmt_attr, semantic_attr, type)
+        fmt = safe_attr(term, fmt_attr)
+        fmt_list = fmt.is_a?(Array) ? fmt : [fmt].compact
+        parts = []
+        if fmt_list.empty?
+          term.public_send(semantic_attr)&.each do |designation|
+            parts << (render_term_designation(designation, type) || "")
+          end
+        else
+          fmt_list.each do |element|
+            element.p&.each { |para| parts << (render_paragraph(para) || "") }
+          end
+        end
+        parts.join
+      end
+
+      def render_term_domain(term, fmt_definition)
+        return nil if fmt_definition
+
+        domain = term.domain
+        return nil unless domain
+
+        domain_text = domain.is_a?(String) ? domain : safe_attr(domain, :text).to_s
+        return nil if domain_text.empty?
+
+        render_liquid("_term_domain.html.liquid", {
+                        "text" => escape_html(domain_text),
+                      }).to_s
+      end
+
+      def render_term_definitions(term, fmt_definition)
+        return render_ordered_content(fmt_definition) || "" if fmt_definition
+
+        parts = []
+        safe_attr(term, :p)&.each do |para|
+          parts << (render_paragraph(para) || "")
+        end
+        term.definition&.each do |definition|
+          parts << (render_term_definition(definition) || "")
+        end
+        parts.join
+      end
+
+      def render_term_note_parts(term)
+        notes = safe_attr(term, :termnote) || Array(safe_attr(term, :note))
+        parts = []
+        notes.each_with_index do |note, i|
+          parts << (render_term_note_item(note, i) || "")
+        end
+        parts.join
+      end
+
+      # A term note can be a raw String (rendered with a "Note N to entry"
+      # label), a termnote element (labelled wrapper), or a plain block
+      # (rendered as a generic note).
+      def render_term_note_item(note, index)
+        if note.is_a?(String)
+          render_liquid("_term_text_note.html.liquid", {
+                          "label" => "Note #{index + 1} to entry: ",
+                          "content" => escape_html(note),
+                        }).to_s
+        elsif term_scoped_block?(note)
+          render_term_note(note)
+        else
+          render_note(note)
+        end
+      end
+
+      def render_term_example_parts(term)
+        examples = safe_attr(term, :termexample) ||
+          Array(safe_attr(term, :example))
+        examples.map do |example|
+          render_term_example_item(example) || ""
+        end.join
+      end
+
+      # A term example can be a termexample element (labelled wrapper), a
+      # raw String, or a plain paragraph block (both rendered as paragraphs).
+      # render_paragraph cannot take a bare String (render_mixed_inline
+      # expects a model), so Strings go through the paragraph template
+      # directly — same markup render_paragraph would emit.
+      def render_term_example_item(example)
+        if example.is_a?(String)
+          return render_liquid("_paragraph.html.liquid", {
+                                 "attrs" => "",
+                                 "content" => escape_html(example),
+                               })
+        end
+        return render_term_example(example) if term_scoped_block?(example)
+
+        render_paragraph(example)
+      end
+
+      # Termnote/termexample elements wrap block children (`p`, lists);
+      # plain paragraph blocks and Strings do not declare a `p` attribute.
+      def term_scoped_block?(node)
+        node.is_a?(Lutaml::Model::Serializable) &&
+          node.class.attributes.key?(:p)
+      end
+
+      def render_term_source_parts(term)
+        fmt_termsource = safe_attr(term, :fmt_termsource)
+        parts = []
+        if fmt_termsource && !fmt_termsource.empty?
+          fmt_termsource.each do |source|
+            parts << render_liquid("_paragraph.html.liquid", {
+                                     "attrs" => " class=\"term-source\"",
+                                     "content" => render_mixed_inline(source),
+                                   })
+          end
+        else
+          term.source&.each { |src| parts << (render_term_source(src) || "") }
+          safe_attr(term, :termsource)&.each do |source|
+            parts << (render_term_source_element(source) || "")
+          end
+        end
+        parts.join
+      end
+
+      def extract_term_name(term)
+        fmt_pref = safe_attr(term, :fmt_preferred)
+        if fmt_pref && !fmt_pref.empty?
+          fp = fmt_pref.first
+          if fp.p && !fp.p.empty?
+            return extract_plain_text(fp.p.first)
+          end
+        end
+        if term.preferred && !term.preferred.empty?
+          return extract_designation_name(term.preferred.first).to_s
+        end
+
+        safe_attr(term, :id).to_s.delete_prefix("term-")
+      end
+
+      def extract_term_definition(term)
+        fmt_def = safe_attr(term, :fmt_definition)
+        return extract_plain_text(fmt_def) if fmt_def
+
+        term_p = safe_attr(term, :p)
+        if term_p && !term_p.empty?
+          text = term_p.map { |para| extract_plain_text(para) }.join(" ")
+          return text.strip unless text.strip.empty?
+        end
+        nil
       end
 
       def render_term_designation(designation, _type)

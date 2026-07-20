@@ -16,26 +16,26 @@ RSpec.describe Metanorma::Html::Component::FootnoteCollector do
     it "returns sequential numbers" do
       n1 = collector.register(mock_fn(id: "fn1", reference: "a"))
       n2 = collector.register(mock_fn(id: "fn2", reference: "b"))
-      n1.should eq(1)
-      n2.should eq(2)
+      expect(n1).to eq(1)
+      expect(n2).to eq(2)
     end
 
     it "deduplicates by reference" do
       n1 = collector.register(mock_fn(id: "fn1", reference: "a"))
       n2 = collector.register(mock_fn(id: "fn1-dup", reference: "a"))
-      n1.should eq(1)
-      n2.should eq(1)
+      expect(n1).to eq(1)
+      expect(n2).to eq(1)
     end
   end
 
   describe "#empty?" do
     it "is true initially" do
-      collector.should be_empty
+      expect(collector).to be_empty
     end
 
     it "is false after registering" do
       collector.register(mock_fn(id: "fn1", reference: "a"))
-      collector.should_not be_empty
+      expect(collector).not_to be_empty
     end
   end
 
@@ -43,9 +43,9 @@ RSpec.describe Metanorma::Html::Component::FootnoteCollector do
     it "returns FootnoteEntry structs" do
       collector.register(mock_fn(id: "fn1", reference: "a"))
       entries = collector.to_a
-      entries.length.should eq(1)
-      entries.first.number.should eq(1)
-      entries.first.reference.should eq("a")
+      expect(entries.length).to eq(1)
+      expect(entries.first.number).to eq(1)
+      expect(entries.first.reference).to eq("a")
     end
   end
 end

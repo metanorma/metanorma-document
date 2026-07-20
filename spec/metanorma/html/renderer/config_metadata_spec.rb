@@ -18,45 +18,45 @@ RSpec.describe "Config-driven flavor metadata" do
 
   describe "theme auto-resolution" do
     it "resolves ISO theme from IsoDocument" do
-      renderer.theme.should_not be_nil
-      renderer.theme.primary.should eq("#b3000c")
+      expect(renderer.theme).not_to be_nil
+      expect(renderer.theme.primary).to eq("#b3000c")
     end
 
     it "resolves publisher metadata from theme config" do
-      renderer.theme.publishers.should include("ISO")
+      expect(renderer.theme.publishers).to include("ISO")
     end
 
     it "resolves publisher_name from theme config" do
-      renderer.theme.publisher_name.should eq("ISO")
+      expect(renderer.theme.publisher_name).to eq("ISO")
     end
 
     it "resolves logo map from theme config" do
-      renderer.theme.logos.should be_a(Hash)
-      renderer.theme.logos["ISO"].should eq("iso-logo.svg")
+      expect(renderer.theme.logos).to be_a(Hash)
+      expect(renderer.theme.logos["ISO"]).to eq("iso-logo.svg")
     end
   end
 
   describe "flavor_publishers" do
     it "returns publishers from theme config" do
-      renderer.flavor_publishers(nil).should include("ISO")
+      expect(renderer.flavor_publishers(nil)).to include("ISO")
     end
   end
 
   describe "flavor_publisher_name" do
     it "returns publisher_name from theme config" do
-      renderer.flavor_publisher_name.should eq("ISO")
+      expect(renderer.flavor_publisher_name).to eq("ISO")
     end
   end
 
   describe "publisher_logo_map" do
     it "returns logos from theme config" do
-      renderer.publisher_logo_map.should be_a(Hash)
+      expect(renderer.publisher_logo_map).to be_a(Hash)
     end
   end
 
   describe "flavor resolution from document class" do
     it "identifies IsoDocument namespace" do
-      renderer.flavor_name.should eq(:iso)
+      expect(renderer.flavor_name).to eq(:iso)
     end
   end
 end

@@ -104,13 +104,6 @@ module Metanorma
         end
 
         def render_mixed_inline(node)
-          if raw_content_node?(node)
-            raw = node.content
-            if raw.is_a?(String) && !raw.strip.empty?
-              return render_raw_content(raw)
-            end
-          end
-
           if node.is_a?(Lutaml::Model::Serializable) && node.element_order && !node.element_order.empty?
             render_ordered_inline(node)
           elsif node.is_a?(Lutaml::Model::Serializable)
@@ -127,13 +120,6 @@ module Metanorma
           else
             render_inline_collections(node)
           end
-        end
-
-        def raw_content_node?(node)
-          node.is_a?(Lutaml::Model::Serializable) &&
-            node.content.is_a?(String)
-        rescue NoMethodError
-          false
         end
 
         def render_ordered_inline(node)
@@ -243,8 +229,19 @@ module Metanorma
           ", "
         end
 
+        # Form inputs render as disabled HTML inputs — this is a document
+        # rendering, not an interactive form.
+        def render_input(el)
+          attrs = element_attrs(
+            type: safe_attr(el, :type) || "text",
+            disabled: "disabled",
+            checked: safe_attr(el, :checked) ? "checked" : nil,
+          )
+          "<input#{attrs}>"
+        end
+
         def render_math(el)
-          el.content.to_s
+          el.to_xml
         end
 
         def render_asciimath(el)
@@ -374,65 +371,6 @@ module Metanorma
                         })
         end
 
-        def render_raw_content(raw_xml)
-          doc = Nokogiri::XML.fragment(raw_xml)
-          doc.css("fmt-link").each do |el|
-            target = el["target"] || el["href"]
-            if target
-              display_text = target.delete_prefix("mailto:")
-              a = doc.document.create_element("a", display_text,
-                                              "href" => target)
-              el.replace(a)
-            else
-              el.replace(el.children)
-            end
-          end
-          doc.traverse do |node|
-            next unless node.element?
-            next unless %w[xref eref stem link].include?(node.name)
-
-            next_sib = node.next_sibling
-            while next_sib.is_a?(Nokogiri::XML::Text) && next_sib.text.strip.empty?
-              next_sib = next_sib.next_sibling
-            end
-            next unless next_sib&.element? && next_sib.name == "semx"
-
-            deduplicate_semx_label(node, next_sib)
-            node.remove
-          end
-          %w[semx fmt-xref].each do |tag|
-            doc.css(tag).each { |el| el.replace(el.children) }
-          end
-          doc.css("[class]").each do |el|
-            el["class"] = el["class"].split(/\s+/).map do |c|
-              html_class_for_span(c)
-            end.join(" ")
-          end
-          doc.inner_html
-        end
-
-        def deduplicate_semx_label(source_node, semx_node)
-          first_text = semx_node.children.find do |c|
-            c.text? && !c.text.strip.empty?
-          end
-          return unless first_text
-
-          semx_prefix = first_text.text[/\A(\s*\S+)/, 1]
-          return unless semx_prefix && !semx_prefix.strip.empty?
-
-          prev = source_node.previous_sibling
-          return unless prev.is_a?(Nokogiri::XML::Text)
-
-          label = semx_prefix.strip
-          prev_text = prev.text.rstrip
-          return unless prev_text.end_with?(label)
-
-          prev.content = prev_text.sub(/#{Regexp.escape(label)}\s*\z/, "")
-          first_text.content = first_text.text.sub(
-            /\A\s*#{Regexp.escape(label)}\s*/, ""
-          )
-        end
-
         def render_link(link)
           target = safe_attr(link, :target) || safe_attr(link, :href)
           attrs = element_attrs(href: target, id: safe_attr(link, :id))
@@ -517,7 +455,7 @@ module Metanorma
           end
 
           if math_items.any?
-            content = math_items.map { |m| m.content.to_s }.join
+            content = math_items.map(&:to_xml).join
             unless content.empty?
               return render_liquid("_math_container.html.liquid", {
                                      "data_attrs" => data_attrs,

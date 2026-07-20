@@ -15,10 +15,24 @@ module Metanorma
       module ElementOrderTraversal
         module_function
 
+        # The map depends only on the model class's xml mapping, which is
+        # immutable after class definition — cache one map per mapping
+        # object instead of rebuilding it for every rendered node.
+        @cache = {}.compare_by_identity
+
+        def element_to_attr_map(xml_mapping)
+          @cache[xml_mapping] ||= build_map(xml_mapping)
+        end
+
+        # Test/benchmark hook: drop all memoized maps.
+        def reset_cache!
+          @cache.clear
+        end
+
         # Returns `{ xml_element_name => attr_name }` including both
         # symbol and string keys for each mapped element, so callers
         # can look up by either el.name form.
-        def element_to_attr_map(xml_mapping)
+        def build_map(xml_mapping)
           {}.tap do |map|
             xml_mapping.mapping_elements_hash.each_value do |rule_or_array|
               Array(rule_or_array).each do |rule|
