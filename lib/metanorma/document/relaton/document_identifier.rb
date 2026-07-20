@@ -4,6 +4,10 @@ module Metanorma
   module Document
     module Relaton
       # An identifier of a bibliographic item in an international standard scheme.
+      # Keeps its own mapping: relaton-bib 2.2.0.pre.alpha.1 Docidentifier
+      # inherits LocalizedMarkedUpString, whose Sanitizer strips
+      # span/semx/link/fmt-* from the content at assignment time, and reads
+      # the identifier string as +content+ (ours is +id+).
       class DocumentIdentifier < Lutaml::Model::Serializable
         attribute :id, :string
         attribute :type, :string

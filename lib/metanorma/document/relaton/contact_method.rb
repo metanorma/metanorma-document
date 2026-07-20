@@ -4,6 +4,11 @@ module Metanorma
   module Document
     module Relaton
       # Contact information for a person or organization.
+      # Keeps its own mapping: relaton-bib 2.2.0.pre.alpha.1 has no Contact
+      # model class — its Contact mixin inlines phone/email/address/uri
+      # directly on Person/Organization (the fixture shape), so there is no
+      # counterpart to inherit. The <contact> wrapper appears in no fixture;
+      # kept because the Person and Organization mappings declare it.
       class ContactMethod < Lutaml::Model::Serializable
         attribute :address, Metanorma::Document::Relaton::Address
         attribute :phone, Metanorma::Document::Relaton::Phone, collection: true

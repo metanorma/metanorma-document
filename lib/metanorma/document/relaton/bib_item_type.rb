@@ -4,6 +4,9 @@ module Metanorma
   module Document
     module Relaton
       # Type of bibliographic item.
+      # Keep-forever (wave-5 sweep): relaton-bib 2.2.0.pre.alpha.1 carries
+      # the item type as a plain accessor, not a mapped bib-item-type
+      # element class; not a migration candidate.
       class BibItemType < Lutaml::Model::Serializable
         attribute :value, :string
 

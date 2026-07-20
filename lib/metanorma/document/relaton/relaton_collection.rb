@@ -4,6 +4,8 @@ module Metanorma
   module Document
     module Relaton
       # Used to present a group of bibliographic items as a single group.
+      # Keep-forever (wave-5 sweep): collection-level grouping with no
+      # relaton-bib 2.2.0.pre.alpha.1 counterpart; not a migration candidate.
       class RelatonCollection < Lutaml::Model::Serializable
         attribute :type, :string
         attribute :title, Metanorma::Document::Relaton::TypedTitleString,
