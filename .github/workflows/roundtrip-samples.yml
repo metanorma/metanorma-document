@@ -88,7 +88,6 @@ jobs:
         run: |
           mkdir -p tmp/roundtrip_reports
           bundle exec rake "roundtrip:site[https://metanorma.github.io/mn-samples-${{ matrix.repo }},${{ matrix.repo }}]"
-        continue-on-error: true
 
       - name: Upload report
         uses: actions/upload-artifact@v4
@@ -121,7 +120,6 @@ jobs:
 
       - name: Consolidate reports
         run: bundle exec rake "roundtrip:consolidate[tmp/roundtrip_reports]"
-        continue-on-error: true
 
       - name: Upload consolidated report
         uses: actions/upload-artifact@v4

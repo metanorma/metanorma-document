@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description   = "A Ruby library for representing and processing Metanorma document XML, providing a comprehensive model for standards documents with support for various metadata, content blocks, and structured markup."
   spec.homepage      = "https://github.com/metanorma/metanorma-document"
   spec.license       = "BSD-2-Clause"
-  spec.required_ruby_version = ">= 3.1"
+  spec.required_ruby_version = ">= 3.3"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/metanorma/metanorma-document"
@@ -27,7 +27,8 @@ Gem::Specification.new do |spec|
     ls.readlines("\x0", chomp: true).reject do |f|
       (f == gemspec) ||
         f.start_with?(*%w[bin/ Gemfile .gitignore .rspec spec/ .github/
-                          .rubocop.yml])
+                          .rubocop.yml .rubocop_todo.yml TODO docs/
+                          lib/data/])
     end
   end
   # Include frontend dist assets (built locally, not committed to git)
@@ -38,6 +39,10 @@ Gem::Specification.new do |spec|
 
   # Uncomment to register a new dependency of your gem
   spec.add_dependency "lutaml-model", "~> 0.8.0"
+  spec.add_dependency "mml", "~> 2.4"
+  # pubid has no stable 2.x release yet (latest: 2.0.0.pre.alpha.x);
+  # relax this pin once pubid 2.0.0 ships.
   spec.add_dependency "pubid", "~> 2.0.0.pre.alpha"
-  spec.add_dependency "relaton-bib", ">= 2.2.0.pre.alpha.1", "< 2.3.0"
+  # Stable floor; 2.2.x is prerelease-only for now (2.2.0.pre.alpha.1).
+  spec.add_dependency "relaton-bib", ">= 2.1.5", "< 2.3.0"
 end
