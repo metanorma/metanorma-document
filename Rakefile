@@ -25,9 +25,11 @@ desc "Build frontend SPA assets"
 task :build_frontend do
   frontend_dir = File.join(__dir__, "frontend")
   puts "Building frontend..."
-  # npm ci (not npm install): it never rewrites package-lock.json, which
-  # would dirty the tree and trip bundler's release:guard_clean.
-  system("cd #{frontend_dir} && npm ci && npm run build") || raise("Frontend build failed")
+  # npx npm@11 ci: package-lock.json is npm-11-shaped (npm 10 and npm 11
+  # produce mutually incompatible locks here), and the release runner's
+  # default Node ships npm 10. npx fetches npm 11 on demand; ci never
+  # rewrites the lock (keeps release:guard_clean green).
+  system("cd #{frontend_dir} && npx -y npm@11 ci && npm run build") || raise("Frontend build failed")
 end
 
 # Abort packaging if the SPA bundle is missing — the gem must never
