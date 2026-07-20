@@ -5,6 +5,7 @@ module Metanorma
     module Elements
       autoload :Add, "#{__dir__}/elements/add"
       autoload :Del, "#{__dir__}/elements/del"
+      autoload :Input, "#{__dir__}/elements/input"
     end
   end
 end
