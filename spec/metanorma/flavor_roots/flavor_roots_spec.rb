@@ -1916,7 +1916,7 @@ RSpec.describe "Flavor Root classes" do
     it "restricts attributes to the ISO grammar set" do
       expect(described_class.attributes.keys).to contain_exactly(
         :abstract, :foreword, :introduction, :clause, :content,
-        :semx_id, :displayorder,
+        :semx_id, :displayorder
       )
     end
 

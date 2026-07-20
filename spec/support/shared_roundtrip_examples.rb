@@ -10,11 +10,12 @@ RSpec.shared_examples "xml round-trip" do |flavor_dir:, doc_class: Metanorma::Is
 
   fixtures.each do |fixture|
     describe fixture[:name] do
-      let(:xml) { File.read(fixture[:path]) }
-      let(:doc) { doc_class.from_xml(xml) }
-      let(:output_xml) { doc.to_xml }
-      let(:original_noko) { RoundtripHelper.parse_xml(xml) }
-      let(:roundtrip_noko) { RoundtripHelper.parse_xml(output_xml) }
+      let(:data) { RoundtripHelper.fixture_data(fixture[:path], doc_class) }
+      let(:xml) { data[:xml] }
+      let(:doc) { data[:doc] }
+      let(:output_xml) { data[:output_xml] }
+      let(:original_noko) { data[:original_noko] }
+      let(:roundtrip_noko) { data[:roundtrip_noko] }
 
       it "parses without error" do
         expect(doc).to be_a(doc_class)
@@ -106,11 +107,15 @@ RSpec.shared_examples "collection round-trip" do |flavor_dir:|
 
   collections.each do |fixture|
     describe fixture[:name] do
-      let(:xml) { File.read(fixture[:path]) }
-      let(:doc) { Metanorma::Collection::Root.from_xml(xml) }
-      let(:output_xml) { doc.to_xml }
-      let(:original_noko) { RoundtripHelper.parse_xml(xml) }
-      let(:roundtrip_noko) { RoundtripHelper.parse_xml(output_xml) }
+      let(:data) do
+        RoundtripHelper.fixture_data(fixture[:path],
+                                     Metanorma::Collection::Root)
+      end
+      let(:xml) { data[:xml] }
+      let(:doc) { data[:doc] }
+      let(:output_xml) { data[:output_xml] }
+      let(:original_noko) { data[:original_noko] }
+      let(:roundtrip_noko) { data[:roundtrip_noko] }
 
       it "parses without error" do
         expect(doc).to be_a(Metanorma::Collection::Root)
