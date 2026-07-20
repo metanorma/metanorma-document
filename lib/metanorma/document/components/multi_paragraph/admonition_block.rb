@@ -10,10 +10,15 @@ module Metanorma
           # Subclass of admonition determining how it is to be rendered; e.g.
           # Warning, Note, Tip.
           # Distinct admonition types are often associated with distinct icons or rendering.
+          # Values are the union of AdmonitionType across current flavor grammars:
+          #   basicdoc + isodoc: caution, editorial, important, note, statement,
+          #     tip, warning, box
+          #   isostandard.rng / un.rng: danger, safety precautions
+          #   bsi.rng / jis.rng: commentary
           attribute :type, :string,
                     values: %w[danger caution warning important
                                safety\ precautions editorial tip note
-                               commentary]
+                               commentary statement box]
 
           # Caption of admonition.
           attribute :name, Metanorma::Document::Components::TextElements::TextElement,

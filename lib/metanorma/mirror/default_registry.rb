@@ -153,6 +153,27 @@ module Metanorma
             Handlers::Structural,
             method_name: :preface,
           )
+          # IsoPreface and UnPreface deliberately do not inherit
+          # StandardDocument::Preface (grammar-strict classes compose from
+          # mixins), so they need explicit registrations — the registry
+          # resolves handlers through class ancestry.
+          registry.register(
+            Metanorma::IsoDocument::Sections::IsoPreface,
+            Handlers::Structural,
+            method_name: :preface,
+          )
+          registry.register(
+            Metanorma::UnDocument::Sections::UnPreface,
+            Handlers::Structural,
+            method_name: :preface,
+          )
+          # UnAbstractSection likewise composes instead of inheriting
+          # ContentSection.
+          registry.register(
+            Metanorma::UnDocument::Sections::UnAbstractSection,
+            Handlers::Section,
+            method_name: :content_section,
+          )
           registry.register(
             Metanorma::StandardDocument::Sections::Sections,
             Handlers::Structural,

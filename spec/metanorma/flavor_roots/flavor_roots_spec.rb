@@ -919,9 +919,15 @@ RSpec.describe "Flavor Root classes" do
   end
 
   describe Metanorma::UnDocument::Sections::UnPreface do
-    it "inherits from StandardDocument Preface" do
+    it "composes from Serializable (restrictive classes must not inherit)" do
       expect(described_class.superclass).to eq(
-        Metanorma::StandardDocument::Sections::Preface,
+        Lutaml::Model::Serializable,
+      )
+    end
+
+    it "types abstract as UnAbstractSection (UN Basic-Section)" do
+      expect(described_class.attributes[:abstract].type).to eq(
+        Metanorma::UnDocument::Sections::UnAbstractSection,
       )
     end
 
@@ -936,6 +942,9 @@ RSpec.describe "Flavor Root classes" do
 
       preface = described_class.from_xml(xml)
       expect(preface.abstract).not_to be_nil
+      expect(preface.abstract).to be_a(
+        Metanorma::UnDocument::Sections::UnAbstractSection,
+      )
       expect(preface.foreword).not_to be_nil
       expect(preface.introduction).not_to be_nil
     end
@@ -1898,9 +1907,16 @@ RSpec.describe "Flavor Root classes" do
   # ============================================================
 
   describe Metanorma::IsoDocument::Sections::IsoPreface do
-    it "inherits from StandardDocument::Preface" do
+    it "composes from Serializable (restrictive classes must not inherit)" do
       expect(described_class.superclass).to eq(
-        Metanorma::StandardDocument::Sections::Preface,
+        Lutaml::Model::Serializable,
+      )
+    end
+
+    it "restricts attributes to the ISO grammar set" do
+      expect(described_class.attributes.keys).to contain_exactly(
+        :abstract, :foreword, :introduction, :clause, :content,
+        :semx_id, :displayorder,
       )
     end
 
@@ -1936,6 +1952,29 @@ RSpec.describe "Flavor Root classes" do
       expect(preface.foreword).to be_a(Metanorma::IsoDocument::Sections::IsoForewordSection)
       expect(preface.introduction).to be_a(Metanorma::IsoDocument::Sections::IsoClauseSection)
       expect(preface.clause.length).to eq(1)
+      expect(preface.content.length).to eq(1)
+    end
+
+    it "serializes constructed prefaces in grammar order" do
+      sections = Metanorma::IsoDocument::Sections
+      preface = described_class.new(
+        introduction: sections::IsoClauseSection.new(id: "_intro"),
+        foreword: sections::IsoForewordSection.new(id: "_fw"),
+        abstract: sections::IsoAbstractSection.new(id: "_abs"),
+      )
+      expect(preface.to_xml.index("<abstract")).to be < preface.to_xml.index("<foreword")
+      expect(preface.to_xml.index("<foreword")).to be < preface.to_xml.index("<introduction")
+    end
+
+    it "drops acknowledgements forbidden by the ISO grammar" do
+      xml = <<~XML
+        <preface>
+          <foreword id="_fw"><title>Foreword</title><p>Text</p></foreword>
+          <acknowledgements id="_ack"><p>Ack</p></acknowledgements>
+        </preface>
+      XML
+      preface = described_class.from_xml(xml)
+      expect(preface.to_xml).not_to include("acknowledgements")
     end
   end
 

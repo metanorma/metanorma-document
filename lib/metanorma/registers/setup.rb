@@ -161,6 +161,10 @@ module Metanorma
             from_type: sd::Sections::Preface,
             to_type: Metanorma::UnDocument::Sections::UnPreface,
           )
+          reg.register_global_type_substitution(
+            from_type: Metanorma::Document::Components::MultiParagraph::AdmonitionBlock,
+            to_type: Metanorma::UnDocument::Blocks::UnAdmonitionBlock,
+          )
         end
       end
     end

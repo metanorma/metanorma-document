@@ -18,6 +18,14 @@ module Metanorma
                 Metanorma::StandardDocument::Sections::AnnexSection,
                 collection: true
 
+      # Validates the parsed document against the UN grammar restrictions
+      # the model does not enforce structurally (currently: the UN
+      # TextElement inline subset). Walks the model graph and returns an
+      # array of error strings; empty when the document is valid.
+      def grammar_errors
+        Metanorma::UnDocument::UnTextElement.validate(self)
+      end
+
       xml do
         element "metanorma"
         namespace Metanorma::StandardDocument::Namespace
