@@ -25,7 +25,9 @@ desc "Build frontend SPA assets"
 task :build_frontend do
   frontend_dir = File.join(__dir__, "frontend")
   puts "Building frontend..."
-  system("cd #{frontend_dir} && npm install && npm run build") || raise("Frontend build failed")
+  # npm ci (not npm install): it never rewrites package-lock.json, which
+  # would dirty the tree and trip bundler's release:guard_clean.
+  system("cd #{frontend_dir} && npm ci && npm run build") || raise("Frontend build failed")
 end
 
 # Abort packaging if the SPA bundle is missing — the gem must never
