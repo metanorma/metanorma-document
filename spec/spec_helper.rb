@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 
+if ENV["COVERAGE"]
+  require "simplecov"
+  SimpleCov.start { add_filter "/spec/" }
+end
+
 require_relative "../lib/metanorma/document"
 
 Dir[File.join(__dir__, "support/**/*.rb")].each { |f| require f }
@@ -9,7 +14,7 @@ RSpec.configure do |config|
   config.example_status_persistence_file_path = ".rspec_status"
 
   config.expect_with :rspec do |c|
-    c.syntax = :should
+    c.syntax = :expect
   end
 end
 
@@ -38,16 +43,4 @@ end
 
 def fixture(name)
   parse_path(fixture_path(name))
-end
-
-def each_fixture_path_does(description, &)
-  context description do
-    Dir[fixture_path("*")].each do |fixture_path|
-      fixture = File.basename(fixture_path, ".xml")
-
-      it "for fixture #{fixture}" do
-        instance_exec(fixture_path, &)
-      end
-    end
-  end
 end

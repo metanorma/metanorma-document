@@ -6,17 +6,13 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 1
-Gemspec/RequiredRubyVersion:
-  Exclude:
-    - 'metanorma-document.gemspec'
-
 # Offense count: 703
 # This cop supports safe autocorrection (--autocorrect).
+# Re-enabled 2026-07-19 at current max as a regression guard; burn down.
 # Configuration parameters: Max, AllowHeredoc, AllowURI, AllowQualifiedName, URISchemes, AllowRBSInlineAnnotation, AllowCopDirectives, AllowedPatterns, SplitStrings.
 # URISchemes: http, https
 Layout/LineLength:
-  Enabled: false
+  Max: 270
 
 # Offense count: 2
 # Configuration parameters: AllowedMethods.
@@ -33,12 +29,6 @@ Lint/DuplicateBranch:
     - 'lib/metanorma/html/base_renderer.rb'
     - 'lib/metanorma/html/renderers/inline_renderer.rb'
     - 'lib/metanorma/html/standard_renderer.rb'
-
-# Offense count: 2
-# Configuration parameters: AllowComments, AllowEmptyLambdas.
-Lint/EmptyBlock:
-  Exclude:
-    - 'spec/metanorma/iso_document/metadata/title_roundtrip_spec.rb'
 
 # Offense count: 4
 # Configuration parameters: AllowedParentClasses.
@@ -62,24 +52,21 @@ Lint/UnusedMethodArgument:
   Exclude:
     - 'lib/metanorma/mirror/handlers/formula.rb'
     - 'lib/metanorma/mirror/handlers/sourcecode.rb'
-    - 'lib/metanorma/mirror/output/html_renderers/block_renderers.rb'
-    - 'lib/metanorma/mirror/output/html_renderers/list_renderers.rb'
-    - 'lib/metanorma/mirror/output/html_renderers/section_renderers.rb'
-    - 'lib/metanorma/mirror/output/html_renderers/structural_renderers.rb'
-    - 'lib/metanorma/mirror/output/html_renderers/table_renderers.rb'
     - 'spec/metanorma/mirror/handler_registry_spec.rb'
-    - 'spec/metanorma/mirror/html_renderer_spec.rb'
-
-# Offense count: 114
-# Configuration parameters: AllowedMethods, AllowedPatterns, CountRepeatedAttributes, Max.
-Metrics/AbcSize:
-  Enabled: false
 
 # Offense count: 12
 # Configuration parameters: CountComments, CountAsOne, AllowedMethods, AllowedPatterns, inherit_mode.
 # AllowedMethods: refine
 Metrics/BlockLength:
-  Max: 76
+  # Raised 76 -> 82 for the CSA flavor entry in Html::Generator's
+  # flavor registry (one Flavor entry per flavor by design).
+  Max: 82
+
+# Offense count: 96
+# Re-enabled 2026-07-19 at current max as a regression guard; burn down.
+# Configuration parameters: AllowedMethods, AllowedPatterns, CountRepeatedAttributes, Max.
+Metrics/AbcSize:
+  Max: 53
 
 # Offense count: 3
 # Configuration parameters: CountBlocks, CountModifierForms.
@@ -87,9 +74,10 @@ Metrics/BlockNesting:
   Max: 4
 
 # Offense count: 84
+# Re-enabled 2026-07-19 at current max as a regression guard; burn down.
 # Configuration parameters: AllowedMethods, AllowedPatterns, Max.
 Metrics/CyclomaticComplexity:
-  Enabled: false
+  Max: 21
 
 # Offense count: 149
 # Configuration parameters: CountComments, CountAsOne, AllowedMethods, AllowedPatterns.
@@ -102,9 +90,10 @@ Metrics/ParameterLists:
   Max: 7
 
 # Offense count: 68
+# Re-enabled 2026-07-19 at current max as a regression guard; burn down.
 # Configuration parameters: AllowedMethods, AllowedPatterns, Max.
 Metrics/PerceivedComplexity:
-  Enabled: false
+  Max: 21
 
 # Offense count: 52
 # Configuration parameters: MinNameLength, AllowNamesEndingInNumbers, AllowedNames, ForbiddenNames.
@@ -160,7 +149,6 @@ RSpec/BeforeAfterAll:
 RSpec/ContextWording:
   Exclude:
     - 'spec/metanorma/html/renderer/theme_spec.rb'
-    - 'spec/metanorma/mirror/html_renderer_spec.rb'
 
 # Offense count: 32
 # Configuration parameters: IgnoredMetadata.
@@ -187,6 +175,11 @@ RSpec/MultipleDescribes:
     - 'spec/metanorma/mirror/serialization_spec.rb'
     - 'spec/metanorma/standard_document/sections_spec.rb'
 
+# Offense count: 288
+# Configuration parameters: Max, AllowAggregateFailures, CountAsOne.
+RSpec/MultipleExpectations:
+  Max: 11
+
 # Offense count: 1
 # Configuration parameters: AllowSubject.
 RSpec/MultipleMemoizedHelpers:
@@ -198,12 +191,6 @@ RSpec/MultipleMemoizedHelpers:
 RSpec/NamedSubject:
   Exclude:
     - 'spec/metanorma/flavor_roots/flavor_roots_spec.rb'
-
-# Offense count: 1076
-# Configuration parameters: AllowedPatterns.
-# AllowedPatterns: ^expect_, ^assert_
-RSpec/NoExpectationExample:
-  Enabled: false
 
 # Offense count: 29
 # Configuration parameters: CustomTransform, IgnoreMethods, IgnoreMetadata, InflectorPath, EnforcedInflector.
