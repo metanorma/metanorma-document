@@ -1,25 +1,14 @@
 # frozen_string_literal: true
 
+require "relaton/bib"
+
 module Metanorma
   module Document
     module Relaton
       # Information about the medium and transmission of a bibliographic item.
-      class MediumType < Lutaml::Model::Serializable
-        attribute :content, :string
-        attribute :genre, :string
-        attribute :form, :string
-        attribute :carrier, :string
-        attribute :size, :string
-        attribute :scale, :string
-
-        xml do
-          map_attribute "content", to: :content
-          map_attribute "genre", to: :genre
-          map_attribute "form", to: :form
-          map_attribute "carrier", to: :carrier
-          map_attribute "size", to: :size
-          map_attribute "scale", to: :scale
-        end
+      # relaton-bib's element grammar matches metanorma biblio.rng; this gem's
+      # previous all-attribute mapping matched no valid metanorma document.
+      class MediumType < ::Relaton::Bib::Medium
       end
     end
   end
