@@ -20,30 +20,30 @@ RSpec.describe Metanorma::Mirror::Handlers::Figure do
     it "returns a Figure hash" do
       el = parse_figure("<figure id='f1'><image src='test.png'/></figure>")
       result = described_class.call(el, context: context)
-      result.type.should eq("figure")
+      expect(result.type).to eq("figure")
     end
 
     it "extracts image with src" do
       el = parse_figure("<figure id='f1'><image src='test.png' height='100' width='200'/></figure>")
       result = described_class.call(el, context: context)
       img = (result.content || []).find { |n| n.type == "image" }
-      img.should_not be_nil
-      img.attrs["src"].should eq("test.png")
-      img.attrs["height"].should eq("100")
-      img.attrs["width"].should eq("200")
+      expect(img).not_to be_nil
+      expect(img.attrs["src"]).to eq("test.png")
+      expect(img.attrs["height"]).to eq("100")
+      expect(img.attrs["width"]).to eq("200")
     end
 
     it "extracts alt text from image" do
       el = parse_figure("<figure id='f1'><image src='x.png' alt='Diagram'/></figure>")
       result = described_class.call(el, context: context)
       img = (result.content || []).find { |n| n.type == "image" }
-      img.attrs["alt"].should eq("Diagram")
+      expect(img.attrs["alt"]).to eq("Diagram")
     end
 
     it "extracts figure title from name" do
       el = parse_figure("<figure id='f1'><name>Fig 1</name></figure>")
       result = described_class.call(el, context: context)
-      result.attrs["title"].should eq("Fig 1")
+      expect(result.attrs["title"]).to eq("Fig 1")
     end
   end
 
@@ -51,8 +51,8 @@ RSpec.describe Metanorma::Mirror::Handlers::Figure do
     it "compacts nil values" do
       el = parse_figure("<figure id='f1'></figure>")
       attrs = described_class.figure_attrs(el)
-      attrs.should_not have_key(:unnumbered)
-      attrs.should_not have_key(:width)
+      expect(attrs).not_to have_key(:unnumbered)
+      expect(attrs).not_to have_key(:width)
     end
   end
 end

@@ -20,10 +20,10 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
     it "maps every inline element class to a callable builder" do
       map = described_class::MARK_BUILDERS
       map.each_value do |builder|
-        builder.should be_a(Method).or be_a(Proc)
+        expect(builder).to be_a(Method).or be_a(Proc)
         result = builder.call(nil)
-        result.should be_a(Metanorma::Mirror::Model::Mark)
-        result.type.should be_a(String)
+        expect(result).to be_a(Metanorma::Mirror::Model::Mark)
+        expect(result.type).to be_a(String)
       end
     end
 
@@ -31,14 +31,14 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
       map = described_class::MARK_BUILDERS
       em_class = Metanorma::Document::Components::Inline::EmRawElement
       strong_class = Metanorma::Document::Components::Inline::StrongRawElement
-      map[em_class].should_not be_nil
-      map[strong_class].should_not be_nil
+      expect(map[em_class]).not_to be_nil
+      expect(map[strong_class]).not_to be_nil
 
       em_mark = map[em_class].call(nil)
-      em_mark.type.should eq("emphasis")
+      expect(em_mark.type).to eq("emphasis")
 
       strong_mark = map[strong_class].call(nil)
-      strong_mark.type.should eq("strong")
+      expect(strong_mark.type).to eq("strong")
     end
   end
 
@@ -46,9 +46,9 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
     it "extracts plain text from a paragraph" do
       p = parse_paragraph("<p>Hello world</p>")
       nodes = described_class.extract_inline(p, context:)
-      nodes.size.should eq(1)
-      nodes.first.should be_a(Metanorma::Mirror::Model::Text)
-      nodes.first.text.should eq("Hello world")
+      expect(nodes.size).to eq(1)
+      expect(nodes.first).to be_a(Metanorma::Mirror::Model::Text)
+      expect(nodes.first.text).to eq("Hello world")
     end
 
     it "extracts emphasis marks" do
@@ -56,8 +56,8 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
       nodes = described_class.extract_inline(p, context:)
       texts = nodes.grep(Metanorma::Mirror::Model::Text)
       em_node = texts.find { |n| n.marks.any? { |m| m.type == "emphasis" } }
-      em_node.should_not be_nil
-      em_node.text.should eq("important")
+      expect(em_node).not_to be_nil
+      expect(em_node.text).to eq("important")
     end
 
     it "extracts strong marks" do
@@ -65,8 +65,8 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
       nodes = described_class.extract_inline(p, context:)
       texts = nodes.grep(Metanorma::Mirror::Model::Text)
       strong_node = texts.find { |n| n.marks.any? { |m| m.type == "strong" } }
-      strong_node.should_not be_nil
-      strong_node.text.should eq("bold")
+      expect(strong_node).not_to be_nil
+      expect(strong_node.text).to eq("bold")
     end
 
     it "extracts subscript marks" do
@@ -74,8 +74,8 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
       nodes = described_class.extract_inline(p, context:)
       texts = nodes.grep(Metanorma::Mirror::Model::Text)
       sub_node = texts.find { |n| n.marks.any? { |m| m.type == "subscript" } }
-      sub_node.should_not be_nil
-      sub_node.text.should eq("2")
+      expect(sub_node).not_to be_nil
+      expect(sub_node.text).to eq("2")
     end
 
     it "extracts superscript marks" do
@@ -83,8 +83,8 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
       nodes = described_class.extract_inline(p, context:)
       texts = nodes.grep(Metanorma::Mirror::Model::Text)
       sup_node = texts.find { |n| n.marks.any? { |m| m.type == "superscript" } }
-      sup_node.should_not be_nil
-      sup_node.text.should eq("2")
+      expect(sup_node).not_to be_nil
+      expect(sup_node.text).to eq("2")
     end
 
     it "extracts code (tt) marks" do
@@ -92,19 +92,19 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
       nodes = described_class.extract_inline(p, context:)
       texts = nodes.grep(Metanorma::Mirror::Model::Text)
       code_node = texts.find { |n| n.marks.any? { |m| m.type == "code" } }
-      code_node.should_not be_nil
-      code_node.text.should eq("monospace")
+      expect(code_node).not_to be_nil
+      expect(code_node.text).to eq("monospace")
     end
   end
 
   describe ".extract_element_text" do
     it "extracts text from a simple element" do
       p = parse_paragraph("<p>Plain text</p>")
-      described_class.extract_element_text(p).should eq("Plain text")
+      expect(described_class.extract_element_text(p)).to eq("Plain text")
     end
 
     it "returns empty string for nil" do
-      described_class.extract_element_text(nil).should eq("")
+      expect(described_class.extract_element_text(nil)).to eq("")
     end
   end
 
@@ -112,15 +112,15 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
     it "extracts text from a title element" do
       xml = "<title>Simple title</title>"
       title = Metanorma::Document::Components::Inline::TitleWithAnnotationElement.from_xml(xml)
-      described_class.extract_formatted_text(title).should eq("Simple title")
+      expect(described_class.extract_formatted_text(title)).to eq("Simple title")
     end
 
     it "returns empty string for nil" do
-      described_class.extract_formatted_text(nil).should eq("")
+      expect(described_class.extract_formatted_text(nil)).to eq("")
     end
 
     it "returns string representation of non-serializable" do
-      described_class.extract_formatted_text(42).should eq("42")
+      expect(described_class.extract_formatted_text(42)).to eq("42")
     end
   end
 
@@ -132,8 +132,8 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
       real_text = Metanorma::Mirror::Model::Text.new(text: "keep")
 
       result = described_class.filter_empty_crossrefs([empty_text, real_text])
-      result.size.should eq(1)
-      result.first.text.should eq("keep")
+      expect(result.size).to eq(1)
+      expect(result.first.text).to eq("keep")
     end
 
     it "does not mutate the input array" do
@@ -143,7 +143,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
       input = [empty_text]
 
       described_class.filter_empty_crossrefs(input)
-      input.size.should eq(1)
+      expect(input.size).to eq(1)
     end
 
     it "keeps text nodes with non-crossref marks even if empty" do
@@ -151,7 +151,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
       empty_text = Metanorma::Mirror::Model::Text.new(text: " ", marks: [em])
 
       result = described_class.filter_empty_crossrefs([empty_text])
-      result.size.should eq(1)
+      expect(result.size).to eq(1)
     end
   end
 
@@ -163,18 +163,18 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
     it "extracts inline formatting correctly" do
       title = parse_title("<title>A <em>B</em> C <strong>D</strong> E</title>")
       result = described_class.extract_rich_html(title)
-      result.should include("<em>B</em>")
-      result.should include("<strong>D</strong>")
-      result.should include("A ")
-      result.should include("C ")
-      result.should include(" E")
+      expect(result).to include("<em>B</em>")
+      expect(result).to include("<strong>D</strong>")
+      expect(result).to include("A ")
+      expect(result).to include("C ")
+      expect(result).to include(" E")
     end
   end
 
   describe "RichHtmlRenderer::COMPLEX_RENDERERS" do
     it "maps each element class to a callable" do
       described_class::RichHtmlRenderer::COMPLEX_RENDERERS.each_value do |renderer|
-        renderer.should be_a(Proc)
+        expect(renderer).to be_a(Proc)
       end
     end
   end

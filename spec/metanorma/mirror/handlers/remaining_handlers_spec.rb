@@ -20,19 +20,19 @@ RSpec.describe Metanorma::Mirror::Handlers::Paragraph do
     it "returns a Paragraph hash" do
       p = parse_paragraph("<p id='p1'>Hello</p>")
       result = described_class.call(p, context: context)
-      result.type.should eq("paragraph")
+      expect(result.type).to eq("paragraph")
     end
 
     it "extracts id" do
       p = parse_paragraph("<p id='p1'>Text</p>")
       result = described_class.call(p, context: context)
-      result.attrs["id"].should eq("p1")
+      expect(result.attrs["id"]).to eq("p1")
     end
 
     it "extracts inline content" do
       p = parse_paragraph("<p>Hello <em>world</em></p>")
       result = described_class.call(p, context: context)
-      result.content.should_not be_empty
+      expect(result.content).not_to be_empty
     end
   end
 end
@@ -53,13 +53,13 @@ RSpec.describe Metanorma::Mirror::Handlers::Admonition do
     it "returns an Admonition hash" do
       el = parse_admonition("<admonition id='a1' type='warning'><p>Be careful</p></admonition>")
       result = described_class.call(el, context: context)
-      result.type.should eq("admonition")
+      expect(result.type).to eq("admonition")
     end
 
     it "extracts type" do
       el = parse_admonition("<admonition id='a1' type='danger'>Content</admonition>")
       result = described_class.call(el, context: context)
-      result.attrs["type"].should eq("danger")
+      expect(result.attrs["type"]).to eq("danger")
     end
   end
 end
@@ -80,13 +80,13 @@ RSpec.describe Metanorma::Mirror::Handlers::Example do
     it "returns an Example hash" do
       el = parse_example("<example id='e1'><p>Example text</p></example>")
       result = described_class.call(el, context: context)
-      result.type.should eq("example")
+      expect(result.type).to eq("example")
     end
 
     it "extracts id" do
       el = parse_example("<example id='e1'><p>Text</p></example>")
       result = described_class.call(el, context: context)
-      result.attrs["id"].should eq("e1")
+      expect(result.attrs["id"]).to eq("e1")
     end
   end
 end
@@ -107,13 +107,13 @@ RSpec.describe Metanorma::Mirror::Handlers::Sourcecode do
     it "returns a Sourcecode hash" do
       el = parse_sourcecode("<sourcecode id='s1' lang='ruby'>puts 'hello'</sourcecode>")
       result = described_class.call(el, context: context)
-      result.type.should eq("sourcecode")
+      expect(result.type).to eq("sourcecode")
     end
 
     it "extracts language" do
       el = parse_sourcecode("<sourcecode lang='python'>print(1)</sourcecode>")
       result = described_class.call(el, context: context)
-      result.attrs["language"].should eq("python")
+      expect(result.attrs["language"]).to eq("python")
     end
   end
 end
@@ -134,13 +134,13 @@ RSpec.describe Metanorma::Mirror::Handlers::Formula do
     it "returns a Formula hash" do
       el = parse_formula("<formula id='f1'><stem type='MathML'/></formula>")
       result = described_class.call(el, context: context)
-      result.type.should eq("formula")
+      expect(result.type).to eq("formula")
     end
 
     it "extracts id" do
       el = parse_formula("<formula id='f1'><stem type='MathML'/></formula>")
       result = described_class.call(el, context: context)
-      result.attrs["id"].should eq("f1")
+      expect(result.attrs["id"]).to eq("f1")
     end
   end
 end
@@ -161,13 +161,13 @@ RSpec.describe Metanorma::Mirror::Handlers::Quote do
     it "returns a Quote hash" do
       el = parse_quote("<quote id='q1'><p>Quoted text</p></quote>")
       result = described_class.call(el, context: context)
-      result.type.should eq("quote")
+      expect(result.type).to eq("quote")
     end
 
     it "extracts id" do
       el = parse_quote("<quote id='q1'><p>Text</p></quote>")
       result = described_class.call(el, context: context)
-      result.attrs["id"].should eq("q1")
+      expect(result.attrs["id"]).to eq("q1")
     end
   end
 end
@@ -188,13 +188,13 @@ RSpec.describe Metanorma::Mirror::Handlers::Review do
     it "returns a Review hash" do
       el = parse_review("<review id='r1' reviewer='John'><p>Review comment</p></review>")
       result = described_class.call(el, context: context)
-      result.type.should eq("review")
+      expect(result.type).to eq("review")
     end
 
     it "extracts reviewer" do
       el = parse_review("<review id='r1' reviewer='Jane'>Content</review>")
       result = described_class.call(el, context: context)
-      result.attrs["reviewer"].should eq("Jane")
+      expect(result.attrs["reviewer"]).to eq("Jane")
     end
   end
 end

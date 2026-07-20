@@ -20,16 +20,16 @@ RSpec.describe Metanorma::Mirror::Output::Builder do
         format: :inline,
         flavor: "iso",
       )
-      builder.xml_path.should eq("/tmp/in.xml")
-      builder.output_path.should eq("/tmp/out.html")
-      builder.format.should eq(:inline)
-      builder.options[:flavor].should eq("iso")
+      expect(builder.xml_path).to eq("/tmp/in.xml")
+      expect(builder.output_path).to eq("/tmp/out.html")
+      expect(builder.format).to eq(:inline)
+      expect(builder.options[:flavor]).to eq("iso")
     end
 
     it "defaults format to :inline" do
       builder = described_class.new(xml_path: "/tmp/in.xml",
                                     output_path: "/tmp/out.html")
-      builder.format.should eq(:inline)
+      expect(builder.format).to eq(:inline)
     end
 
     it "stores id_strategy in options" do
@@ -39,7 +39,7 @@ RSpec.describe Metanorma::Mirror::Output::Builder do
         output_path: "/tmp/out.html",
         id_strategy: strategy,
       )
-      builder.options[:id_strategy].should eq(strategy)
+      expect(builder.options[:id_strategy]).to eq(strategy)
     end
   end
 
@@ -50,7 +50,7 @@ RSpec.describe Metanorma::Mirror::Output::Builder do
         output_path: "/tmp/out.html",
         format: :nonexistent,
       )
-      -> { builder.build }.should raise_error(ArgumentError, /Unknown format/)
+      expect { builder.build }.to raise_error(ArgumentError, /Unknown format/)
     end
 
     it "produces an HTML file via the inline format" do
@@ -63,11 +63,11 @@ RSpec.describe Metanorma::Mirror::Output::Builder do
           flavor: "iso",
         )
         result = builder.build
-        result.should eq(output)
-        File.exist?(output).should be(true)
+        expect(result).to eq(output)
+        expect(File.exist?(output)).to be(true)
         content = File.read(output)
-        content.should include("<!DOCTYPE html>")
-        content.should include("window.METANORMA_DATA")
+        expect(content).to include("<!DOCTYPE html>")
+        expect(content).to include("window.METANORMA_DATA")
       end
     end
 
@@ -83,7 +83,7 @@ RSpec.describe Metanorma::Mirror::Output::Builder do
         )
         builder.build
         content = File.read(output)
-        content.should match(/"sec-\d/)
+        expect(content).to match(/"sec-\d/)
       end
     end
 
@@ -98,7 +98,7 @@ RSpec.describe Metanorma::Mirror::Output::Builder do
         )
         builder.build
         content = File.read(output)
-        content.should include("window.METANORMA_DATA")
+        expect(content).to include("window.METANORMA_DATA")
       end
     end
   end

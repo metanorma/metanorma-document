@@ -26,7 +26,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Term do
       XML
       el = parse_term(xml)
       result = described_class.call(el, context: context)
-      result.type.should eq("term")
+      expect(result.type).to eq("term")
     end
 
     it "extracts term id" do
@@ -37,7 +37,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Term do
       XML
       el = parse_term(xml)
       result = described_class.call(el, context: context)
-      result.attrs["id"].should eq("term-alpha")
+      expect(result.attrs["id"]).to eq("term-alpha")
     end
   end
 end

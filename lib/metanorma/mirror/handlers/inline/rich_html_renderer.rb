@@ -12,9 +12,8 @@ module Metanorma
         # Nokogiri::HTML5::Builder to guarantee well-formed, escaped output.
         #
         # Simple-wrap elements (em, strong, sub, sup, code, u, s, smallcap,
-        # bcp14, concept) share their tag-and-attrs mapping with the Model-side
-        # renderer via Inline::Catalog, so the XML→HTML and Model→HTML paths
-        # produce visually equivalent output for the same mark type.
+        # bcp14, concept) take their tag-and-attrs mapping from the shared
+        # Inline::Catalog table.
         module RichHtmlRenderer
           # Complex element handlers — these have per-instance attrs or
           # multi-step rendering and bypass the shared Catalog.

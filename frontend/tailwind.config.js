@@ -4,6 +4,11 @@ export default {
     './src/**/*.{vue,ts,html}',
   ],
   darkMode: 'class',
+  corePlugins: {
+    // Preflight resets bare elements, which would clobber the classic
+    // renderer's SSR body inlined by InlineFormat (no-JS placeholder).
+    preflight: false,
+  },
   theme: {
     extend: {
       colors: {

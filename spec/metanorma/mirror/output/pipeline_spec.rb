@@ -7,10 +7,10 @@ RSpec.describe Metanorma::Mirror::Output::Pipeline do
   describe "default configuration" do
     it "uses default steps [ParseXml, TransformMirror, AttachMetadata]" do
       pipeline = described_class.new(xml_path: "/tmp/test.xml")
-      pipeline.steps.size.should eq(3)
-      pipeline.steps[0].should eq(described_class::Steps::ParseXml)
-      pipeline.steps[1].should eq(described_class::Steps::TransformMirror)
-      pipeline.steps[2].should eq(described_class::Steps::AttachMetadata)
+      expect(pipeline.steps.size).to eq(3)
+      expect(pipeline.steps[0]).to eq(described_class::Steps::ParseXml)
+      expect(pipeline.steps[1]).to eq(described_class::Steps::TransformMirror)
+      expect(pipeline.steps[2]).to eq(described_class::Steps::AttachMetadata)
     end
   end
 
@@ -25,7 +25,7 @@ RSpec.describe Metanorma::Mirror::Output::Pipeline do
 
       pipeline = described_class.new(xml_path: "/tmp/test.xml",
                                      steps: [custom_step])
-      pipeline.steps.size.should eq(1)
+      expect(pipeline.steps.size).to eq(1)
     end
   end
 
@@ -34,12 +34,22 @@ RSpec.describe Metanorma::Mirror::Output::Pipeline do
       strategy = Metanorma::Mirror::IdStrategy::Positional.new
       pipeline = described_class.new(xml_path: "/tmp/test.xml",
                                      id_strategy: strategy)
-      pipeline.context.id_strategy.should eq(strategy)
+      expect(pipeline.context.id_strategy).to eq(strategy)
     end
 
     it "defaults id_strategy to nil" do
       pipeline = described_class.new(xml_path: "/tmp/test.xml")
-      pipeline.context.id_strategy.should be_nil
+      expect(pipeline.context.id_strategy).to be_nil
+    end
+  end
+
+  describe "#process" do
+    it "returns a Guide carrying the parsed source document" do
+      xml_path = File.expand_path(
+        "../../../fixtures/iso/is/document-en.presentation.xml", __dir__
+      )
+      guide = described_class.new(xml_path: xml_path, flavor: "iso").process
+      expect(guide.document).to be_a(Metanorma::IsoDocument::Root)
     end
   end
 
@@ -48,12 +58,12 @@ RSpec.describe Metanorma::Mirror::Output::Pipeline do
       strategy = Metanorma::Mirror::IdStrategy::Preserve.new
       ctx = described_class.new(xml_path: "/tmp/test.xml",
                                 id_strategy: strategy)
-      ctx.id_strategy.should eq(strategy)
+      expect(ctx.id_strategy).to eq(strategy)
     end
 
     it "defaults id_strategy to nil" do
       ctx = described_class.new(xml_path: "/tmp/test.xml")
-      ctx.id_strategy.should be_nil
+      expect(ctx.id_strategy).to be_nil
     end
   end
 end

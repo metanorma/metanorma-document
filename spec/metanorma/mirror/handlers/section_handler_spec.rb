@@ -24,26 +24,26 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
     it "returns a Clause hash" do
       el = parse_clause("<clause id='c1'><title>Scope</title><p>Text</p></clause>")
       result = described_class.clause(el, context: context)
-      result.type.should eq("clause")
+      expect(result.type).to eq("clause")
     end
 
     it "extracts id and title" do
       el = parse_clause("<clause id='c1'><title>Scope</title></clause>")
       result = described_class.clause(el, context: context)
-      result.attrs["id"].should eq("c1")
+      expect(result.attrs["id"]).to eq("c1")
     end
 
     it "extracts title text" do
       el = parse_clause("<clause id='c1'><title>Scope</title></clause>")
       result = described_class.clause(el, context: context)
-      result.attrs["title"].should eq("Scope")
+      expect(result.attrs["title"]).to eq("Scope")
     end
 
     it "extracts block content from mixed_content" do
       el = parse_clause("<clause id='c1'><p>Para 1</p><p>Para 2</p></clause>")
       result = described_class.clause(el, context: context)
-      result.content.size.should eq(2)
-      result.content.each { |c| c.type.should eq("paragraph") }
+      expect(result.content.size).to eq(2)
+      result.content.each { |c| expect(c.type).to eq("paragraph") }
     end
   end
 
@@ -51,13 +51,13 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
     it "returns an Annex hash" do
       el = parse_annex("<annex id='a1'><title>Annex A</title><p>Text</p></annex>")
       result = described_class.annex(el, context: context)
-      result.type.should eq("annex")
+      expect(result.type).to eq("annex")
     end
 
     it "extracts annex-specific attributes" do
       el = parse_annex("<annex id='a1' language='en'><title>Notes</title></annex>")
       result = described_class.annex(el, context: context)
-      result.attrs["language"].should eq("en")
+      expect(result.attrs["language"]).to eq("en")
     end
   end
 
@@ -67,7 +67,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
         "<floating-title depth='3'>Subtitle</floating-title>",
       )
       result = described_class.floating_title(el, context: context)
-      result.type.should eq("floating_title")
+      expect(result.type).to eq("floating_title")
     end
 
     it "extracts depth" do
@@ -75,19 +75,19 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
         "<floating-title depth='3'>Subtitle</floating-title>",
       )
       result = described_class.floating_title(el, context: context)
-      result.attrs["depth"].should eq(3)
+      expect(result.attrs["depth"]).to eq(3)
     end
   end
 
   describe ".extract_title" do
     it "returns nil when no title" do
       el = parse_clause("<clause id='c1'></clause>")
-      described_class.extract_title(el).should be_nil
+      expect(described_class.extract_title(el)).to be_nil
     end
 
     it "extracts string title" do
       el = parse_clause("<clause id='c1'><title>Simple</title></clause>")
-      described_class.extract_title(el).should eq("Simple")
+      expect(described_class.extract_title(el)).to eq("Simple")
     end
   end
 
@@ -95,8 +95,8 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
     it "compacts nil values" do
       el = parse_clause("<clause id='c1'><title>T</title></clause>")
       attrs = described_class.section_attrs(el, context: context)
-      attrs.should_not have_key(:number)
-      attrs.should_not have_key(:obligation)
+      expect(attrs).not_to have_key(:number)
+      expect(attrs).not_to have_key(:obligation)
     end
   end
 
@@ -106,8 +106,8 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
         "<foreword id='fw'><title>Foreword</title><p>Text</p></foreword>",
       )
       result = described_class.content_section(el, context: context)
-      result.type.should eq("content_section")
-      result.attrs["id"].should eq("fw")
+      expect(result.type).to eq("content_section")
+      expect(result.attrs["id"]).to eq("fw")
     end
   end
 
@@ -117,8 +117,8 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
         "<terms id='terms'><title>Terms</title></terms>",
       )
       result = described_class.terms(el, context: context)
-      result.type.should eq("terms")
-      result.attrs["id"].should eq("terms")
+      expect(result.type).to eq("terms")
+      expect(result.attrs["id"]).to eq("terms")
     end
   end
 
@@ -128,8 +128,8 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
         "<definitions id='defs'><title>Definitions</title></definitions>",
       )
       result = described_class.definitions(el, context: context)
-      result.type.should eq("definitions")
-      result.attrs["id"].should eq("defs")
+      expect(result.type).to eq("definitions")
+      expect(result.attrs["id"]).to eq("defs")
     end
   end
 
@@ -139,8 +139,8 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
         "<references id='refs' normative='true'><p>The following documents</p></references>",
       )
       result = described_class.references(el, context: context)
-      result.type.should eq("references")
-      result.attrs["id"].should eq("refs")
+      expect(result.type).to eq("references")
+      expect(result.attrs["id"]).to eq("refs")
     end
   end
 end

@@ -13,14 +13,14 @@ RSpec.describe Metanorma::Mirror::HandlerRegistry do
       end
       klass = Class.new
       registry.register(klass, handler_mod, method_name: :call)
-      registry.registered?(klass).should be(true)
+      expect(registry.registered?(klass)).to be(true)
     end
   end
 
   describe "#registered?" do
     it "returns false for unregistered classes" do
       klass = Class.new
-      registry.registered?(klass).should be(false)
+      expect(registry.registered?(klass)).to be(false)
     end
   end
 
@@ -32,11 +32,11 @@ RSpec.describe Metanorma::Mirror::HandlerRegistry do
       klass = Class.new
       registry.register(klass, handler_mod, method_name: :transform)
       entry = registry.entry_for(klass.new)
-      entry.callable.should eq(handler_mod.method(:transform))
+      expect(entry.callable).to eq(handler_mod.method(:transform))
     end
 
     it "returns nil for unregistered class" do
-      registry.entry_for(Class.new.new).should be_nil
+      expect(registry.entry_for(Class.new.new)).to be_nil
     end
   end
 
@@ -54,10 +54,10 @@ RSpec.describe Metanorma::Mirror::HandlerRegistry do
       element = klass.new
 
       result = registry.handle(element, context: nil)
-      result.should be_a(Metanorma::Mirror::HandlerResult)
-      result.nodes.should be_a(Metanorma::Mirror::Model::Node)
-      result.nodes.type.should eq("paragraph")
-      result.concat?.should be(false)
+      expect(result).to be_a(Metanorma::Mirror::HandlerResult)
+      expect(result.nodes).to be_a(Metanorma::Mirror::Model::Node)
+      expect(result.nodes.type).to eq("paragraph")
+      expect(result.concat?).to be(false)
     end
 
     it "supports method_name option" do
@@ -72,13 +72,13 @@ RSpec.describe Metanorma::Mirror::HandlerRegistry do
       element = klass.new
 
       result = registry.handle(element, context: nil)
-      result.nodes.type.should eq("paragraph")
+      expect(result.nodes.type).to eq("paragraph")
     end
 
     it "returns none HandlerResult for unregistered elements" do
       result = registry.handle(Class.new.new, context: nil)
-      result.should be_a(Metanorma::Mirror::HandlerResult)
-      result.none?.should be(true)
+      expect(result).to be_a(Metanorma::Mirror::HandlerResult)
+      expect(result.none?).to be(true)
     end
 
     it "supports concat option" do
@@ -94,8 +94,8 @@ RSpec.describe Metanorma::Mirror::HandlerRegistry do
       element = klass.new
 
       result = registry.handle(element, context: nil)
-      result.nodes.should be_an(Array)
-      result.concat?.should be(true)
+      expect(result.nodes).to be_an(Array)
+      expect(result.concat?).to be(true)
     end
   end
 end
