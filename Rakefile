@@ -5,6 +5,14 @@ require "rspec/core/rake_task"
 
 RSpec::Core::RakeTask.new(:spec)
 
+# Fast gate: the full suite minus the roundtrip specs over multi-MB
+# fixtures (spec/metanorma/iso_document/roundtrip/**), which dominate
+# runtime. Those run in .github/workflows/roundtrip.yml; run the full
+# suite locally with `rake spec`.
+RSpec::Core::RakeTask.new(:spec_fast) do |t|
+  t.exclude_pattern = "spec/metanorma/iso_document/roundtrip/**"
+end
+
 require "rubocop/rake_task"
 
 RuboCop::RakeTask.new
@@ -36,4 +44,4 @@ if Rake::Task.task_defined?("build")
   Rake::Task["build"].enhance(["build_frontend", "ensure_frontend_dist"])
 end
 
-task default: %i[spec rubocop]
+task default: %i[spec_fast rubocop]
