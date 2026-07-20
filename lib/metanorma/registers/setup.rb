@@ -44,6 +44,12 @@ module Metanorma
           Lutaml::Model::GlobalRegister.register(reg)
         end
 
+        def setup_csa_register
+          reg = Lutaml::Model::Register.new(:csa_document,
+                                            fallback: [:iso_document])
+          Lutaml::Model::GlobalRegister.register(reg)
+        end
+
         def setup_bsi_register
           iso = Metanorma::IsoDocument
           reg = Lutaml::Model::Register.new(:bsi_document,

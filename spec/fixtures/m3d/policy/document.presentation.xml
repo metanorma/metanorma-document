@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<m3d-standard xmlns="https://www.metanorma.org/ns/m3d" type="presentation" version="2.1.7">
+<bibdata type="standard">
+<title language="en" format="text/plain">M3AAWG Comments on the Initial Report of the Temporary Specification for gTLD Registration Data Phase 2 Expedited Policy Development Process</title>
+<docidentifier type="M3AAWG">:2020</docidentifier><date type="published"><on>2020-03-23</on></date><contributor><role type="author"/><organization>
+<name>Messaging Malware and Mobile Anti-Abuse Working Group</name>
+<abbreviation>M3AAWG</abbreviation></organization></contributor><contributor><role type="publisher"/><organization>
+<name>Messaging Malware and Mobile Anti-Abuse Working Group</name>
+<abbreviation>M3AAWG</abbreviation></organization></contributor><version><revision-date>2020-03-23</revision-date></version><language current="true">en</language><script current="true">Latn</script><status><stage>published</stage></status><copyright><from>2020</from><owner><organization>
+<name>Messaging Malware and Mobile Anti-Abuse Working Group</name>
+<abbreviation>M3AAWG</abbreviation></organization></owner></copyright><ext><doctype>policy</doctype></ext></bibdata><localized-strings><localized-string key="scope" language="en">Scope</localized-string><localized-string key="symbolsabbrev" language="en">Symbols and abbreviated terms</localized-string><localized-string key="abbrev" language="en">Abbreviated terms</localized-string><localized-string key="symbols" language="en">Symbols</localized-string><localized-string key="table_of_contents" language="en">Table of contents</localized-string><localized-string key="introduction" language="en">Introduction</localized-string><localized-string key="foreword" language="en">Foreword</localized-string><localized-string key="abstract" language="en">Abstract</localized-string><localized-string key="acknowledgements" language="en">Acknowledgements</localized-string><localized-string key="termsdef" language="en">Terms and definitions</localized-string><localized-string key="termsdefsymbolsabbrev" language="en">Terms, definitions, symbols and abbreviated terms</localized-string><localized-string key="termsdefsymbols" language="en">Terms, definitions and symbols</localized-string><localized-string key="termsdefabbrev" language="en">Terms, definitions and abbreviated terms</localized-string><localized-string key="normref" language="en">Normative references</localized-string><localized-string key="bibliography" language="en">Bibliography</localized-string><localized-string key="preface" language="en">Preface</localized-string><localized-string key="clause" language="en">Clause</localized-string><localized-string key="annex" language="en">Appendix</localized-string><localized-string key="appendix" language="en">Appendix</localized-string><localized-string key="no_terms_boilerplate" language="en"><p>No terms and definitions are listed in this document.</p>
+</localized-string><localized-string key="internal_terms_boilerplate" language="en"><p>For the purposes of this document, 
+    the following terms and definitions apply.</p>
+</localized-string><localized-string key="norm_with_refs_pref" language="en">The following documents are referred to in the text in such a way that some or all of their content constitutes requirements of this document. For dated references, only the edition cited applies. For undated references, the latest edition of the referenced document (including any amendments) applies.</localized-string><localized-string key="norm_empty_pref" language="en">There are no normative references in this document.</localized-string><localized-string key="external_terms_boilerplate" language="en"><p>For the purposes of this document, 
+  the terms and definitions given in % apply.</p>
+</localized-string><localized-string key="internal_external_terms_boilerplate" language="en"><p>For the purposes of this document, the terms and definitions 
+  given in % and the following apply.</p>
+</localized-string><localized-string key="term_defined_in" language="en">[term defined in %]</localized-string><localized-string key="binary_and" language="en">%1 and %2</localized-string><localized-string key="multiple_and" language="en">%1, and %2</localized-string><localized-string key="binary_or" language="en">%1 or %2</localized-string><localized-string key="multiple_or" language="en">%1, or %2</localized-string><localized-string key="chain_and" language="en">%1 and %2</localized-string><localized-string key="chain_or" language="en">%1 or %2</localized-string><localized-string key="chain_from" language="en">%1 from %2</localized-string><localized-string key="chain_to" language="en">%1 to %2</localized-string><localized-string key="SpelloutRules" language="en">spellout-ordinal</localized-string><localized-string key="note" language="en">NOTE</localized-string><localized-string key="note_xref" language="en">Note</localized-string><localized-string key="termnote" language="en">Note % to entry</localized-string><localized-string key="list" language="en">List</localized-string><localized-string key="deflist" language="en">Definition List</localized-string><localized-string key="figure" language="en">Figure</localized-string><localized-string key="formula" language="en">Formula</localized-string><localized-string key="inequality" language="en">Formula</localized-string><localized-string key="table" language="en">Table</localized-string><localized-string key="requirement" language="en">Requirement</localized-string><localized-string key="recommendation" language="en">Recommendation</localized-string><localized-string key="permission" language="en">Permission</localized-string><localized-string key="recommendationtest" language="en">Recommendation test</localized-string><localized-string key="requirementtest" language="en">Requirement test</localized-string><localized-string key="permissiontest" language="en">Permission test</localized-string><localized-string key="recommendationclass" language="en">Recommendations class</localized-string><localized-string key="requirementclass" language="en">Requirements class</localized-string><localized-string key="permissionclass" language="en">Permissions class</localized-string><localized-string key="abstracttest" language="en">Abstract test</localized-string><localized-string key="conformanceclass" language="en">Conformance class</localized-string><localized-string key="key" language="en">Key</localized-string><localized-string key="example" language="en">EXAMPLE</localized-string><localized-string key="example_xref" language="en">Example</localized-string><localized-string key="where" language="en">where</localized-string><localized-string key="wholeoftext" language="en">Whole of text</localized-string><localized-string key="draft_label" language="en">draft</localized-string><localized-string key="inform_annex" language="en">informative</localized-string><localized-string key="norm_annex" language="en">normative</localized-string><localized-string key="modified" language="en">modified</localized-string><localized-string key="deprecated" language="en">DEPRECATED</localized-string><localized-string key="source" language="en">SOURCE</localized-string><localized-string key="and" language="en">and</localized-string><localized-string key="all_parts" language="en">All Parts</localized-string><localized-string key="edition_ordinal" language="en">%Spellout edition</localized-string><localized-string key="edition" language="en">edition</localized-string><localized-string key="version" language="en">version</localized-string><localized-string key="toc_figures" language="en">List of figures</localized-string><localized-string key="toc_tables" language="en">List of tables</localized-string><localized-string key="toc_recommendations" language="en">List of recommendations</localized-string><localized-string key="month_january" language="en">January</localized-string><localized-string key="month_february" language="en">February</localized-string><localized-string key="month_march" language="en">March</localized-string><localized-string key="month_april" language="en">April</localized-string><localized-string key="month_may" language="en">May</localized-string><localized-string key="month_june" language="en">June</localized-string><localized-string key="month_july" language="en">July</localized-string><localized-string key="month_august" language="en">August</localized-string><localized-string key="month_september" language="en">September</localized-string><localized-string key="month_october" language="en">October</localized-string><localized-string key="month_november" language="en">November</localized-string><localized-string key="month_december" language="en">December</localized-string><localized-string key="obligation" language="en">Obligation</localized-string><localized-string key="subject" language="en">Subject</localized-string><localized-string key="inherits" language="en">Inherits</localized-string><localized-string key="admonition.danger" language="en">Danger</localized-string><localized-string key="admonition.warning" language="en">Warning</localized-string><localized-string key="admonition.caution" language="en">Caution</localized-string><localized-string key="admonition.important" language="en">Important</localized-string><localized-string key="admonition.safety_precautions" language="en">Safety Precautions</localized-string><localized-string key="admonition.editorial" language="en">Editorial Note</localized-string><localized-string key="locality.section" language="en">Section</localized-string><localized-string key="locality.clause" language="en">Clause</localized-string><localized-string key="locality.part" language="en">Part</localized-string><localized-string key="locality.paragraph" language="en">Paragraph</localized-string><localized-string key="locality.chapter" language="en">Chapter</localized-string><localized-string key="locality.page" language="en">Page</localized-string><localized-string key="locality.table" language="en">Table</localized-string><localized-string key="locality.annex" language="en">Annex</localized-string><localized-string key="locality.figure" language="en">Figure</localized-string><localized-string key="locality.example" language="en">Example</localized-string><localized-string key="locality.note" language="en">Note</localized-string><localized-string key="locality.formula" language="en">Formula</localized-string><localized-string key="grammar_abbrevs.masculine" language="en">m</localized-string><localized-string key="grammar_abbrevs.feminine" language="en">f</localized-string><localized-string key="grammar_abbrevs.neuter" language="en">n</localized-string><localized-string key="grammar_abbrevs.common" language="en">common</localized-string><localized-string key="grammar_abbrevs.singular" language="en">sg</localized-string><localized-string key="grammar_abbrevs.dual" language="en">dual</localized-string><localized-string key="grammar_abbrevs.pl" language="en">pl</localized-string><localized-string key="grammar_abbrevs.isPreposition" language="en">prep</localized-string><localized-string key="grammar_abbrevs.isParticiple" language="en">part</localized-string><localized-string key="grammar_abbrevs.isAdjective" language="en">adj</localized-string><localized-string key="grammar_abbrevs.isAdverb" language="en">adv</localized-string><localized-string key="grammar_abbrevs.isNoun" language="en">noun</localized-string><localized-string key="grammar_abbrevs.isVerb" language="en">verb</localized-string><localized-string key="relatedterms.deprecates" language="en">deprecates</localized-string><localized-string key="relatedterms.supersedes" language="en">supersedes</localized-string><localized-string key="relatedterms.narrower" language="en">narrower</localized-string><localized-string key="relatedterms.broader" language="en">broader</localized-string><localized-string key="relatedterms.equivalent" language="en">equivalent</localized-string><localized-string key="relatedterms.compare" language="en">compare</localized-string><localized-string key="relatedterms.contrast" language="en">contrast</localized-string><localized-string key="relatedterms.see" language="en">see</localized-string><localized-string key="relatedterms.seealso" language="en">see also</localized-string><localized-string key="Clause.sg" language="en">Clause</localized-string><localized-string key="Clause.pl" language="en">Clauses</localized-string><localized-string key="Annex.sg" language="en">Annex</localized-string><localized-string key="Annex.pl" language="en">Annexes</localized-string><localized-string key="Appendix.sg" language="en">Appendix</localized-string><localized-string key="Appendix.pl" language="en">Appendixes</localized-string><localized-string key="Note.sg" language="en">Note</localized-string><localized-string key="Note.pl" language="en">Notes</localized-string><localized-string key="Note_%_to_entry.sg" language="en">Note % to entry</localized-string><localized-string key="Note_%_to_entry.pl" language="en">Notes % to entry</localized-string><localized-string key="List.sg" language="en">List</localized-string><localized-string key="List.pl" language="en">Lists</localized-string><localized-string key="Figure.sg" language="en">Figure</localized-string><localized-string key="Figure.pl" language="en">Figures</localized-string><localized-string key="Formula.sg" language="en">Formula</localized-string><localized-string key="Formula.pl" language="en">Formulas</localized-string><localized-string key="Table.sg" language="en">Table</localized-string><localized-string key="Table.pl" language="en">Tables</localized-string><localized-string key="Requirement.sg" language="en">Requirement</localized-string><localized-string key="Requirement.pl" language="en">Requirements</localized-string><localized-string key="Recommendation.sg" language="en">Recommendation</localized-string><localized-string key="Recommendation.pl" language="en">Recommendations</localized-string><localized-string key="Permission.sg" language="en">Permission</localized-string><localized-string key="Permission.pl" language="en">Permissions</localized-string><localized-string key="Example.sg" language="en">Example</localized-string><localized-string key="Example.pl" language="en">Examples</localized-string><localized-string key="Part.sg" language="en">Part</localized-string><localized-string key="Part.pl" language="en">Parts</localized-string><localized-string key="Section.sg" language="en">Section</localized-string><localized-string key="Section.pl" language="en">Sections</localized-string><localized-string key="Paragraph.sg" language="en">Paragraph</localized-string><localized-string key="Paragraph.pl" language="en">Paragraphs</localized-string><localized-string key="Chapter.sg" language="en">Chapter</localized-string><localized-string key="Chapter.pl" language="en">Chapters</localized-string><localized-string key="Page.sg" language="en">Page</localized-string><localized-string key="Page.pl" language="en">Pages</localized-string><localized-string key="language" language="en">en</localized-string><localized-string key="script" language="en">Latn</localized-string></localized-strings>
+<boilerplate>
+  <copyright-statement>
+    <clause>
+      <p id="_2ed28f83-1b90-747a-02bf-36555ae292f9">© 2020 Messaging, Malware and Mobile Anti-Abuse Working Group</p>
+    </clause>
+  </copyright-statement>
+
+  
+
+  <legal-statement>
+    <clause>
+      <p id="_299dcfba-ef93-7095-8c28-7f8ffc95374f">All rights reserved. Unless otherwise specified, no part of this
+        publication may be reproduced or utilized otherwise in any form or by any
+        means, electronic or mechanical, including photocopying, or posting on the
+        internet or an intranet, without prior written permission. Permission can
+        be requested from the address below.</p>
+    </clause>
+  </legal-statement>
+
+  <feedback-statement>
+
+    <p id="boilerplate-name">Messaging, Malware and Mobile Anti-Abuse Working Group</p>
+    <p class="boilerplate-address" id="_964db264-9358-0046-6625-b137f10b4c9e">
+      781 Beach Street, Suite 302<br/>
+      San Francisco<br/>
+      California 94109<br/>
+      United States of America<br/>
+      <br/>
+      <link target="https://www.m3aawg.org">www.m3aawg.org</link>
+    </p>
+  </feedback-statement>
+</boilerplate>
+
+<preface><foreword id="_95a18373-eeb6-4105-e7af-6bfce5f5be0b" obligation="informative" displayorder="1">
+<title>Foreword</title>
+<p id="_014a8b6b-2e2b-7f87-2788-7329d131dfb4">M3AAWG, the Messaging, Malware and Mobile Anti-Abuse Working Group, appreciates
+this opportunity to comment on the Initial Report of the Temporary Specification
+for gTLD Registration Data Phase 2 Expedited Policy Development Process
+(<link target="https://gnso.icann.org/en/issues/epdp-phase-2-initial-07feb20-en.pdf"/>). We make these
+comments in our capacities as cybersecurity professionals and researchers committed
+to ensuring the security and stability of the internet, including the domain name
+ecosystem.</p>
+
+<p id="_6a01d67f-f1a1-1f0a-f3fa-1c4938a5cb51">This issue is very important to M3AAWG members.
+<strong>Our 2018 Joint Survey published jointly with the Anti-Phishing Working Group</strong>
+found that changes to WHOIS access
+following ICANN’s implementation of the Temporary Specification is significantly
+impeding cyber applications and forensic investigations and allowing more harm to
+victims. M3AAWG appreciates the hard work of the EPDP Phase 2 team and the
+progress they have made to date. The successful completion of this policy and the
+ultimate implementation of a workable System for Standardized Access/Disclosure
+(SSAD) of Registration Data is key to organizations and individuals, including many of
+our members, that require access to registration data in order to detect threats,
+investigate new attack vectors and to understand trends aimed at protecting users and
+the Internet as a whole. This includes law enforcement authorities, both civil and
+criminal, who rely on the analysis and coloration of Registration Data obtained by
+private sector researchers and security. Failure to allow these professionals to access
+this data will threaten the security, stability and resiliency of the Internet as a whole and
+result in higher abuse rates, more harm inflicted on users and result in more criminal
+impunity on a global scale.</p>
+
+<p id="_4a505fb4-db33-0e4a-a010-d71b68eb09c5">Given that context, M3AAWG has identified the following preliminary recommendations
+that represent the greatest concern to our members.</p>
+</foreword></preface><sections>
+<clause id="_preliminary_recommendation_12_query_policy" obligation="normative" displayorder="2">
+<title depth="1">1.<tab/>Preliminary Recommendation #12. Query Policy</title>
+<p id="_1d7dea3d-29fd-614f-254f-88b93a700369">In the course of investigations, especially those of a global nature, it is often necessary
+to request many thousands of requests for Registration data from the SSAD system.
+While we appreciate the need for any system to protect itself from abuse of all kinds, we
+are concerned that the definition of “abusive use” of the SSAD, specifically point #4,
+may inadvertently interfere with some investigations. E.g</p>
+
+<quote id="_d246f23e-05fe-c95b-74e5-688398813c24"><p id="_0147f57a-b51a-14be-513a-ec3d14886e83">‌4. Storing/delaying and sending high-volume requests causing the SSAD or
+other parties to fail SLA performance. When investigating abuse based on
+this specific behavior, the concept of proportionality should be considered.</p>
+</quote>
+
+<p id="_7d960a16-c16e-66c5-72f8-3468bef2a7d4">Query policy limits enforced by the SSAD must not impede the access required by
+accredited investigators to detect, attribute and mitigate abuse on a global scale. The
+receipt of requests at this scale must not result in throttling or result in a situation where
+legitimate requests are rejected.</p>
+</clause>
+
+<clause id="_preliminary_recommendation_9_determining_variable_slas_for_response_times_for_ssad" obligation="normative" displayorder="3">
+<title depth="1">2.<tab/>Preliminary Recommendation #9. Determining Variable SLAs for response times for SSAD</title>
+<p id="_ade0afc1-db41-fb6e-faca-2164572f8415">The definition and enforcement of SLA associated with response times is of high
+importance to ensuring a workable and effective SSAD system. We note that the ability
+of accredited cyber-security investigators to tag their requests as “Urgent Requests” is
+currently not possible given the current definition. At best it is unclear:</p>
+
+<quote id="_1c4a0689-c66b-c9c6-0984-74fb05eff368"><p id="_e5a2a557-98c9-e2a6-3265-94fdb9743662">“The criteria to determine whether it concerns an urgent request are limited to circumstances that pose an imminent threat to life, serious bodily injury, critical infrastructure (online and offline) or child exploitation.”</p>
+</quote>
+
+<p id="_55d2f5a2-4367-d185-252a-6c16e6669baf">Given most campaigns to attack internet users [consumers] are short lived by design, a
+maximum response time of 5 business days is neither acceptable nor sufficient. By
+then the damage will have been done. As such the definition of “Urgent Requests”
+must be updated to include the important work of cybersecurity investigators.</p>
+
+<p id="_3ad3ebff-0f91-f7a2-fbad-458e6a0a65ea">We suggest adding the following language to make it clear that accredited cybersecurity
+researchers can submit requests that have been tagged as Urgent.</p>
+
+<quote id="_4f0a893f-c562-16eb-5190-51c9be452d09"><p id="_24d8a347-1f7c-69e8-795c-113784612b4c">“For the avoidance of doubt, this includes issues related to malware, Botnets [and their command and control systems], phishing, pharming and abuse related to consumer fraud.”</p>
+</quote>
+
+<p id="_6375894a-8a5a-1342-23ba-9f94548d4086">Finally, we note that the SLAs defined in Recommendation #9 focus on response times
+only. In order to ensure transparency of the system in addition to allowing
+accountability to the community there must exist a mechanism to measure the rate of
+disclosure of RDS data across all disclosers. As such an SLA that measures and tracks
+disclosure rates must be added to this recommendation. The data associated with this
+SLA must be routinely audited and reported publicly.</p>
+</clause>
+
+<clause id="_preliminary_recommendation_7_authorization_for_automated_disclosure_requests" obligation="normative" displayorder="4">
+<title depth="1">3.<tab/>Preliminary Recommendation #7. Authorization for automated disclosure requests</title>
+<p id="_542acf84-0dfc-0dc8-461f-62f496d9f3a9">In order to be effective, the SSAD system (as defined in the initial report) must support
+additional use cases that can be fully automated above and beyond the two currently
+specified (in Jurisdiction LEA and URS/UDRP due process). These must include use
+cases related to the needs of properly Accredited cybersecurity and anti-abuse
+investigators.</p>
+
+<p id="_3c3d7620-3f18-3ba5-a18f-66ad6f5f1c1f">We note that additional use case review will be the subject of further discussion by the
+EPDP Phase 2 working group. In our review of the “Working Draft Use Case Candidates for Possible Automation”<fn reference="1"><p id="_f849e771-4eec-dad1-ac9d-c7dc88423296"><link target="https://community.icann.org/display/EOTSFGRD/Working+Draft+Use+Case+Candidates+for+Possible+Automation"/></p>
+</fn>, we are encouraged that Use Case #7 “Identify infrastructure involved in botnets, malware, phishing, and consumer fraud” will be
+considered and believe strongly that an SSAD system that did not include this (or a
+similar) use cases would not address the needs of accredited cybersecurity and antiabuse investigators.</p>
+</clause>
+
+<clause id="_preliminary_recommendation_19_mechanism_for_the_continuous_evolution_of_the_ssad" obligation="normative" displayorder="5">
+<title depth="1">4.<tab/>Preliminary Recommendation #19. Mechanism for the continuous evolution of the SSAD</title>
+<p id="_e2faab32-ba66-1a14-229f-2f2f168536ee">The need for a mechanism that ensures the SSAD system can evolve at Internet speed
+is a very important concept and policy must exist to support it. It is equally important
+that transparency, accountability and full participation by all stakeholders be assured
+and as such we insist that any mechanism involved in defining how the SSAD will
+evolve include stakeholders outside of the GNSO, including the SSAC, GAC and ALAC.
+In addition, decisions that result from this mechanism must not be subject to a vote from
+the GNSO Council that does not include the Advisory Committees.</p>
+</clause>
+
+<clause id="_preliminary_recommendation_15_financial_sustainability" obligation="normative" displayorder="6">
+<title depth="1">5.<tab/>Preliminary Recommendation #15. Financial Sustainability</title>
+<p id="_581a8283-48e6-84b9-d1f1-91e1cf8c26f9">M3AAWG is very concerned that the use of the SSAD may involve per
+transaction/requests charges. While we do not object to reasonable fees to ensure
+proper accreditation of members of the cybersecurity community, we would object to
+any financial sustainability model that may impose any per-transaction fees related to
+requests required during the course of a legitimate investigations.</p>
+
+<p id="_d62c65de-05a3-8a9a-0674-aba04fabeb4f">Thank you in advance for your consideration of these comments.</p>
+</clause>
+</sections>
+</m3d-standard>
