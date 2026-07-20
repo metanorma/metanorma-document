@@ -3,6 +3,9 @@
 module Metanorma
   module Document
     module Relaton
+      # Keeps its own mapping: relaton-bib 2.2.0.pre.alpha.1 Organization has
+      # no variant/variant-subdivision, its identifier lacks the @id attribute,
+      # and its Subdivision has no fmt-identifier — all carried by fixtures.
       class Organization < Contributor
         attribute :name, LocalizedName, collection: true
         attribute :variant, VariantOrgName, collection: true

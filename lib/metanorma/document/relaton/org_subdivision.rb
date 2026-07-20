@@ -4,6 +4,8 @@ module Metanorma
   module Document
     module Relaton
       # A subdivision of an organization (e.g. committee, subcommittee, workgroup).
+      # Keeps its own mapping: relaton-bib 2.2.0.pre.alpha.1 Subdivision lacks
+      # identifier/@id and fmt-identifier, both carried by fixtures.
       class OrgSubdivision < Lutaml::Model::Serializable
         attribute :type, :string
         attribute :subtype, :string

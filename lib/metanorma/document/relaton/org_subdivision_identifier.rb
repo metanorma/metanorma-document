@@ -4,6 +4,8 @@ module Metanorma
   module Document
     module Relaton
       # An identifier of an organization subdivision.
+      # Keeps its own mapping: relaton-bib 2.2.0.pre.alpha.1
+      # OrganizationType::Identifier lacks the @id attribute carried by fixtures.
       class OrgSubdivisionIdentifier < Lutaml::Model::Serializable
         attribute :id, :string
         attribute :type, :string
