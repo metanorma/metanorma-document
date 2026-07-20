@@ -3,6 +3,9 @@
 module Metanorma
   module Document
     module Relaton
+      # Keeps its own mapping: relaton-bib 2.2.0.pre.alpha.1 Copyright types
+      # from/to as bare strings (ours preserve the DateTime text attribute) and
+      # maps scope as an element (ours is an attribute).
       class CopyrightAssociation < Lutaml::Model::Serializable
         attribute :from, Metanorma::Document::Relaton::DateTime
         attribute :to, Metanorma::Document::Relaton::DateTime

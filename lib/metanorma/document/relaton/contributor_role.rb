@@ -4,6 +4,9 @@ module Metanorma
   module Document
     module Relaton
       # A description of the role of the contributor in the production of a bibliographic item.
+      # Keeps its own mapping: relaton-bib 2.2.0.pre.alpha.1 Contributor::Role
+      # has no mixed content (BIPM fixture: <role type="editor">Author for
+      # correspondence</role>) and sanitizes description markup.
       class ContributorRole < Lutaml::Model::Serializable
         attribute :type, :string
         attribute :description,

@@ -1,10 +1,16 @@
 # frozen_string_literal: true
 
+require "relaton/bib"
+
 module Metanorma
   module Document
     module Relaton
       # Person associated with a bibliographic item.
-      class Person < Contributor
+      # Inherits relaton-bib's Person (gaining credential and address);
+      # all mappings are re-declared with Metanorma's richer model classes —
+      # relaton-bib 2.2.0.pre.alpha.1 sanitizes affiliation descriptions,
+      # has no contact wrapper, and types uri as a collection.
+      class Person < ::Relaton::Bib::Person
         attribute :name, FullName
         attribute :affiliation, Affiliation, collection: true
         attribute :identifier, PersonIdentifier, collection: true
