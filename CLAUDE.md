@@ -1,6 +1,6 @@
 # metanorma-document — Project Rules
 
-## ABSOLUTE RULE: NEVER use Nokogiri on document model XML
+## ABSOLUTE RULE: NEVER use Nokogiri on document XML, and no freeform XML strings
 
 Document XML (presentation XML) is parsed into lutaml-model objects. All access to document content MUST go through the model object graph — typed attributes, `element_order`, `each_mixed_content`, etc.
 
@@ -8,8 +8,9 @@ NEVER:
 - Call `to_xml` on a model object and then parse that XML with Nokogiri
 - Use Nokogiri to strip, transform, or manipulate document XML content
 - Use Nokogiri CSS selectors on document XML to find elements
+- Hold markup-bearing content in a plain string attribute (`map_all_content` / `map_content` on content that can contain elements) — EVERY document payload must be modeled as typed lutaml-model classes. This is why `metanorma-extension` (semantic-metadata, presentation-metadata, UnitsML, source-highlighter-css) and `misc-container` (presentation-metadata) are fully modeled under `standard_document/metadata/`.
 
-The HTML renderer must use the model's typed attributes and the rendering pipeline (`render_paragraph`, `render_mixed_inline`, etc.) to produce HTML. Nokogiri is only acceptable for processing non-document strings (e.g., SVG logo files).
+The HTML renderer must use the model's typed attributes and the rendering pipeline (`render_paragraph`, `render_mixed_inline`, etc.) to produce HTML. Nokogiri is only acceptable for processing non-document asset files (e.g., SVG logo files) — never on anything parsed from or derived from a document.
 
 ## ABSOLUTE RULE: Use `each_mixed_content` for mixed content nodes
 
