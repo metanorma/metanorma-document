@@ -1,18 +1,15 @@
 # frozen_string_literal: true
 
+require "relaton/bib"
+
 module Metanorma
   module Document
     module Relaton
       # Hierarchical arrangement of bibliographic localities.
-      class LocalityStack < Lutaml::Model::Serializable
-        attribute :connective, :string
-        attribute :bib_locality, BibItemLocality, collection: true
-
-        xml do
-          element "localityStack"
-          map_attribute "connective", to: :connective
-          map_element "locality", to: :bib_locality
-        end
+      class LocalityStack < ::Relaton::Bib::LocalityStack
+        # Compatibility alias: relaton-bib names the collection
+        # +locality+, this gem historically used +bib_locality+.
+        def bib_locality = locality
       end
     end
   end
