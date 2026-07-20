@@ -4,6 +4,11 @@ module Metanorma
   module Document
     module Relaton
       # Significant date in the lifecycle of the bibliographic item.
+      # Keeps its own mapping: relaton-bib 2.2.0.pre.alpha.1 Bib::Date has no
+      # +format+ attribute and no text content, and casts on→at as StringDate
+      # (nil-ing non-ISO values like "–") — fixture dates such as
+      # <date type="published" format="ddMMMyyyy">I.2019</date> would
+      # re-serialize as a bare <date type="published"/>.
       class BibliographicDate < Lutaml::Model::Serializable
         attribute :type, :string
         attribute :format, :string

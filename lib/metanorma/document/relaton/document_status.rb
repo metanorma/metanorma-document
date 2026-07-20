@@ -4,6 +4,10 @@ module Metanorma
   module Document
     module Relaton
       # The publication or preparation status of a document.
+      # Keeps its own mapping: relaton-bib 2.2.0.pre.alpha.1 Status has
+      # singular stage/substage, its Stage lacks +language+, and there is no
+      # stage-abbreviation element — fixtures carry multi-language stage
+      # collections (read as .value/.language by the ISO renderer).
       class DocumentStatus < Lutaml::Model::Serializable
         attribute :stage, Metanorma::Document::Components::DataTypes::FormattedString,
                   collection: true

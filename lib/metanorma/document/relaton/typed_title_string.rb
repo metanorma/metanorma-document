@@ -4,6 +4,10 @@ module Metanorma
   module Document
     module Relaton
       # A title of a bibliographic item, associated with a type of title.
+      # Keeps its own mapping: relaton-bib 2.2.0.pre.alpha.1 Title sanitizes
+      # span/semx/link/fmt-* out of the content at assignment time and offers
+      # no structured inline elements (em/strong/sub/sup/tt/fn/stem/variant)
+      # as queryable readers.
       class TypedTitleString < Lutaml::Model::Serializable
         attribute :type, :string
         attribute :format, :string
