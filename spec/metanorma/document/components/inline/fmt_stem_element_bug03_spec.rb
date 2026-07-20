@@ -19,7 +19,7 @@ RSpec.describe "BUGS.sts 03: FmtStemElement declares mixed_content" do
     yielded = []
     fmt_stem.each_mixed_content { |n| yielded << n }
 
-    yielded.any?(Metanorma::Document::Components::Inline::SemxElement).should be(true)
+    expect(yielded.any?(Metanorma::Document::Components::Inline::SemxElement)).to be(true)
   end
 
   it "still exposes semx via the typed attribute" do
@@ -32,6 +32,6 @@ RSpec.describe "BUGS.sts 03: FmtStemElement declares mixed_content" do
         </semx>
       </fmt-stem>
     XML
-    Array(fmt_stem.semx).size.should eq(1)
+    expect(Array(fmt_stem.semx).size).to eq(1)
   end
 end

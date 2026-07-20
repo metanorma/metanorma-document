@@ -10,13 +10,14 @@ module Metanorma
         class Callout < ReferenceToIdElement
           attribute :target_attr, :string
           attribute :type, :string
-          attribute :text, Metanorma::Document::Components::TextElements::TextElement
+          attribute :text, :string, collection: true
 
           xml do
             element "callout"
+            mixed_content
             map_attribute "target", to: :target_attr
             map_element "type", to: :type
-            map_element "text", to: :text
+            map_content to: :text
           end
         end
       end

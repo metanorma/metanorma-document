@@ -5,6 +5,8 @@ module Metanorma
     module Components
       module Inline
         class ErefElement < Lutaml::Model::Serializable
+          include Inline::Vocabulary
+
           attribute :id, :string
           attribute :type, :string
           attribute :bibitemid, :string
@@ -15,10 +17,10 @@ module Metanorma
           attribute :relative, :string
           attribute :locality_stack, Metanorma::Document::Relaton::LocalityStack,
                     collection: true
-          attribute :text, :string
 
           xml do
             element "eref"
+            mixed_content
             map_attribute "id", to: :id
             map_attribute "type", to: :type
             map_attribute "bibitemid", to: :bibitemid
@@ -29,6 +31,7 @@ module Metanorma
             map_attribute "relative", to: :relative
             map_element "localityStack", to: :locality_stack
             map_content to: :text
+            Vocabulary::VocabularyXmlMapping.apply_inline_mappings(self)
           end
         end
       end

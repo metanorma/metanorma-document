@@ -7,22 +7,22 @@ RSpec.describe Metanorma::Document::Components::Inline::Vocabulary do
   describe "VocabularyXmlMapping" do
     it "exposes INLINE_MAPPINGS as a hash" do
       mapping = described_class::VocabularyXmlMapping::INLINE_MAPPINGS
-      mapping.should be_a(Hash)
-      mapping["em"].should eq(:em)
-      mapping["fmt-stem"].should eq(:fmt_stem)
+      expect(mapping).to be_a(Hash)
+      expect(mapping["em"]).to eq(:em)
+      expect(mapping["fmt-stem"]).to eq(:fmt_stem)
     end
 
     it "includes mappings for every vocabulary attribute" do
       mapping_keys = described_class::VocabularyXmlMapping::INLINE_MAPPINGS.keys.to_set
-      mapping_keys.should include("em", "strong", "sub", "sup", "tt",
-                                  "underline", "strike", "smallcap",
-                                  "br", "tab", "xref", "eref", "link",
-                                  "span", "stem", "concept", "fn",
-                                  "bcp14", "fmt-stem", "fmt-concept")
+      expect(mapping_keys).to include("em", "strong", "sub", "sup", "tt",
+                                      "underline", "strike", "smallcap",
+                                      "br", "tab", "xref", "eref", "link",
+                                      "span", "stem", "concept", "fn",
+                                      "bcp14", "fmt-stem", "fmt-concept")
     end
 
     it "is frozen (immutable)" do
-      described_class::VocabularyXmlMapping::INLINE_MAPPINGS.should be_frozen
+      expect(described_class::VocabularyXmlMapping::INLINE_MAPPINGS).to be_frozen
     end
   end
 
@@ -36,8 +36,8 @@ RSpec.describe Metanorma::Document::Components::Inline::Vocabulary do
       attrs = test_class.attributes
       %i[em strong sub sup tt stem concept fn link xref eref span
          fmt_stem fmt_concept bcp14 smallcap strike underline].each do |attr|
-        attrs.key?(attr).should be(true),
-                                "#{attr} should be declared by Vocabulary"
+        expect(attrs.key?(attr)).to be(true),
+                                    "#{attr} should be declared by Vocabulary"
       end
     end
   end

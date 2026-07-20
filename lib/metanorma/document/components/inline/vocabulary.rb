@@ -107,6 +107,9 @@ module Metanorma
                              collection: true
               base.attribute :del, "Metanorma::Document::Elements::Del",
                              collection: true
+              base.attribute :input,
+                             Metanorma::Document::Elements::Input,
+                             collection: true
             end
 
             def declare_rendered_display_attributes_on(base)
@@ -164,6 +167,7 @@ module Metanorma
               "index" => :index,
               "add" => :add,
               "del" => :del,
+              "input" => :input,
               "fmt-stem" => :fmt_stem,
               "fmt-concept" => :fmt_concept,
               "fmt-fn-label" => :fmt_fn_label,

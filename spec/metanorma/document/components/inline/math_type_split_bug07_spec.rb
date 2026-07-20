@@ -6,27 +6,34 @@ require "metanorma/document"
 RSpec.describe "BUGS.sts 07: Math element type split" do
   describe Metanorma::Document::Components::Inline::SemanticMathElement do
     it "is a subclass of MathElement" do
-      described_class.ancestors.should include(Metanorma::Document::Components::Inline::MathElement)
+      expect(described_class.ancestors).to include(Metanorma::Document::Components::Inline::MathElement)
     end
 
     it "round-trips through XML" do
       m = described_class.from_xml(<<~XML)
         <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0.7</mn></math>
       XML
-      m.content.should include("0.7")
+      expect(m.to_xml).to include("<mn>0.7</mn>")
+    end
+
+    it "keeps the MathML namespace on serialize" do
+      m = described_class.from_xml(<<~XML)
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0.7</mn></math>
+      XML
+      expect(m.to_xml).to include('xmlns="http://www.w3.org/1998/Math/MathML"')
     end
   end
 
   describe Metanorma::Document::Components::Inline::RenderedMathElement do
     it "is a subclass of MathElement" do
-      described_class.ancestors.should include(Metanorma::Document::Components::Inline::MathElement)
+      expect(described_class.ancestors).to include(Metanorma::Document::Components::Inline::MathElement)
     end
 
     it "round-trips through XML" do
       m = described_class.from_xml(<<~XML)
         <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0,7</mn></math>
       XML
-      m.content.should include("0,7")
+      expect(m.to_xml).to include("<mn>0,7</mn>")
     end
   end
 
@@ -37,7 +44,7 @@ RSpec.describe "BUGS.sts 07: Math element type split" do
           <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0.7</mn></math>
         </stem>
       XML
-      Array(stem.math).first.should be_a(Metanorma::Document::Components::Inline::SemanticMathElement)
+      expect(Array(stem.math).first).to be_a(Metanorma::Document::Components::Inline::SemanticMathElement)
     end
   end
 
@@ -48,7 +55,7 @@ RSpec.describe "BUGS.sts 07: Math element type split" do
           <math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0,7</mn></math>
         </semx>
       XML
-      Array(semx.math).first.should be_a(Metanorma::Document::Components::Inline::RenderedMathElement)
+      expect(Array(semx.math).first).to be_a(Metanorma::Document::Components::Inline::RenderedMathElement)
     end
   end
 
@@ -60,8 +67,8 @@ RSpec.describe "BUGS.sts 07: Math element type split" do
         </stem>
       XML
       math = Array(stem.math).first
-      math.is_a?(Metanorma::Document::Components::Inline::SemanticMathElement).should be(true)
-      math.is_a?(Metanorma::Document::Components::Inline::RenderedMathElement).should be(false)
+      expect(math.is_a?(Metanorma::Document::Components::Inline::SemanticMathElement)).to be(true)
+      expect(math.is_a?(Metanorma::Document::Components::Inline::RenderedMathElement)).to be(false)
     end
 
     it "rendered math is RenderedMathElement" do
@@ -71,8 +78,19 @@ RSpec.describe "BUGS.sts 07: Math element type split" do
         </semx>
       XML
       math = Array(semx.math).first
-      math.is_a?(Metanorma::Document::Components::Inline::RenderedMathElement).should be(true)
-      math.is_a?(Metanorma::Document::Components::Inline::SemanticMathElement).should be(false)
+      expect(math.is_a?(Metanorma::Document::Components::Inline::RenderedMathElement)).to be(true)
+      expect(math.is_a?(Metanorma::Document::Components::Inline::SemanticMathElement)).to be(false)
+    end
+  end
+
+  describe "namespace round-trip through a mixed-content parent" do
+    it "does not move <math> into the standoc namespace on serialize" do
+      p_el = Metanorma::Document::Components::Paragraphs::ParagraphBlock.from_xml(<<~XML)
+        <p xmlns="https://www.metanorma.org/ns/standoc">a <stem type="MathML"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi></math></stem> b</p>
+      XML
+      expect(p_el.to_xml).to include(
+        '<math xmlns="http://www.w3.org/1998/Math/MathML">',
+      )
     end
   end
 end

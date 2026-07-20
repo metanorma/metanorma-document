@@ -7,11 +7,15 @@ RSpec.describe "Title round-trip" do
   let(:doc) { Metanorma::IsoDocument::Root.from_xml(xml) }
   let(:bibdata) { doc.bibdata }
 
-  it "parses title items with type attribute" do
-    bibdata.titles.items.each do |item|
-    end
+  it "parses title items" do
+    expect(bibdata.titles.items).not_to be_empty
+  end
 
-    bibdata.titles.per_language.each do |g|
-    end
+  it "groups titles per language" do
+    expect(bibdata.titles.per_language).not_to be_empty
+  end
+
+  it "finds the English title" do
+    expect(bibdata.titles.for_language("en")).not_to be_nil
   end
 end

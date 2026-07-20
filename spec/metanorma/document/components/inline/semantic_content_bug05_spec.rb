@@ -10,15 +10,15 @@ RSpec.describe "BUGS.sts 05: SemanticContent filters fmt-* duplicates" do
         .map { |c| Metanorma::Document::Components::Inline.const_get(c) }
         .select { |c| c.is_a?(Class) && c.name.end_with?("Element") && c.name.include?("Fmt") }
       fmt_classes.each do |klass|
-        klass.include?(described_class).should be(true),
-                                               "#{klass.name} should include RenderedDisplay"
+        expect(klass.include?(described_class)).to be(true),
+                                                   "#{klass.name} should include RenderedDisplay"
       end
     end
 
     it "is NOT included in non-fmt classes" do
-      Metanorma::Document::Components::Inline::SpanElement.include?(
-        described_class,
-      ).should be(false)
+      expect(Metanorma::Document::Components::Inline::SpanElement.include?(
+               described_class,
+             )).to be(false)
     end
   end
 
@@ -50,15 +50,15 @@ RSpec.describe "BUGS.sts 05: SemanticContent filters fmt-* duplicates" do
 
       stem_classes = yielded.grep(Lutaml::Model::Serializable)
         .map(&:class)
-      stem_classes.should include(Metanorma::Document::Components::Inline::StemInlineElement)
-      stem_classes.should_not include(Metanorma::Document::Components::Inline::FmtStemElement)
+      expect(stem_classes).to include(Metanorma::Document::Components::Inline::StemInlineElement)
+      expect(stem_classes).not_to include(Metanorma::Document::Components::Inline::FmtStemElement)
     end
 
     it "returns an Enumerator when no block given" do
       p = parse_p("<p xmlns='https://www.metanorma.org/ns/standoc'>text</p>")
       enum = described_class.each(p)
-      enum.should be_a(Enumerator)
-      enum.to_a.should be_a(Array)
+      expect(enum).to be_a(Enumerator)
+      expect(enum.to_a).to be_a(Array)
     end
 
     it "still yields text nodes" do
@@ -67,7 +67,7 @@ RSpec.describe "BUGS.sts 05: SemanticContent filters fmt-* duplicates" do
       described_class.each(p) do |n|
         strings << n if n.is_a?(String)
       end
-      strings.join.should include("hello world")
+      expect(strings.join).to include("hello world")
     end
 
     it "yields semantic concept but not fmt_concept" do
@@ -83,8 +83,8 @@ RSpec.describe "BUGS.sts 05: SemanticContent filters fmt-* duplicates" do
       yielded = []
       described_class.each(p) { |n| yielded << n }
       classes = yielded.grep(Lutaml::Model::Serializable).map(&:class)
-      classes.should include(Metanorma::Document::Components::Inline::ConceptElement)
-      classes.should_not include(Metanorma::Document::Components::Inline::FmtConceptElement)
+      expect(classes).to include(Metanorma::Document::Components::Inline::ConceptElement)
+      expect(classes).not_to include(Metanorma::Document::Components::Inline::FmtConceptElement)
     end
   end
 end

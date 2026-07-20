@@ -81,6 +81,8 @@ module Metanorma
                     collection: true
           attribute :del, "Metanorma::Document::Elements::Del",
                     collection: true
+          attribute :input, Metanorma::Document::Elements::Input,
+                    collection: true
 
           # JSON serialization attributes
           attribute :json_type, :string
@@ -138,6 +140,7 @@ module Metanorma
             map_element "image", to: :image
             map_element "add", to: :add
             map_element "del", to: :del
+            map_element "input", to: :input
           end
 
           def json_content
