@@ -5,19 +5,14 @@ module Metanorma
     module Handlers
       module Inline
         # Shared declarative table of inline marks whose HTML rendering is
-        # a fixed tag with optional static attrs. Two adapters consume it:
+        # a fixed tag with optional static attrs. It is consumed by
+        # RichHtmlRenderer, which renders Metanorma XML elements to HTML
+        # directly (the fallback / attribute-value path) during the
+        # forward transform into the mirror IR.
         #
-        # - RichHtmlRenderer: renders Metanorma XML elements to HTML
-        #   directly (the fallback / attribute-value path).
-        # - Output::HtmlRenderers::MarkRenderers: renders mirror Model marks
-        #   to HTML (the primary SSR path).
-        #
-        # Both adapters must produce visually equivalent HTML for the same
-        # mark type — the table is the single source of truth for the
-        # mark-name to tag-and-attrs mapping. Marks whose attrs vary per
-        # instance (link, xref, eref, span) carry data in mark.attrs and
-        # are not in this table; each adapter keeps custom handlers for
-        # those.
+        # Marks whose attrs vary per instance (link, xref, eref, span)
+        # carry data in mark.attrs and are not in this table; each
+        # consumer keeps custom handlers for those.
         module Catalog
           SIMPLE_WRAPS = {
             "emphasis" => { tag: :em },

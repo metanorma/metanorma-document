@@ -4,12 +4,13 @@ module Metanorma
   module Mirror
     module Model
       class Guide
-        attr_reader :content, :meta, :title
+        attr_reader :content, :meta, :title, :document
 
-        def initialize(content:, meta: {}, title: nil)
+        def initialize(content:, meta: {}, title: nil, document: nil)
           @content = content
           @meta = meta
           @title = title
+          @document = document
         end
 
         def to_h

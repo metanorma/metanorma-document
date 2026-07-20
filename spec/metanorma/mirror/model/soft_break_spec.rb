@@ -6,24 +6,24 @@ require "metanorma/mirror"
 RSpec.describe Metanorma::Mirror::Model::SoftBreak do
   it "returns type as 'soft_break'" do
     sb = described_class.new
-    sb.type.should eq("soft_break")
+    expect(sb.type).to eq("soft_break")
   end
 
   it "serializes to hash" do
     sb = described_class.new
-    sb.to_h.should eq({ "type" => "soft_break" })
+    expect(sb.to_h).to eq({ "type" => "soft_break" })
   end
 
   it "has empty attrs and content" do
     sb = described_class.new
-    sb.attrs.should eq({})
-    sb.content.should eq([])
+    expect(sb.attrs).to eq({})
+    expect(sb.content).to eq([])
   end
 
   describe "#text_content" do
     it "returns empty string" do
       sb = described_class.new
-      sb.text_content.should eq("")
+      expect(sb.text_content).to eq("")
     end
   end
 end

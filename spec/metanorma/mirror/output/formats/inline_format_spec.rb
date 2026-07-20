@@ -24,12 +24,38 @@ RSpec.describe Metanorma::Mirror::Output::Formats::InlineFormat do
         formatter = described_class.new
         result = formatter.write(output, guide, title: "My Doc")
 
-        result.should eq(output)
+        expect(result).to eq(output)
         content = File.read(output)
-        content.should include("<!DOCTYPE html>")
-        content.should include("<title>My Doc</title>")
-        content.should include("window.METANORMA_DATA")
-        content.should include("<body>")
+        expect(content).to include("<!DOCTYPE html>")
+        expect(content).to include("<title>My Doc</title>")
+        expect(content).to include("window.METANORMA_DATA")
+        expect(content).to include("<body>")
+      end
+    end
+
+    it "embeds the classic-rendered document body as SSR content" do
+      Dir.mktmpdir do |dir|
+        output = File.join(dir, "out.html")
+        described_class.new.write(output, guide, title: "My Doc")
+
+        content = File.read(output)
+        # Markers of the classic Metanorma::Html renderer, not mirror-IR
+        # output: the classic <main> wrapper, its foreword heading, and
+        # paragraph text from the ISO fixture.
+        expect(content).to include('<main class="main-section">')
+        expect(content).to include('<h1 class="foreword-title">Foreword</h1>')
+        expect(content).to include(
+          "ISO (the International Organization for Standardization)",
+        )
+      end
+    end
+
+    it "raises ArgumentError when the guide carries no source document" do
+      guide_without_doc = Metanorma::Mirror::Model::Guide.new(content: nil)
+      Dir.mktmpdir do |dir|
+        output = File.join(dir, "out.html")
+        expect { described_class.new.write(output, guide_without_doc) }
+          .to raise_error(ArgumentError, /requires a Guide carrying its source document/)
       end
     end
 
@@ -38,18 +64,18 @@ RSpec.describe Metanorma::Mirror::Output::Formats::InlineFormat do
         nested = File.join(dir, "a", "b", "out.html")
         formatter = described_class.new
         formatter.write(nested, guide, title: "X")
-        File.exist?(nested).should be(true)
+        expect(File.exist?(nested)).to be(true)
       end
     end
   end
 
   describe "Formats.lookup" do
     it "returns the InlineFormat class for :inline" do
-      Metanorma::Mirror::Output::Formats.lookup(:inline).should eq(described_class)
+      expect(Metanorma::Mirror::Output::Formats.lookup(:inline)).to eq(described_class)
     end
 
     it "returns nil for unknown formats" do
-      Metanorma::Mirror::Output::Formats.lookup(:nonexistent).should be_nil
+      expect(Metanorma::Mirror::Output::Formats.lookup(:nonexistent)).to be_nil
     end
   end
 
@@ -61,7 +87,7 @@ RSpec.describe Metanorma::Mirror::Output::Formats::InlineFormat do
     it "allows new formats to be registered" do
       custom_class = Class.new(described_class)
       Metanorma::Mirror::Output::Formats.register(:test_format, custom_class)
-      Metanorma::Mirror::Output::Formats.lookup(:test_format).should eq(custom_class)
+      expect(Metanorma::Mirror::Output::Formats.lookup(:test_format)).to eq(custom_class)
     end
   end
 end

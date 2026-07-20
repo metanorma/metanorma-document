@@ -65,24 +65,24 @@ RSpec.describe Metanorma::Mirror::Rewriter do
       json = Metanorma::Mirror::Serialization::JsonSerializer.serialize(complex_doc)
       restored = Metanorma::Mirror::Serialization::JsonSerializer.deserialize(json)
 
-      restored.should be_a(Metanorma::Mirror::Model::Container)
-      restored.type.should eq("doc")
-      restored.attrs["flavor"].should eq("iso")
-      restored.content.size.should eq(2)
+      expect(restored).to be_a(Metanorma::Mirror::Model::Container)
+      expect(restored.type).to eq("doc")
+      expect(restored.attrs["flavor"]).to eq("iso")
+      expect(restored.content.size).to eq(2)
 
       preface = restored.content[0]
-      preface.type.should eq("preface")
+      expect(preface.type).to eq("preface")
 
       sections = restored.content[1]
       clause = sections.content[0]
-      clause.attrs["title"].should eq("Scope")
-      clause.attrs["number"].should eq("1")
+      expect(clause.attrs["title"]).to eq("Scope")
+      expect(clause.attrs["number"]).to eq("1")
 
       para = clause.content[0]
-      para.content[0].should be_a(Metanorma::Mirror::Model::Text)
-      para.content[0].text.should eq("Hello ")
-      para.content[1].text.should eq("world")
-      para.content[1].marks.first.type.should eq("emphasis")
+      expect(para.content[0]).to be_a(Metanorma::Mirror::Model::Text)
+      expect(para.content[0].text).to eq("Hello ")
+      expect(para.content[1].text).to eq("world")
+      expect(para.content[1].marks.first.type).to eq("emphasis")
     end
 
     it "round-trips through JSON with strong marks" do
@@ -118,10 +118,10 @@ RSpec.describe Metanorma::Mirror::Rewriter do
       json = Metanorma::Mirror::Serialization::JsonSerializer.serialize(doc)
       restored = Metanorma::Mirror::Serialization::JsonSerializer.deserialize(json)
 
-      restored.attrs["flavor"].should eq("iso")
+      expect(restored.attrs["flavor"]).to eq("iso")
       clause = restored.content[0].content[0]
-      clause.type.should eq("clause")
-      clause.content[0].content[0].marks.first.type.should eq("strong")
+      expect(clause.type).to eq("clause")
+      expect(clause.content[0].content[0].marks.first.type).to eq("strong")
     end
 
     it "round-trips through YAML serialization" do
@@ -136,8 +136,8 @@ RSpec.describe Metanorma::Mirror::Rewriter do
       yaml = Metanorma::Mirror::Serialization::YamlSerializer.serialize(doc)
       restored = Metanorma::Mirror::Serialization::YamlSerializer.deserialize(yaml)
 
-      restored.type.should eq("doc")
-      restored.content[0].type.should eq("bibliography")
+      expect(restored.type).to eq("doc")
+      expect(restored.content[0].type).to eq("bibliography")
     end
   end
 end

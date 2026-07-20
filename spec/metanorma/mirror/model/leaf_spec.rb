@@ -6,22 +6,22 @@ require "metanorma/mirror"
 RSpec.describe Metanorma::Mirror::Model::Leaf do
   it "has type and attrs but no content" do
     leaf = described_class.new(type: "image", attrs: { src: "img.png" })
-    leaf.type.should eq("image")
-    leaf.attrs.should eq("src" => "img.png")
-    leaf.leaf?.should be(true)
-    leaf.container?.should be(false)
+    expect(leaf.type).to eq("image")
+    expect(leaf.attrs).to eq("src" => "img.png")
+    expect(leaf.leaf?).to be(true)
+    expect(leaf.container?).to be(false)
   end
 
   it "serializes to hash without content" do
     leaf = described_class.new(type: "image", attrs: { src: "img.png" })
     h = leaf.to_h
-    h.should eq({ "type" => "image", "attrs" => { "src" => "img.png" } })
+    expect(h).to eq({ "type" => "image", "attrs" => { "src" => "img.png" } })
   end
 
   describe "#text_content" do
     it "returns empty string" do
       leaf = described_class.new(type: "image")
-      leaf.text_content.should eq("")
+      expect(leaf.text_content).to eq("")
     end
   end
 end

@@ -6,7 +6,9 @@ module Metanorma
     # per-type customization. Despite living in the reverse-conversion
     # namespace, this class produces a Model graph (not Metanorma XML) —
     # the output is a fully model-driven representation that can be
-    # serialized via Model#to_h or rendered via Output::HtmlRenderer.
+    # serialized via Model#to_h or embedded into HTML output by
+    # Output::Formats::InlineFormat (which renders the source document
+    # through the classic Metanorma::Html renderer).
     #
     # Instance API:
     #   Rewriter.new(skip: Set.new(%w[review footnotes]))

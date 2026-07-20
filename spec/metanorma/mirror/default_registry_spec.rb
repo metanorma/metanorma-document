@@ -8,13 +8,13 @@ RSpec.describe Metanorma::Mirror::DefaultRegistry do
   describe ".build" do
     it "returns a HandlerRegistry instance" do
       registry = described_class.build
-      registry.should be_a(Metanorma::Mirror::HandlerRegistry)
+      expect(registry).to be_a(Metanorma::Mirror::HandlerRegistry)
     end
 
     it "returns a fresh registry each call (no mutation leak)" do
       first = described_class.build
       second = described_class.build
-      first.should_not equal(second)
+      expect(first).not_to equal(second)
 
       handler_mod = Module.new do
         def self.call(_element, context:); end
@@ -22,12 +22,12 @@ RSpec.describe Metanorma::Mirror::DefaultRegistry do
       custom_klass = Class.new
       first.register(custom_klass, handler_mod)
 
-      second.registered?(custom_klass).should be(false)
+      expect(second.registered?(custom_klass)).to be(false)
     end
 
     it "registers paragraph handler" do
       registry = described_class.build
-      registry.registered?(Metanorma::Document::Components::Paragraphs::ParagraphBlock).should be(true)
+      expect(registry.registered?(Metanorma::Document::Components::Paragraphs::ParagraphBlock)).to be(true)
     end
 
     it "registers section handlers" do
@@ -36,7 +36,7 @@ RSpec.describe Metanorma::Mirror::DefaultRegistry do
         Metanorma::StandardDocument::Sections::ClauseSection,
         Metanorma::StandardDocument::Sections::AnnexSection,
       ].each do |klass|
-        registry.registered?(klass).should be(true)
+        expect(registry.registered?(klass)).to be(true)
       end
     end
 
@@ -47,7 +47,7 @@ RSpec.describe Metanorma::Mirror::DefaultRegistry do
         Metanorma::Document::Components::AncillaryBlocks::FigureBlock,
         Metanorma::Document::Components::Blocks::NoteBlock,
       ].each do |klass|
-        registry.registered?(klass).should be(true)
+        expect(registry.registered?(klass)).to be(true)
       end
     end
 
@@ -58,7 +58,7 @@ RSpec.describe Metanorma::Mirror::DefaultRegistry do
         Metanorma::Document::Components::Lists::OrderedList,
         Metanorma::Document::Components::Lists::DefinitionList,
       ].each do |klass|
-        registry.registered?(klass).should be(true)
+        expect(registry.registered?(klass)).to be(true)
       end
     end
 
@@ -69,7 +69,7 @@ RSpec.describe Metanorma::Mirror::DefaultRegistry do
         Metanorma::StandardDocument::Sections::Sections,
         Metanorma::StandardDocument::Sections::BibliographySection,
       ].each do |klass|
-        registry.registered?(klass).should be(true)
+        expect(registry.registered?(klass)).to be(true)
       end
     end
   end

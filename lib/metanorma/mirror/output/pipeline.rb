@@ -23,6 +23,7 @@ id_strategy: nil)
             content: @context.content,
             meta: @context.meta,
             title: @context.title,
+            document: @context.parsed,
           )
         end
 

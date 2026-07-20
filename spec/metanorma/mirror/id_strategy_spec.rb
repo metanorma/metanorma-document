@@ -9,17 +9,17 @@ RSpec.describe Metanorma::Mirror::IdStrategy do
 
     it "returns the element's id via assign_id" do
       element = Metanorma::StandardDocument::Sections::ClauseSection.new(id: "sec-3.2")
-      strategy.assign_id(element).should eq("sec-3.2")
+      expect(strategy.assign_id(element)).to eq("sec-3.2")
     end
 
     it "returns nil when element has no id" do
       element = Metanorma::StandardDocument::Sections::ClauseSection.new
-      strategy.assign_id(element).should be_nil
+      expect(strategy.assign_id(element)).to be_nil
     end
 
     it "returns the document unchanged via finalize!" do
       doc = { "type" => "doc", "content" => [] }
-      strategy.finalize!(doc).should equal(doc)
+      expect(strategy.finalize!(doc)).to equal(doc)
     end
   end
 
@@ -28,12 +28,12 @@ RSpec.describe Metanorma::Mirror::IdStrategy do
 
     it "returns the element's id unchanged" do
       element = Metanorma::StandardDocument::Sections::ClauseSection.new(id: "sec-3.2")
-      strategy.assign_id(element).should eq("sec-3.2")
+      expect(strategy.assign_id(element)).to eq("sec-3.2")
     end
 
     it "returns the document unchanged via finalize!" do
       doc = { "type" => "doc", "content" => [] }
-      strategy.finalize!(doc).should equal(doc)
+      expect(strategy.finalize!(doc)).to equal(doc)
     end
   end
 
@@ -45,24 +45,24 @@ RSpec.describe Metanorma::Mirror::IdStrategy do
         element = Metanorma::StandardDocument::Sections::ClauseSection.new(
           id: "sec-3.2", number: "3.2",
         )
-        strategy.assign_id(element).should eq("sec-3.2")
+        expect(strategy.assign_id(element)).to eq("sec-3.2")
       end
 
       it "derives positional ID for UUID section elements with number" do
         element = Metanorma::StandardDocument::Sections::ClauseSection.new(
           id: "_abc123", number: "5.4",
         )
-        strategy.assign_id(element).should eq("sec-5.4")
+        expect(strategy.assign_id(element)).to eq("sec-5.4")
       end
 
       it "returns raw UUID when no number and no derivable position" do
         element = Metanorma::StandardDocument::Sections::ClauseSection.new(id: "_abc123")
-        strategy.assign_id(element).should eq("_abc123")
+        expect(strategy.assign_id(element)).to eq("_abc123")
       end
 
       it "returns nil when element has no id" do
         element = Metanorma::StandardDocument::Sections::ClauseSection.new
-        strategy.assign_id(element).should be_nil
+        expect(strategy.assign_id(element)).to be_nil
       end
     end
 
@@ -71,7 +71,7 @@ RSpec.describe Metanorma::Mirror::IdStrategy do
         element = Metanorma::StandardDocument::Sections::ClauseSection.new(
           id: "_abc123-def456", number: "3.1",
         )
-        strategy.assign_id(element).should eq("sec-3.1")
+        expect(strategy.assign_id(element)).to eq("sec-3.1")
       end
     end
 
@@ -80,21 +80,21 @@ RSpec.describe Metanorma::Mirror::IdStrategy do
         element = Metanorma::StandardDocument::Sections::ClauseSection.new(
           id: "_uuid1", number: "4.1",
         )
-        strategy.assign_id(element).should eq("sec-4.1")
+        expect(strategy.assign_id(element)).to eq("sec-4.1")
       end
 
       it "categorizes ContentSection as :section" do
         element = Metanorma::StandardDocument::Sections::ContentSection.new(
           id: "_uuid2", number: "2.3",
         )
-        strategy.assign_id(element).should eq("sec-2.3")
+        expect(strategy.assign_id(element)).to eq("sec-2.3")
       end
 
       it "categorizes AnnexSection as :annex" do
         element = Metanorma::StandardDocument::Sections::AnnexSection.new(
           id: "_uuid3", number: "A.2",
         )
-        strategy.assign_id(element).should eq("anx-A.2")
+        expect(strategy.assign_id(element)).to eq("anx-A.2")
       end
 
       it "categorizes FigureBlock as :figure" do
@@ -102,7 +102,7 @@ RSpec.describe Metanorma::Mirror::IdStrategy do
           id: "_uuid4", autonum: "5",
         )
         # FigureBlock lacks :number, so Positional falls back to raw UUID
-        strategy.assign_id(element).should eq("_uuid4")
+        expect(strategy.assign_id(element)).to eq("_uuid4")
       end
 
       it "categorizes TableBlock as :table" do
@@ -110,7 +110,7 @@ RSpec.describe Metanorma::Mirror::IdStrategy do
           id: "_uuid5", autonum: "3",
         )
         # TableBlock lacks :number, so Positional falls back to raw UUID
-        strategy.assign_id(element).should eq("_uuid5")
+        expect(strategy.assign_id(element)).to eq("_uuid5")
       end
     end
 
@@ -132,13 +132,13 @@ RSpec.describe Metanorma::Mirror::IdStrategy do
 
         result = strategy.finalize!(doc)
         xref = result.content[0].content[0].marks[0]
-        xref.attrs["target"].should eq("sec-5.4")
+        expect(xref.attrs["target"]).to eq("sec-5.4")
       end
 
       it "returns the document unchanged when no IDs were remapped" do
         doc = Metanorma::Mirror::Model::Container.new(type: "doc", content: [])
         result = strategy.finalize!(doc)
-        result.should equal(doc)
+        expect(result).to equal(doc)
       end
 
       it "does not modify xref targets not in the id_map" do
@@ -158,7 +158,7 @@ RSpec.describe Metanorma::Mirror::IdStrategy do
 
         result = strategy.finalize!(doc)
         xref = result.content[0].content[0].marks[0]
-        xref.attrs["target"].should eq("sec-existing")
+        expect(xref.attrs["target"]).to eq("sec-existing")
       end
     end
 
@@ -166,7 +166,7 @@ RSpec.describe Metanorma::Mirror::IdStrategy do
       it "allows new categories to be registered without modifying dispatch" do
         custom_class = Class.new
         described_class.register_category(custom_class, :widget)
-        described_class.category_for(custom_class.new).should eq(:widget)
+        expect(described_class.category_for(custom_class.new)).to eq(:widget)
       ensure
         described_class.unregister_category(custom_class)
       end
@@ -175,7 +175,7 @@ RSpec.describe Metanorma::Mirror::IdStrategy do
         base = Class.new
         sub = Class.new(base)
         described_class.register_category(base, :custom)
-        described_class.category_for(sub.new).should eq(:custom)
+        expect(described_class.category_for(sub.new)).to eq(:custom)
       ensure
         described_class.unregister_category(base)
       end

@@ -6,24 +6,24 @@ require "metanorma/mirror"
 RSpec.describe Metanorma::Mirror::Model::Factory do
   describe ".from_h" do
     it "raises ArgumentError for non-hash input" do
-      -> {
+      expect do
         described_class.from_h("string")
-      }.should raise_error(ArgumentError, /Hash/)
-      -> {
+      end.to raise_error(ArgumentError, /Hash/)
+      expect do
         described_class.from_h(nil)
-      }.should raise_error(ArgumentError, /Hash/)
+      end.to raise_error(ArgumentError, /Hash/)
     end
 
     it "raises ArgumentError when type key is missing" do
-      -> {
+      expect do
         described_class.from_h({})
-      }.should raise_error(ArgumentError, /'type'/)
+      end.to raise_error(ArgumentError, /'type'/)
     end
 
     it "creates Text from text hash" do
       node = described_class.from_h({ "type" => "text", "text" => "hello" })
-      node.should be_a(Metanorma::Mirror::Model::Text)
-      node.text.should eq("hello")
+      expect(node).to be_a(Metanorma::Mirror::Model::Text)
+      expect(node.text).to eq("hello")
     end
 
     it "creates Text with marks" do
@@ -32,13 +32,13 @@ RSpec.describe Metanorma::Mirror::Model::Factory do
                                       "text" => "bold",
                                       "marks" => [{ "type" => "strong" }],
                                     })
-      node.marks.size.should eq(1)
-      node.marks[0].type.should eq("strong")
+      expect(node.marks.size).to eq(1)
+      expect(node.marks[0].type).to eq("strong")
     end
 
     it "creates SoftBreak" do
       node = described_class.from_h({ "type" => "soft_break" })
-      node.should be_a(Metanorma::Mirror::Model::SoftBreak)
+      expect(node).to be_a(Metanorma::Mirror::Model::SoftBreak)
     end
 
     it "creates Container for nodes with content" do
@@ -48,11 +48,11 @@ RSpec.describe Metanorma::Mirror::Model::Factory do
                                       "content" => [{ "type" => "paragraph",
                                                       "content" => [] }],
                                     })
-      node.should be_a(Metanorma::Mirror::Model::Container)
-      node.type.should eq("clause")
-      node.attrs["id"].should eq("s1")
-      node.content.size.should eq(1)
-      node.content[0].type.should eq("paragraph")
+      expect(node).to be_a(Metanorma::Mirror::Model::Container)
+      expect(node.type).to eq("clause")
+      expect(node.attrs["id"]).to eq("s1")
+      expect(node.content.size).to eq(1)
+      expect(node.content[0].type).to eq("paragraph")
     end
 
     it "creates Leaf for nodes without content" do
@@ -60,9 +60,9 @@ RSpec.describe Metanorma::Mirror::Model::Factory do
                                       "type" => "image",
                                       "attrs" => { "src" => "img.png" },
                                     })
-      node.should be_a(Metanorma::Mirror::Model::Leaf)
-      node.type.should eq("image")
-      node.attrs["src"].should eq("img.png")
+      expect(node).to be_a(Metanorma::Mirror::Model::Leaf)
+      expect(node.type).to eq("image")
+      expect(node.attrs["src"]).to eq("img.png")
     end
 
     it "round-trips a full document" do
@@ -77,10 +77,10 @@ RSpec.describe Metanorma::Mirror::Model::Factory do
       }
       model = described_class.from_h(hash)
       restored = model.to_h
-      restored["type"].should eq("doc")
-      restored["content"][0]["type"].should eq("paragraph")
-      restored["content"][0]["content"][0]["text"].should eq("Hello")
-      restored["content"][0]["content"][0]["marks"][0]["type"].should eq("strong")
+      expect(restored["type"]).to eq("doc")
+      expect(restored["content"][0]["type"]).to eq("paragraph")
+      expect(restored["content"][0]["content"][0]["text"]).to eq("Hello")
+      expect(restored["content"][0]["content"][0]["marks"][0]["type"]).to eq("strong")
     end
 
     it "handles string content mixed with nodes" do
@@ -90,9 +90,9 @@ RSpec.describe Metanorma::Mirror::Model::Factory do
                                                     { "type" => "text",
                                                       "text" => "styled" }],
                                     })
-      node.content.size.should eq(2)
-      node.content[0].should eq("plain text")
-      node.content[1].should be_a(Metanorma::Mirror::Model::Text)
+      expect(node.content.size).to eq(2)
+      expect(node.content[0]).to eq("plain text")
+      expect(node.content[1]).to be_a(Metanorma::Mirror::Model::Text)
     end
   end
 end
