@@ -49,7 +49,7 @@ module RoundtripSamples
     "ogc"     => Metanorma::OgcDocument::Root,
     "ribose"  => Metanorma::RiboseDocument::Root,
     "ietf"    => Metanorma::IetfDocument::Root,
-    "csa"     => nil,
+    "csa"     => Metanorma::CsaDocument::Root,
     "un"      => nil,
   }.freeze
 
