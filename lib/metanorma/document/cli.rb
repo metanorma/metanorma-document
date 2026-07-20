@@ -17,11 +17,20 @@ module Metanorma
         keyword_init: true,
       )
 
+      ToHtmlOptions = Struct.new(
+        :xml_path,
+        :output,
+        :flavor,
+        keyword_init: true,
+      )
+
       def self.run(argv)
         command = argv.shift
         case command
         when "to-mirror"
           to_mirror(argv)
+        when "to-html"
+          to_html(argv)
         when nil, "-h", "--help"
           puts usage
         else
@@ -101,12 +110,55 @@ module Metanorma
         end
       end
 
+      def self.to_html(argv)
+        options = parse_to_html_options(argv)
+        execute_to_html(options)
+      end
+
+      def self.parse_to_html_options(argv)
+        options = ToHtmlOptions.new(output: nil, flavor: nil)
+
+        parser = OptionParser.new do |opts|
+          opts.banner = "Usage: metanorma-document to-html <xml_path> [options]"
+
+          opts.on("-o", "--output PATH",
+                  "Output HTML path (default: stdout)") do |path|
+            options.output = path
+          end
+
+          opts.on("-f", "--flavor FLAVOR",
+                  "Document flavor (default: auto-detect)") do |flavor|
+            options.flavor = flavor
+          end
+        end
+
+        parser.parse!(argv)
+
+        xml_path = argv.shift
+        raise Error, "XML path required" unless xml_path
+        raise Error, "File not found: #{xml_path}" unless File.exist?(xml_path)
+
+        options.xml_path = xml_path
+        options
+      end
+
+      def self.execute_to_html(options)
+        # Metanorma::Html is autoloaded from metanorma/document.
+        # Reuse the mirror pipeline's flavor inference/model dispatch so
+        # to-html and to-mirror parse documents identically.
+        step = Mirror::Output::Pipeline::Steps::ParseXml.new
+        flavor = options.flavor || step.infer_flavor(options.xml_path)
+        doc = step.flavor_class(flavor).from_xml(File.read(options.xml_path))
+        write_output(Html::Generator.generate(doc), options.output)
+      end
+
       def self.usage
         <<~USAGE
           Usage: metanorma-document <command> [options]
 
           Commands:
             to-mirror    Convert presentation XML to mirror JSON
+            to-html      Render presentation XML to standalone HTML
 
           Run `metanorma-document <command> --help` for command-specific options.
         USAGE
