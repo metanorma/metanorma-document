@@ -2,24 +2,24 @@
 
 RSpec.describe Metanorma::Document::Components::TextElements do
   it "is defined" do
-    defined?(described_class).should be_truthy
+    expect(defined?(described_class)).to be_truthy
   end
 
   describe "classes" do
     it "autoloads Asciiml" do
-      defined?(Metanorma::Document::Components::TextElements::Asciiml).should be_truthy
+      expect(defined?(Metanorma::Document::Components::TextElements::Asciiml)).to be_truthy
     end
 
     it "autoloads EmphasisElement" do
-      defined?(Metanorma::Document::Components::TextElements::EmphasisElement).should be_truthy
+      expect(defined?(Metanorma::Document::Components::TextElements::EmphasisElement)).to be_truthy
     end
 
     it "autoloads KeywordElement" do
-      defined?(Metanorma::Document::Components::TextElements::KeywordElement).should be_truthy
+      expect(defined?(Metanorma::Document::Components::TextElements::KeywordElement)).to be_truthy
     end
 
     it "autoloads Latex" do
-      defined?(Metanorma::Document::Components::TextElements::Latex).should be_truthy
+      expect(defined?(Metanorma::Document::Components::TextElements::Latex)).to be_truthy
     end
 
     it "parses math element via mml gem" do
@@ -27,60 +27,60 @@ RSpec.describe Metanorma::Document::Components::TextElements do
         <stem type="MathML"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi></mrow></math></stem>
       XML
       stem = Metanorma::Document::Components::TextElements::StemElement.from_xml(xml)
-      stem.stem_type.should eq("MathML")
-      stem.math.should be_a(Mml::V3::Math)
+      expect(stem.stem_type).to eq("MathML")
+      expect(stem.math).to be_a(Mml::V3::Math)
     end
 
     it "autoloads MonospaceElement" do
-      defined?(Metanorma::Document::Components::TextElements::MonospaceElement).should be_truthy
+      expect(defined?(Metanorma::Document::Components::TextElements::MonospaceElement)).to be_truthy
     end
 
     it "autoloads RubyElement" do
-      defined?(Metanorma::Document::Components::TextElements::RubyElement).should be_truthy
+      expect(defined?(Metanorma::Document::Components::TextElements::RubyElement)).to be_truthy
     end
 
     it "autoloads SmallCapsElement" do
-      defined?(Metanorma::Document::Components::TextElements::SmallCapsElement).should be_truthy
+      expect(defined?(Metanorma::Document::Components::TextElements::SmallCapsElement)).to be_truthy
     end
 
     it "autoloads StemElement" do
-      defined?(Metanorma::Document::Components::TextElements::StemElement).should be_truthy
+      expect(defined?(Metanorma::Document::Components::TextElements::StemElement)).to be_truthy
     end
 
     it "autoloads StemType" do
-      defined?(Metanorma::Document::Components::TextElements::StemType).should be_truthy
+      expect(defined?(Metanorma::Document::Components::TextElements::StemType)).to be_truthy
     end
 
     it "autoloads StemValue" do
-      defined?(Metanorma::Document::Components::TextElements::StemValue).should be_truthy
+      expect(defined?(Metanorma::Document::Components::TextElements::StemValue)).to be_truthy
     end
 
     it "autoloads StrikeElement" do
-      defined?(Metanorma::Document::Components::TextElements::StrikeElement).should be_truthy
+      expect(defined?(Metanorma::Document::Components::TextElements::StrikeElement)).to be_truthy
     end
 
     it "autoloads StrongElement" do
-      defined?(Metanorma::Document::Components::TextElements::StrongElement).should be_truthy
+      expect(defined?(Metanorma::Document::Components::TextElements::StrongElement)).to be_truthy
     end
 
     it "autoloads SubscriptElement" do
-      defined?(Metanorma::Document::Components::TextElements::SubscriptElement).should be_truthy
+      expect(defined?(Metanorma::Document::Components::TextElements::SubscriptElement)).to be_truthy
     end
 
     it "autoloads SuperscriptElement" do
-      defined?(Metanorma::Document::Components::TextElements::SuperscriptElement).should be_truthy
+      expect(defined?(Metanorma::Document::Components::TextElements::SuperscriptElement)).to be_truthy
     end
 
     it "autoloads TextElement" do
-      defined?(Metanorma::Document::Components::TextElements::TextElement).should be_truthy
+      expect(defined?(Metanorma::Document::Components::TextElements::TextElement)).to be_truthy
     end
 
     it "autoloads TextElementType" do
-      defined?(Metanorma::Document::Components::TextElements::TextElementType).should be_truthy
+      expect(defined?(Metanorma::Document::Components::TextElements::TextElementType)).to be_truthy
     end
 
     it "autoloads UnderlineElement" do
-      defined?(Metanorma::Document::Components::TextElements::UnderlineElement).should be_truthy
+      expect(defined?(Metanorma::Document::Components::TextElements::UnderlineElement)).to be_truthy
     end
   end
 end

@@ -17,81 +17,81 @@ RSpec.shared_examples "xml round-trip" do |flavor_dir:, doc_class: Metanorma::Is
       let(:roundtrip_noko) { RoundtripHelper.parse_xml(output_xml) }
 
       it "parses without error" do
-        doc.should be_a(doc_class)
+        expect(doc).to be_a(doc_class)
       end
 
       it "produces valid XML" do
-        RoundtripHelper.xml_has_errors?(output_xml).should be_falsey
+        expect(RoundtripHelper).not_to be_xml_has_errors(output_xml)
       end
 
       it "round-trips root element and attributes" do
-        roundtrip_noko.root.name.should eq("metanorma")
-        roundtrip_noko.root["type"].should eq(original_noko.root["type"])
-        roundtrip_noko.root["flavor"].should eq(original_noko.root["flavor"])
+        expect(roundtrip_noko.root.name).to eq("metanorma")
+        expect(roundtrip_noko.root["type"]).to eq(original_noko.root["type"])
+        expect(roundtrip_noko.root["flavor"]).to eq(original_noko.root["flavor"])
       end
 
       it "round-trips bibdata type" do
-        RoundtripHelper.bibdata_type(roundtrip_noko).should eq(RoundtripHelper.bibdata_type(original_noko))
+        expect(RoundtripHelper.bibdata_type(roundtrip_noko)).to eq(RoundtripHelper.bibdata_type(original_noko))
       end
 
       it "round-trips titles" do
-        RoundtripHelper.bibdata_titles(roundtrip_noko).should eq(RoundtripHelper.bibdata_titles(original_noko))
+        expect(RoundtripHelper.bibdata_titles(roundtrip_noko)).to eq(RoundtripHelper.bibdata_titles(original_noko))
       end
 
       it "round-trips status stage" do
-        RoundtripHelper.status_stage(roundtrip_noko).should eq(RoundtripHelper.status_stage(original_noko))
+        expect(RoundtripHelper.status_stage(roundtrip_noko)).to eq(RoundtripHelper.status_stage(original_noko))
       end
 
       it "round-trips section clause IDs" do
-        RoundtripHelper.section_clause_ids(roundtrip_noko).should eq(RoundtripHelper.section_clause_ids(original_noko))
+        expect(RoundtripHelper.section_clause_ids(roundtrip_noko)).to eq(RoundtripHelper.section_clause_ids(original_noko))
       end
 
       it "round-trips preface" do
-        RoundtripHelper.has_preface?(roundtrip_noko).should eq(RoundtripHelper.has_preface?(original_noko))
+        expect(RoundtripHelper.has_preface?(roundtrip_noko)).to eq(RoundtripHelper.has_preface?(original_noko))
       end
 
       it "round-trips annex IDs" do
-        RoundtripHelper.annex_ids(roundtrip_noko).should eq(RoundtripHelper.annex_ids(original_noko))
+        expect(RoundtripHelper.annex_ids(roundtrip_noko)).to eq(RoundtripHelper.annex_ids(original_noko))
       end
 
       it "round-trips bibliography references sections" do
-        RoundtripHelper.bibliography_references_count(roundtrip_noko).should eq(RoundtripHelper.bibliography_references_count(original_noko))
+        expect(RoundtripHelper.bibliography_references_count(roundtrip_noko)).to eq(RoundtripHelper.bibliography_references_count(original_noko))
       end
 
       it "round-trips bibliography normative attributes" do
-        RoundtripHelper.bibliography_normative_attrs(roundtrip_noko).should eq(RoundtripHelper.bibliography_normative_attrs(original_noko))
+        expect(RoundtripHelper.bibliography_normative_attrs(roundtrip_noko)).to eq(RoundtripHelper.bibliography_normative_attrs(original_noko))
       end
 
       if full
         it "round-trips term IDs" do
-          RoundtripHelper.term_ids(roundtrip_noko).should eq(RoundtripHelper.term_ids(original_noko))
+          expect(RoundtripHelper.term_ids(roundtrip_noko)).to eq(RoundtripHelper.term_ids(original_noko))
         end
 
         it "round-trips table IDs" do
-          RoundtripHelper.table_ids(roundtrip_noko).should eq(RoundtripHelper.table_ids(original_noko))
+          expect(RoundtripHelper.table_ids(roundtrip_noko)).to eq(RoundtripHelper.table_ids(original_noko))
         end
 
         it "round-trips figure IDs" do
-          RoundtripHelper.figure_ids(roundtrip_noko).should eq(RoundtripHelper.figure_ids(original_noko))
+          expect(RoundtripHelper.figure_ids(roundtrip_noko)).to eq(RoundtripHelper.figure_ids(original_noko))
         end
 
         it "round-trips formula IDs" do
-          RoundtripHelper.formula_ids(roundtrip_noko).should eq(RoundtripHelper.formula_ids(original_noko))
+          expect(RoundtripHelper.formula_ids(roundtrip_noko)).to eq(RoundtripHelper.formula_ids(original_noko))
         end
 
         it "round-trips nested clause structure" do
-          RoundtripHelper.nested_clause_ids(roundtrip_noko).should eq(RoundtripHelper.nested_clause_ids(original_noko))
+          expect(RoundtripHelper.nested_clause_ids(roundtrip_noko)).to eq(RoundtripHelper.nested_clause_ids(original_noko))
         end
       end
 
       if fixture[:xml_type] == "presentation"
         it "preserves type=presentation on root" do
-          roundtrip_noko.root["type"].should eq("presentation")
+          expect(roundtrip_noko.root["type"]).to eq("presentation")
         end
 
         if full
           it "round-trips inline-header attributes" do
-            RoundtripHelper.inline_header_count(roundtrip_noko).should eq(RoundtripHelper.inline_header_count(original_noko))
+            expect(RoundtripHelper.inline_header_count(roundtrip_noko)).to eq(RoundtripHelper.inline_header_count(original_noko))
           end
         end
       end
@@ -113,59 +113,59 @@ RSpec.shared_examples "collection round-trip" do |flavor_dir:|
       let(:roundtrip_noko) { RoundtripHelper.parse_xml(output_xml) }
 
       it "parses without error" do
-        doc.should be_a(Metanorma::Collection::Root)
+        expect(doc).to be_a(Metanorma::Collection::Root)
       end
 
       it "produces valid XML" do
-        RoundtripHelper.xml_has_errors?(output_xml).should be_falsey
+        expect(RoundtripHelper).not_to be_xml_has_errors(output_xml)
       end
 
       it "round-trips root element name" do
-        roundtrip_noko.root.name.should eq("metanorma-collection")
+        expect(roundtrip_noko.root.name).to eq("metanorma-collection")
       end
 
       it "round-trips collection bibdata type" do
-        RoundtripHelper.bibdata_type(roundtrip_noko).should eq("collection")
+        expect(RoundtripHelper.bibdata_type(roundtrip_noko)).to eq("collection")
       end
 
       it "round-trips collection title" do
         orig_title = original_noko.at_css("bibdata > title")&.text&.strip
         rt_title = roundtrip_noko.at_css("bibdata > title")&.text&.strip
-        rt_title.should eq(orig_title)
+        expect(rt_title).to eq(orig_title)
       end
 
       it "round-trips collection docidentifier" do
         orig_id = original_noko.at_css("bibdata > docidentifier")&.text&.strip
         rt_id = roundtrip_noko.at_css("bibdata > docidentifier")&.text&.strip
-        rt_id.should eq(orig_id)
+        expect(rt_id).to eq(orig_id)
       end
 
       it "round-trips directive count" do
-        RoundtripHelper.collection_directive_count(roundtrip_noko).should eq(
+        expect(RoundtripHelper.collection_directive_count(roundtrip_noko)).to eq(
           RoundtripHelper.collection_directive_count(original_noko),
         )
       end
 
       it "round-trips entry count" do
-        RoundtripHelper.collection_entry_count(roundtrip_noko).should eq(
+        expect(RoundtripHelper.collection_entry_count(roundtrip_noko)).to eq(
           RoundtripHelper.collection_entry_count(original_noko),
         )
       end
 
       it "round-trips doc-container count" do
-        RoundtripHelper.doc_container_count(roundtrip_noko).should eq(
+        expect(RoundtripHelper.doc_container_count(roundtrip_noko)).to eq(
           RoundtripHelper.doc_container_count(original_noko),
         )
       end
 
       it "round-trips doc-container IDs" do
-        RoundtripHelper.doc_container_ids(roundtrip_noko).should eq(
+        expect(RoundtripHelper.doc_container_ids(roundtrip_noko)).to eq(
           RoundtripHelper.doc_container_ids(original_noko),
         )
       end
 
       it "round-trips embedded document docidentifiers" do
-        RoundtripHelper.doc_container_docidentifiers(roundtrip_noko).should eq(
+        expect(RoundtripHelper.doc_container_docidentifiers(roundtrip_noko)).to eq(
           RoundtripHelper.doc_container_docidentifiers(original_noko),
         )
       end
