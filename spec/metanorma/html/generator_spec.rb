@@ -38,8 +38,8 @@ RSpec.describe Metanorma::Html::Generator do
   end
 
   describe "terms and definitions" do
-    it "renders term numbers" do
-      term_nums = page.css(".term-number")
+    it "renders term numbers as TermNum headings" do
+      term_nums = page.css(".TermNum")
       expect(term_nums.length).to be > 0
       expect(term_nums.first.text).to include("3")
     end

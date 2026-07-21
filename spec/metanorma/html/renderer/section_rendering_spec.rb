@@ -39,7 +39,7 @@ RSpec.describe "Section rendering consolidation" do
   end
 
   it "renders terms section with term entries" do
-    terms = page.css(".term-name, .term-number")
+    terms = page.css(".term-name, .TermNum")
     expect(terms.length).to be > 0
   end
 end

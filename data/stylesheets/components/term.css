@@ -9,13 +9,15 @@ div[id^="term-"] {
 }
 div[id^="term-"] + div[id^="term-"] { margin-top: 0; }
 
-.term-number {
+/* TermNum is a heading (h2/h3 by nesting depth, per isodoc term_header) */
+.TermNum {
   font-variant: small-caps;
   font-weight: 600;
   color: var(--mn-primary);
   background: none;
   padding: 0;
-  font-size: 0.88em;
+  margin: 0 0 0.4em;
+  font-size: 0.95em;
 }
 .term-name { font-size: 1.1em; color: var(--mn-primary); font-weight: 500; }
 .term-name dfn { font-style: normal; }

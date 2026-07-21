@@ -26,7 +26,7 @@
   h1, h2, h3, h4, h5, h6 { page-break-after: avoid; break-after: avoid; }
   .note-block, .example, .admonition, .formula, figure, table { page-break-inside: avoid; break-inside: avoid; }
   .caption-label, .fmt-caption-label { color: #000; padding: 0; }
-  .term-number { color: #000; padding: 0; }
+  .TermNum { color: #000; padding: 0; }
   div[id^="term-"] { border-top: 2px solid #666; background: none; box-shadow: none; }
   .formula-number { background: none; border: none; color: #000; padding: 0; }
   .doc-title::after { display: none; }
