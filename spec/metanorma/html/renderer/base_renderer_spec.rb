@@ -201,35 +201,35 @@ RSpec.describe Metanorma::Html::BaseRenderer do
   end
 
   describe "labeled lists (fmt-name markers)" do
-    it "uses the presentation-XML bullet as the marker, without duplicating it" do
+    it "uses the presentation-XML bullet as the marker, without duplicating it", :aggregate_failures do
       model = Metanorma::Document::Components::Lists::UnorderedList.from_xml(<<~XML)
         <ul id="x1"><li><fmt-name><semx element="autonum">&#8212;</semx></fmt-name><p>item text</p></li></ul>
       XML
       output = renderer.render_unordered_list(model)
-      output.should include('class="mn-labeled-list"')
-      output.should include('<span class="li-label">—</span>')
-      output.should include("item text")
-      output.scan("—").size.should eq(1)
+      expect(output).to include('class="mn-labeled-list"')
+      expect(output).to include('<span class="li-label">—</span>')
+      expect(output).to include("item text")
+      expect(output.scan("—").size).to eq(1)
     end
 
-    it "uses the presentation-XML number as the marker in ordered lists" do
+    it "uses the presentation-XML number as the marker in ordered lists", :aggregate_failures do
       model = Metanorma::Document::Components::Lists::OrderedList.from_xml(<<~XML)
         <ol><li><fmt-name><semx element="autonum">1.</semx></fmt-name><p>first</p></li></ol>
       XML
       output = renderer.render_ordered_list(model)
-      output.should include('class="mn-labeled-list"')
-      output.should include('<span class="li-label">1.</span>')
-      output.should include("first")
+      expect(output).to include('class="mn-labeled-list"')
+      expect(output).to include('<span class="li-label">1.</span>')
+      expect(output).to include("first")
     end
 
-    it "leaves lists without fmt-name to default browser markers" do
+    it "leaves lists without fmt-name to default browser markers", :aggregate_failures do
       model = Metanorma::Document::Components::Lists::UnorderedList.from_xml(<<~XML)
         <ul><li><p>plain</p></li></ul>
       XML
       output = renderer.render_unordered_list(model)
-      output.should_not include("mn-labeled-list")
-      output.should_not include("li-label")
-      output.should include("plain")
+      expect(output).not_to include("mn-labeled-list")
+      expect(output).not_to include("li-label")
+      expect(output).to include("plain")
     end
   end
 end
