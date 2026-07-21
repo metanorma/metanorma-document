@@ -152,10 +152,11 @@ RSpec.describe "Liquid templates" do
   end
 
   describe "_term_number.html.liquid" do
-    it "renders term number" do
-      html = render_template("term_number", { "content" => "3.1" })
+    it "renders term number as a TermNum heading" do
+      html = render_template("term_number", { "level" => 2, "content" => "3.1" })
       expect(html).to include("3.1")
-      expect(html).to include("term-number")
+      expect(html).to include("TermNum")
+      expect(html).to include("<h2")
     end
   end
 

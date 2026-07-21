@@ -100,7 +100,7 @@ module Metanorma
         parts << (render_standard_section_blocks(section, level) || "")
         parts << (render_subsections(section, level) || "") if with_subsections
         if with_terms
-          section.terms&.each { |term| parts << (render_term(term) || "") }
+          section.terms&.each { |term| parts << (render_term(term, level: level + 1) || "") }
         end
         render_liquid("_element.html.liquid", {
                         "tag" => "div",
@@ -164,13 +164,14 @@ module Metanorma
       # (StandardDocument::Terms::Term) and presentation-aware models with
       # fmt-* attributes (IsoDocument::Terms::IsoTerm): safe_attr returns nil
       # for attributes a model does not declare, so the fmt-* branches are
-      # skipped automatically on semantic-only models.
-      def render_term(term, **_opts)
+      # skipped automatically on semantic-only models. +level+ is the term's
+      # TermNum heading level (section level + 1, per isodoc's term_header).
+      def render_term(term, level: 2, **_opts)
         attrs = element_attrs(id: safe_attr(term, :id), **term_data_attrs(term))
         fmt_definition = safe_attr(term, :fmt_definition)
 
         parts = []
-        parts << (render_term_number(term) || "")
+        parts << (render_term_number(term, level: level) || "")
         parts << render_term_designations(term, :fmt_preferred, :preferred,
                                           "preferred")
         parts << render_term_designations(term, :fmt_admitted, :admitted,
@@ -185,7 +186,7 @@ module Metanorma
         safe_attr(term, :admonition)&.each do |admonition|
           parts << (render_admonition(admonition) || "")
         end
-        safe_attr(term, :term)&.each { |sub| parts << (render_term(sub) || "") }
+        safe_attr(term, :term)&.each { |sub| parts << (render_term(sub, level: level + 1) || "") }
         render_liquid("_element.html.liquid", {
                         "tag" => "div",
                         "extra_attrs" => attrs,
@@ -206,11 +207,15 @@ module Metanorma
         data_attrs
       end
 
-      def render_term_number(term)
+      # The term number renders as a TermNum HEADING one level below the
+      # enclosing section heading (isodoc term_header postprocess: p.TermNum
+      # becomes h(parent+1), so top-level terms get h2, nested terms h3+).
+      def render_term_number(term, level: 2)
         fmt_name = safe_attr(term, :fmt_name)
         term_number = safe_attr(term, :term_number)
         if fmt_name
           render_liquid("_term_number.html.liquid", {
+                          "level" => [level, 6].min,
                           "content" => render_inline_element(fmt_name),
                         })
         elsif term_number
@@ -220,6 +225,7 @@ module Metanorma
                           extract_text_value(term_number)
                         end
           render_liquid("_term_number.html.liquid", {
+                          "level" => [level, 6].min,
                           "content" => escape_html(number_text),
                         })
         end

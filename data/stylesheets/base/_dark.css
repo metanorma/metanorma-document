@@ -37,7 +37,7 @@
 [data-theme="dark"] .code-copy-btn { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
 [data-theme="dark"] .table-scroll-wrapper { box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
 [data-theme="dark"] .caption-label, [data-theme="dark"] .fmt-caption-label { color: #a8b4e0; }
-[data-theme="dark"] .term-number { color: #a8b4e0; }
+[data-theme="dark"] .TermNum { color: #a8b4e0; }
 [data-theme="dark"] .term-name { color: var(--color-text); }
 [data-theme="dark"] div[id^="term-"] { border-top-color: #4a5a9a; }
 [data-theme="dark"] .term-source { border-top-color: var(--color-border); }
@@ -100,7 +100,7 @@
 [data-theme="sepia"] .cover-stage p { border-color: rgba(255,255,255,0.2); }
 [data-theme="sepia"] .code-copy-btn { background: rgba(0,0,0,0.15); border-color: rgba(255,255,255,0.1); }
 [data-theme="sepia"] .caption-label, [data-theme="sepia"] .fmt-caption-label { color: #6b4423; }
-[data-theme="sepia"] .term-number { color: #6b4423; }
+[data-theme="sepia"] .TermNum { color: #6b4423; }
 [data-theme="sepia"] .term-name { color: #6b4423; }
 [data-theme="sepia"] div[id^="term-"] { border-top-color: #a67c20; }
 [data-theme="sepia"] h1 { border-bottom-color: var(--color-border); }
@@ -159,7 +159,7 @@
 [data-theme="oled"] .cover-stage p { border-color: #222; }
 [data-theme="oled"] .code-copy-btn { background: rgba(255,255,255,0.04); border-color: #1a1a1a; }
 [data-theme="oled"] .caption-label, [data-theme="oled"] .fmt-caption-label { color: #c0c0c0; }
-[data-theme="oled"] .term-number { color: #c0c0c0; }
+[data-theme="oled"] .TermNum { color: #c0c0c0; }
 [data-theme="oled"] .term-name { color: #d0d0d0; }
 [data-theme="oled"] div[id^="term-"] { border-top-color: #222; }
 [data-theme="oled"] h1 { border-bottom-color: #1a1a1a; }

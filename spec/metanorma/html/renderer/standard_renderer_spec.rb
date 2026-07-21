@@ -19,8 +19,8 @@ RSpec.describe Metanorma::Html::StandardRenderer do
       expect(headings.length).to be > 0
     end
 
-    it "renders terms sections with term-number entries" do
-      expect(page.at_css(".term-number")).not_to be_nil
+    it "renders terms sections with TermNum headings" do
+      expect(page.at_css(".TermNum")).not_to be_nil
     end
 
     it "renders foreword with foreword-title class" do

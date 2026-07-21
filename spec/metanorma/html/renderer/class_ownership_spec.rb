@@ -13,11 +13,15 @@ RSpec.describe "HTML class name ownership" do
   let(:html) { Metanorma::Html::Generator.generate(doc) }
   let(:page) { Nokogiri::HTML(html) }
 
-  # XML-originated class names that must NEVER appear in HTML output
+  # XML-originated class names that must NEVER appear in HTML output.
+  # `TermNum` is intentionally exempt: it is the isodoc convention for
+  # the term-number heading (every fixture under spec/fixtures/iso/is/
+  # emits `<h2 class="TermNum">`), so the renderer matches it rather
+  # than inventing a parallel class.
   XML_CLASS_NAMES = %w[
     zzSTDTitle1 zzSTDTitle2 zzSTDTitle
     ForewordTitle IntroTitle
-    TermNum DeprecatedTerms Terms
+    DeprecatedTerms Terms
     Note Example
     Section3 Section3Sub
     Annex
@@ -67,9 +71,8 @@ RSpec.describe "HTML class name ownership" do
     expect(page.at_css("figure")).not_to be_nil
   end
 
-  it "uses term-number class instead of TermNum" do
-    expect(page.at_css(".term-number")).not_to be_nil
-    expect(page.at_css(".TermNum")).to be_nil
+  it "renders term numbers as TermNum headings (isodoc convention)" do
+    expect(page.at_css("h2.TermNum, h3.TermNum")).not_to be_nil
   end
 
   it "uses foreword-title class instead of ForewordTitle" do

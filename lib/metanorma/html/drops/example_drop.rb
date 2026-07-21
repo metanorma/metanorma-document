@@ -9,6 +9,10 @@ module Metanorma
           label = renderer.extract_block_label(example, "EXAMPLE")
 
           content_html = renderer.render_full_block_children(example) || ""
+          # Same convention as notes: the EXAMPLE label opens the first
+          # paragraph rather than floating outside it.
+          label_html = %(<span class="example-label">#{renderer.escape_html(label)}</span>&nbsp;)
+          content_html = NoteDrop.inject_label(content_html, label_html)
 
           new(
             id: id,
