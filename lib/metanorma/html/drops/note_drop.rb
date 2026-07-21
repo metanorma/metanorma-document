@@ -36,12 +36,31 @@ module Metanorma
         # Inserts the label markup right after the first <p> opening
         # tag; when the note has no paragraph, the label leads the
         # content instead.
+        #
+        # Uses linear string scanning rather than a regex so that
+        # adversarial or malformed input (e.g. an unterminated `<p `
+        # sequence) cannot trigger polynomial backtracking.
         def self.inject_label(content_html, label_html)
-          if content_html.match?(/<p(?:\s[^>]*)?>/)
-            content_html.sub(/<p(?:\s[^>]*)?>/, "\\0#{label_html}")
-          else
-            label_html + content_html
-          end
+          injection_point = first_paragraph_open_tag_end(content_html)
+          return label_html + content_html if injection_point.nil?
+
+          content_html.dup.insert(injection_point, label_html)
+        end
+
+        # Returns the index immediately AFTER the '>' that closes the
+        # first `<p ...>` opening tag in +content_html+, or nil if the
+        # string has no `<p` token. Search is linear: find the first
+        # occurrence of "<p" (optionally followed by attributes up to
+        # the next '>').
+        def self.first_paragraph_open_tag_end(content_html)
+          p_start = content_html.index("<p")
+          return nil if p_start.nil?
+          return nil if p_start + 2 >= content_html.length
+
+          tag_end = content_html.index(">", p_start + 2)
+          return nil if tag_end.nil?
+
+          tag_end + 1
         end
       end
     end
