@@ -21,8 +21,8 @@ RSpec.describe "Theme override via Generator.generate" do
 
       html = Metanorma::Html::Generator.generate(doc, theme: dir)
 
-      html.should include("--mn-primary: #123456")
-      html.should include("acme-custom-marker")
+      expect(html).to include("--mn-primary: #123456")
+      expect(html).to include("acme-custom-marker")
     end
   end
 
@@ -33,7 +33,7 @@ RSpec.describe "Theme override via Generator.generate" do
 
       html = Metanorma::Html::Generator.generate(doc, theme: path)
 
-      html.should include("--mn-primary: #654321")
+      expect(html).to include("--mn-primary: #654321")
     end
   end
 
@@ -42,6 +42,6 @@ RSpec.describe "Theme override via Generator.generate" do
 
     html = Metanorma::Html::Generator.generate(doc, theme: theme)
 
-    html.should include("--mn-primary: #aabbcc")
+    expect(html).to include("--mn-primary: #aabbcc")
   end
 end

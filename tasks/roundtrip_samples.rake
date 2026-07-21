@@ -37,11 +37,11 @@ module RoundtripSamples
 
   # Maps mn-samples-* repo name to the model class for round-tripping.
   # nil means no document model exists yet — reported as "no_model".
+  # OIML moved to the metanorma-oiml gem — its roundtrip lives there.
   FLAVOR_MODEL_MAP = {
     "iso"     => Metanorma::IsoDocument::Root,
     "iec"     => Metanorma::IecDocument::Root,
     "ieee"    => Metanorma::IeeeDocument::Root,
-    "oiml"    => Metanorma::OimlDocument::Root,
     "iho"     => Metanorma::IhoDocument::Root,
     "cc"      => Metanorma::CcDocument::Root,
     "bipm"    => Metanorma::BipmDocument::Root,
