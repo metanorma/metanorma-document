@@ -125,6 +125,7 @@ module Metanorma
         def render_note_children(...) = @renderer.render_note_children(...)
         def render_simple_children(...) = @renderer.render_simple_children(...)
         def render_full_block_children(...) = @renderer.render_full_block_children(...)
+        def render_label_paragraph(...) = @renderer.render_label_paragraph(...)
       end
 
       def renderer_context
@@ -668,13 +669,20 @@ module Metanorma
       end
 
       def render_block_children(model,
-children:)
-        @block_renderer.render_block_children(model, children: children)
+children:, **)
+        @block_renderer.render_block_children(model, children: children, **)
       end
 
       def render_note_children(model) = @block_renderer.render_note_children(model)
       def render_simple_children(model) = @block_renderer.render_simple_children(model)
-      def render_full_block_children(model) = @block_renderer.render_full_block_children(model)
+
+      def render_full_block_children(model, **)
+        @block_renderer.render_full_block_children(model, **)
+      end
+
+      def render_label_paragraph(content_html, **)
+        @block_renderer.render_label_paragraph(content_html, **)
+      end
 
       # Section rendering delegation
       def render_basic_section(section,
