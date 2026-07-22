@@ -23,6 +23,17 @@ RSpec.describe Metanorma::Html::Drops do
       expect(note).not_to be_nil
       expect(note.text).to include("NOTE")
     end
+
+    it "places the note label inside the first <p> of the note" do
+      first_p = page.at_css(".note-block > p:first-child")
+      expect(first_p).not_to be_nil
+      first_child = first_p.children.find do |n|
+        n.is_a?(Nokogiri::XML::Element)
+      end
+      expect(first_child).not_to be_nil
+      expect(first_child["class"])
+        .to(satisfy { |c| %w[note-label term-note-label].include?(c) })
+    end
   end
 
   describe "ExampleDrop" do
@@ -34,6 +45,14 @@ RSpec.describe Metanorma::Html::Drops do
       example = page.at_css(".example .example-label")
       expect(example).not_to be_nil
       expect(example.text).to include("EXAMPLE")
+    end
+
+    it "places the example label inside the first <p> of the example" do
+      first_p = page.at_css(".example > p:first-child")
+      expect(first_p).not_to be_nil
+      first_child = first_p.children.first
+      expect(first_child).to be_a(Nokogiri::XML::Element)
+      expect(first_child["class"]).to eq("example-label")
     end
   end
 

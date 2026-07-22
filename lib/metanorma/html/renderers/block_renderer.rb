@@ -34,7 +34,7 @@ module Metanorma
           @coordinator = coordinator
         end
 
-        def render_paragraph(p, **_opts)
+        def render_paragraph(p, label: nil, label_class: nil, **_opts)
           attrs = element_attrs(id: safe_attr(p, :id),
                                 style: coordinator.alignment_style(safe_attr(p,
                                                                              :alignment)))
@@ -42,6 +42,21 @@ module Metanorma
           render_liquid("_paragraph.html.liquid", {
                           "attrs" => attrs,
                           "content" => content,
+                          "label" => label,
+                          "label_class" => label_class,
+                        })
+        end
+
+        # Wraps an already-rendered HTML fragment in a `<p>` opened by the
+        # given label span. Used by NoteDrop / ExampleDrop when a note has
+        # no paragraph child to host the label (e.g. inline-only content or
+        # an empty note). All markup is emitted by `_paragraph.html.liquid`.
+        def render_label_paragraph(content_html, label:, label_class:)
+          render_liquid("_paragraph.html.liquid", {
+                          "attrs" => "",
+                          "content" => content_html,
+                          "label" => label,
+                          "label_class" => label_class,
                         })
         end
 
@@ -354,16 +369,33 @@ module Metanorma
                         })
         end
 
-        def render_block_children(model, children:)
+        def render_block_children(model, children:, first_paragraph_label: nil,
+                                 first_paragraph_label_class: nil)
           parts = []
+          label_applied = first_paragraph_label.nil?
+
           children.each do |attr, render_method|
             values = safe_attr(model, attr)
             next if values.nil?
 
             Array(values).each do |v|
-              parts << (public_send(render_method, v) || "")
+              if !label_applied && render_method == :render_paragraph
+                parts << (render_paragraph(v,
+                                           label: first_paragraph_label,
+                                           label_class: first_paragraph_label_class) || "")
+                label_applied = true
+              else
+                parts << (public_send(render_method, v) || "")
+              end
             end
           end
+
+          unless label_applied
+            parts.unshift(render_label_paragraph("",
+                                                 label: first_paragraph_label,
+                                                 label_class: first_paragraph_label_class))
+          end
+
           parts.join
         end
 
@@ -375,8 +407,11 @@ module Metanorma
           render_block_children(model, children: SIMPLE_CHILDREN)
         end
 
-        def render_full_block_children(model)
-          render_block_children(model, children: BLOCK_CHILDREN)
+        def render_full_block_children(model, first_paragraph_label: nil,
+                                       first_paragraph_label_class: nil)
+          render_block_children(model, children: BLOCK_CHILDREN,
+                                       first_paragraph_label: first_paragraph_label,
+                                       first_paragraph_label_class: first_paragraph_label_class)
         end
 
         private

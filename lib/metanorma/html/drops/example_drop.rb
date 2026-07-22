@@ -4,15 +4,18 @@ module Metanorma
   module Html
     module Drops
       class ExampleDrop < BlockElementDrop
+        LABEL_CLASS = "example-label"
+        private_constant :LABEL_CLASS
+
         def self.from_model(example, renderer:)
           id = renderer.safe_attr(example, :id)
           label = renderer.extract_block_label(example, "EXAMPLE")
 
-          content_html = renderer.render_full_block_children(example) || ""
-          # Same convention as notes: the EXAMPLE label opens the first
-          # paragraph rather than floating outside it.
-          label_html = %(<span class="example-label">#{renderer.escape_html(label)}</span>&nbsp;)
-          content_html = NoteDrop.inject_label(content_html, label_html)
+          content_html = renderer.render_full_block_children(
+            example,
+            first_paragraph_label: label,
+            first_paragraph_label_class: LABEL_CLASS,
+          ) || ""
 
           new(
             id: id,
