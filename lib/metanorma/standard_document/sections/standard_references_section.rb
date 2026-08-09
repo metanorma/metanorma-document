@@ -22,6 +22,10 @@ module Metanorma
         attribute :hidden, :boolean
         attribute :references, Metanorma::Document::Components::BibData::BibliographicItem,
                   collection: true
+        attribute :subsections, StandardReferencesSection,
+                  collection: true
+        attribute :clauses, Metanorma::StandardDocument::Sections::ClauseSection,
+                  collection: true
         attribute :passthrough, Metanorma::StandardDocument::Blocks::Passthrough,
                   collection: true
         attribute :note,
@@ -61,6 +65,8 @@ module Metanorma
           map_element "p", to: :p
           map_element "note", to: :note
           map_element "bibitem", to: :references
+          map_element "references", to: :subsections
+          map_element "clause", to: :clauses
           map_element "passthrough", to: :passthrough
           map_element "table", to: :table
           map_element "fmt-title", to: :fmt_title
