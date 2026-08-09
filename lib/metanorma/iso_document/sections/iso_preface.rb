@@ -21,7 +21,7 @@ module Metanorma
       # dual mapping.
       class IsoPreface < Lutaml::Model::Serializable
         attribute :abstract, IsoAbstractSection
-        attribute :foreword, IsoForewordSection, required: true
+        attribute :foreword, IsoForewordSection
         attribute :introduction, IsoClauseSection
 
         # Presentation front-matter clauses (e.g. table of contents placeholder)
