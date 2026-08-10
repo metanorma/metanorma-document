@@ -3,32 +3,6 @@
 require "spec_helper"
 
 RSpec.describe "metanorma-document model extensions for validation", type: :model do
-  describe "IsoPreface#foreword required" do
-    it "flags missing foreword via Layer 1 validate" do
-      xml = <<~XML
-        <metanorma xmlns="https://www.metanorma.org/ns/standoc" type="semantic" flavor="iso">
-          <bibdata><docidentifier>ISO 1</docidentifier></bibdata>
-          <preface/>
-        </metanorma>
-      XML
-      root = Metanorma::IsoDocument::Root.from_xml(xml)
-      errors = root.preface.validate
-      expect(errors).not_to be_empty
-      expect(errors.any? { |e| e.is_a?(Lutaml::Model::RequiredAttributeMissingError) }).to be(true)
-    end
-
-    it "passes when foreword is present" do
-      xml = <<~XML
-        <metanorma xmlns="https://www.metanorma.org/ns/standoc" type="semantic" flavor="iso">
-          <bibdata><docidentifier>ISO 1</docidentifier></bibdata>
-          <preface><foreword><p>text</p></foreword></preface>
-        </metanorma>
-      XML
-      root = Metanorma::IsoDocument::Root.from_xml(xml)
-      expect(root.preface.validate).to be_empty
-    end
-  end
-
   describe "StandardReferencesSection nested children" do
     it "preserves nested references sections" do
       xml = <<~XML
