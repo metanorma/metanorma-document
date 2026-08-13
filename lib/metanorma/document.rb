@@ -39,7 +39,15 @@ module Metanorma
   end
 
   autoload :BasicDocument, "#{__dir__}/basic_document"
+  # StandardDocument canonical home is metanorma-standoc (PR #1232).
+  # This autoload remains for backwards compat with consumers that have
+  # not yet migrated to Metanorma::Standoc::Document. Scheduled for
+  # removal once downstream flavor gems update.
   autoload :StandardDocument, "metanorma/standard_document"
+  # IsoDocument canonical home is metanorma-iso (PR #1618). This
+  # autoload remains for backwards compat with consumers that have not
+  # yet migrated to Metanorma::Iso::Document. Scheduled for removal
+  # once downstream flavor gems update.
   autoload :IsoDocument, "metanorma/iso_document"
   autoload :IecDocument, "metanorma/iec_document"
   autoload :IeeeDocument, "metanorma/ieee_document"
