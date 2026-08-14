@@ -30,44 +30,16 @@ module Metanorma
       # For now, we cannot parse arbitrary XML into Lutaml models without knowing
       # the target class. This will be addressed in a future refactoring.
       # BasicDocument does not have XML root mapping and cannot be used to parse
-      # documents directly. Use StandardDocument or IsoDocument for specific flavors.
+      # documents directly. Use a flavor document model for specific flavors.
       raise NotImplementedError,
             "BasicDocument cannot parse XML directly. " \
-            "Use StandardDocument or IsoDocument for specific document flavors, " \
-            "or implement a custom parser that determines the appropriate document class."
+            "Use a flavor document model (e.g. Metanorma::Standoc::Document::Root " \
+            "from metanorma-standoc), or implement a custom parser."
     end
   end
 
   autoload :BasicDocument, "#{__dir__}/basic_document"
-  # StandardDocument canonical home is metanorma-standoc (PR #1232).
-  # This autoload remains for backwards compat with consumers that have
-  # not yet migrated to Metanorma::Standoc::Document. Scheduled for
-  # removal once downstream flavor gems update.
-  autoload :StandardDocument, "metanorma/standard_document"
-  # IsoDocument canonical home is metanorma-iso (PR #1618). This
-  # autoload remains for backwards compat with consumers that have not
-  # yet migrated to Metanorma::Iso::Document. Scheduled for removal
-  # once downstream flavor gems update.
-  autoload :IsoDocument, "metanorma/iso_document"
-  autoload :IecDocument, "metanorma/iec_document"
-  autoload :IeeeDocument, "metanorma/ieee_document"
-  autoload :IetfDocument, "metanorma/ietf_document"
-  autoload :IhoDocument, "metanorma/iho_document"
-  autoload :CcDocument, "metanorma/cc_document"
-  autoload :CsaDocument, "metanorma/csa_document"
-  autoload :BipmDocument, "metanorma/bipm_document"
-  autoload :BsiDocument, "metanorma/bsi_document"
-  autoload :GbDocument, "metanorma/gb_document"
-  autoload :GenericDocument, "metanorma/generic_document"
-  autoload :ItuDocument, "metanorma/itu_document"
-  autoload :JisDocument, "metanorma/jis_document"
-  autoload :M3dDocument, "metanorma/m3d_document"
-  autoload :NistDocument, "metanorma/nist_document"
-  autoload :OgcDocument, "metanorma/ogc_document"
-  autoload :PlateauDocument, "metanorma/plateau_document"
   autoload :Registers, "metanorma/registers"
-  autoload :RiboseDocument, "metanorma/ribose_document"
-  autoload :UnDocument, "metanorma/un_document"
   autoload :Collection, "metanorma/collection"
   autoload :Html, "metanorma/html"
   autoload :Mirror, "metanorma/mirror"

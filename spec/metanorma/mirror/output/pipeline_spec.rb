@@ -49,7 +49,7 @@ RSpec.describe Metanorma::Mirror::Output::Pipeline do
         "../../../fixtures/iso/is/document-en.presentation.xml", __dir__
       )
       guide = described_class.new(xml_path: xml_path, flavor: "iso").process
-      expect(guide.document).to be_a(Metanorma::IsoDocument::Root)
+      expect(guide.document).to be_a(Metanorma::Iso::Document::Root)
     end
   end
 

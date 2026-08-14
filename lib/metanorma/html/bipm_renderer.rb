@@ -3,7 +3,7 @@
 module Metanorma
   module Html
     class BipmRenderer < IsoRenderer
-      register_render Metanorma::BipmDocument::Root, :render_document
+      register_render "Metanorma::Bipm::Document::Root", :render_document
       register_render Metanorma::StandardDocument::Sections::Preface,
                       :render_preface
       register_render Metanorma::StandardDocument::Sections::ClauseSection,

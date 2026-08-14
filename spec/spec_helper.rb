@@ -6,7 +6,11 @@ if ENV["COVERAGE"]
 end
 
 require_relative "../lib/metanorma/document"
-
+# The Html/Mirror subsystems render flavor documents; their specs
+# exercise Standoc/ISO/ITU models. The gems are dev-time Gemfile pins.
+require "metanorma/standoc"
+require "metanorma/iso/document"
+require "metanorma/itu/document"
 Dir[File.join(__dir__, "support/**/*.rb")].each { |f| require f }
 
 RSpec.configure do |config|

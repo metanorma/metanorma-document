@@ -3,20 +3,20 @@
 module Metanorma
   module Html
     class OgcRenderer < IsoRenderer
-      register_render Metanorma::OgcDocument::Root, :render_document
-      register_render Metanorma::StandardDocument::Sections::Preface,
+      register_render "Metanorma::Ogc::Document::Root", :render_document
+      register_render "Metanorma::Standoc::Document::Sections::Preface",
                       :render_preface
-      register_render Metanorma::StandardDocument::Sections::ClauseSection,
+      register_render "Metanorma::Standoc::Document::Sections::ClauseSection",
                       :render_clause
-      register_render Metanorma::StandardDocument::Sections::AnnexSection,
+      register_render "Metanorma::Standoc::Document::Sections::AnnexSection",
                       :render_annex
-      register_render Metanorma::StandardDocument::Sections::ContentSection,
+      register_render "Metanorma::Standoc::Document::Sections::ContentSection",
                       :render_clause
-      register_render Metanorma::StandardDocument::Sections::TermsSection,
+      register_render "Metanorma::Standoc::Document::Sections::TermsSection",
                       :render_terms_section
-      register_render Metanorma::StandardDocument::Sections::BibliographySection,
+      register_render "Metanorma::Standoc::Document::Sections::BibliographySection",
                       :render_clause
-      register_render Metanorma::StandardDocument::Sections::DefinitionSection,
+      register_render "Metanorma::Standoc::Document::Sections::DefinitionSection",
                       :render_clause
     end
   end

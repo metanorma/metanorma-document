@@ -3,7 +3,7 @@
 module Metanorma
   module Html
     class IhoRenderer < IsoRenderer
-      register_render Metanorma::IhoDocument::Root, :render_document
+      register_render "Metanorma::Iho::Document::Root", :render_document
     end
   end
 end

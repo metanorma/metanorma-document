@@ -99,42 +99,42 @@ module Metanorma
 
         def register_sections(registry)
           registry.register(
-            Metanorma::StandardDocument::Sections::ClauseSection,
+            Metanorma::Standoc::Document::Sections::ClauseSection,
             Handlers::Section,
             method_name: :clause,
           )
           registry.register(
-            Metanorma::StandardDocument::Sections::AnnexSection,
+            Metanorma::Standoc::Document::Sections::AnnexSection,
             Handlers::Section,
             method_name: :annex,
           )
           registry.register(
-            Metanorma::StandardDocument::Sections::ContentSection,
+            Metanorma::Standoc::Document::Sections::ContentSection,
             Handlers::Section,
             method_name: :content_section,
           )
           registry.register(
-            Metanorma::StandardDocument::Sections::TermsSection,
+            Metanorma::Standoc::Document::Sections::TermsSection,
             Handlers::Section,
             method_name: :terms,
           )
           registry.register(
-            Metanorma::IsoDocument::Sections::IsoTermsSection,
+            Metanorma::Iso::Document::Sections::IsoTermsSection,
             Handlers::Section,
             method_name: :terms,
           )
           registry.register(
-            Metanorma::StandardDocument::Sections::DefinitionSection,
+            Metanorma::Standoc::Document::Sections::DefinitionSection,
             Handlers::Section,
             method_name: :definitions,
           )
           registry.register(
-            Metanorma::StandardDocument::Sections::StandardReferencesSection,
+            Metanorma::Standoc::Document::Sections::StandardReferencesSection,
             Handlers::Section,
             method_name: :references,
           )
           registry.register(
-            Metanorma::StandardDocument::Sections::FloatingTitle,
+            Metanorma::Standoc::Document::Sections::FloatingTitle,
             Handlers::Section,
             method_name: :floating_title,
           )
@@ -142,14 +142,14 @@ module Metanorma
 
         def register_terms(registry)
           registry.register(
-            Metanorma::IsoDocument::Terms::IsoTerm,
+            Metanorma::Iso::Document::Terms::IsoTerm,
             Handlers::Term,
           )
         end
 
         def register_structural(registry)
           registry.register(
-            Metanorma::StandardDocument::Sections::Preface,
+            Metanorma::Standoc::Document::Sections::Preface,
             Handlers::Structural,
             method_name: :preface,
           )
@@ -158,29 +158,31 @@ module Metanorma
           # mixins), so they need explicit registrations — the registry
           # resolves handlers through class ancestry.
           registry.register(
-            Metanorma::IsoDocument::Sections::IsoPreface,
+            Metanorma::Iso::Document::Sections::IsoPreface,
             Handlers::Structural,
             method_name: :preface,
           )
+if defined?(Metanorma::Un::Document)
           registry.register(
-            Metanorma::UnDocument::Sections::UnPreface,
+            Metanorma::Un::Document::Sections::UnPreface,
             Handlers::Structural,
             method_name: :preface,
           )
           # UnAbstractSection likewise composes instead of inheriting
           # ContentSection.
           registry.register(
-            Metanorma::UnDocument::Sections::UnAbstractSection,
+            Metanorma::Un::Document::Sections::UnAbstractSection,
             Handlers::Section,
             method_name: :content_section,
           )
+        end
           registry.register(
-            Metanorma::StandardDocument::Sections::Sections,
+            Metanorma::Standoc::Document::Sections::Sections,
             Handlers::Structural,
             method_name: :sections,
           )
           registry.register(
-            Metanorma::StandardDocument::Sections::BibliographySection,
+            Metanorma::Standoc::Document::Sections::BibliographySection,
             Handlers::Structural,
             method_name: :bibliography,
           )

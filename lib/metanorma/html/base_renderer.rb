@@ -64,22 +64,39 @@ module Metanorma
       METANORMA_LOGO = "metanorma-logo.svg"
 
       class << self
-        def render_registry
-          @render_registry ||= {}
-        end
+  def render_registry
+    @render_registry ||= {}
+  end
 
-        def register_render(type_class, method_name)
-          render_registry[type_class] = method_name
-        end
+  def register_render(type_class, method_name)
+    resolved = resolve_type(type_class)
+    render_registry[resolved] = method_name if resolved
+  end
 
-        def inline_registry
-          @inline_registry ||= {}
-        end
+  def inline_registry
+    @inline_registry ||= {}
+  end
 
-        def register_inline_render(type_class, method_name)
-          inline_registry[type_class] = method_name
-        end
-      end
+  def register_inline_render(type_class, method_name)
+    resolved = resolve_type(type_class)
+    inline_registry[resolved] = method_name if resolved
+  end
+
+  # type_class may be a Class or a String constant name. String form
+  # requires the owning flavor gem, then resolves; if the gem is not
+  # installed the registration is skipped (that flavor cannot be
+  # rendered in this process anyway).
+  def resolve_type(type_class)
+    return type_class unless type_class.is_a?(String)
+    flavor = type_class.split("::")[1].to_s.downcase
+    begin
+      require "metanorma/#{flavor}/document"
+    rescue LoadError
+      nil
+    end
+    Object.const_defined?(type_class) ? Object.const_get(type_class) : nil
+  end
+end
 
       attr_reader :inline_renderer, :block_renderer, :section_renderer,
                   :pubid_renderer, :index_term_collector, :footnote_collector
@@ -382,7 +399,7 @@ module Metanorma
                       :render_note
       register_render Metanorma::Document::Components::AncillaryBlocks::ExampleBlock,
                       :render_example
-      register_render Metanorma::StandardDocument::Blocks::Form,
+      register_render "Metanorma::Standoc::Document::Blocks::Form",
                       :render_form
       register_render Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock,
                       :render_sourcecode
@@ -449,7 +466,7 @@ module Metanorma
                              :render_fmt_stem
       register_inline_render Metanorma::Document::Components::Inline::CommaElement,
                              :render_comma
-      register_inline_render Metanorma::StandardDocument::Elements::Input,
+      register_inline_render "Metanorma::Standoc::Document::Elements::Input",
                              :render_input
       register_inline_render Metanorma::Document::Components::Inline::EnumCommaElement,
                              :render_comma

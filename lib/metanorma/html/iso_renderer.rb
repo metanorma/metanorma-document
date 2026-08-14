@@ -10,28 +10,28 @@ module Metanorma
     class IsoRenderer < StandardRenderer
       # --- Public hooks for flavor customization ---
 
-      register_render Metanorma::IsoDocument::Root, :render_document
-      register_render Metanorma::IsoDocument::Sections::IsoPreface,
+      register_render "Metanorma::Iso::Document::Root", :render_document
+      register_render "Metanorma::Iso::Document::Sections::IsoPreface",
                       :render_preface
-      register_render Metanorma::IsoDocument::Sections::IsoSections,
+      register_render "Metanorma::Iso::Document::Sections::IsoSections",
                       :render_sections
-      register_render Metanorma::IsoDocument::Sections::IsoClauseSection,
+      register_render "Metanorma::Iso::Document::Sections::IsoClauseSection",
                       :render_clause
-      register_render Metanorma::IsoDocument::Sections::IsoAnnexSection,
+      register_render "Metanorma::Iso::Document::Sections::IsoAnnexSection",
                       :render_annex
-      register_render Metanorma::IsoDocument::Sections::IsoTermsSection,
+      register_render "Metanorma::Iso::Document::Sections::IsoTermsSection",
                       :render_terms_section
-      register_render Metanorma::IsoDocument::Sections::IsoForewordSection,
+      register_render "Metanorma::Iso::Document::Sections::IsoForewordSection",
                       :render_foreword
-      register_render Metanorma::IsoDocument::Sections::IsoAbstractSection,
+      register_render "Metanorma::Iso::Document::Sections::IsoAbstractSection",
                       :render_abstract
-      register_render Metanorma::IsoDocument::Terms::IsoTerm, :render_term
-      register_render Metanorma::IsoDocument::Terms::TermNote, :render_term_note
-      register_render Metanorma::IsoDocument::Terms::TermExample,
+      register_render "Metanorma::Iso::Document::Terms::IsoTerm", :render_term
+      register_render "Metanorma::Iso::Document::Terms::TermNote", :render_term_note
+      register_render "Metanorma::Iso::Document::Terms::TermExample",
                       :render_term_example
-      register_render Metanorma::IsoDocument::Boilerplate, :render_boilerplate
+      register_render "Metanorma::Iso::Document::Boilerplate", :render_boilerplate
 
-      register_inline_render Metanorma::IsoDocument::Terms::TermOrigin,
+      register_inline_render "Metanorma::Iso::Document::Terms::TermOrigin",
                              :render_term_origin
 
       def render_term_origin(element)

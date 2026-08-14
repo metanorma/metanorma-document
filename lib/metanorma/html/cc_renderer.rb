@@ -3,7 +3,7 @@
 module Metanorma
   module Html
     class CcRenderer < IsoRenderer
-      register_render Metanorma::CcDocument::Root, :render_document
+      register_render "Metanorma::Cc::Document::Root", :render_document
     end
   end
 end
