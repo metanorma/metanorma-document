@@ -5,6 +5,21 @@ source "https://rubygems.org"
 # Specify your gem's dependencies in metanorma-document.gemspec
 gemspec
 
+# TEMPORARY: cross-PR branch pins so the Html/Mirror specs (which render
+# flavor documents) resolve against the new canonical homes during the
+# model-ownership migration. Revert each once its PR merges:
+#   - https://github.com/metanorma/metanorma-standoc/pull/1232
+#   - https://github.com/metanorma/metanorma-iso/pull/1618
+#   - https://github.com/metanorma/metanorma-itu/pull/832
+gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "feat/move-standard-document"
+gem "metanorma-iso", github: "metanorma/metanorma-iso", branch: "feat/model-validation-migration"
+gem "metanorma-itu", github: "metanorma/metanorma-itu", branch: "feat/move-itu-document"
+gem "metanorma-ogc", github: "metanorma/metanorma-ogc", branch: "feat/move-ogc-document"
+gem "metanorma-iec", github: "metanorma/metanorma-iec", branch: "feat/move-iec-document"
+gem "isodoc", github: "metanorma/isodoc", branch: "rt-pubid-2-migration"
+gem "relaton-bib", "~> 2.2.0.pre.alpha.1"
+gem "pubid", github: "pubid/pubid", branch: "main"
+
 # Dependency sources. Default (no env vars): released gems, exactly the
 # contract downstream users get — CI and local dev must test that.
 # METANORMA_CI_EDGE=1   -> track upstream main branches (bleeding-edge CI).

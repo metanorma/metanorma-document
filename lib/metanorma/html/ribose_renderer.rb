@@ -3,7 +3,7 @@
 module Metanorma
   module Html
     class RiboseRenderer < IsoRenderer
-      register_render Metanorma::RiboseDocument::Root, :render_document
+      register_render "Metanorma::Ribose::Document::Root", :render_document
     end
   end
 end

@@ -2,7 +2,7 @@
 
 require "spec_helper"
 require "metanorma/mirror"
-require "metanorma/iso_document"
+require "metanorma/iso/document"
 
 RSpec.describe Metanorma::Mirror::Handlers::Section do
   let(:registry) { Metanorma::Mirror.build_default_registry }
@@ -13,11 +13,11 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
   end
 
   def parse_clause(xml)
-    Metanorma::StandardDocument::Sections::ClauseSection.from_xml(xml)
+    Metanorma::Standoc::Document::Sections::ClauseSection.from_xml(xml)
   end
 
   def parse_annex(xml)
-    Metanorma::StandardDocument::Sections::AnnexSection.from_xml(xml)
+    Metanorma::Standoc::Document::Sections::AnnexSection.from_xml(xml)
   end
 
   describe ".clause" do
@@ -63,7 +63,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
 
   describe ".floating_title" do
     it "returns a FloatingTitle hash" do
-      el = Metanorma::StandardDocument::Sections::FloatingTitle.from_xml(
+      el = Metanorma::Standoc::Document::Sections::FloatingTitle.from_xml(
         "<floating-title depth='3'>Subtitle</floating-title>",
       )
       result = described_class.floating_title(el, context: context)
@@ -71,7 +71,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
     end
 
     it "extracts depth" do
-      el = Metanorma::StandardDocument::Sections::FloatingTitle.from_xml(
+      el = Metanorma::Standoc::Document::Sections::FloatingTitle.from_xml(
         "<floating-title depth='3'>Subtitle</floating-title>",
       )
       result = described_class.floating_title(el, context: context)
@@ -102,7 +102,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
 
   describe ".content_section" do
     it "returns a content_section hash" do
-      el = Metanorma::StandardDocument::Sections::ContentSection.from_xml(
+      el = Metanorma::Standoc::Document::Sections::ContentSection.from_xml(
         "<foreword id='fw'><title>Foreword</title><p>Text</p></foreword>",
       )
       result = described_class.content_section(el, context: context)
@@ -113,7 +113,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
 
   describe ".terms" do
     it "returns a terms hash" do
-      el = Metanorma::StandardDocument::Sections::TermsSection.from_xml(
+      el = Metanorma::Standoc::Document::Sections::TermsSection.from_xml(
         "<terms id='terms'><title>Terms</title></terms>",
       )
       result = described_class.terms(el, context: context)
@@ -124,7 +124,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
 
   describe ".definitions" do
     it "returns a definitions hash" do
-      el = Metanorma::StandardDocument::Sections::DefinitionSection.from_xml(
+      el = Metanorma::Standoc::Document::Sections::DefinitionSection.from_xml(
         "<definitions id='defs'><title>Definitions</title></definitions>",
       )
       result = described_class.definitions(el, context: context)
@@ -135,7 +135,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Section do
 
   describe ".references" do
     it "returns a references hash" do
-      el = Metanorma::StandardDocument::Sections::StandardReferencesSection.from_xml(
+      el = Metanorma::Standoc::Document::Sections::StandardReferencesSection.from_xml(
         "<references id='refs' normative='true'><p>The following documents</p></references>",
       )
       result = described_class.references(el, context: context)

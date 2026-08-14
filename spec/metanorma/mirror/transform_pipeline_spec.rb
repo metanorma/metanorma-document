@@ -2,7 +2,7 @@
 
 require "spec_helper"
 require "metanorma/mirror"
-require "metanorma/iso_document"
+require "metanorma/iso/document"
 
 RSpec.describe "Mirror forward transform pipeline" do
   let(:xml_path) do
@@ -13,7 +13,7 @@ RSpec.describe "Mirror forward transform pipeline" do
 
   describe "full pipeline with real ISO document" do
     it "parses XML and produces a mirror Container model" do
-      doc = Metanorma::IsoDocument::Root.from_xml(xml)
+      doc = Metanorma::Iso::Document::Root.from_xml(xml)
       transformer = Metanorma::Mirror::Transformer.new
       result = transformer.from_metanorma(doc)
 
@@ -23,7 +23,7 @@ RSpec.describe "Mirror forward transform pipeline" do
     end
 
     it "produces serializable output" do
-      doc = Metanorma::IsoDocument::Root.from_xml(xml)
+      doc = Metanorma::Iso::Document::Root.from_xml(xml)
       transformer = Metanorma::Mirror::Transformer.new
       result = transformer.from_metanorma(doc)
 
@@ -34,7 +34,7 @@ RSpec.describe "Mirror forward transform pipeline" do
     end
 
     it "round-trips through JSON serialization" do
-      doc = Metanorma::IsoDocument::Root.from_xml(xml)
+      doc = Metanorma::Iso::Document::Root.from_xml(xml)
       transformer = Metanorma::Mirror::Transformer.new
       result = transformer.from_metanorma(doc)
 
@@ -47,7 +47,7 @@ RSpec.describe "Mirror forward transform pipeline" do
   end
 
   describe "section structure" do
-    let(:doc) { Metanorma::IsoDocument::Root.from_xml(xml) }
+    let(:doc) { Metanorma::Iso::Document::Root.from_xml(xml) }
     let(:mirror) { Metanorma::Mirror::Transformer.new.from_metanorma(doc) }
 
     it "contains preface and sections" do
@@ -73,7 +73,7 @@ RSpec.describe "Mirror forward transform pipeline" do
   end
 
   describe "inline content" do
-    let(:doc) { Metanorma::IsoDocument::Root.from_xml(xml) }
+    let(:doc) { Metanorma::Iso::Document::Root.from_xml(xml) }
     let(:mirror) { Metanorma::Mirror::Transformer.new.from_metanorma(doc) }
 
     it "paragraphs contain text nodes" do
@@ -110,7 +110,7 @@ RSpec.describe "Mirror forward transform pipeline" do
 
   describe "ID strategy" do
     it "Preserve strategy keeps original IDs" do
-      doc = Metanorma::IsoDocument::Root.from_xml(xml)
+      doc = Metanorma::Iso::Document::Root.from_xml(xml)
       strategy = Metanorma::Mirror::IdStrategy::Preserve.new
       transformer = Metanorma::Mirror::Transformer.new(id_strategy: strategy)
       result = transformer.from_metanorma(doc)
@@ -125,7 +125,7 @@ RSpec.describe "Mirror forward transform pipeline" do
     end
 
     it "Positional strategy assigns positional IDs" do
-      doc = Metanorma::IsoDocument::Root.from_xml(xml)
+      doc = Metanorma::Iso::Document::Root.from_xml(xml)
       strategy = Metanorma::Mirror::IdStrategy::Positional.new
       transformer = Metanorma::Mirror::Transformer.new(id_strategy: strategy)
       result = transformer.from_metanorma(doc)
@@ -136,7 +136,7 @@ RSpec.describe "Mirror forward transform pipeline" do
   end
 
   describe "block types" do
-    let(:doc) { Metanorma::IsoDocument::Root.from_xml(xml) }
+    let(:doc) { Metanorma::Iso::Document::Root.from_xml(xml) }
     let(:mirror) { Metanorma::Mirror::Transformer.new.from_metanorma(doc) }
 
     it "produces note nodes" do

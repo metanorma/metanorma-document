@@ -3,7 +3,7 @@
 module Metanorma
   module Html
     class IetfRenderer < IsoRenderer
-      register_render Metanorma::IetfDocument::Root, :render_document
+      register_render "Metanorma::Ietf::Document::Root", :render_document
     end
   end
 end

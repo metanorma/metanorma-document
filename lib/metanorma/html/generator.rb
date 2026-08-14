@@ -4,6 +4,7 @@ module Metanorma
   module Html
     class Generator
       @tastes = []
+      @resolved_tastes = {}
       @setup = false
 
       class << self
@@ -41,13 +42,28 @@ module Metanorma
         private
 
         def find_taste(document)
-          @tastes.each do |model_class, publisher_abbrev, renderer_class|
-            next unless document.is_a?(model_class)
-            return renderer_class if taste_publisher?(document,
-                                                      publisher_abbrev)
-          end
-          nil
-        end
+  @tastes.each do |model_class, publisher_abbrev, renderer_class|
+    klass = resolve_model_class(model_class)
+    next unless klass && document.is_a?(klass)
+    return renderer_class if taste_publisher?(document,
+                                              publisher_abbrev)
+  end
+  nil
+end
+
+def resolve_model_class(model_class)
+  return model_class if model_class.is_a?(Class)
+  return @resolved_tastes[model_class] if @resolved_tastes.key?(model_class)
+
+  flavor = model_class.split("::")[1].to_s.downcase
+  begin
+    require "metanorma/#{flavor}/document"
+  rescue LoadError
+    nil
+  end
+  @resolved_tastes[model_class] =
+    Object.const_defined?(model_class) ? Object.const_get(model_class) : nil
+end
 
         def taste_publisher?(document, abbrev)
           bibdata = document.bibdata if document.is_a?(Lutaml::Model::Serializable)
@@ -99,8 +115,8 @@ module Metanorma
           RiboseRenderer
 
           # Register tastes (publisher-based dispatch within same model)
-          register_taste Metanorma::IsoDocument::Root, "ICC", IccRenderer
-          register_taste Metanorma::RiboseDocument::Root, "PDF Association",
+          register_taste "Metanorma::Iso::Document::Root", "ICC", IccRenderer
+          register_taste "Metanorma::Ribose::Document::Root", "PDF Association",
                          PdfaRenderer
         end
 
@@ -122,68 +138,68 @@ module Metanorma
                               ))
             registry.register(Flavor.new(
                                 name: :iso,
-                                model_class: Metanorma::IsoDocument::Root,
+                                model_class: "Metanorma::Iso::Document::Root",
                                 renderer_class: IsoRenderer,
                                 pubid_module: :"Pubid::Iso",
                               ))
             registry.register(Flavor.new(
                                 name: :bipm,
-                                model_class: Metanorma::BipmDocument::Root,
+                                model_class: "Metanorma::Bipm::Document::Root",
                                 renderer_class: BipmRenderer,
                               ))
             registry.register(Flavor.new(
                                 name: :cc,
-                                model_class: Metanorma::CcDocument::Root,
+                                model_class: "Metanorma::Cc::Document::Root",
                                 renderer_class: CcRenderer,
                               ))
             registry.register(Flavor.new(
                                 name: :csa,
-                                model_class: Metanorma::CsaDocument::Root,
+                                model_class: "Metanorma::Csa::Document::Root",
                                 renderer_class: CsaRenderer,
                                 pubid_module: :"Pubid::Csa",
                               ))
             registry.register(Flavor.new(
                                 name: :iec,
-                                model_class: Metanorma::IecDocument::Root,
+                                model_class: "Metanorma::Iec::Document::Root",
                                 renderer_class: IecRenderer,
                                 pubid_module: :"Pubid::Iec",
                               ))
             registry.register(Flavor.new(
                                 name: :ieee,
-                                model_class: Metanorma::IeeeDocument::Root,
+                                model_class: "Metanorma::Ieee::Document::Root",
                                 renderer_class: IeeeRenderer,
                                 pubid_module: :"Pubid::Ieee",
                               ))
             registry.register(Flavor.new(
                                 name: :ietf,
-                                model_class: Metanorma::IetfDocument::Root,
+                                model_class: "Metanorma::Ietf::Document::Root",
                                 renderer_class: IetfRenderer,
                               ))
             registry.register(Flavor.new(
                                 name: :iho,
-                                model_class: Metanorma::IhoDocument::Root,
+                                model_class: "Metanorma::Iho::Document::Root",
                                 renderer_class: IhoRenderer,
                                 pubid_module: :"Pubid::Iho",
                               ))
             registry.register(Flavor.new(
                                 name: :itu,
-                                model_class: Metanorma::ItuDocument::Root,
+                                model_class: "Metanorma::Itu::Document::Root",
                                 renderer_class: ItuRenderer,
                                 pubid_module: :"Pubid::Itu",
                               ))
             registry.register(Flavor.new(
                                 name: :ogc,
-                                model_class: Metanorma::OgcDocument::Root,
+                                model_class: "Metanorma::Ogc::Document::Root",
                                 renderer_class: OgcRenderer,
                               ))
             registry.register(Flavor.new(
                                 name: :pdfa,
-                                model_class: Metanorma::RiboseDocument::Root,
+                                model_class: "Metanorma::Ribose::Document::Root",
                                 renderer_class: PdfaRenderer,
                               ))
             registry.register(Flavor.new(
                                 name: :ribose,
-                                model_class: Metanorma::RiboseDocument::Root,
+                                model_class: "Metanorma::Ribose::Document::Root",
                                 renderer_class: RiboseRenderer,
                               ))
           end

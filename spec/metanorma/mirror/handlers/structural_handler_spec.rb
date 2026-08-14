@@ -2,7 +2,7 @@
 
 require "spec_helper"
 require "metanorma/mirror"
-require "metanorma/iso_document"
+require "metanorma/iso/document"
 
 RSpec.describe Metanorma::Mirror::Handlers::Structural do
   let(:registry) { Metanorma::Mirror.build_default_registry }
@@ -13,11 +13,11 @@ RSpec.describe Metanorma::Mirror::Handlers::Structural do
   end
 
   def parse_preface(xml)
-    Metanorma::StandardDocument::Sections::Preface.from_xml(xml)
+    Metanorma::Standoc::Document::Sections::Preface.from_xml(xml)
   end
 
   def parse_sections(xml)
-    Metanorma::StandardDocument::Sections::Sections.from_xml(xml)
+    Metanorma::Standoc::Document::Sections::Sections.from_xml(xml)
   end
 
   describe ".preface" do
@@ -52,7 +52,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Structural do
   describe ".bibliography" do
     it "returns a Bibliography hash" do
       xml = "<bibliography><references id='refs'><p>References text</p></references></bibliography>"
-      el = Metanorma::StandardDocument::Sections::BibliographySection.from_xml(xml)
+      el = Metanorma::Standoc::Document::Sections::BibliographySection.from_xml(xml)
       result = described_class.bibliography(el, context: context)
       expect(result.type).to eq("bibliography")
     end

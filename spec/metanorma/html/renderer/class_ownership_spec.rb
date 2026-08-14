@@ -9,7 +9,7 @@ RSpec.describe "HTML class name ownership" do
                      __dir__)
   end
   let(:xml) { File.read(xml_path) }
-  let(:doc) { Metanorma::IsoDocument::Root.from_xml(xml) }
+  let(:doc) { Metanorma::Iso::Document::Root.from_xml(xml) }
   let(:html) { Metanorma::Html::Generator.generate(doc) }
   let(:page) { Nokogiri::HTML(html) }
 

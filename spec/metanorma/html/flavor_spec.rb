@@ -2,8 +2,8 @@
 
 require "spec_helper"
 require "metanorma/html"
-require "metanorma/iso_document"
-require "metanorma/itu_document"
+require "metanorma/iso/document"
+require "metanorma/itu/document"
 
 RSpec.describe Metanorma::Html::Flavor do
   def build_flavor(name:, pubid_module: nil)
