@@ -14,6 +14,7 @@ module Metanorma
         attribute :tag, :string
         attribute :multilingual_rendering, :string
         attribute :id, :string
+        attribute :anchor, :string
         attribute :preferred, Metanorma::StandardDocument::Terms::Designation,
                   collection: true
         attribute :admitted, Metanorma::StandardDocument::Terms::Designation,
@@ -22,16 +23,18 @@ module Metanorma
                   collection: true
         attribute :deprecates, Metanorma::StandardDocument::Terms::Designation,
                   collection: true
+        attribute :fmt_deprecates,
+                  Metanorma::StandardDocument::Terms::FmtDeprecates
         attribute :domain, Metanorma::Document::Components::DataTypes::LocalizedString
         attribute :subject, Metanorma::Document::Components::DataTypes::LocalizedString
         attribute :usage_info,
                   Metanorma::Document::Components::Blocks::BasicBlock, collection: true
         attribute :definition, Metanorma::StandardDocument::Terms::TermDefinition,
                   collection: true
-        attribute :note,
-                  Metanorma::Document::Components::Paragraphs::ParagraphBlock, collection: true
-        attribute :example,
-                  Metanorma::Document::Components::Paragraphs::ParagraphBlock, collection: true
+        attribute :note, Metanorma::StandardDocument::Terms::TermNote,
+                  collection: true
+        attribute :example, Metanorma::StandardDocument::Terms::TermExample,
+                  collection: true
         attribute :source, Metanorma::StandardDocument::Terms::TermSource,
                   collection: true
 
@@ -45,10 +48,12 @@ module Metanorma
           map_attribute "tag", to: :tag
           map_attribute "multilingual-rendering", to: :multilingual_rendering
           map_attribute "id", to: :id
+          map_attribute "anchor", to: :anchor
           map_element "preferred", to: :preferred
           map_element "admitted", to: :admitted
           map_element "related", to: :related
           map_element "deprecates", to: :deprecates
+          map_element "fmt-deprecates", to: :fmt_deprecates
           map_element "domain", to: :domain
           map_element "subject", to: :subject
           map_element "usage-info", to: :usage_info

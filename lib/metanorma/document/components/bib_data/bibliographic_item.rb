@@ -7,6 +7,8 @@ module Metanorma
         # Description of a bibliographic resource.
         class BibliographicItem < Lutaml::Model::Serializable
           attribute :id, :string
+          attribute :hidden, :boolean
+          attribute :suppress_identifier, :boolean
           attribute :type, Metanorma::Document::Relaton::BibItemType
           attribute :fetched, Metanorma::Document::Relaton::DateTime
           attribute :title, Metanorma::Document::Relaton::TypedTitleString,
@@ -65,6 +67,8 @@ module Metanorma
           xml do
             element "bibitem"
             map_attribute "id", to: :id
+            map_attribute "hidden", to: :hidden
+            map_attribute "suppress_identifier", to: :suppress_identifier
             map_attribute "type", to: :type_attr
             map_attribute "anchor", to: :anchor
             map_attribute "semx-id", to: :semx_id

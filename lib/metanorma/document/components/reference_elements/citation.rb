@@ -16,6 +16,8 @@ module Metanorma
                     collection: true
           attribute :locality_stack, Metanorma::Document::Relaton::LocalityStack,
                     collection: true
+          attribute :locality, Metanorma::Document::Relaton::BibItemLocality,
+                    collection: true
           attribute :bib_item, Metanorma::Document::Components::BibData::BibliographicItem
           attribute :display_text, "Metanorma::Document::Components::Inline::DisplayTextElement"
 
@@ -28,6 +30,7 @@ module Metanorma
             map_element "bib-locality", to: :bib_locality
             map_element "bib-locality-stack", to: :bib_locality_stack
             map_element "localityStack", to: :locality_stack
+            map_element "locality", to: :locality
             map_element "bib-item", to: :bib_item
             map_element "display-text", to: :display_text
           end

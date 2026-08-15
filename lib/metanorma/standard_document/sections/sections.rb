@@ -10,6 +10,8 @@ module Metanorma
       #   }
       class Sections < Lutaml::Model::Serializable
         attribute :clause, ClauseSection, collection: true
+        attribute :introduction,
+                  Metanorma::StandardDocument::Sections::Introduction
         attribute :terms,
                   Metanorma::StandardDocument::Sections::TermsSection,
                   collection: true

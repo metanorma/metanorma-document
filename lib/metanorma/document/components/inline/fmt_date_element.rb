@@ -4,25 +4,22 @@ module Metanorma
   module Document
     module Components
       module Inline
-        class VariantTitleElement < Lutaml::Model::Serializable
-          attribute :type, :string
+        # Presentation-layer rendering of an inline date.
+        class FmtDateElement < Lutaml::Model::Serializable
+          include RenderedDisplay
+
           attribute :id, :string
-          attribute :anchor, :string
           attribute :text, :string, collection: true
           attribute :span, SpanElement, collection: true
           attribute :semx, SemxElement, collection: true
-          attribute :br, BrElement, collection: true
 
           xml do
-            element "variant-title"
+            element "fmt-date"
             mixed_content
-            map_attribute "type", to: :type
             map_attribute "id", to: :id
-            map_attribute "anchor", to: :anchor
             map_content to: :text
             map_element "span", to: :span
             map_element "semx", to: :semx
-            map_element "br", to: :br
           end
         end
       end

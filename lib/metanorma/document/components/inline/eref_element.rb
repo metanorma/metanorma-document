@@ -15,7 +15,11 @@ module Metanorma
           attribute :alt, :string
           attribute :display_format, :string
           attribute :relative, :string
+          attribute :connective, :string
+          attribute :custom_connective, :string
           attribute :locality_stack, Metanorma::Document::Relaton::LocalityStack,
+                    collection: true
+          attribute :locality, Metanorma::Document::Relaton::BibItemLocality,
                     collection: true
 
           xml do
@@ -29,7 +33,10 @@ module Metanorma
             map_attribute "alt", to: :alt
             map_attribute "displayFormat", to: :display_format
             map_attribute "relative", to: :relative
+            map_attribute "connective", to: :connective
+            map_attribute "custom-connective", to: :custom_connective
             map_element "localityStack", to: :locality_stack
+            map_element "locality", to: :locality
             map_content to: :text
             Vocabulary::VocabularyXmlMapping.apply_inline_mappings(self)
           end

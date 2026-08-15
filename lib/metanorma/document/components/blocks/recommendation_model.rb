@@ -15,7 +15,16 @@ module Metanorma
             map_element "subject", to: :subject
             map_element "classification", to: :classification
             map_element "description", to: :description
+            map_element "identifier", to: :identifier
+            map_element "title", to: :title
+            map_element "specification", to: :specification
+            map_element "measurement-target", to: :measurement_target
+            map_element "verification", to: :verification
+            map_element "import", to: :import
             map_element "inherit", to: :inherit
+            map_element "fmt-name", to: :fmt_name
+            map_element "fmt-xref-label", to: :fmt_xref_label
+            map_element "fmt-provision", to: :fmt_provision
             map_element "requirement", to: :requirement
             map_element "recommendation", to: :recommendation
             map_element "permission", to: :permission

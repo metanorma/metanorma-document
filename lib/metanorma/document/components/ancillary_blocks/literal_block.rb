@@ -11,6 +11,7 @@ module Metanorma
         # semantically.
         class LiteralBlock < Lutaml::Model::Serializable
           attribute :id, :string
+          attribute :anchor, :string
           attribute :alt, :string
           attribute :align, :string
           attribute :name, Metanorma::Document::Components::TextElements::TextElement,
@@ -20,6 +21,7 @@ module Metanorma
           xml do
             element "pre"
             map_attribute "id", to: :id
+            map_attribute "anchor", to: :anchor
             map_attribute "alt", to: :alt
             map_attribute "align", to: :align
             map_element "name", to: :name
