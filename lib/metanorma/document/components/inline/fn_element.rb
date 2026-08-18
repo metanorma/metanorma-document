@@ -6,6 +6,7 @@ module Metanorma
       module Inline
         class FnElement < Lutaml::Model::Serializable
           attribute :id, :string
+          attribute :anchor, :string
           attribute :reference, :string
           attribute :hiddenref, :boolean
           attribute :target, :string
@@ -18,6 +19,7 @@ module Metanorma
           xml do
             element "fn"
             map_attribute "id", to: :id
+            map_attribute "anchor", to: :anchor
             map_attribute "reference", to: :reference
             map_attribute "hiddenref", to: :hiddenref
             map_attribute "target", to: :target

@@ -110,6 +110,18 @@ module Metanorma
               base.attribute :input,
                              Metanorma::Document::Elements::Input,
                              collection: true
+              base.attribute :passthrough,
+                             Metanorma::Document::Components::Blocks::Passthrough,
+                             collection: true
+              base.attribute :date,
+                             Metanorma::Document::Components::Inline::DateElement,
+                             collection: true
+              base.attribute :fmt_date,
+                             Metanorma::Document::Components::Inline::FmtDateElement,
+                             collection: true
+              base.attribute :erefstack,
+                             Metanorma::Document::Components::Inline::ErefStack,
+                             collection: true
             end
 
             def declare_rendered_display_attributes_on(base)
@@ -168,6 +180,10 @@ module Metanorma
               "add" => :add,
               "del" => :del,
               "input" => :input,
+              "passthrough" => :passthrough,
+              "date" => :date,
+              "fmt-date" => :fmt_date,
+              "erefstack" => :erefstack,
               "fmt-stem" => :fmt_stem,
               "fmt-concept" => :fmt_concept,
               "fmt-fn-label" => :fmt_fn_label,

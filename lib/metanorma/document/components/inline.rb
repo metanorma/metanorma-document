@@ -102,6 +102,16 @@ module Metanorma
                  "metanorma/document/components/inline/semantic_content"
         autoload :LocationElement,
                  "metanorma/document/components/inline/location_element"
+        autoload :DateElement,
+                 "metanorma/document/components/inline/date_element"
+        autoload :FmtDateElement,
+                 "metanorma/document/components/inline/fmt_date_element"
+        autoload :ErefStack,
+                 "metanorma/document/components/inline/eref_stack"
+        autoload :ErrorMessage,
+                 "metanorma/document/components/inline/error_message"
+        autoload :TermrefElement,
+                 "metanorma/document/components/inline/termref_element"
         autoload :SemanticMathElement,
                  "metanorma/document/components/inline/semantic_math_element"
         autoload :RenderedMathElement,

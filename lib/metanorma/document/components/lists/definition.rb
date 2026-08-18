@@ -6,6 +6,7 @@ module Metanorma
       module Lists
         # Definition used to constitute a definition list.
         class Definition < Lutaml::Model::Serializable
+          attribute :anchor, :string
           attribute :item, "Metanorma::Document::Components::TextElements::TextElement",
                     collection: true
           attribute :definition,
@@ -18,6 +19,7 @@ module Metanorma
 
           xml do
             element "dd"
+            map_attribute "anchor", to: :anchor
             map_element "item", to: :item
             map_element "definition", to: :definition
             map_element "p", to: :p

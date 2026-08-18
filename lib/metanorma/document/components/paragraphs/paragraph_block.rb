@@ -83,6 +83,14 @@ module Metanorma
                     collection: true
           attribute :input, Metanorma::Document::Elements::Input,
                     collection: true
+          attribute :passthrough, Metanorma::Document::Components::Blocks::Passthrough,
+                    collection: true
+          attribute :date, Metanorma::Document::Components::Inline::DateElement,
+                    collection: true
+          attribute :fmt_date, Metanorma::Document::Components::Inline::FmtDateElement,
+                    collection: true
+          attribute :erefstack, Metanorma::Document::Components::Inline::ErefStack,
+                    collection: true
 
           # JSON serialization attributes
           attribute :json_type, :string
@@ -141,6 +149,10 @@ module Metanorma
             map_element "add", to: :add
             map_element "del", to: :del
             map_element "input", to: :input
+            map_element "passthrough", to: :passthrough
+            map_element "date", to: :date
+            map_element "fmt-date", to: :fmt_date
+            map_element "erefstack", to: :erefstack
           end
 
           def json_content

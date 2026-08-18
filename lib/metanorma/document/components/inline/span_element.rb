@@ -12,6 +12,7 @@ module Metanorma
 
           attribute :class_attr, :string
           attribute :style, :string
+          attribute :anchor, :string
           attribute :callout,
                     Metanorma::Document::Components::ReferenceElements::Callout,
                     collection: true
@@ -21,6 +22,7 @@ module Metanorma
             mixed_content
             map_attribute "class", to: :class_attr
             map_attribute "style", to: :style
+            map_attribute "anchor", to: :anchor
             map_content to: :text
             map_element "callout", to: :callout
             Vocabulary::VocabularyXmlMapping.apply_inline_mappings(self)

@@ -7,6 +7,7 @@ module Metanorma
         # Base class for table cells with common attributes and mixed content.
         class TableCell < Lutaml::Model::Serializable
           attribute :id, :string
+          attribute :anchor, :string
           attribute :colspan, :integer
           attribute :rowspan, :integer
           attribute :align, :string
@@ -94,6 +95,7 @@ module Metanorma
           xml do
             mixed_content
             map_attribute "id", to: :id
+            map_attribute "anchor", to: :anchor
             map_attribute "colspan", to: :colspan
             map_attribute "rowspan", to: :rowspan
             map_attribute "align", to: :align

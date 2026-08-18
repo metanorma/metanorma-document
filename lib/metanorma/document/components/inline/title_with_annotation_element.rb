@@ -6,6 +6,7 @@ module Metanorma
       module Inline
         class TitleWithAnnotationElement < Lutaml::Model::Serializable
           attribute :id, :string
+          attribute :anchor, :string
           attribute :semx_id, :string
           attribute :text, :string, collection: true
           attribute :fmt_annotation_end, FmtAnnotationBodyElement
@@ -31,6 +32,7 @@ module Metanorma
             element "title"
             mixed_content
             map_attribute "id", to: :id
+            map_attribute "anchor", to: :anchor
             map_attribute "semx-id", to: :semx_id
             map_content to: :text
             map_element "em", to: :em

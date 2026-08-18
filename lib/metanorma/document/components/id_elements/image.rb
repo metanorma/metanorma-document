@@ -9,6 +9,7 @@ module Metanorma
           attribute :height, :string
           attribute :width, :string
           attribute :align, :string
+          attribute :anchor, :string
           attribute :semx_id, :string
           attribute :inline_svg, :string
 
@@ -17,6 +18,7 @@ module Metanorma
             map_attribute "height", to: :height, render_empty: true
             map_attribute "width", to: :width, render_empty: true
             map_attribute "align", to: :align
+            map_attribute "anchor", to: :anchor
             map_attribute "semx-id", to: :semx_id
             map_element "svg", to: :inline_svg, raw: :element
           end

@@ -7,6 +7,7 @@ module Metanorma
         # Definition description element, containing paragraphs.
         class DdElement < Lutaml::Model::Serializable
           attribute :id, :string
+          attribute :anchor, :string
           attribute :semx_id, :string
           attribute :p, "Metanorma::Document::Components::Paragraphs::ParagraphBlock",
                     collection: true
@@ -36,6 +37,7 @@ module Metanorma
           xml do
             element "dd"
             map_attribute "id", to: :id
+            map_attribute "anchor", to: :anchor
             map_attribute "semx-id", to: :semx_id
             map_element "p", to: :p
             map_element "ul", to: :ul

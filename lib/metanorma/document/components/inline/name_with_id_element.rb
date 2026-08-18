@@ -6,6 +6,7 @@ module Metanorma
       module Inline
         class NameWithIdElement < Lutaml::Model::Serializable
           attribute :id, :string
+          attribute :anchor, :string
           attribute :semx_id, :string
           attribute :text, :string
           attribute :stem, TextElements::StemElement, collection: true
@@ -13,6 +14,7 @@ module Metanorma
           xml do
             element "name"
             map_attribute "id", to: :id
+            map_attribute "anchor", to: :anchor
             map_attribute "semx-id", to: :semx_id
             map_content to: :text
             map_element "stem", to: :stem

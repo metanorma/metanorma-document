@@ -7,6 +7,7 @@ module Metanorma
         # Sequence of cells to be displayed as a row in a table.
         class TextTableRow < Lutaml::Model::Serializable
           attribute :id, :string
+          attribute :anchor, :string
           attribute :semx_id, :string
           attribute :td, TextTableCell, collection: true
           attribute :th, HeaderTableCell, collection: true
@@ -14,6 +15,7 @@ module Metanorma
           xml do
             element "tr"
             map_attribute "id", to: :id
+            map_attribute "anchor", to: :anchor
             map_attribute "semx-id", to: :semx_id
             map_element "td", to: :td
             map_element "th", to: :th
