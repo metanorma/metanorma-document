@@ -3,7 +3,7 @@
 require "metanorma/html"
 
 # Spec-side mirror of what flavour gems ship once they adopt the seam:
-# renderer subclasses plus Metanorma::Html.register_flavor registration.
+# renderer subclasses plus Metanorma.register_flavor registration.
 # lib/metanorma carries no flavour code; the portability spec enforces
 # that, and this file proves the seam works end-to-end.
 module SpecFlavors
@@ -568,30 +568,53 @@ module SpecFlavors
     return if @registered
 
     @registered = true
-    Metanorma::Html.register_flavor(Metanorma::Html::Flavor.new(
-                                      name: :iso,
-                                      model_class: "Metanorma::Iso::Document::Root",
-                                      renderer_class: IsoRenderer,
-                                      pubid_module: :"Pubid::Iso",
-                                    ))
-    Metanorma::Html.register_flavor(Metanorma::Html::Flavor.new(
-                                      name: :bipm,
-                                      model_class: "Metanorma::Bipm::Document::Root",
-                                      renderer_class: BipmRenderer,
-                                    ))
-    Metanorma::Html.register_flavor(Metanorma::Html::Flavor.new(
-                                      name: :ogc,
-                                      model_class: "Metanorma::Ogc::Document::Root",
-                                      renderer_class: OgcRenderer,
-                                    ))
+    Metanorma.register_flavor(Metanorma::Flavor.new(
+                                 name: :iso,
+                                 model_class: "Metanorma::Iso::Document::Root",
+                                 pubid_module: :"Pubid::Iso",
+                                 renderers: {
+                                   html: lambda do |document, **_options|
+                                     if SpecFlavors.publisher_abbreviation(document) == "ICC"
+                                       IccRenderer
+                                     else
+                                       IsoRenderer
+                                     end
+                                   end,
+                                 },
+                               ))
+    Metanorma.register_flavor(Metanorma::Flavor.new(
+                                 name: :bipm,
+                                 model_class: "Metanorma::Bipm::Document::Root",
+                                 renderers: { html: BipmRenderer },
+                               ))
+    Metanorma.register_flavor(Metanorma::Flavor.new(
+                                 name: :ogc,
+                                 model_class: "Metanorma::Ogc::Document::Root",
+                                 renderers: { html: OgcRenderer },
+                               ))
+  end
 
-    # Publisher-based dispatch within the iso/ribose models — the taste
-    # mechanism is generic harness machinery; the data is the flavor's.
-    Metanorma::Html::Generator.register_taste(
-      "Metanorma::Iso::Document::Root", "ICC", IccRenderer,
-    )
-    Metanorma::Html::Generator.register_taste(
-      "Metanorma::Ribose::Document::Root", "PDF Association", PdfaRenderer,
-    )
+  # Publisher-based variant selection, mirroring what metanorma-iso
+  # ships as Iso::Html.publisher_abbreviation.
+  def self.publisher_abbreviation(document)
+    bibdata = document.bibdata if document.is_a?(Lutaml::Model::Serializable)
+    return nil unless bibdata
+
+    contributors = bibdata.contributor
+    return nil unless contributors
+
+    contributors.each do |c|
+      roles = c.role
+      next unless roles.is_a?(Array)
+      next unless roles.any? { |r| r&.type == "author" }
+
+      org = c.organization
+      next unless org
+
+      abbrev = org.abbreviation
+      val = abbrev.is_a?(String) ? abbrev : abbrev.to_s
+      return val unless val.empty?
+    end
+    nil
   end
 end
