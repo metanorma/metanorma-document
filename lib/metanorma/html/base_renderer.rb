@@ -200,7 +200,7 @@ end
       def flavor_name
         return nil unless defined?(@document) && @document
 
-        Metanorma.flavors.name_for(@document.class)
+        Metanorma::Core::Flavors.flavor_for(@document)&.name
       end
 
       # Pubid module for the current document's flavor, or nil if the
@@ -208,7 +208,7 @@ end
       def pubid_module
         return nil unless defined?(@document) && @document
 
-        Metanorma.flavors.pubid_module_for(@document.class)
+        Metanorma::Core::Flavors.flavor_for(@document)&.pubid_module_const
       end
 
       def flavor_publishers(_doc_id)

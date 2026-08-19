@@ -558,9 +558,10 @@ module SpecFlavors
     register_render "Metanorma::Standoc::Document::Sections::DefinitionSection", :render_clause
   end
 
-  # No-op subclasses mirror the former empty icc/pdfa renderer classes.
-  class IccRenderer < IsoRenderer; end
-  class PdfaRenderer < IsoRenderer; end
+  # Synthetic variant demonstrating the resolver mechanism: a flavor's
+  # OWN rendering profile, selected by a per-call option. Real variants
+  # belong to the flavor that owns them — never another flavor's repo.
+  class DraftProfileRenderer < IsoRenderer; end
 
   module_function
 
@@ -568,53 +569,29 @@ module SpecFlavors
     return if @registered
 
     @registered = true
-    Metanorma.register_flavor(Metanorma::Flavor.new(
+    Metanorma::Core::Flavors.register(Metanorma::Core::Flavor.new(
                                  name: :iso,
-                                 model_class: "Metanorma::Iso::Document::Root",
+                                 model_root: "Metanorma::Iso::Document::Root",
                                  pubid_module: :"Pubid::Iso",
                                  renderers: {
-                                   html: lambda do |document, **_options|
-                                     if SpecFlavors.publisher_abbreviation(document) == "ICC"
-                                       IccRenderer
+                                   html: lambda do |_document, **options|
+                                     if options[:profile] == :draft
+                                       DraftProfileRenderer
                                      else
                                        IsoRenderer
                                      end
                                    end,
                                  },
                                ))
-    Metanorma.register_flavor(Metanorma::Flavor.new(
+    Metanorma::Core::Flavors.register(Metanorma::Core::Flavor.new(
                                  name: :bipm,
-                                 model_class: "Metanorma::Bipm::Document::Root",
+                                 model_root: "Metanorma::Bipm::Document::Root",
                                  renderers: { html: BipmRenderer },
                                ))
-    Metanorma.register_flavor(Metanorma::Flavor.new(
+    Metanorma::Core::Flavors.register(Metanorma::Core::Flavor.new(
                                  name: :ogc,
-                                 model_class: "Metanorma::Ogc::Document::Root",
+                                 model_root: "Metanorma::Ogc::Document::Root",
                                  renderers: { html: OgcRenderer },
                                ))
-  end
-
-  # Publisher-based variant selection, mirroring what metanorma-iso
-  # ships as Iso::Html.publisher_abbreviation.
-  def self.publisher_abbreviation(document)
-    bibdata = document.bibdata if document.is_a?(Lutaml::Model::Serializable)
-    return nil unless bibdata
-
-    contributors = bibdata.contributor
-    return nil unless contributors
-
-    contributors.each do |c|
-      roles = c.role
-      next unless roles.is_a?(Array)
-      next unless roles.any? { |r| r&.type == "author" }
-
-      org = c.organization
-      next unless org
-
-      abbrev = org.abbreviation
-      val = abbrev.is_a?(String) ? abbrev : abbrev.to_s
-      return val unless val.empty?
-    end
-    nil
   end
 end

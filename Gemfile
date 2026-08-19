@@ -12,6 +12,7 @@ gemspec
 #   - https://github.com/metanorma/metanorma-iso/pull/1618
 #   - https://github.com/metanorma/metanorma-itu/pull/832
 gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "feat/move-standard-document"
+gem "metanorma-core", github: "metanorma/metanorma-core", branch: "feat/flavor-table"
 gem "metanorma-iso", github: "metanorma/metanorma-iso", branch: "feat/model-validation-migration"
 gem "metanorma-itu", github: "metanorma/metanorma-itu", branch: "feat/move-itu-document"
 gem "metanorma-ogc", github: "metanorma/metanorma-ogc", branch: "feat/move-ogc-document"

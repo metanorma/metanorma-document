@@ -16,8 +16,8 @@ module Metanorma
         end
 
         def renderer_for(document, **options)
-          Metanorma.flavors.renderer_for(:html, document, **options) ||
-            BaseRenderer
+          Metanorma::Core::Flavors.renderer_for(document, format: :html,
+                                                **options) || BaseRenderer
         end
 
         private
