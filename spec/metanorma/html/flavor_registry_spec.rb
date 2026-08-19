@@ -4,27 +4,27 @@ require "spec_helper"
 require "metanorma/html"
 require "metanorma/iso/document"
 
-RSpec.describe Metanorma::Html::FlavorRegistry do
+RSpec.describe Metanorma::FlavorRegistry do
   let(:registry) { described_class.new }
   let(:base_flavor) do
-    Metanorma::Html::Flavor.new(
+    Metanorma::Flavor.new(
       name: nil,
       model_class: Metanorma::Document::Root,
-      renderer_class: Metanorma::Html::BaseRenderer,
+      renderers: { html: Metanorma::Html::BaseRenderer },
     )
   end
   let(:standard_flavor) do
-    Metanorma::Html::Flavor.new(
+    Metanorma::Flavor.new(
       name: nil,
       model_class: Metanorma::Standoc::Document::Root,
-      renderer_class: Metanorma::Html::StandardRenderer,
+      renderers: { html: Metanorma::Html::StandardRenderer },
     )
   end
   let(:iso_flavor) do
-    Metanorma::Html::Flavor.new(
+    Metanorma::Flavor.new(
       name: :iso,
       model_class: Metanorma::Iso::Document::Root,
-      renderer_class: SpecFlavors::IsoRenderer,
+      renderers: { html: SpecFlavors::IsoRenderer },
       pubid_module: :"Pubid::Iso",
     )
   end
@@ -67,7 +67,8 @@ RSpec.describe Metanorma::Html::FlavorRegistry do
 
   describe "#renderer_for" do
     it "returns the renderer class for the matching flavor" do
-      expect(registry.renderer_for(Metanorma::Iso::Document::Root)).to eq(SpecFlavors::IsoRenderer)
+      document = Metanorma::Iso::Document::Root.new
+      expect(registry.renderer_for(:html, document)).to eq(SpecFlavors::IsoRenderer)
     end
   end
 
@@ -93,12 +94,12 @@ RSpec.describe Metanorma::Html::FlavorRegistry do
   end
 end
 
-RSpec.describe Metanorma::Html::Flavor do
+RSpec.describe Metanorma::Flavor do
   let(:flavor) do
     described_class.new(
       name: :iso,
       model_class: Metanorma::Iso::Document::Root,
-      renderer_class: SpecFlavors::IsoRenderer,
+      renderers: { html: SpecFlavors::IsoRenderer },
       pubid_module: :"Pubid::Iso",
     )
   end
@@ -127,7 +128,7 @@ RSpec.describe Metanorma::Html::Flavor do
     it "returns nil when no pubid_module" do
       bare = described_class.new(name: :other,
                                  model_class: Metanorma::Document::Root,
-                                 renderer_class: Metanorma::Html::BaseRenderer)
+                                 renderers: { html: Metanorma::Html::BaseRenderer })
       expect(bare.pubid_module_const).to be_nil
     end
   end

@@ -26,6 +26,12 @@ module Metanorma
           register_sections(registry)
           register_terms(registry)
           register_structural(registry)
+
+          # Flavor-contributed entries (Metanorma::Mirror.register_default
+          # blocks from flavor gems).
+          Mirror.instance_variable_get(:@default_hooks).each do |hook|
+            hook.call(registry)
+          end
         end
 
         def register_paragraphs(registry)
@@ -119,11 +125,6 @@ module Metanorma
             method_name: :terms,
           )
           registry.register(
-            Metanorma::Iso::Document::Sections::IsoTermsSection,
-            Handlers::Section,
-            method_name: :terms,
-          )
-          registry.register(
             Metanorma::Standoc::Document::Sections::DefinitionSection,
             Handlers::Section,
             method_name: :definitions,
@@ -140,11 +141,9 @@ module Metanorma
           )
         end
 
-        def register_terms(registry)
-          registry.register(
-            Metanorma::Iso::Document::Terms::IsoTerm,
-            Handlers::Term,
-          )
+        def register_terms(_registry)
+          # Flavor-specific terms register via Mirror.register_default
+          # blocks (see the flavor gems) — the harness ships none.
         end
 
         def register_structural(registry)
@@ -157,25 +156,6 @@ module Metanorma
           # StandardDocument::Preface (grammar-strict classes compose from
           # mixins), so they need explicit registrations — the registry
           # resolves handlers through class ancestry.
-          registry.register(
-            Metanorma::Iso::Document::Sections::IsoPreface,
-            Handlers::Structural,
-            method_name: :preface,
-          )
-if defined?(Metanorma::Un::Document)
-          registry.register(
-            Metanorma::Un::Document::Sections::UnPreface,
-            Handlers::Structural,
-            method_name: :preface,
-          )
-          # UnAbstractSection likewise composes instead of inheriting
-          # ContentSection.
-          registry.register(
-            Metanorma::Un::Document::Sections::UnAbstractSection,
-            Handlers::Section,
-            method_name: :content_section,
-          )
-        end
           registry.register(
             Metanorma::Standoc::Document::Sections::Sections,
             Handlers::Structural,
