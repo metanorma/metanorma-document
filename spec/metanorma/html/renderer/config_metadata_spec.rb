@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require "metanorma/html/iso_renderer"
+require "support/flavor_registration"
 
 RSpec.describe "Config-driven flavor metadata" do
   let(:xml_path) do
@@ -11,7 +11,7 @@ RSpec.describe "Config-driven flavor metadata" do
   let(:xml) { File.read(xml_path) }
   let(:doc) { Metanorma::Iso::Document::Root.from_xml(xml) }
   let(:renderer) do
-    r = Metanorma::Html::IsoRenderer.new
+    r = SpecFlavors::IsoRenderer.new
     r.document = doc
     r
   end

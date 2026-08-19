@@ -13,7 +13,7 @@ RSpec.describe Metanorma::Html::Generator do
 
     it "returns IsoRenderer for IsoDocument::Root" do
       doc = Metanorma::Iso::Document::Root.new
-      expect(described_class.renderer_for(doc)).to eq(Metanorma::Html::IsoRenderer)
+      expect(described_class.renderer_for(doc)).to eq(SpecFlavors::IsoRenderer)
     end
 
     it "returns StandardRenderer for StandardDocument::Root" do
@@ -23,7 +23,7 @@ RSpec.describe Metanorma::Html::Generator do
 
     it "returns OgcRenderer for OgcDocument::Root" do
       doc = Metanorma::Ogc::Document::Root.new
-      expect(described_class.renderer_for(doc)).to eq(Metanorma::Html::OgcRenderer)
+      expect(described_class.renderer_for(doc)).to eq(SpecFlavors::OgcRenderer)
     end
   end
 end

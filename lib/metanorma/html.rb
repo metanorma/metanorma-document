@@ -23,18 +23,38 @@ module Metanorma
     autoload :Component, "metanorma/html/component"
     autoload :Drops, "metanorma/html/drops"
     autoload :StandardRenderer, "metanorma/html/standard_renderer"
-    autoload :IsoRenderer, "metanorma/html/iso_renderer"
-    autoload :BipmRenderer, "metanorma/html/bipm_renderer"
-    autoload :CcRenderer, "metanorma/html/cc_renderer"
-    autoload :CsaRenderer, "metanorma/html/csa_renderer"
-    autoload :IccRenderer, "metanorma/html/icc_renderer"
-    autoload :PdfaRenderer, "metanorma/html/pdfa_renderer"
-    autoload :IecRenderer, "metanorma/html/iec_renderer"
-    autoload :IeeeRenderer, "metanorma/html/ieee_renderer"
-    autoload :IetfRenderer, "metanorma/html/ietf_renderer"
-    autoload :IhoRenderer, "metanorma/html/iho_renderer"
-    autoload :ItuRenderer, "metanorma/html/itu_renderer"
-    autoload :OgcRenderer, "metanorma/html/ogc_renderer"
-    autoload :RiboseRenderer, "metanorma/html/ribose_renderer"
+
+    class << self
+      # The process-wide flavor registry. The harness seeds only its own
+      # defaults (generic document + Standoc); flavour gems register
+      # themselves at load time via #register_flavor. Nothing in this
+      # gem registers a flavour.
+      def flavors
+        @flavors ||= FlavorRegistry.new
+      end
+
+      # Write-side of the extension seam: flavour gems call this from
+      # their own load path with their Flavor entry (model class,
+      # renderer class, pubid module). Most-specific-wins ancestry
+      # matching means a flavour can re-base its renderer by changing
+      # only its own registration.
+      def register_flavor(flavor)
+        flavors.register(flavor)
+      end
+    end
+
+    # Harness defaults: the two model trees this gem ships renderers
+    # for. Registered first so flavour entries (registered later) win
+    # the most-specific match.
+    register_flavor(Flavor.new(
+                      name: nil,
+                      model_class: Metanorma::Document::Root,
+                      renderer_class: BaseRenderer,
+                    ))
+    register_flavor(Flavor.new(
+                      name: nil,
+                      model_class: "Metanorma::Standoc::Document::Root",
+                      renderer_class: StandardRenderer,
+                    ))
   end
 end

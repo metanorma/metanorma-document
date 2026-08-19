@@ -24,7 +24,7 @@ RSpec.describe Metanorma::Html::FlavorRegistry do
     Metanorma::Html::Flavor.new(
       name: :iso,
       model_class: Metanorma::Iso::Document::Root,
-      renderer_class: Metanorma::Html::IsoRenderer,
+      renderer_class: SpecFlavors::IsoRenderer,
       pubid_module: :"Pubid::Iso",
     )
   end
@@ -67,7 +67,7 @@ RSpec.describe Metanorma::Html::FlavorRegistry do
 
   describe "#renderer_for" do
     it "returns the renderer class for the matching flavor" do
-      expect(registry.renderer_for(Metanorma::Iso::Document::Root)).to eq(Metanorma::Html::IsoRenderer)
+      expect(registry.renderer_for(Metanorma::Iso::Document::Root)).to eq(SpecFlavors::IsoRenderer)
     end
   end
 
@@ -98,7 +98,7 @@ RSpec.describe Metanorma::Html::Flavor do
     described_class.new(
       name: :iso,
       model_class: Metanorma::Iso::Document::Root,
-      renderer_class: Metanorma::Html::IsoRenderer,
+      renderer_class: SpecFlavors::IsoRenderer,
       pubid_module: :"Pubid::Iso",
     )
   end
