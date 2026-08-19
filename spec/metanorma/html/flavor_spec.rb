@@ -5,9 +5,9 @@ require "metanorma/html"
 require "metanorma/iso/document"
 require "metanorma/itu/document"
 
-RSpec.describe Metanorma::Flavor do
+RSpec.describe Metanorma::Core::Flavor do
   def build_flavor(name:, pubid_module: nil)
-    described_class.new(name: name, model_class: Object,
+    described_class.new(name: name, model_root: Object,
                         renderers: { html: Object }, pubid_module: pubid_module)
   end
 
@@ -30,7 +30,7 @@ RSpec.describe Metanorma::Flavor do
 
   describe "Generator flavor registry" do
     it "resolves every configured pubid module", :aggregate_failures do
-      modules = Metanorma.flavors.filter_map(&:pubid_module)
+      modules = Metanorma::Core::Flavors.table.filter_map(&:pubid_module)
       expect(modules).not_to be_empty
       modules.each { |m| expect(Object.const_get(m.to_s)).to be_a(Module) }
     end

@@ -41,22 +41,5 @@ module Metanorma
   autoload :BasicDocument, "#{__dir__}/basic_document"
   autoload :Collection, "metanorma/collection"
   autoload :Html, "metanorma/html"
-  autoload :Flavor, "metanorma/flavor"
-  autoload :FlavorRegistry, "metanorma/flavor_registry"
-
-  class << self
-    # The process-wide flavor registry: single source of truth for
-    # flavor identity, format-agnostic. Flavor gems register at load
-    # time via #register_flavor; format adapters read through
-    # #renderer_for with their own format key. The harness registers
-    # only its own defaults.
-    def flavors
-      @flavors ||= FlavorRegistry.new
-    end
-
-    def register_flavor(flavor)
-      flavors.register(flavor)
-    end
-  end
   autoload :Mirror, "metanorma/mirror"
 end

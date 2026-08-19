@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "liquid"
+require "metanorma-core"
 require "nokogiri"
 
 module Metanorma
@@ -27,15 +28,15 @@ module Metanorma
     # for the two model trees the harness ships — that is the extent of
     # its registration. Flavor gems register their own entries from
     # their load paths; nothing here knows a flavor.
-    Metanorma.register_flavor(Metanorma::Flavor.new(
-                                name: nil,
-                                model_class: Metanorma::Document::Root,
-                                renderers: { html: BaseRenderer },
-                              ))
-    Metanorma.register_flavor(Metanorma::Flavor.new(
-                                name: nil,
-                                model_class: "Metanorma::Standoc::Document::Root",
-                                renderers: { html: StandardRenderer },
-                              ))
+    Metanorma::Core::Flavors.register(Metanorma::Core::Flavor.new(
+                                        name: :document,
+                                        model_root: Metanorma::Document::Root,
+                                        renderers: { html: BaseRenderer },
+                                      ))
+    Metanorma::Core::Flavors.register(Metanorma::Core::Flavor.new(
+                                        name: :standoc,
+                                        model_root: "Metanorma::Standoc::Document::Root",
+                                        renderers: { html: StandardRenderer },
+                                      ))
   end
 end
