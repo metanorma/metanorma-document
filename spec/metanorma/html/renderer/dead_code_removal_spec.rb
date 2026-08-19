@@ -8,11 +8,11 @@ RSpec.describe "Dead code removal" do
   end
 
   it "does not define registers_doc_type on IsoRenderer" do
-    expect(Metanorma::Html::IsoRenderer).not_to respond_to(:registers_doc_type)
+    expect(SpecFlavors::IsoRenderer).not_to respond_to(:registers_doc_type)
   end
 
   it "does not define doc_types on IsoRenderer" do
-    expect(Metanorma::Html::IsoRenderer).not_to respond_to(:doc_types)
+    expect(SpecFlavors::IsoRenderer).not_to respond_to(:doc_types)
   end
 
   it "does not define build_reader_controls on BaseRenderer" do

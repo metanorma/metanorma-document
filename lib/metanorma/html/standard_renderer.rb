@@ -56,16 +56,7 @@ module Metanorma
         bibdata = doc.bibdata
         return "" unless bibdata
 
-        cover_id = nil
-        bibdata.doc_identifier&.each do |di|
-          next unless safe_attr(di, :type) == "iso-reference"
-
-          id = extract_text_value(di)
-          next if id.to_s.empty?
-
-          cover_id = id
-          break
-        end
+        cover_id = extract_primary_doc_id
 
         title_text = extract_display_title(bibdata)
 
@@ -681,7 +672,7 @@ module Metanorma
         docids = Array(item.docidentifier)
         primary = docids.find do |di|
           val = extract_text_value(di).to_s
-          val.match?(/\A\[?\d+\]?\z/) ? false : !val.match?(/\A(?:iso-reference|URN)\s/)
+          val.match?(/\A\[?\d+\]?\z/) ? false : !val.match?(/\A(?:URN|[a-z]+-reference)\s/)
         end
         return nil unless primary
 
@@ -700,7 +691,7 @@ module Metanorma
         docids = Array(item.docidentifier)
         primary = docids.find do |di|
           val = extract_text_value(di).to_s
-          val.match?(/\A\[?\d+\]?\z/) ? false : !val.match?(/\A(?:iso-reference|URN)\s/)
+          val.match?(/\A\[?\d+\]?\z/) ? false : !val.match?(/\A(?:URN|[a-z]+-reference)\s/)
         end
         return unless primary
 

@@ -15,21 +15,21 @@ RSpec.describe "Architecture improvements" do
 
   describe "respond_to? elimination" do
     it "extract_doctype uses is_a? for IsoBibliographicItem" do
-      renderer = Metanorma::Html::IsoRenderer.new
+      renderer = SpecFlavors::IsoRenderer.new
       bibdata = doc.bibdata
       doctype = renderer.extract_doctype(bibdata)
       expect(doctype).to be_a(String)
     end
 
     it "extract_doctype returns nil for non-ISO bibdata" do
-      renderer = Metanorma::Html::IsoRenderer.new
+      renderer = SpecFlavors::IsoRenderer.new
       doctype = renderer.extract_doctype("not a bibdata")
       expect(doctype).to be_nil
     end
   end
 
   describe "RendererContext delegation" do
-    let(:renderer) { Metanorma::Html::IsoRenderer.new }
+    let(:renderer) { SpecFlavors::IsoRenderer.new }
     let(:ctx) { renderer.renderer_context }
 
     it "delegates safe_attr via explicit method" do

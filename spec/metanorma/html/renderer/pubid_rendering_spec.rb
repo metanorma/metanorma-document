@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require "metanorma/html/iso_renderer"
+require "support/flavor_registration"
 
 RSpec.describe "Pubid rendering" do
-  let(:renderer) { Metanorma::Html::IsoRenderer.new }
+  let(:renderer) { SpecFlavors::IsoRenderer.new }
 
   describe "#parse_pubid" do
     it "returns nil for nil input" do
