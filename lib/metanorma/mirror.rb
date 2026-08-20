@@ -30,6 +30,10 @@ module Metanorma
       @default_hooks << block
     end
 
+    def self.default_hooks
+      @default_hooks
+    end
+
     def self.default_registry
       @default_registry ||= build_default_registry
     end
