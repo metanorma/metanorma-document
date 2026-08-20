@@ -29,7 +29,7 @@ module Metanorma
 
           # Flavor-contributed entries (Metanorma::Mirror.register_default
           # blocks from flavor gems).
-          Mirror.instance_variable_get(:@default_hooks).each do |hook|
+          Mirror.default_hooks.each do |hook|
             hook.call(registry)
           end
         end
