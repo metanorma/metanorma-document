@@ -24,6 +24,7 @@ module Metanorma
 
           attribute :anchor, :string
           attribute :semx_id, :string
+          attribute :original_id, :string
           attribute :autonum, :string
           attribute :displayorder, :integer
 
@@ -63,6 +64,7 @@ module Metanorma
             map_attribute "id", to: :id
             map_attribute "anchor", to: :anchor
             map_attribute "semx-id", to: :semx_id
+            map_attribute "original-id", to: :original_id
             map_attribute "autonum", to: :autonum
             map_attribute "displayorder", to: :displayorder
             map_element "stem", to: :stem
