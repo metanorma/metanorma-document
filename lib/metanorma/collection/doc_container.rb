@@ -6,7 +6,11 @@ module Metanorma
     # Each doc-container holds one <metanorma> document identified by its id attribute.
     class DocContainer < Lutaml::Model::Serializable
       attribute :id, :string
-      attribute :document, Metanorma::IsoDocument::Root
+      # Embedded documents belong to whichever flavor authored them; the
+      # harness carries only the neutral base root. Flavor-faithful parsing
+      # arrives with lutaml polymorphic differentiators (subclass roots
+      # declaring polymorphic_class: true), not by typing against a flavor.
+      attribute :document, Metanorma::Document::Root
 
       xml do
         element "doc-container"
