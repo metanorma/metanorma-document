@@ -18,6 +18,11 @@ RSpec.describe "harness portability (OCP gate)" do
   # is gated.
   MIRROR_EXCEPTION = "lib/metanorma/mirror/default_registry.rb".freeze
 
+  # Top-level aliases (Metanorma::IsoDocument & friends) are flavour
+  # knowledge too — the collection models once typed bibdata/embedded
+  # documents against them, fatal-loading every non-iso-family bundle.
+  FLAVOR_ALIASES = FLAVOR_NAMESPACES.map { |n| "Metanorma::#{n}Document" }.freeze
+
   it "lib/metanorma references no flavor namespaces" do
     pattern = /\bMetanorma::(#{FLAVOR_NAMESPACES.join('|')})\b/
     hits = Dir["lib/metanorma/**/*.rb"].reject { |f| f == MIRROR_EXCEPTION }.flat_map do |f|
@@ -27,6 +32,16 @@ RSpec.describe "harness portability (OCP gate)" do
     end
     expect(hits).to be_empty,
                     "flavour knowledge leaked into the harness:\n#{hits.join("\n")}"
+  end
+
+  it "lib/metanorma references no flavor document aliases" do
+    hits = Dir["lib/metanorma/**/*.rb"].reject { |f| f == MIRROR_EXCEPTION }.flat_map do |f|
+      File.readlines(f).each_with_index.filter_map do |line, i|
+        "#{f}:#{i + 1}: #{line.strip}" if FLAVOR_ALIASES.any? { |a| line.include?(a) }
+      end
+    end
+    expect(hits).to be_empty,
+                    "flavour alias leaked into the harness:\n#{hits.join("\n")}"
   end
 
   it "ships no flavor-prefixed templates or theme assets" do

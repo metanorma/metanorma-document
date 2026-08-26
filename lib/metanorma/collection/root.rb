@@ -10,7 +10,7 @@ module Metanorma
     # (presentation). Embedded <metanorma> documents inside doc-containers use
     # the standoc namespace (https://www.metanorma.org/ns/standoc).
     class Root < Lutaml::Model::Serializable
-      attribute :bibdata, Metanorma::IsoDocument::Metadata::IsoBibliographicItem
+      attribute :bibdata, Metanorma::Document::Components::BibData::BibliographicItem
       attribute :directive, Directive, collection: true
       attribute :entry, Entry
       attribute :format, :string, collection: true
