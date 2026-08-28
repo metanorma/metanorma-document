@@ -431,9 +431,39 @@ module Metanorma
           end
         end
 
+        # Prose containers hold paragraphs and lists (lists are not
+        # separate units — their content belongs in the clause text).
+        # Composed in document order via element_order, like
+        # extract_plain_text, but scoped to prose: tables/figures/
+        # formulas are their own units and stay out.
+        SECTION_PROSE_SOURCES = {
+          "p" => :paragraphs, "ul" => :unordered_lists,
+          "ol" => :ordered_lists, "dl" => :definition_lists,
+        }.freeze
+
         def section_text(section)
-          vals(section, :paragraphs).map { |p| Document::PlainText.call(p) }
-            .reject(&:empty?).join("\n")
+          collections = SECTION_PROSE_SOURCES.each_with_object({}) do |(_name, attr), h|
+            h[attr] = vals(section, attr)
+          end
+          indices = Hash.new(0)
+          parts = []
+          section.element_order.each do |el|
+            next unless el.is_a?(Lutaml::Xml::Element)
+
+            attr = SECTION_PROSE_SOURCES[el.name.to_s] or next
+            item = collections[attr][indices[attr]]
+            indices[attr] += 1
+            text = Document::PlainText.call(item) if item
+            parts << text if text && !text.empty?
+          end
+          # element_order unavailable: fall back to declaration order
+          if parts.empty?
+            parts = collections.values.flatten.filter_map do |item|
+              text = Document::PlainText.call(item)
+              text unless text.empty?
+            end
+          end
+          parts.join("\n")
         end
 
         BLOCK_SOURCES = {

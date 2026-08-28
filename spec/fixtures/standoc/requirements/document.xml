@@ -41,6 +41,16 @@
 </requirement>
 </clause>
 </sections>
+<annex id="_annex-terms" obligation="normative">
+<title>Additional terms</title>
+<terms id="_annex-terms-sec">
+<title>Terms and definitions</title>
+<term id="_term-annex-load-cell" anchor="term-annex-load-cell">
+<preferred><expression><name>annex load cell</name></expression></preferred>
+<definition><verbal-definition><p id="_p-annex-def">a load cell defined in an annex</p></verbal-definition></definition>
+</term>
+</terms>
+</annex>
 <bibliography><references id="_rf-norm" normative="true" obligation="informative">
 <title>Normative references</title>
 <bibitem id="SNR0"><formattedref format="application/x-isodoc+xml"><em>SNR 0</em></formattedref><docidentifier type="ogc-internal">SNR-0</docidentifier></bibitem>

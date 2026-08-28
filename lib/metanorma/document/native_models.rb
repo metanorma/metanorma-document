@@ -219,6 +219,8 @@ module Metanorma
           out = []
           collect_entries(val(root, :sections), out)
           collect_entries(val(root, :preface), out)
+          # amendments keep their terms in annexes (e.g. OIML R 60/A1)
+          vals(root, :annex).each { |a| collect_entries(a, out) }
           out
         end
 
