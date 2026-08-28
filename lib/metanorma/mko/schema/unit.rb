@@ -17,16 +17,22 @@ module Metanorma
         attribute :caption, :string
         attribute :columns, TableColumn, collection: true
         attribute :rows, :string, collection: true, default: -> { [] }
+        # The block's own serialization — the model's native XML (the
+        # canonical interchange form). The lutaml key-value path cannot
+        # serialize content blocks on 0.8.x (register-scoped type
+        # resolution), so XML is the native wire form.
+        attribute :xml, :string
 
         json do
           map "caption", to: :caption
           map "columns", to: :columns
           map "rows", to: :rows
+          map "xml", to: :xml
         end
 
         def embed_text
           cols = columns.map { |c| c.label + (c.unit ? " [#{c.unit}]" : "") }
-                        .join(", ")
+            .join(", ")
           "Table: #{caption}; columns: #{cols}; " +
             rows.map { |r| "row: #{r}" }.join(" | ")
         end
@@ -35,11 +41,15 @@ module Metanorma
       class FormulaPayload < Lutaml::Model::Serializable
         attribute :asciimath, :string
         attribute :mathml, :string
+        attribute :latex, :string
+        attribute :omml, :string
         attribute :description, :string
 
         json do
           map "asciimath", to: :asciimath
           map "mathml", to: :mathml
+          map "latex", to: :latex
+          map "omml", to: :omml
           map "description", to: :description
         end
       end
@@ -48,11 +58,13 @@ module Metanorma
         attribute :alt, :string
         attribute :uri, :string
         attribute :caption, :string
+        attribute :xml, :string
 
         json do
           map "alt", to: :alt
           map "uri", to: :uri
           map "caption", to: :caption
+          map "xml", to: :xml
         end
       end
 

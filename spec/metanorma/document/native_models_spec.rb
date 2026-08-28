@@ -62,6 +62,29 @@ RSpec.describe Metanorma::Document::NativeModels do
     end
   end
 
+  describe ".plurimath_formula" do
+    it "parses formula blocks into native Plurimath formulas" do
+      annex = Array(model.annex).first
+      formula = nil
+      stack = [annex]
+      until formula || stack.empty?
+        node = stack.pop
+        next unless node.class.respond_to?(:attributes)
+        if node.class.attributes.key?(:formulas)
+          formula = Array(node.formulas).first
+        end
+        if node.class.attributes.key?(:clause)
+          stack.concat(Array(node.clause))
+        end
+      end
+      expect(formula).not_to be_nil
+      math = described_class.plurimath_formula(formula)
+      expect(math).to be_a(Plurimath::Math::Formula)
+      expect(math.to_latex).to be_a(String)
+      expect(math.to_omml).to include("<m:oMath")
+    end
+  end
+
   describe ".pubid_identifiers" do
     it "parses document identifiers with the native pubid monogem" do
       entries = described_class.pubid_identifiers(model)

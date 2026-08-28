@@ -99,6 +99,28 @@ module Metanorma
           )
         end
 
+        # Formula as a native Plurimath::Math::Formula. Plurimath is the
+        # Metanorma math ecosystem: parse from the stem's AsciiMath, or
+        # from its MathML (the mml model's own XML serialization) when
+        # only that is present. Plurimath 0.11 has no data-producing
+        # to_json — its native serializations are the to_* forms
+        # (asciimath, latex, mathml, omml, unicodemath), which is what
+        # consumers get.
+        def plurimath_formula(formula_block)
+          require "plurimath"
+          stem = val(formula_block, :stem)
+          return nil unless stem
+
+          expr = val(stem, :asciimath)&.value
+          unless expr.to_s.empty?
+            return Plurimath::Math.parse(expr.to_s, :asciimath)
+          end
+          math = val(stem, :math)
+          Plurimath::Math.parse(math.to_xml, :mathml) if math
+        rescue StandardError, LoadError
+          nil
+        end
+
         private
 
         # -- publisher → pubid flavor --------------------------------
