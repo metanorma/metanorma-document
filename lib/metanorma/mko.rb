@@ -13,7 +13,6 @@ module Metanorma
   # typed document model: like a rendering, never a source format.
   module Mko
     autoload :Schema, "metanorma/mko/schema"
-    autoload :PlainText, "metanorma/mko/plain_text"
     autoload :Project, "metanorma/mko/project"
     autoload :Writer, "metanorma/mko/writer"
     autoload :Exporter, "metanorma/mko/exporter"

@@ -3,13 +3,13 @@
 module Metanorma
   module Mko
     module Schema
-      # identifiers.json — the document's identifiers, with the pubid
-      # parse when one succeeds.
+      # identifiers.json — the document's identifiers; `parsed` carries
+      # the pubid monogem's native JSON when a flavor covers it.
       class IdentifierInfo < Lutaml::Model::Serializable
         attribute :original, :string
         attribute :type, :string
         attribute :primary, :boolean
-        attribute :parsed, :string
+        attribute :parsed, :hash
 
         json do
           map "original", to: :original

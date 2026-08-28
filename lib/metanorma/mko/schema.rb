@@ -10,8 +10,6 @@ module Metanorma
       autoload :StructureNode, "metanorma/mko/schema/document"
       autoload :Unit, "metanorma/mko/schema/unit"
       autoload :Edge, "metanorma/mko/schema/edge"
-      autoload :Glossary, "metanorma/mko/schema/glossary"
-      autoload :GlossaryTerm, "metanorma/mko/schema/glossary"
       autoload :Identifiers, "metanorma/mko/schema/identifiers"
       autoload :IdentifierInfo, "metanorma/mko/schema/identifiers"
     end

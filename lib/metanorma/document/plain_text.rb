@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Metanorma
-  module Mko
+  module Document
     # Extracts plain display text from typed model elements. Delegates to
     # the canonical model-walking extractor shared with the HTML renderer
     # (element_order resolution + typed attributes) — never Nokogiri over
@@ -21,11 +21,17 @@ module Metanorma
       EXTRACTOR = Extractor.new
 
       class << self
+        # Whitespace-squashed on the way out: document text carries
+        # non-breaking spaces (U+00A0) that break exact matching; Ruby's
+        # \s is ASCII-only, so use the Unicode-aware POSIX class.
         def call(element)
-          return EXTRACTOR.extract_plain_text(element).to_s
-                 .gsub(/\s+/, " ").strip unless element.is_a?(Array)
+          return squash(EXTRACTOR.extract_plain_text(element).to_s) unless element.is_a?(Array)
 
           element.map { |e| call(e) }.reject(&:empty?).join(" ")
+        end
+
+        def squash(text)
+          text.gsub(/[[:space:]]+/, " ").strip
         end
       end
     end
