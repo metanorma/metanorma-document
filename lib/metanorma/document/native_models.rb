@@ -169,6 +169,10 @@ module Metanorma
           g_lang = GLOSSARIST_LANG.fetch(lang, lang)
           designations = vals(term, :preferred)
                            .map { |d| PlainText.call(d) }.reject(&:empty?)
+          admitted = vals(term, :admitted)
+                      .map { |d| PlainText.call(d) }.reject(&:empty?)
+          deprecated = vals(term, :deprecates)
+                        .map { |d| PlainText.call(d) }.reject(&:empty?)
           definition = PlainText.call(val(term, :definition))
           sources = vals(term, :source).filter_map do |src|
             citeas = vals(src, :origin).first&.citeas rescue nil
@@ -186,11 +190,16 @@ module Metanorma
             data: Glossarist::ConceptData.new(
               id: "#{anchor_of(term)}-#{g_lang}",
               language_code: g_lang,
-              terms: designations.each_with_index.map do |designation, i|
-                Glossarist::Designation::Expression.new(
-                  designation: designation,
-                  normative_status: i.zero? ? "preferred" : "admitted"
-                )
+              terms: [
+                ["preferred", designations],
+                ["admitted", admitted],
+                ["deprecated", deprecated],
+              ].flat_map do |status, terms|
+                terms.map do |designation|
+                  Glossarist::Designation::Expression.new(
+                    designation: designation, normative_status: status
+                  )
+                end
               end,
               definition: [Glossarist::DetailedDefinition.new(
                 content: definition

@@ -80,12 +80,16 @@ module Metanorma
       class TermPayload < Lutaml::Model::Serializable
         attribute :concept, :string
         attribute :designations, :string, collection: true, default: -> { [] }
+        attribute :admitted, :string, collection: true, default: -> { [] }
+        attribute :deprecated, :string, collection: true, default: -> { [] }
         attribute :definition, :string
         attribute :sources, TermSourceEntry, collection: true, default: -> { [] }
 
         json do
           map "concept", to: :concept
           map "designations", to: :designations
+          map "admitted", to: :admitted, render_empty: false
+          map "deprecated", to: :deprecated, render_empty: false
           map "definition", to: :definition
           map "sources", to: :sources
         end

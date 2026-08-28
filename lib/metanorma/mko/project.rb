@@ -402,6 +402,11 @@ module Metanorma
           number = @numbers[anchor]
           designations = vals(term, :preferred)
                          .map { |d| Document::PlainText.call(d) }.reject(&:empty?)
+          # both trees declare the synonym attrs as :admitted/:deprecates
+          admitted = vals(term, :admitted)
+                     .map { |d| Document::PlainText.call(d) }.reject(&:empty?)
+          deprecated = vals(term, :deprecates)
+                       .map { |d| Document::PlainText.call(d) }.reject(&:empty?)
           definition = Document::PlainText.call(val(term, :definition))
           sources = vals(term, :source).map do |src|
             Schema::TermSourceEntry.new(
@@ -410,6 +415,7 @@ module Metanorma
           end
           payload = Schema::TermPayload.new(
             concept: anchor, designations: designations,
+            admitted: admitted, deprecated: deprecated,
             definition: definition, sources: sources
           )
           unit = emit_unit(
