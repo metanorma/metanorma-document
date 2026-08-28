@@ -120,10 +120,38 @@ RSpec.describe Metanorma::Mko do
         u["type"] == "formula"
       end
       formulas.each do |f|
-        reps = %w[asciimath mathml description].count do |k|
+        reps = %w[asciimath mathml latex omml description].count do |k|
           f["payload"][k] && !f["payload"][k].empty?
         end
         expect(reps).to be >= 1 # semantic-only docs may lack mathml
+      end
+    end
+
+    it "carries formulas through native plurimath serializations" do
+      bundle = export!
+      formulas = read_lines(bundle, "units.jsonl").select do |u|
+        u["type"] == "formula"
+      end
+      expect(formulas).not_to be_empty
+      formulas.each do |f|
+        next unless f.dig("payload", "asciimath")
+
+        expect(f["payload"]["latex"]).to be_a(String) # native to_latex
+        expect(f["payload"]["omml"]).to include("<m:oMath") # native to_omml
+      end
+    end
+
+    it "carries tables and figures with their native XML" do
+      bundle = export!
+      units = read_lines(bundle, "units.jsonl")
+      tables = units.select { |u| u["type"] == "table" }
+      tables.each do |t|
+        expect(t["payload"]["xml"]).to start_with("<table")
+        expect(t["payload"]["xml"]).to include("<thead")
+      end
+      figures = units.select { |u| u["type"] == "figure" }
+      figures.each do |f|
+        expect(f["payload"]["xml"]).to start_with("<figure")
       end
     end
 

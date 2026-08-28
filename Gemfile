@@ -20,6 +20,7 @@ gem "metanorma-iec", github: "metanorma/metanorma-iec", branch: "feat/move-iec-d
 gem "isodoc", github: "metanorma/isodoc", branch: "rt-pubid-2-migration"
 gem "pubid", ">= 2.0.0.pre.alpha.9"
 gem "glossarist", "~> 2.13"
+gem "plurimath", "~> 0.11"
 
 # Dependency sources. Default (no env vars): released gems, exactly the
 # contract downstream users get — CI and local dev must test that.

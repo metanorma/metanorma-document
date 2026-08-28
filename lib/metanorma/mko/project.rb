@@ -456,7 +456,8 @@ module Metanorma
           end
           payload = Schema::TablePayload.new(
             caption: Document::PlainText.call(val(table, :name)),
-            columns: columns, rows: rows
+            columns: columns, rows: rows,
+            xml: table.to_xml
           )
           emit_unit(
             type: "table", anchor: element_anchor(table),
@@ -471,7 +472,7 @@ module Metanorma
           caption = Document::PlainText.call(val(figure, :name))
           payload = Schema::FigurePayload.new(
             alt: val(figure, :alt), uri: val(figure, :source),
-            caption: caption
+            caption: caption, xml: figure.to_xml
           )
           emit_unit(
             type: "figure", anchor: element_anchor(figure),
@@ -486,8 +487,13 @@ module Metanorma
           asciimath = val(stem, :asciimath)&.value
           mathml = mathml_of(stem)
           description = Document::PlainText.call(val(formula, :name))
+          # Native math object: Plurimath's own serializations (it has no
+          # data to_json; to_* are the native forms).
+          plurimath = Document::NativeModels.plurimath_formula(formula)
           payload = Schema::FormulaPayload.new(
-            asciimath: asciimath, mathml: mathml, description: description
+            asciimath: asciimath, mathml: mathml,
+            latex: plurimath&.to_latex, omml: plurimath&.to_omml,
+            description: description
           )
           emit_unit(
             type: "formula", anchor: element_anchor(formula),

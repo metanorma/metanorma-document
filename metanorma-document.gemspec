@@ -48,6 +48,7 @@ Gem::Specification.new do |spec|
   # the former standalone relaton-bib gem is consolidated into it.
   spec.add_dependency "relaton", ">= 3.0.0.pre.alpha.1"
   # Native object-model decomposition (Glossarist concepts, Relaton
-  # bibdata) is a model-layer capability.
+  # bibdata, Plurimath formulas) is a model-layer capability.
   spec.add_dependency "glossarist", "~> 2.13"
+  spec.add_dependency "plurimath", "~> 0.11"
 end
