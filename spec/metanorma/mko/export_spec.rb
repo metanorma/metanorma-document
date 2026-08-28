@@ -245,7 +245,7 @@ RSpec.describe Metanorma::Mko do
       b1 = export!
       b2 = export!
       %w[document.json units.jsonl edges.jsonl glossary.json
-         identifiers.json].each do |file|
+         identifiers.json bibliography.jsonl bibdata.json].each do |file|
         expect(File.read(File.join(b2, file)))
           .to eq(File.read(File.join(b1, file)))
       end
@@ -340,6 +340,8 @@ RSpec.describe Metanorma::Mko do
       units = read_lines(bundle, "units.jsonl")
       expect(units).not_to be_empty
       expect(units.first["text"]).to include("recommends")
+      # list content (not separate units) stays in the clause text
+      expect(units.first["text"]).to include("RECOMMENDATION ITU-D 6-1")
     end
 
     it "exports ModSpec requirement units with payloads and class_of edges" do
@@ -352,6 +354,17 @@ RSpec.describe Metanorma::Mko do
       edges = read_lines(bundle, "edges.jsonl")
       requirements = units.select { |u| u["type"] == "requirement" }
       expect(requirements.size).to eq(5)
+
+      # annex terms reach the native glossary too (amendments keep
+      # their terms in annexes)
+      terms = units.select { |u| u["type"] == "term" }
+      concepts = read_json(bundle, "glossary.json")["concepts"]
+      expect(concepts.size).to eq(terms.size)
+      annex_term = concepts.find do |c|
+        c.dig("data", "terms", 0, "designation") == "annex load cell"
+      end
+      expect(annex_term.dig("data", "definition", 0, "content"))
+        .to eq("a load cell defined in an annex")
 
       accuracy = requirements.find { |r| r["anchor"] == "req-sensor-accuracy" }
       expect(accuracy["payload"]["identifier"]).to eq("req-sensor-accuracy")
