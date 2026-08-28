@@ -85,6 +85,24 @@ RSpec.describe Metanorma::Document::NativeModels do
     end
   end
 
+  describe ".mirror_object" do
+    it "serializes content blocks to the native Mirror node tree" do
+      clause = Array(model.sections.clause)[1]
+      tbl = nil
+      stack = [clause]
+      until tbl || stack.empty?
+        node = stack.pop
+        next unless node.class.respond_to?(:attributes)
+        tbl = Array(node.tables).first if node.class.attributes.key?(:tables)
+        stack.concat(Array(node.clause)) if node.class.attributes.key?(:clause)
+      end
+      mirror = described_class.mirror_object(tbl)
+      expect(mirror["type"]).to eq("table")
+      expect(mirror["content"].map { |c| c["type"] })
+        .to include("table_head")
+    end
+  end
+
   describe ".pubid_identifiers" do
     it "parses document identifiers with the native pubid monogem" do
       entries = described_class.pubid_identifiers(model)

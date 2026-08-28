@@ -99,6 +99,28 @@ module Metanorma
           )
         end
 
+        # A content block's native JSON object: the Mirror node tree —
+        # the lossless JSON serialization this gem's JS ecosystem
+        # renders from (same handlers the to-mirror CLI uses). This is
+        # the blocks' native serialization; the lutaml key-value path
+        # cannot serialize content blocks on 0.8.x.
+        def mirror_object(block)
+          transformer = ::Metanorma::Mirror::Transformer.new
+          result = ::Metanorma::Mirror.default_registry.handle(
+            block, context: transformer
+          )
+          Array(result.nodes).each do |node|
+            parsed = JSON.parse(
+              ::Metanorma::Mirror::Serialization::JsonSerializer
+                .serialize(node)
+            )
+            return parsed if parsed.is_a?(Hash)
+          end
+          nil
+        rescue StandardError
+          nil
+        end
+
         # Formula as a native Plurimath::Math::Formula. Plurimath is the
         # Metanorma math ecosystem: parse from the stem's AsciiMath, or
         # from its MathML (the mml model's own XML serialization) when

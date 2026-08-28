@@ -17,17 +17,17 @@ module Metanorma
         attribute :caption, :string
         attribute :columns, TableColumn, collection: true
         attribute :rows, :string, collection: true, default: -> { [] }
-        # The block's own serialization — the model's native XML (the
-        # canonical interchange form). The lutaml key-value path cannot
-        # serialize content blocks on 0.8.x (register-scoped type
-        # resolution), so XML is the native wire form.
-        attribute :xml, :string
+        # The block's native JSON object — the Mirror node tree
+        # (lossless; the serialization the JS renderer consumes).
+        # Provenance/fidelity, not an embedding form: the retrieval
+        # contract is the typed text fields.
+        attribute :mirror, :hash
 
         json do
           map "caption", to: :caption
           map "columns", to: :columns
           map "rows", to: :rows
-          map "xml", to: :xml
+          map "mirror", to: :mirror
         end
 
         def embed_text
@@ -58,13 +58,14 @@ module Metanorma
         attribute :alt, :string
         attribute :uri, :string
         attribute :caption, :string
-        attribute :xml, :string
+        # Native JSON object: the Mirror node tree (see TablePayload).
+        attribute :mirror, :hash
 
         json do
           map "alt", to: :alt
           map "uri", to: :uri
           map "caption", to: :caption
-          map "xml", to: :xml
+          map "mirror", to: :mirror
         end
       end
 

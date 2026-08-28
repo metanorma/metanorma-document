@@ -457,7 +457,7 @@ module Metanorma
           payload = Schema::TablePayload.new(
             caption: Document::PlainText.call(val(table, :name)),
             columns: columns, rows: rows,
-            xml: table.to_xml
+            mirror: Document::NativeModels.mirror_object(table)
           )
           emit_unit(
             type: "table", anchor: element_anchor(table),
@@ -472,7 +472,8 @@ module Metanorma
           caption = Document::PlainText.call(val(figure, :name))
           payload = Schema::FigurePayload.new(
             alt: val(figure, :alt), uri: val(figure, :source),
-            caption: caption, xml: figure.to_xml
+            caption: caption,
+            mirror: Document::NativeModels.mirror_object(figure)
           )
           emit_unit(
             type: "figure", anchor: element_anchor(figure),
