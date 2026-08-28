@@ -224,6 +224,87 @@ RSpec.describe Metanorma::Mko do
     end
   end
 
+  describe "flavors" do
+    it "exports an ogc document through the same walk" do
+      bundle = described_class.export(
+        File.read(fixture_path("ogc/19-004/document.xml"),
+                  encoding: "utf-8"),
+        to: tmpdir,
+        presentation_xml: File.read(fixture_path("ogc/19-004/document.presentation.xml"),
+                                    encoding: "utf-8")
+      )
+      expect(read_json(bundle, "manifest.json")["generated"]["flavor"])
+        .to eq("ogc")
+      units = read_lines(bundle, "units.jsonl")
+      expect(units.size).to be > 50
+      document = read_json(bundle, "document.json")
+      expect(document["ids"]["canonical"]).to eq("19-004")
+      expect(document["doctype"]).to eq("discussion-paper")
+      ids = units.map { |u| u["id"] }
+      read_lines(bundle, "edges.jsonl")
+        .select { |e| e["kind"] == "part_of" }.each do |e|
+        expect(ids).to include(e["from"])
+        expect(ids).to include(e["to"])
+      end
+    end
+
+    it "exports an itu document through the same walk" do
+      bundle = described_class.export(
+        File.read(fixture_path("itu/d-rec-d.19-201003/en.xml"),
+                  encoding: "utf-8"),
+        to: tmpdir,
+        presentation_xml: File.read(fixture_path("itu/d-rec-d.19-201003/en.presentation.xml"),
+                                    encoding: "utf-8")
+      )
+      expect(read_json(bundle, "manifest.json")["generated"]["flavor"])
+        .to eq("itu")
+      document = read_json(bundle, "document.json")
+      expect(document["ids"]["canonical"]).to eq("ITU-D D.19")
+      units = read_lines(bundle, "units.jsonl")
+      expect(units).not_to be_empty
+      expect(units.first["text"]).to include("recommends")
+    end
+
+    it "exports ModSpec requirement units with payloads and class_of edges" do
+      bundle = described_class.export(
+        File.read(fixture_path("standoc/requirements/document.xml"),
+                  encoding: "utf-8"),
+        to: tmpdir
+      )
+      units = read_lines(bundle, "units.jsonl")
+      edges = read_lines(bundle, "edges.jsonl")
+      requirements = units.select { |u| u["type"] == "requirement" }
+      expect(requirements.size).to eq(5)
+
+      accuracy = requirements.find { |r| r["anchor"] == "req-sensor-accuracy" }
+      expect(accuracy["payload"]["identifier"]).to eq("req-sensor-accuracy")
+      expect(accuracy["payload"]["class"]).to eq("accuracy")
+      expect(accuracy["payload"]["obligation"]).to eq("requirement")
+      expect(accuracy["payload"]["subject"]).to eq("sensors")
+      expect(accuracy["payload"]["statement"])
+        .to include("accurate to within ±0.1 %")
+      expect(accuracy["payload"]["inherits"]).to eq(["SNR 0"])
+
+      permission = requirements.find { |r| r["anchor"] == "perm-maintenance" }
+      expect(permission["payload"]["obligation"]).to eq("permission")
+      recommendation = requirements.find { |r| r["anchor"] == "rec-calibration" }
+      expect(recommendation["payload"]["obligation"]).to eq("recommendation")
+
+      class_of = edges.select { |e| e["kind"] == "class_of" }
+      expect(class_of).to contain_exactly(
+        { "from" => "u:req-sensor-accuracy", "to" => "class:accuracy",
+          "kind" => "class_of" },
+        { "from" => "u:req-battery", "to" => "class:battery",
+          "kind" => "class_of" }
+      )
+      nested = edges.select do |e|
+        e["kind"] == "part_of" &&
+          e["from"] == "u:req-battery-life" && e["to"] == "u:req-battery"
+      end
+      expect(nested.size).to eq(1)
+    end
+  end
+
   describe "portability gate (OCP)" do
     it "references no flavor namespaces" do
       src = Dir[File.expand_path("../../../../lib/metanorma/mko/**/*.rb",

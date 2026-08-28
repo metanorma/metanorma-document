@@ -530,9 +530,6 @@ module Metanorma
           end
           vals(req, :requirement).each do |sub|
             walk_requirement(sub, unit.id, breadcrumb)
-            @edges << Schema::Edge.new(
-              from: @units.last.id, to: unit.id, kind: "part_of"
-            )
           end
           unit
         end
@@ -545,14 +542,18 @@ module Metanorma
             klass: requirement_class(req),
             obligation: val(req, :obligation),
             subject: val(req, :subject), statement: statement,
-            inherits: vals(req, :inherit).map { |i| val(i, :target) }
-                                              .compact
+            inherits: vals(req, :inherit).filter_map do |i|
+              text = Array(val(i, :text)).join
+              next text unless text.empty?
+
+              val(Array(val(i, :eref)).first, :citeas)
+            end
           )
         end
 
         def requirement_class(req)
           vals(req, :classification).find { |c| val(c, :tag) == "class" }
-            .then { |c| c && val(c, :value) }
+            .then { |c| c && Document::PlainText.call(val(c, :value)) }
         end
 
         def walk_bibliography(model)
