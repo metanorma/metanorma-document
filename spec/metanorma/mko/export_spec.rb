@@ -176,6 +176,23 @@ RSpec.describe Metanorma::Mko do
       expect(paddy.dig("data", "sources", 0, "origin", "ref", "source"))
         .to eq("ISO 7301:2011")
       expect(paddy.dig("data", "language_code")).to eq("eng")
+
+      # synonyms carry their normative status
+      statuses = paddy.dig("data", "terms").map { |t| [t["designation"], t["normative_status"]] }
+      expect(statuses).to include(
+        ["paddy", "preferred"], ["paddy rice", "admitted"], ["rough rice", "admitted"]
+      )
+      husked = concepts.find { |c| c.dig("data", "terms", 0, "designation") == "husked rice" }
+      expect(husked.dig("data", "terms").map { |t| t["normative_status"] })
+        .to include("deprecated")
+
+      # unit payloads carry the synonyms alongside the preferred list
+      paddy_unit = read_lines(bundle, "units.jsonl").find do |u|
+        u["type"] == "term" && u["anchor"] == "term-paddy"
+      end
+      expect(paddy_unit.dig("payload", "admitted"))
+        .to eq(["paddy rice", "rough rice"])
+      expect(paddy_unit.dig("payload", "deprecated")).to be_nil
     end
 
     it "carries the bibliographic record as native Relaton JSON" do
@@ -237,6 +254,43 @@ RSpec.describe Metanorma::Mko do
       bundle = export!
       edges = read_lines(bundle, "edges.jsonl")
       expect(edges.select { |e| e["kind"] == "defines" }).not_to be_empty
+    end
+  end
+
+  describe "zip export" do
+    it "writes a .mko.zip with identical components" do
+      dir_bundle = export!
+      zip_dir = Dir.mktmpdir("mko-zip")
+      begin
+        zip_path = described_class.export(
+          semantic_xml, to: zip_dir,
+          presentation_xml: presentation_xml, zip: true
+        )
+        expect(zip_path).to end_with(".mko.zip")
+        expect(File.file?(zip_path)).to be true
+        require "zip"
+        names = Zip::File.open(zip_path) { |z| z.entries.map(&:name).sort }
+        expect(names).to include("manifest.json", "units.jsonl", "edges.jsonl",
+                                 "bibdata.json", "bibliography.jsonl",
+                                 "glossary.json", "identifiers.json")
+        Zip::File.open(zip_path) do |z|
+          names.each do |n|
+            a = z.read(n).force_encoding("UTF-8")
+            b = File.read(File.join(dir_bundle, n))
+            if n == "manifest.json"
+              # timestamps are the sanctioned exception (MN 116)
+              ja = JSON.parse(a); jb = JSON.parse(b)
+              ja["generated"].delete("timestamp")
+              jb["generated"].delete("timestamp")
+              expect(ja).to eq(jb), n
+            else
+              expect(a).to eq(b), n
+            end
+          end
+        end
+      ensure
+        FileUtils.remove_entry(zip_dir)
+      end
     end
   end
 
