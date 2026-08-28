@@ -48,6 +48,20 @@ RSpec.describe Metanorma::Document::NativeModels do
     end
   end
 
+  describe ".relaton_bibliography" do
+    it "exports every bibitem as a native Relaton item with a pubid" do
+      entries = described_class.relaton_bibliography(model)
+      expect(entries.size).to eq(23)
+      expect(entries).to all(have_attributes(key: a_string_starting_with(/\A/)))
+      iso712 = entries.find { |e| e.citeas.to_s.start_with?("ISO 712") }
+      expect(iso712.item).to be_a(::Relaton::Bib::ItemData)
+      expect(iso712.pubid).to be_a(Pubid::Iso::Identifier)
+      native = JSON.parse(iso712.item.to_json)
+      docids = native["docidentifier"].map { |d| d["content"] }
+      expect(docids.compact.join(" ")).to include("ISO 712")
+    end
+  end
+
   describe ".pubid_identifiers" do
     it "parses document identifiers with the native pubid monogem" do
       entries = described_class.pubid_identifiers(model)

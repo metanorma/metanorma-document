@@ -10,15 +10,16 @@ module Metanorma
     module Project
       class Result
         attr_reader :document, :units, :edges, :glossary, :bibdata,
-                    :identifiers, :flavor
+                    :bibliography, :identifiers, :flavor
 
         def initialize(document:, units:, edges:, glossary:, bibdata:,
-                       identifiers:, flavor:)
+                       bibliography:, identifiers:, flavor:)
           @document = document
           @units = units
           @edges = edges
           @glossary = glossary
           @bibdata = bibdata
+          @bibliography = bibliography
           @identifiers = identifiers
           @flavor = flavor
         end
@@ -37,6 +38,7 @@ module Metanorma
           collect_numbers(presentation)
           walk_root(model)
           identity = build_identity(model)
+          @edges.concat(document_relation_edges(identity))
           # Native object models (Glossarist concepts, Relaton bibdata)
           # come from the model layer; the projection only serializes.
           Result.new(document: identity, units: @units, edges: @edges,
@@ -44,7 +46,24 @@ module Metanorma
                        model, lang: @lang, date: @doc_date
                      ),
                      bibdata: Document::NativeModels.relaton_bibdata(model),
+                     bibliography:
+                       Document::NativeModels.relaton_bibliography(model),
                      identifiers: build_identifiers(model), flavor: @flavor)
+        end
+
+        # Cross-document relations from the bibliographic record, as
+        # edges: doc:<short> -> ext:<identifier>, kind = the Relaton
+        # relation type verbatim (obsoletes, hasSuccessor, hasPart,
+        # updates, ...). Relaton's own vocabulary, no lossy mapping —
+        # consumers already carry the relaton type tables.
+        def document_relation_edges(identity)
+          Array(identity.relations).filter_map do |rel|
+            to = Document::PlainText.call(rel.to)
+            next if to.empty?
+
+            Schema::Edge.new(from: "doc:#{identity.ids.short}",
+                             to: "ext:#{to}", kind: rel.type)
+          end
         end
 
         def published_on(model)
@@ -397,6 +416,14 @@ module Metanorma
           @edges << Schema::Edge.new(
             from: unit.id, to: "concept:#{anchor}", kind: "defines"
           )
+          sources.map(&:citeas).compact.each do |citeas|
+            cited = Document::PlainText.call(citeas)
+            next if cited.empty?
+
+            @edges << Schema::Edge.new(
+              from: unit.id, to: "ext:#{cited}", kind: "cites"
+            )
+          end
         end
 
         def section_text(section)
