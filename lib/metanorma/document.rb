@@ -42,4 +42,5 @@ module Metanorma
   autoload :Collection, "metanorma/collection"
   autoload :Html, "metanorma/html"
   autoload :Mirror, "metanorma/mirror"
+  autoload :Mko, "metanorma/mko"
 end
