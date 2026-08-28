@@ -117,6 +117,11 @@ module Metanorma
         def walk_container(container)
           vals(container, :clause).each { |s| yield s }
           vals(container, :terms).each { |s| yield s }
+          # preface-shaped containers declare :foreword/:introduction
+          # sections — OIML-CS admin documents keep their whole body
+          # there (semantic XML serializes an empty <sections>)
+          vals(container, :foreword).each { |s| yield s }
+          vals(container, :introduction).each { |s| yield s }
         end
 
         # Term entries: the iso tree declares them as :term with nested
