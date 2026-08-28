@@ -127,22 +127,42 @@ RSpec.describe Metanorma::Mko do
       end
     end
 
-    it "emits terms with definitions into the glossary" do
+    it "emits terms as native Glossarist concepts" do
       bundle = export!
       terms = read_lines(bundle, "units.jsonl").select do |u|
         u["type"] == "term"
       end
-      glossary = read_json(bundle, "glossary.json")["terms"]
-      expect(glossary.size).to eq(terms.size)
-      terms.each do |t|
-        expect(t["payload"]["designations"]).to be_an(Array)
-        expect(t["payload"]["definition"]).to be_a(String)
-        expect(t["payload"]["definition"]).not_to include("#<")
+      concepts = read_json(bundle, "glossary.json")["concepts"]
+      expect(concepts.size).to eq(terms.size)
+      paddy = concepts.find do |c|
+        c.dig("data", "terms", 0, "designation") == "paddy"
       end
-      paddy = terms.find { |t| t["anchor"] == "term-paddy" }
-      expect(paddy["payload"]["designations"]).to eq(["paddy"])
-      expect(paddy["payload"]["definition"])
+      expect(paddy.dig("data", "terms", 0, "normative_status"))
+        .to eq("preferred")
+      expect(paddy.dig("data", "definition", 0, "content"))
         .to eq("rice retaining its husk after threshing")
+      expect(paddy.dig("data", "sources", 0, "origin", "ref", "source"))
+        .to eq("ISO 7301:2011")
+      expect(paddy.dig("data", "language_code")).to eq("eng")
+    end
+
+    it "carries the bibliographic record as native Relaton JSON" do
+      bundle = export!
+      bibdata = read_json(bundle, "bibdata.json")
+      document = read_json(bundle, "document.json")
+      expect(bibdata).not_to eq(document) # never a duplicate of document
+      expect(bibdata["schema_version"]).to be_a(String) # relaton wire shape
+      docids = bibdata["docidentifier"].map { |d| d["content"] }
+      expect(docids).to include("ISO 17301-1:2016")
+    end
+
+    it "carries identifiers with native pubid parses" do
+      bundle = export!
+      identifiers = read_json(bundle, "identifiers.json")["identifiers"]
+      iso = identifiers.find { |i| i["original"] == "ISO 17301-1:2016" }
+      expect(iso["parsed"]["number"]).to eq("17301")
+      expect(iso["parsed"]["part"]).to eq("1")
+      expect(iso["parsed"]["year"]).to eq("2016")
     end
 
     it "emits bibliography references with cites edges" do

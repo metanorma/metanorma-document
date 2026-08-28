@@ -35,12 +35,20 @@ module Metanorma
           )
           add_component(manifest, dir, "document", "document.json",
                         "application/json", result.document)
-          add_component(manifest, dir, "bibdata", "bibdata.json",
-                        "application/json", result.document)
+          # bibdata/glossary/identifiers carry the NATIVE object-model
+          # serializations (Relaton::Bib, Glossarist::Concept, Pubid),
+          # produced by Document::NativeModels at the model layer.
+          if result.bibdata
+            add_component(manifest, dir, "bibdata", "bibdata.json",
+                          "application/json", result.bibdata)
+          end
           add_component(manifest, dir, "identifiers", "identifiers.json",
                         "application/json", result.identifiers)
+          glossary = { "concepts" => result.glossary.map do |c|
+            JSON.parse(c.to_json)
+          end }
           add_component(manifest, dir, "glossary", "glossary.json",
-                        "application/json", result.glossary)
+                        "application/json", glossary)
           write_lines(manifest, dir, "units", "units.jsonl", result.units)
           write_lines(manifest, dir, "edges", "edges.jsonl", result.edges)
           manifest

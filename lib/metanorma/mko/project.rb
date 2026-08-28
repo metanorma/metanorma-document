@@ -9,15 +9,16 @@ module Metanorma
     # attributes the base trees carry.
     module Project
       class Result
-        attr_reader :document, :units, :edges, :glossary, :identifiers,
-                    :flavor
+        attr_reader :document, :units, :edges, :glossary, :bibdata,
+                    :identifiers, :flavor
 
-        def initialize(document:, units:, edges:, glossary:, identifiers:,
-                       flavor:)
+        def initialize(document:, units:, edges:, glossary:, bibdata:,
+                       identifiers:, flavor:)
           @document = document
           @units = units
           @edges = edges
           @glossary = glossary
+          @bibdata = bibdata
           @identifiers = identifiers
           @flavor = flavor
         end
@@ -27,18 +28,28 @@ module Metanorma
         def call(model, presentation: nil)
           @units = []
           @edges = []
-          @glossary_terms = []
           @numbers = {}
           @structure = []
           @presentation = presentation
           @lang = first_lang(model)
           @flavor = flavor_of(model)
+          @doc_date = published_on(model)
           collect_numbers(presentation)
           walk_root(model)
           identity = build_identity(model)
+          # Native object models (Glossarist concepts, Relaton bibdata)
+          # come from the model layer; the projection only serializes.
           Result.new(document: identity, units: @units, edges: @edges,
-                     glossary: Schema::Glossary.new(terms: @glossary_terms),
+                     glossary: Document::NativeModels.glossarist_concepts(
+                       model, lang: @lang, date: @doc_date
+                     ),
+                     bibdata: Document::NativeModels.relaton_bibdata(model),
                      identifiers: build_identifiers(model), flavor: @flavor)
+        end
+
+        def published_on(model)
+          bib = val(model, :bibdata)
+          vals(bib, :date).filter_map { |d| scalar(val(d, :on)) }.first
         end
 
         private
@@ -139,7 +150,7 @@ module Metanorma
           return unless serializable?(element)
 
           if val(element, :element_attr) == "autonum"
-            text = PlainText.call(element)
+            text = Document::PlainText.call(element)
             out << text unless text.empty?
           end
           element.class.attributes.each_value do |attr|
@@ -188,7 +199,7 @@ module Metanorma
           return value.map { |v| scalar(v) }.join(" ") if value.is_a?(Array)
           return value.to_s unless serializable?(value)
 
-          PlainText.call(value)
+          Document::PlainText.call(value)
         end
 
         # Flavors rename some metadata attributes (e.g. the iso tree uses
@@ -218,7 +229,7 @@ module Metanorma
         def build_titles(bib)
           vals_any(bib, :title, :titles).map do |t|
             Schema::TitleEntry.new(lang: val(t, :language)&.to_s,
-                                   text: PlainText.call(t))
+                                   text: Document::PlainText.call(t))
           end
         end
 
@@ -250,23 +261,14 @@ module Metanorma
         end
 
         def build_identifiers(model)
-          bib = val(model, :bibdata)
-          infos = docids(bib).map do |d|
-            text = docid_text(d)
+          infos = Document::NativeModels.pubid_identifiers(model).map do |e|
+            pubid = e[:pubid] && JSON.parse(e[:pubid].to_json)
             Schema::IdentifierInfo.new(
-              original: text, type: val(d, :type),
-              primary: val(d, :primary), parsed: parse_pubid(text)
+              original: e[:original], type: e[:type],
+              primary: e[:primary], parsed: pubid
             )
           end
           Schema::Identifiers.new(identifiers: infos)
-        end
-
-        def parse_pubid(id)
-          return nil if id.nil? || id.empty?
-
-          Pubid.parse(id).to_s
-        rescue StandardError, LoadError, NameError
-          nil
         end
 
         def vals_any(obj, *names)
@@ -321,7 +323,7 @@ module Metanorma
         def walk_section(section, type: "clause", parent: nil, breadcrumb: [])
           anchor = element_anchor(section)
           number = @numbers[anchor] || section_autonum(section)
-          title = PlainText.call(val(section, :title))
+          title = Document::PlainText.call(val(section, :title))
           unit = emit_unit(
             type: type, anchor: anchor, number: number, title: title,
             parent: parent, breadcrumb: breadcrumb,
@@ -350,7 +352,7 @@ module Metanorma
         def walk_terms_section(ts, parent: nil, breadcrumb: [])
           anchor = element_anchor(ts)
           number = @numbers[anchor] || section_autonum(ts)
-          title = PlainText.call(val(ts, :title))
+          title = Document::PlainText.call(val(ts, :title))
           unit = emit_unit(
             type: "clause", anchor: anchor, number: number, title: title,
             parent: parent, breadcrumb: breadcrumb,
@@ -367,7 +369,7 @@ module Metanorma
           vals_any(ts, :paragraphs, :p).each do |p|
             emit_unit(type: "note", anchor: element_anchor(p),
                       parent: unit.id, breadcrumb: crumb,
-                      text: PlainText.call(p), model: p)
+                      text: Document::PlainText.call(p), model: p)
           end
         end
 
@@ -375,8 +377,8 @@ module Metanorma
           anchor = element_anchor(term, section)
           number = @numbers[anchor]
           designations = vals(term, :preferred)
-                         .map { |d| PlainText.call(d) }.reject(&:empty?)
-          definition = PlainText.call(val(term, :definition))
+                         .map { |d| Document::PlainText.call(d) }.reject(&:empty?)
+          definition = Document::PlainText.call(val(term, :definition))
           sources = vals(term, :source).map do |src|
             Schema::TermSourceEntry.new(
               citeas: vals(src, :origin).first&.citeas
@@ -392,18 +394,13 @@ module Metanorma
             breadcrumb: breadcrumb, text: definition, model: term,
             payload: payload
           )
-          @glossary_terms << Schema::GlossaryTerm.new(
-            unit: unit.id, concept: anchor, designations: designations,
-            definition: definition,
-            sources: sources.map(&:citeas).compact
-          )
           @edges << Schema::Edge.new(
             from: unit.id, to: "concept:#{anchor}", kind: "defines"
           )
         end
 
         def section_text(section)
-          vals(section, :paragraphs).map { |p| PlainText.call(p) }
+          vals(section, :paragraphs).map { |p| Document::PlainText.call(p) }
             .reject(&:empty?).join("\n")
         end
 
@@ -425,13 +422,13 @@ module Metanorma
         def walk_table(table, parent_id, breadcrumb)
           head_row = vals(val(table, :thead), :tr).first
           columns = vals(head_row, :th).map do |cell|
-            Schema::TableColumn.new(label: PlainText.call(cell))
+            Schema::TableColumn.new(label: Document::PlainText.call(cell))
           end
           rows = vals(val(table, :tbody), :tr).map do |tr|
-            vals(tr, :td).map { |cell| PlainText.call(cell) }.join(" | ")
+            vals(tr, :td).map { |cell| Document::PlainText.call(cell) }.join(" | ")
           end
           payload = Schema::TablePayload.new(
-            caption: PlainText.call(val(table, :name)),
+            caption: Document::PlainText.call(val(table, :name)),
             columns: columns, rows: rows
           )
           emit_unit(
@@ -444,7 +441,7 @@ module Metanorma
         end
 
         def walk_figure(figure, parent_id, breadcrumb)
-          caption = PlainText.call(val(figure, :name))
+          caption = Document::PlainText.call(val(figure, :name))
           payload = Schema::FigurePayload.new(
             alt: val(figure, :alt), uri: val(figure, :source),
             caption: caption
@@ -461,7 +458,7 @@ module Metanorma
           stem = val(formula, :stem)
           asciimath = val(stem, :asciimath)&.value
           mathml = mathml_of(stem)
-          description = PlainText.call(val(formula, :name))
+          description = Document::PlainText.call(val(formula, :name))
           payload = Schema::FormulaPayload.new(
             asciimath: asciimath, mathml: mathml, description: description
           )
@@ -486,7 +483,7 @@ module Metanorma
         def walk_note(note, parent_id, breadcrumb)
           emit_unit(
             type: "note", anchor: element_anchor(note), parent: parent_id,
-            breadcrumb: breadcrumb, text: PlainText.call(note), model: note
+            breadcrumb: breadcrumb, text: Document::PlainText.call(note), model: note
           )
         end
 
@@ -494,7 +491,7 @@ module Metanorma
           emit_unit(
             type: "example", anchor: element_anchor(example),
             parent: parent_id, breadcrumb: breadcrumb,
-            text: PlainText.call(example), model: example
+            text: Document::PlainText.call(example), model: example
           )
         end
 
@@ -502,9 +499,9 @@ module Metanorma
           emit_unit(
             type: "sourcecode", anchor: element_anchor(block),
             number: val(block, :autonum),
-            title: PlainText.call(val(block, :name)),
+            title: Document::PlainText.call(val(block, :name)),
             parent: parent_id, breadcrumb: breadcrumb,
-            text: PlainText.call(block), model: block
+            text: Document::PlainText.call(block), model: block
           )
         end
 
@@ -541,7 +538,7 @@ module Metanorma
         end
 
         def requirement_payload(req)
-          statement = vals(req, :description).map { |d| PlainText.call(d) }
+          statement = vals(req, :description).map { |d| Document::PlainText.call(d) }
                             .reject(&:empty?).join("\n")
           Schema::RequirementPayload.new(
             identifier: val(req, :anchor) || val(req, :id),
@@ -565,7 +562,7 @@ module Metanorma
 
         def walk_references_section(bib_section)
           vals(bib_section, :references).each do |refs|
-            title = PlainText.call(val(refs, :title))
+            title = Document::PlainText.call(val(refs, :title))
             section_unit = emit_unit(
               type: "clause", anchor: element_anchor(refs), title: title,
               parent: nil, breadcrumb: [], text: nil, model: refs
@@ -577,7 +574,7 @@ module Metanorma
             items.each do |item|
               key = val(item, :anchor) || val(item, :id)
               cited = docid_text(vals(item, :docidentifier).first) ||
-                      PlainText.call(val(item, :formatted_ref))
+                      Document::PlainText.call(val(item, :formatted_ref))
               payload = Schema::ReferencePayload.new(key: key, cited: cited)
               unit = emit_unit(
                 type: "reference", anchor: key, title: cited,

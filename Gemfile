@@ -18,8 +18,8 @@ gem "metanorma-itu", github: "metanorma/metanorma-itu", branch: "feat/move-itu-d
 gem "metanorma-ogc", github: "metanorma/metanorma-ogc", branch: "feat/move-ogc-document"
 gem "metanorma-iec", github: "metanorma/metanorma-iec", branch: "feat/move-iec-document"
 gem "isodoc", github: "metanorma/isodoc", branch: "rt-pubid-2-migration"
-gem "relaton-bib", "~> 2.2.0.pre.alpha.1"
-gem "pubid", github: "pubid/pubid", branch: "main"
+gem "pubid", ">= 2.0.0.pre.alpha.9"
+gem "glossarist", "~> 2.13"
 
 # Dependency sources. Default (no env vars): released gems, exactly the
 # contract downstream users get — CI and local dev must test that.

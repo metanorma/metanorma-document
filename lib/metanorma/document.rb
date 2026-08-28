@@ -18,6 +18,8 @@ module Metanorma
     autoload :Components, "metanorma/document/components"
     autoload :DataTypes, "metanorma/document/data_types"
     autoload :Elements, "metanorma/document/elements"
+    autoload :NativeModels, "metanorma/document/native_models"
+    autoload :PlainText, "metanorma/document/plain_text"
     autoload :Relaton, "metanorma/document/relaton"
     autoload :Root, "metanorma/document/root"
     autoload :Version, "metanorma/document/version"
