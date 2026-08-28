@@ -141,17 +141,21 @@ RSpec.describe Metanorma::Mko do
       end
     end
 
-    it "carries tables and figures with their native XML" do
+    it "carries tables and figures as native Mirror JSON objects" do
       bundle = export!
       units = read_lines(bundle, "units.jsonl")
       tables = units.select { |u| u["type"] == "table" }
+      expect(tables).not_to be_empty
       tables.each do |t|
-        expect(t["payload"]["xml"]).to start_with("<table")
-        expect(t["payload"]["xml"]).to include("<thead")
+        mirror = t["payload"]["mirror"]
+        expect(mirror["type"]).to eq("table")
+        types = mirror["content"].map { |c| c["type"] }
+        expect(types).to include("table_head")
       end
       figures = units.select { |u| u["type"] == "figure" }
+      expect(figures).not_to be_empty
       figures.each do |f|
-        expect(f["payload"]["xml"]).to start_with("<figure")
+        expect(f["payload"]["mirror"]["type"]).to eq("figure")
       end
     end
 
