@@ -37,6 +37,8 @@ elsif ENV["METANORMA_DEV_LOCAL"]
 end
 
 gem "nokogiri"
+# 0.8.20 yanked; keep the lock below it
+gem "lutaml-model", "~> 0.8.0", "< 0.8.20"
 gem "rake", "~> 13.0"
 gem "rdoc"
 gem "rspec", "~> 3.0"

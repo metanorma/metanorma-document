@@ -11,6 +11,7 @@ require_relative "../lib/metanorma/document"
 require "metanorma/standoc"
 require "metanorma/iso/document"
 require "metanorma/itu/document"
+require "metanorma/ogc/document"
 Dir[File.join(__dir__, "support/**/*.rb")].each { |f| require f }
 
 # Spec-side flavor registration (mirrors what flavour gems ship via
