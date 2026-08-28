@@ -53,6 +53,52 @@ module Metanorma
           end
         end
 
+        # One bibliography entry: the reference unit's key, the citeas
+        # string, and the NATIVE objects behind the cited document — a
+        # Relaton::Bib item and, when a pubid flavor covers it, a
+        # Pubid::Identifier. This is what makes citation edges resolvable
+        # objects instead of dangling strings.
+        class BibliographyEntry
+          attr_reader :key, :citeas, :pubid, :item
+
+          def initialize(key:, citeas:, pubid:, item:)
+            @key = key
+            @citeas = citeas
+            @pubid = pubid
+            @item = item
+          end
+        end
+
+        # Bibliography entries as native Relaton items. Every <bibitem>
+        # in every references section round-trips: model XML (the
+        # Relaton schema) parsed back by the relaton monogem.
+        def relaton_bibliography(root)
+          entries = []
+          Array(val(root, :bibliography)).each do |bib_section|
+            vals(bib_section, :references).each do |refs|
+              items = vals(refs, :bibitem)
+              items = vals(refs, :references) if items.empty?
+              items.each { |i| entries << bibliography_entry(i) }
+            end
+          end
+          entries
+        end
+
+        def bibliography_entry(item)
+          key = val(item, :anchor) || val(item, :id)
+          citeas = docid_text(vals(item, :docidentifier).first) ||
+                   PlainText.call(val(item, :formatted_ref))
+          BibliographyEntry.new(
+            key: key, citeas: citeas,
+            pubid: parse_pubid(citeas),
+            item: begin
+              ::Relaton::Bib::Item.from_xml(item.to_xml)
+            rescue StandardError
+              nil
+            end
+          )
+        end
+
         private
 
         # -- publisher → pubid flavor --------------------------------

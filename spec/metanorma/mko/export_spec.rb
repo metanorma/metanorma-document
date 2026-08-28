@@ -45,7 +45,7 @@ RSpec.describe Metanorma::Mko do
       expect(manifest["schema_version"]).to eq("1.0.0")
       names = manifest["components"].map { |c| c["name"] }
       expect(names).to include("document", "units", "edges", "identifiers",
-                               "glossary")
+                               "glossary", "bibliography")
       manifest["components"].each do |c|
         digest = Digest::SHA256.file(File.join(bundle, c["file"])).hexdigest
         expect(c["hash"]).to eq("sha256:#{digest}")
@@ -172,8 +172,18 @@ RSpec.describe Metanorma::Mko do
       expect(references.size).to be > 20
       cites = read_lines(bundle, "edges.jsonl")
                      .select { |e| e["kind"] == "cites" }
-      expect(cites.size).to eq(references.size)
+      # references + term-source citations
+      terms_with_sources = read_lines(bundle, "units.jsonl").count do |u|
+        u["type"] == "term" && !u.dig("payload", "sources").to_a.empty?
+      end
+      expect(cites.size).to eq(references.size + terms_with_sources)
       cites.each { |e| expect(e["to"]).to start_with("ext:") }
+
+      # term units cite their authoritative sources
+      expect(cites).to include(
+        { "from" => "u:term-paddy", "to" => "ext:ISO 7301:2011",
+          "kind" => "cites" }
+      )
     end
   end
 
@@ -207,6 +217,41 @@ RSpec.describe Metanorma::Mko do
         expect(File.read(File.join(b2, file)))
           .to eq(File.read(File.join(b1, file)))
       end
+    end
+  end
+
+  describe "cross-document graph" do
+    it "exports the bibliography as native Relaton items with pubids" do
+      bundle = export!
+      manifest = read_json(bundle, "manifest.json")
+      biblio = manifest["components"].find { |c| c["name"] == "bibliography" }
+      expect(biblio["count"]).to eq(23)
+      lines = read_lines(bundle, "bibliography.jsonl")
+      iso712 = lines.find { |l| l["citeas"].to_s.start_with?("ISO 712") }
+      expect(iso712["unit"]).to match(/\Au:/)
+      expect(iso712.dig("pubid", "_type")).to eq("pubid:iso:international-standard")
+      expect(iso712.dig("pubid", "number")).to eq("712")
+      docids = iso712.dig("bibitem", "docidentifier").map { |d| d["content"] }
+      expect(docids.compact.join(" ")).to include("ISO 712")
+      expect(iso712.dig("bibitem", "title")).to be_an(Array)
+    end
+
+    it "emits document-level relations as edges with relaton types" do
+      bundle = described_class.export(
+        File.read(fixture_path("standoc/requirements/document.xml"),
+                  encoding: "utf-8"),
+        to: tmpdir
+      )
+      document = read_json(bundle, "document.json")
+      short = document["ids"]["short"]
+      edges = read_lines(bundle, "edges.jsonl")
+      doc_edges = edges.select { |e| e["from"] == "doc:#{short}" }
+      expect(doc_edges).to contain_exactly(
+        { "from" => "doc:#{short}", "to" => "ext:SNR-0",
+          "kind" => "obsoletes" },
+        { "from" => "doc:#{short}", "to" => "ext:SNR-2",
+          "kind" => "hasPart" }
+      )
     end
   end
 

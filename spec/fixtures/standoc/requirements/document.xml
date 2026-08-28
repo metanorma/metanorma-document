@@ -9,6 +9,8 @@
 <status><stage>published</stage></status>
 <contributor><role type="publisher"/><organization><name>Metanorma</name></organization></contributor>
 <copyright><from>2026</from><owner><organization><name>Metanorma</name></organization></owner></copyright>
+<relation type="obsoletes"><bibitem><docidentifier type="ogc-internal">SNR-0</docidentifier></bibitem></relation>
+<relation type="hasPart"><bibitem><docidentifier type="ogc-internal">SNR-2</docidentifier></bibitem></relation>
 </bibdata>
 <sections>
 <clause id="_sec-req" anchor="sensor-requirements" obligation="normative" displayorder="2">

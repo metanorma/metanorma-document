@@ -49,6 +49,20 @@ module Metanorma
           end }
           add_component(manifest, dir, "glossary", "glossary.json",
                         "application/json", glossary)
+          # bibliography.jsonl: every cited document as native objects —
+          # Relaton item + pubid parse — keyed to its reference unit, so
+          # citation edges resolve to documents instead of strings.
+          bib_lines = result.bibliography.map do |e|
+            {
+              "unit" => "u:#{e.key}",
+              "citeas" => e.citeas,
+              "pubid" => e.pubid && JSON.parse(e.pubid.to_json),
+              "pubid_render" => e.pubid&.to_s,
+              "bibitem" => e.item && JSON.parse(e.item.to_json),
+            }
+          end
+          write_native_lines(manifest, dir, "bibliography",
+                             "bibliography.jsonl", bib_lines)
           write_lines(manifest, dir, "units", "units.jsonl", result.units)
           write_lines(manifest, dir, "edges", "edges.jsonl", result.edges)
           manifest
@@ -60,6 +74,17 @@ module Metanorma
           manifest.components << Schema::ManifestComponent.new(
             name: name, file: file, media_type: media_type,
             hash: file_hash(path)
+          )
+        end
+
+        # Line-oriented component whose values are already-serialized
+        # native JSON objects (framework to_json upstream).
+        def write_native_lines(manifest, dir, name, file, lines)
+          path = File.join(dir, file)
+          File.write(path, lines.map { |l| JSON.generate(l) }.join("\n") + "\n")
+          manifest.components << Schema::ManifestComponent.new(
+            name: name, file: file, media_type: "application/jsonl",
+            count: lines.size, hash: file_hash(path)
           )
         end
 
