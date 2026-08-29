@@ -150,9 +150,12 @@ module Metanorma
 
         # -- publisher → pubid flavor --------------------------------
 
+        # "OIML" engages the day the flavor ships (pubid/pubid#342);
+        # until then Pubid::Oiml is undefined and parses nil.
         PUBID_FLAVORS = {
           "ISO" => :Iso, "IEC" => :Iec, "ITU" => :Itu, "BSI" => :Bsi,
-          "BS" => :Bsi, "OGC" => :Ogc, "NIST" => :Nist, "IEEE" => :Ieee
+          "BS" => :Bsi, "OGC" => :Ogc, "NIST" => :Nist, "IEEE" => :Ieee,
+          "OIML" => :Oiml
         }.freeze
 
         def parse_pubid(text)
