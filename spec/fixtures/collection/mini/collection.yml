@@ -1,0 +1,20 @@
+directives:
+  - flavor: ogc
+bibdata:
+  title:
+    - language: en
+      type: title-main
+      content: "Sensor network requirements collection"
+  type: collection
+  docid:
+    type: oiml
+    id: SNR Family
+  edition: "1"
+manifest:
+  level: document
+  title: Documents
+  docref:
+    - fileref: member-1.xml
+      identifier: SNR-1
+    - fileref: member-2.xml
+      identifier: SNR-2

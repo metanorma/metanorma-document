@@ -17,6 +17,8 @@ module Metanorma
     autoload :Writer, "metanorma/mko/writer"
     autoload :Exporter, "metanorma/mko/exporter"
     autoload :Assets, "metanorma/mko/assets"
+    autoload :Bundle, "metanorma/mko/bundle"
+    autoload :Collection, "metanorma/mko/collection"
 
     SCHEMA = "metanorma-mko"
     SCHEMA_VERSION = "1.0.0"
@@ -61,7 +63,7 @@ module Metanorma
                        else presentation_xml
                        end
         projection = Project.call(model, presentation: presentation,
-                                  assets: Assets.new(source_dir: assets_from))
+                                         assets: Assets.new(source_dir: assets_from))
         Writer.write(projection, to: to, zip: zip)
       end
 
@@ -77,6 +79,13 @@ module Metanorma
       # The published wire contract, generated from the schema
       # classes: name => JSON Schema (draft 2020-12). MN 116 ships
       # these alongside the spec text.
+      # Canonical short-id derivation (one rule, used by documents and
+      # collections alike).
+      def slug(canonical)
+        canonical.to_s.tr(" ", "-").gsub(/[^A-Za-z0-9.-]/, "")
+          .squeeze("-").downcase
+      end
+
       def json_schemas
         Schema::JsonSchema.all
       end

@@ -12,6 +12,8 @@ module Metanorma
       autoload :Edge, "metanorma/mko/schema/edge"
       autoload :Identifiers, "metanorma/mko/schema/identifiers"
       autoload :JsonSchema, "metanorma/mko/schema/json_schema"
+      autoload :Collection, "metanorma/mko/schema/collection"
+      autoload :CollectionMember, "metanorma/mko/schema/collection"
       autoload :IdentifierInfo, "metanorma/mko/schema/identifiers"
     end
   end
