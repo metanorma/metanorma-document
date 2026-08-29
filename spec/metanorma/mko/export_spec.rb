@@ -281,6 +281,31 @@ RSpec.describe Metanorma::Mko do
     end
   end
 
+  describe "figure assets" do
+    it "emits data-URI figures as hash-addressed bundle assets" do
+      bundle = export!
+      figures = read_lines(bundle, "units.jsonl")
+                       .select { |u| u["type"] == "figure" }
+      with_asset = figures.select { |f| f.dig("payload", "asset") }
+      expect(with_asset).not_to be_empty
+      with_asset.each do |f|
+        asset = f.dig("payload", "asset")
+        expect(asset).to start_with("assets/")
+        path = File.join(bundle, asset)
+        expect(File.file?(path)).to be true
+      end
+      manifest = read_json(bundle, "manifest.json")
+      asset_components = manifest["components"]
+                            .select { |c| c["name"].start_with?("assets/") }
+      expect(asset_components.size).to eq(with_asset.size)
+      asset_components.each do |c|
+        expect(c["media_type"]).to eq("image/png")
+        digest = Digest::SHA256.file(File.join(bundle, c["file"])).hexdigest
+        expect(c["hash"]).to eq("sha256:#{digest}")
+      end
+    end
+  end
+
   describe "zip export" do
     it "writes a .mko.zip with identical components" do
       dir_bundle = export!

@@ -16,6 +16,7 @@ module Metanorma
     autoload :Project, "metanorma/mko/project"
     autoload :Writer, "metanorma/mko/writer"
     autoload :Exporter, "metanorma/mko/exporter"
+    autoload :Assets, "metanorma/mko/assets"
 
     SCHEMA = "metanorma-mko"
     SCHEMA_VERSION = "1.0.0"
@@ -51,14 +52,16 @@ module Metanorma
       # Export a document model (or semantic/presentation XML string)
       # as an MKO bundle directory (or .mko.zip with zip: true).
       # Returns the bundle path.
-      def export(source, to:, presentation_xml: nil, zip: false)
+      def export(source, to:, presentation_xml: nil, zip: false,
+                 assets_from: nil)
         model = source.is_a?(String) ? model_from_xml(source) : source
         presentation = case presentation_xml
                        when String then model_from_xml(presentation_xml)
                        when nil then nil
                        else presentation_xml
                        end
-        projection = Project.call(model, presentation: presentation)
+        projection = Project.call(model, presentation: presentation,
+                                  assets: Assets.new(source_dir: assets_from))
         Writer.write(projection, to: to, zip: zip)
       end
 

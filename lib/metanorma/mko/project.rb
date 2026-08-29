@@ -10,10 +10,10 @@ module Metanorma
     class Project
       class Result
         attr_reader :document, :units, :edges, :glossary, :bibdata,
-                    :bibliography, :identifiers, :flavor
+                    :bibliography, :identifiers, :assets, :flavor
 
         def initialize(document:, units:, edges:, glossary:, bibdata:,
-                       bibliography:, identifiers:, flavor:)
+                       bibliography:, identifiers:, assets: [], flavor:)
           @document = document
           @units = units
           @edges = edges
@@ -21,6 +21,7 @@ module Metanorma
           @bibdata = bibdata
           @bibliography = bibliography
           @identifiers = identifiers
+          @assets = assets
           @flavor = flavor
         end
       end
@@ -28,14 +29,15 @@ module Metanorma
       include Metanorma::Document::ModelAccess
 
       class << self
-        def call(model, presentation: nil)
-          new(model, presentation: presentation).call
+        def call(model, presentation: nil, assets: nil)
+          new(model, presentation: presentation, assets: assets).call
         end
       end
 
-      def initialize(model, presentation: nil)
+      def initialize(model, presentation: nil, assets: nil)
         @model = model
         @presentation = presentation
+        @assets = assets
         @units = []
         @edges = []
         @numbers = {}
@@ -62,7 +64,7 @@ module Metanorma
                    bibliography:
                      Document::NativeModels.relaton_bibliography(@model),
                    identifiers: build_identifiers(@model),
-                   flavor: @flavor)
+                   assets: @assets&.entries || [], flavor: @flavor)
       end
 
       # Cross-document relations from the bibliographic record, as
@@ -500,8 +502,12 @@ module Metanorma
 
       def walk_figure(figure, parent_id, breadcrumb)
         caption = Document::PlainText.call(val(figure, :name))
+        img = val(figure, :image)
+        uri = val(figure, :source) || val(img, :source) ||
+              val(img, :filename)
         payload = Schema::FigurePayload.new(
-          alt: val(figure, :alt), uri: val(figure, :source),
+          alt: val(figure, :alt) || val(img, :alt), uri: uri,
+          asset: @assets&.attach(uri),
           caption: caption,
           mirror: Document::NativeModels.mirror_object(figure)
         )
