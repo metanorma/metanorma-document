@@ -134,6 +134,11 @@ module Metanorma
         attribute :type, :string
         attribute :anchor, :string
         attribute :number, :string
+        # the anchor a READER cites (issue #50 follow-up 2): the parent
+        # clause number for embedded objects (tables/formulas/figures),
+        # the unit's own number for top-level sections. Consumers cite
+        # identically without walking the parent chain.
+        attribute :cite_as, :string
         attribute :title, :string
         attribute :parent, :string
         attribute :breadcrumb, :string, collection: true, default: -> { [] }
@@ -148,6 +153,7 @@ module Metanorma
           map "type", to: :type
           map "anchor", to: :anchor
           map "number", to: :number
+          map "cite_as", to: :cite_as
           map "title", to: :title
           map "parent", to: :parent
           map "breadcrumb", to: :breadcrumb

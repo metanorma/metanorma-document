@@ -39,6 +39,7 @@ module Metanorma
         @presentation = presentation
         @assets = assets
         @units = []
+        @units_by_id = {}
         @edges = []
         @numbers = {}
         @structure = []
@@ -192,6 +193,15 @@ module Metanorma
 
       # -- identity ----------------------------------------------------
 
+      # "OIML R 60-1" → ["R", "60", "1"]; "ISO 17301-1" likewise.
+      # Nil-safe: an unparseable canonical yields nils (fields absent in
+      # JSON), never a crash — unknown shapes stay visible, not fatal.
+      def parse_identity(canonical)
+        m = canonical.to_s.match(/\A(?:[A-Z][A-Za-z0-9&-]*\s+)?([A-Z])\s*(\d+)(?:-(\d+|[A-Za-z][A-Za-z0-9]*))?\b/)
+        return [m[1], m[2], m[3]] if m
+        []
+      end
+
       def build_identity(model)
         bib = val(model, :bibdata)
         ids = docids(bib)
@@ -199,10 +209,14 @@ module Metanorma
           &.then { |d| docid_text(d) } ||
           ids.reject { |d| docid_is_urn?(d) }
             .filter_map { |d| docid_text(d) }.first
+        series, number, part = parse_identity(canonical)
         Schema::Document.new(
           ids: Schema::Ids.new(
             canonical: canonical,
-            short: slug(canonical),
+            short: Mko.slug(canonical),
+            series: series,
+            number: number,
+            part: part,
             docid: ids.filter_map { |d| docid_text(d) },
             urn: ids.select { |d| docid_is_urn?(d) }
               .filter_map { |d| docid_text(d) },
@@ -302,11 +316,6 @@ module Metanorma
 
       def docid_is_urn?(d)
         val(d, :type) == "URN" || docid_text(d).to_s.start_with?("urn:")
-      end
-
-      def slug(canonical)
-        canonical.to_s.tr(" ", "-").gsub(/[^A-Za-z0-9.-]/, "")
-          .squeeze("-").downcase
       end
 
       # -- the walk ----------------------------------------------------
@@ -667,17 +676,35 @@ module Metanorma
                     payload: nil, number: nil, title: nil, obligation: nil)
         anchor ||= content_anchor(model, type)
         id = "u:#{anchor}"
+        cite_as = citation_anchor(anchor: anchor, number: number,
+                                  parent: parent, type: type)
         unit = Schema::Unit.new(
-          id: id, type: type, anchor: anchor, number: number, title: title,
+          id: id, type: type, anchor: anchor, number: number,
+          cite_as: cite_as, title: title,
           parent: parent, breadcrumb: breadcrumb.compact,
           obligation: obligation, lang: @lang, text: text,
           payload: payload_hash(payload), hash: content_hash(text, payload)
         )
         @units << unit
+        @units_by_id[id] = unit
         if parent
           @edges << Schema::Edge.new(from: id, to: parent, kind: "part_of")
         end
         unit
+      end
+
+      # Embedded objects cite their containing clause: a table in §4.1.2
+      # is cited as 4.1.2, not as its own anchor. Top-level sections and
+      # parentless units cite their own number/anchor.
+      def citation_anchor(anchor:, number:, parent:, type:)
+        own = number || anchor
+        if parent && @units_by_id
+          pu = @units_by_id[parent]
+          if pu && %w[clause annex].include?(pu.type)
+            return (pu.number || pu.anchor || own).to_s
+          end
+        end
+        own&.to_s
       end
 
       def payload_hash(payload)
