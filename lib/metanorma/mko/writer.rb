@@ -65,6 +65,7 @@ module Metanorma
                       bib_lines) { |line| JSON.generate(line) }
           write_lines(manifest, dir, "units", "units.jsonl", result.units)
           write_lines(manifest, dir, "edges", "edges.jsonl", result.edges)
+          write_assets(manifest, dir, result.assets)
           manifest
         end
 
@@ -87,6 +88,21 @@ module Metanorma
             name: name, file: file, media_type: "application/jsonl",
             count: objects.size, hash: file_hash(path)
           )
+        end
+
+        # Hash-addressed asset components: bytes land as
+        # assets/<sha256>, manifest-verified like every component.
+        def write_assets(manifest, dir, entries)
+          entries.each do |entry|
+            path = File.join(dir, entry.name)
+            FileUtils.mkdir_p(File.dirname(path))
+            File.binwrite(path, entry.data)
+            manifest.components << Schema::ManifestComponent.new(
+              name: entry.name, file: entry.name,
+              media_type: entry.media_type, count: 1,
+              hash: file_hash(path)
+            )
+          end
         end
 
         def file_hash(path)

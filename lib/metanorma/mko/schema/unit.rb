@@ -57,12 +57,16 @@ module Metanorma
       class FigurePayload < Lutaml::Model::Serializable
         attribute :alt, :string
         attribute :uri, :string
+        # hash-addressed bundle asset ("assets/<sha256>"), when bytes
+        # were available at export (data URIs or assets_from)
+        attribute :asset, :string
         attribute :caption, :string
         # Native JSON object: the Mirror node tree (see TablePayload).
         attribute :mirror, :hash
 
         json do
           map "alt", to: :alt
+          map "asset", to: :asset
           map "uri", to: :uri
           map "caption", to: :caption
           map "mirror", to: :mirror
