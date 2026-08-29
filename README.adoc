@@ -397,6 +397,27 @@ Metanorma::Mko.export(xml_or_model, to: dir, presentation_xml: nil, zip: false)
 #    edges.jsonl, bibdata.json, bibliography.jsonl, identifiers.json,
 #    glossary.json
 
+Collections export as document families — every member document as
+its own bundle plus one small collection bundle (collection.json and
+the doc:<member> part_of doc:<family> membership edges):
+
+[source,ruby]
+Metanorma::Mko::Collection.export("collection.yml", to: dir)
+
+Figure bytes are emitted as hash-addressed, manifest-verified bundle
+assets (data URIs from the model, or `assets_from:` paths). Language
+editions align by stable anchors:
+
+[source,ruby]
+Metanorma::Mko::Alignment.export(bundle_en, bundle_fr)
+# => alignment.jsonl of variant_of unit edges
+
+The wire contract ships as generated JSON Schema (the schema classes
+are the single source of truth):
+
+[source,ruby]
+Metanorma::Mko.json_schemas # => { "unit" => …, "collection" => …, "excerpt" => … }
+
 The bundle carries: typed units (clause, term, table, figure, formula,
 note, example, sourcecode, requirement, reference) with typed payloads;
 the edge graph (part_of containment, cites from reference and term units,

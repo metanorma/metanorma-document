@@ -89,6 +89,8 @@ RSpec.describe Metanorma::Mko do
       bundle = export!
       document = read_json(bundle, "document.json")
       expect(document["doctype"]).to eq("international-standard")
+      expect(document["ids"]["number"]).to eq("17301")
+      expect(document["ids"]["part"]).to eq("1")
       expect(document["edition"]).to eq("2")
       expect(document["status"]["stage"]).to eq("60")
       expect(document["status"]["abbreviation"]).to eq("IS")
