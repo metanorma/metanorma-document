@@ -6,12 +6,22 @@ module Metanorma
       class Ids < Lutaml::Model::Serializable
         attribute :canonical, :string
         attribute :short, :string
+        # parsed identity (issue #50 follow-up 1): consumers filter and
+        # group on series/number/part — they must never decompose the
+        # canonical string themselves (a silent parse failure on the
+        # consumer side hid a whole corpus lane from retrieval)
+        attribute :series, :string
+        attribute :number, :string
+        attribute :part, :string
         attribute :docid, :string, collection: true
         attribute :urn, :string, collection: true
 
         json do
           map "canonical", to: :canonical
           map "short", to: :short
+          map "series", to: :series
+          map "number", to: :number
+          map "part", to: :part
           map "docid", to: :docid
           map "urn", to: :urn
         end
