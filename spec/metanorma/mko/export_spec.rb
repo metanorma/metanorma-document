@@ -4,6 +4,19 @@ require "spec_helper"
 require "fileutils"
 require "tmpdir"
 
+# Memoized fixture models (parse-once holders shared across examples).
+module FixtureModel
+  class << self
+    def semantic(xml)
+      @semantic ||= Metanorma::Iso::Document::Root.from_xml(xml)
+    end
+
+    def presentation(xml)
+      @presentation ||= Metanorma::Iso::Document::Root.from_xml(xml)
+    end
+  end
+end
+
 RSpec.describe Metanorma::Mko do
   let(:semantic_xml) do
     File.read(fixture_path("iso/is/document-en.xml"),
@@ -21,10 +34,21 @@ RSpec.describe Metanorma::Mko do
     File.expand_path("../../fixtures/#{rel}", __dir__)
   end
 
+  # Fixture models parse once per file (the parse dominates suite
+  # time); export! still exercises the full projection+write per call.
+  # The "resolves the iso model root" example keeps the raw-XML path.
+  def semantic_model
+    FixtureModel.semantic(semantic_xml)
+  end
+
+  def presentation_model
+    FixtureModel.presentation(presentation_xml)
+  end
+
   def export!(presentation: true)
     described_class.export(
-      semantic_xml, to: tmpdir,
-      presentation_xml: presentation ? presentation_xml : nil
+      semantic_model, to: tmpdir,
+                      presentation_xml: presentation ? presentation_model : nil
     )
   end
 
@@ -58,7 +82,7 @@ RSpec.describe Metanorma::Mko do
       document = read_json(bundle, "document.json")
       expect(document["flavor"]).to eq("iso")
       expect(document["ids"]["canonical"]).to be_a(String)
-      expect(document["ids"]["short"]).to match(/\A[a-z0-9.\-]+\z/)
+      expect(document["ids"]["short"]).to match(/\A[a-z0-9.-]+\z/)
     end
 
     it "carries parsed identity: doctype, edition, status, structure" do
@@ -98,7 +122,7 @@ RSpec.describe Metanorma::Mko do
       units = read_lines(bundle, "units.jsonl")
       numbered = units.select { |u| u["number"] }
       expect(numbered).not_to be_empty
-      expect(numbered.map { |u| u["number"] }).to all(match(/\A[\dA-Z.\-]+/))
+      expect(numbered.map { |u| u["number"] }).to all(match(/\A[\dA-Z.-]+/))
     end
 
     it "carries tables as typed payloads, never only linearized text" do
@@ -220,7 +244,7 @@ RSpec.describe Metanorma::Mko do
       references = units.select { |u| u["type"] == "reference" }
       expect(references.size).to be > 20
       cites = read_lines(bundle, "edges.jsonl")
-                     .select { |e| e["kind"] == "cites" }
+        .select { |e| e["kind"] == "cites" }
       # references + term-source citations
       terms_with_sources = read_lines(bundle, "units.jsonl").count do |u|
         u["type"] == "term" && !u.dig("payload", "sources").to_a.empty?
@@ -231,7 +255,7 @@ RSpec.describe Metanorma::Mko do
       # term units cite their authoritative sources
       expect(cites).to include(
         { "from" => "u:term-paddy", "to" => "ext:ISO 7301:2011",
-          "kind" => "cites" }
+          "kind" => "cites" },
       )
     end
   end
@@ -264,7 +288,7 @@ RSpec.describe Metanorma::Mko do
       begin
         zip_path = described_class.export(
           semantic_xml, to: zip_dir,
-          presentation_xml: presentation_xml, zip: true
+                        presentation_xml: presentation_xml, zip: true
         )
         expect(zip_path).to end_with(".mko.zip")
         expect(File.file?(zip_path)).to be true
@@ -279,7 +303,8 @@ RSpec.describe Metanorma::Mko do
             b = File.read(File.join(dir_bundle, n))
             if n == "manifest.json"
               # timestamps are the sanctioned exception (MN 116)
-              ja = JSON.parse(a); jb = JSON.parse(b)
+              ja = JSON.parse(a)
+              jb = JSON.parse(b)
               ja["generated"].delete("timestamp")
               jb["generated"].delete("timestamp")
               expect(ja).to eq(jb), n
@@ -326,7 +351,7 @@ RSpec.describe Metanorma::Mko do
       bundle = described_class.export(
         File.read(fixture_path("standoc/requirements/document.xml"),
                   encoding: "utf-8"),
-        to: tmpdir
+        to: tmpdir,
       )
       document = read_json(bundle, "document.json")
       short = document["ids"]["short"]
@@ -336,7 +361,7 @@ RSpec.describe Metanorma::Mko do
         { "from" => "doc:#{short}", "to" => "ext:SNR-0",
           "kind" => "obsoletes" },
         { "from" => "doc:#{short}", "to" => "ext:SNR-2",
-          "kind" => "hasPart" }
+          "kind" => "hasPart" },
       )
     end
   end
@@ -362,7 +387,7 @@ RSpec.describe Metanorma::Mko do
                   encoding: "utf-8"),
         to: tmpdir,
         presentation_xml: File.read(fixture_path("ogc/19-004/document.presentation.xml"),
-                                    encoding: "utf-8")
+                                    encoding: "utf-8"),
       )
       expect(read_json(bundle, "manifest.json")["generated"]["flavor"])
         .to eq("ogc")
@@ -385,7 +410,7 @@ RSpec.describe Metanorma::Mko do
                   encoding: "utf-8"),
         to: tmpdir,
         presentation_xml: File.read(fixture_path("itu/d-rec-d.19-201003/en.presentation.xml"),
-                                    encoding: "utf-8")
+                                    encoding: "utf-8"),
       )
       expect(read_json(bundle, "manifest.json")["generated"]["flavor"])
         .to eq("itu")
@@ -402,7 +427,7 @@ RSpec.describe Metanorma::Mko do
       bundle = described_class.export(
         File.read(fixture_path("standoc/requirements/document.xml"),
                   encoding: "utf-8"),
-        to: tmpdir
+        to: tmpdir,
       )
       units = read_lines(bundle, "units.jsonl")
       edges = read_lines(bundle, "edges.jsonl")
@@ -439,7 +464,7 @@ RSpec.describe Metanorma::Mko do
         { "from" => "u:req-sensor-accuracy", "to" => "class:accuracy",
           "kind" => "class_of" },
         { "from" => "u:req-battery", "to" => "class:battery",
-          "kind" => "class_of" }
+          "kind" => "class_of" },
       )
       nested = edges.select do |e|
         e["kind"] == "part_of" &&
@@ -452,7 +477,7 @@ RSpec.describe Metanorma::Mko do
   describe "portability gate (OCP)" do
     it "references no flavor namespaces" do
       src = Dir[File.expand_path("../../../../lib/metanorma/mko/**/*.rb",
-                                __dir__)]
+                                 __dir__)]
       hits = src.flat_map do |f|
         File.readlines(f).each_with_index.filter_map do |line, i|
           "#{f}:#{i + 1}: #{line.strip}" if line.match?(/\bIso::|\bItu::|\bOgc::|\bIec::/)

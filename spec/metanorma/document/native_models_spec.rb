@@ -3,12 +3,23 @@
 require "spec_helper"
 require "json"
 
+module FixtureModel
+  class << self
+    def semantic(xml)
+      @semantic ||= Metanorma::Iso::Document::Root.from_xml(xml)
+    end
+  end
+end
+
 RSpec.describe Metanorma::Document::NativeModels do
   let(:semantic_xml) do
     File.read(File.expand_path("../../fixtures/iso/is/document-en.xml",
                                __dir__), encoding: "utf-8")
   end
-  let(:model) { Metanorma::Iso::Document::Root.from_xml(semantic_xml) }
+
+  def model
+    FixtureModel.semantic(semantic_xml)
+  end
 
   describe ".glossarist_concepts" do
     it "exports term entries as native Glossarist::Concept objects" do
@@ -54,7 +65,7 @@ RSpec.describe Metanorma::Document::NativeModels do
       expect(entries.size).to eq(23)
       expect(entries).to all(have_attributes(key: a_string_starting_with(/\A/)))
       iso712 = entries.find { |e| e.citeas.to_s.start_with?("ISO 712") }
-      expect(iso712.item).to be_a(::Relaton::Bib::ItemData)
+      expect(iso712.item).to be_a(Relaton::Bib::ItemData)
       expect(iso712.pubid).to be_a(Pubid::Iso::Identifier)
       native = JSON.parse(iso712.item.to_json)
       docids = native["docidentifier"].map { |d| d["content"] }
@@ -70,6 +81,7 @@ RSpec.describe Metanorma::Document::NativeModels do
       until formula || stack.empty?
         node = stack.pop
         next unless node.class.respond_to?(:attributes)
+
         if node.class.attributes.key?(:formulas)
           formula = Array(node.formulas).first
         end
@@ -93,6 +105,7 @@ RSpec.describe Metanorma::Document::NativeModels do
       until tbl || stack.empty?
         node = stack.pop
         next unless node.class.respond_to?(:attributes)
+
         tbl = Array(node.tables).first if node.class.attributes.key?(:tables)
         stack.concat(Array(node.clause)) if node.class.attributes.key?(:clause)
       end

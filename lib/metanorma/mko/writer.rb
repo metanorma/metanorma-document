@@ -20,7 +20,7 @@ module Metanorma
         private
 
         def bundle_dir(result, to)
-          name = (result.document.ids.short || "document") + ".mko"
+          name = "#{result.document.ids.short || 'document'}.mko"
           File.expand_path(File.join(to, name))
         end
 
@@ -61,8 +61,8 @@ module Metanorma
               "bibitem" => e.item && JSON.parse(e.item.to_json),
             }
           end
-          write_native_lines(manifest, dir, "bibliography",
-                             "bibliography.jsonl", bib_lines)
+          write_lines(manifest, dir, "bibliography", "bibliography.jsonl",
+                      bib_lines) { |line| JSON.generate(line) }
           write_lines(manifest, dir, "units", "units.jsonl", result.units)
           write_lines(manifest, dir, "edges", "edges.jsonl", result.edges)
           manifest
@@ -79,18 +79,10 @@ module Metanorma
 
         # Line-oriented component whose values are already-serialized
         # native JSON objects (framework to_json upstream).
-        def write_native_lines(manifest, dir, name, file, lines)
+        def write_lines(manifest, dir, name, file, objects, &serializer)
+          serializer ||= lambda(&:to_json)
           path = File.join(dir, file)
-          File.write(path, lines.map { |l| JSON.generate(l) }.join("\n") + "\n")
-          manifest.components << Schema::ManifestComponent.new(
-            name: name, file: file, media_type: "application/jsonl",
-            count: lines.size, hash: file_hash(path)
-          )
-        end
-
-        def write_lines(manifest, dir, name, file, objects)
-          path = File.join(dir, file)
-          File.write(path, objects.map(&:to_json).join("\n") + "\n")
+          File.write(path, "#{objects.map(&serializer).join("\n")}\n")
           manifest.components << Schema::ManifestComponent.new(
             name: name, file: file, media_type: "application/jsonl",
             count: objects.size, hash: file_hash(path)
@@ -98,17 +90,17 @@ module Metanorma
         end
 
         def file_hash(path)
-          "sha256:" + Digest::SHA256.file(path).hexdigest
+          "sha256:#{Digest::SHA256.file(path).hexdigest}"
         end
 
         def zip_bundle(dir)
-          zip_path = dir + ".zip"
+          zip_path = "#{dir}.zip"
           require "zip"
           Zip::File.open(zip_path, Zip::File::CREATE) do |zipfile|
-            Dir[File.join(dir, "**", "*")].sort.each do |f|
+            Dir[File.join(dir, "**", "*")].each do |f|
               next if File.directory?(f)
 
-              zipfile.add(f.sub(dir + "/", ""), f)
+              zipfile.add(f.sub("#{dir}/", ""), f)
             end
           end
           zip_path
