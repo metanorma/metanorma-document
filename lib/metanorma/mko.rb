@@ -19,6 +19,7 @@ module Metanorma
     autoload :Assets, "metanorma/mko/assets"
     autoload :Bundle, "metanorma/mko/bundle"
     autoload :Collection, "metanorma/mko/collection"
+    autoload :Alignment, "metanorma/mko/alignment"
 
     SCHEMA = "metanorma-mko"
     SCHEMA_VERSION = "1.0.0"

@@ -43,6 +43,7 @@ module Metanorma
               "manifest" => schema_for(Manifest),
               "document" => schema_for(Document),
               "identifiers" => schema_for(Identifiers),
+              "collection" => schema_for(Schema::Collection),
               "payload-table" => schema_for(TablePayload),
               "payload-formula" => schema_for(FormulaPayload),
               "payload-figure" => schema_for(FigurePayload),
