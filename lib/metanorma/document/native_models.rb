@@ -19,6 +19,8 @@ module Metanorma
     # knowledge).
     module NativeModels
       class << self
+        include Metanorma::Document::ModelAccess
+
         # Term entries as Glossarist::Concept objects (native to_json).
         # lang/date are derivable defaults, overridable by callers that
         # already computed them.
@@ -87,7 +89,7 @@ module Metanorma
         def bibliography_entry(item)
           key = val(item, :anchor) || val(item, :id)
           citeas = docid_text(vals(item, :docidentifier).first) ||
-                   PlainText.call(val(item, :formatted_ref))
+            PlainText.call(val(item, :formatted_ref))
           BibliographyEntry.new(
             key: key, citeas: citeas,
             pubid: parse_pubid(citeas),
@@ -112,7 +114,7 @@ module Metanorma
           Array(result.nodes).each do |node|
             parsed = JSON.parse(
               ::Metanorma::Mirror::Serialization::JsonSerializer
-                .serialize(node)
+                .serialize(node),
             )
             return parsed if parsed.is_a?(Hash)
           end
@@ -137,6 +139,7 @@ module Metanorma
           unless expr.to_s.empty?
             return Plurimath::Math.parse(expr.to_s, :asciimath)
           end
+
           math = val(stem, :math)
           Plurimath::Math.parse(math.to_xml, :mathml) if math
         rescue StandardError, LoadError
@@ -149,7 +152,7 @@ module Metanorma
 
         PUBID_FLAVORS = {
           "ISO" => :Iso, "IEC" => :Iec, "ITU" => :Itu, "BSI" => :Bsi,
-          "BS" => :Bsi, "OGC" => :Ogc, "NIST" => :Nist, "IEEE" => :Ieee,
+          "BS" => :Bsi, "OGC" => :Ogc, "NIST" => :Nist, "IEEE" => :Ieee
         }.freeze
 
         def parse_pubid(text)
@@ -168,23 +171,33 @@ module Metanorma
         def concept_for(term, lang:, date:)
           g_lang = GLOSSARIST_LANG.fetch(lang, lang)
           designations = vals(term, :preferred)
-                           .map { |d| PlainText.call(d) }.reject(&:empty?)
+            .map { |d| PlainText.call(d) }.reject(&:empty?)
           admitted = vals(term, :admitted)
-                      .map { |d| PlainText.call(d) }.reject(&:empty?)
+            .map { |d| PlainText.call(d) }.reject(&:empty?)
           deprecated = vals(term, :deprecates)
-                        .map { |d| PlainText.call(d) }.reject(&:empty?)
+            .map { |d| PlainText.call(d) }.reject(&:empty?)
           definition = PlainText.call(val(term, :definition))
           sources = vals(term, :source).filter_map do |src|
-            citeas = vals(src, :origin).first&.citeas rescue nil
+            citeas = begin
+              vals(src, :origin).first&.citeas
+            rescue StandardError
+              nil
+            end
             citeas = PlainText.call(citeas) if citeas
-            Glossarist::ConceptSource.new(
-              type: "authoritative",
-              origin: { "ref" => { "source" => citeas } }
-            ) if citeas && !citeas.empty?
+            if citeas && !citeas.empty?
+              Glossarist::ConceptSource.new(
+                type: "authoritative",
+                origin: { "ref" => { "source" => citeas } },
+              )
+            end
           end
-          dates = date ? [Glossarist::ConceptDate.new(
-            date: date, type: "accepted"
-          )] : []
+          dates = if date
+                    [Glossarist::ConceptDate.new(
+                      date: date, type: "accepted",
+                    )]
+                  else
+                    []
+                  end
           Glossarist::Concept.new(
             id: anchor_of(term),
             data: Glossarist::ConceptData.new(
@@ -197,17 +210,17 @@ module Metanorma
               ].flat_map do |status, terms|
                 terms.map do |designation|
                   Glossarist::Designation::Expression.new(
-                    designation: designation, normative_status: status
+                    designation: designation, normative_status: status,
                   )
                 end
               end,
               definition: [Glossarist::DetailedDefinition.new(
-                content: definition
+                content: definition,
               )],
               sources: sources,
               dates: dates,
-              entry_status: "valid"
-            )
+              entry_status: "valid",
+            ),
           )
         end
 
@@ -215,7 +228,7 @@ module Metanorma
         GLOSSARIST_LANG = {
           "en" => "eng", "fr" => "fre", "de" => "ger", "es" => "spa",
           "ar" => "ara", "ru" => "rus", "zh" => "zho", "ja" => "jpn",
-          "ko" => "kor",
+          "ko" => "kor"
         }.freeze
 
         # -- term-entry traversal (both trees) -----------------------
@@ -255,38 +268,12 @@ module Metanorma
           entries_
         end
 
-        # -- shared typed-model helpers ------------------------------
-
-        def val(obj, name)
-          return nil unless serializable?(obj)
-
-          obj.class.attributes.key?(name) ? obj.public_send(name) : nil
-        end
-
-        def vals(obj, name)
-          Array(val(obj, name))
-        end
-
-        def serializable?(obj)
-          obj.is_a?(Lutaml::Model::Serializable)
-        end
-
         def anchor_of(element)
           anchor = val(element, :anchor)
           return anchor if anchor && !anchor.empty?
 
           id = val(element, :id)
           id && !id.empty? ? id : nil
-        end
-
-        def docids(bib)
-          out = vals(bib, :docidentifier)
-          out = vals(bib, :doc_identifier) if out.empty?
-          out.compact
-        end
-
-        def docid_text(d)
-          val(d, :id) || val(d, :value)
         end
 
         def first_lang(root)
@@ -297,7 +284,7 @@ module Metanorma
         def published_on(root)
           bib = val(root, :bibdata)
           vals(bib, :date).filter_map { |d| PlainText.call(val(d, :on)) }
-                          .first
+            .first
         end
       end
     end
