@@ -71,6 +71,13 @@ module Metanorma
           .new.generate_full_document(document, **)
       end
 
+      # The published wire contract, generated from the schema
+      # classes: name => JSON Schema (draft 2020-12). MN 116 ships
+      # these alongside the spec text.
+      def json_schemas
+        Schema::JsonSchema.all
+      end
+
       def renderer_for(document, **)
         Metanorma::Core::Flavors.renderer_for(document, format: :mko,
                                                         **) || Exporter

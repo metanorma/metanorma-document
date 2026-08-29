@@ -11,6 +11,7 @@ module Metanorma
       autoload :Unit, "metanorma/mko/schema/unit"
       autoload :Edge, "metanorma/mko/schema/edge"
       autoload :Identifiers, "metanorma/mko/schema/identifiers"
+      autoload :JsonSchema, "metanorma/mko/schema/json_schema"
       autoload :IdentifierInfo, "metanorma/mko/schema/identifiers"
     end
   end
