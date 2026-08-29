@@ -59,6 +59,17 @@ RSpec.describe Metanorma::Document::NativeModels do
     end
   end
 
+  describe ".pubid_identity" do
+    it "parses series/number/part across publishers natively" do
+      expect(described_class.pubid_identity("OIML R 60-1:2017"))
+        .to eq(["R", "60", "1"])
+      expect(described_class.pubid_identity("OIML D 11"))
+        .to eq(["D", "11", nil])
+      expect(described_class.pubid_identity("ISO 17301-1:2016"))
+        .to eq([nil, "17301", "1"])
+    end
+  end
+
   describe ".relaton_bibliography" do
     it "exports every bibitem as a native Relaton item with a pubid" do
       entries = described_class.relaton_bibliography(model)

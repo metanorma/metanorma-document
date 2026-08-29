@@ -193,14 +193,16 @@ module Metanorma
 
       # -- identity ----------------------------------------------------
 
-      # "OIML R 60-1" → ["R", "60", "1"]; "ISO 17301-1" likewise.
-      # Nil-safe: an unparseable canonical yields nils (fields absent in
+      # Identity comes from the native pubid parser first (one parser,
+      # every publisher it covers); the series-letter regex remains as
+      # the fallback for publishers pubid does not model. Nil-safe: an unparseable canonical yields nils (fields absent in
       # JSON), never a crash — unknown shapes stay visible, not fatal.
       def parse_identity(canonical)
-        m = canonical.to_s.match(/\A(?:[A-Z][A-Za-z0-9&-]*\s+)?([A-Z])\s*(\d+)(?:-(\d+|[A-Za-z][A-Za-z0-9]*))?\b/)
-        return [m[1], m[2], m[3]] if m
+        native = Document::NativeModels.pubid_identity(canonical)
+        return native if native
 
-        []
+        m = canonical.to_s.match(/\A(?:[A-Z][A-Za-z0-9&-]*\s+)?([A-Z])\s*(\d+)(?:-(\d+|[A-Za-z][A-Za-z0-9]*))?\b/)
+        m ? [m[1], m[2], m[3]] : []
       end
 
       def build_identity(model)

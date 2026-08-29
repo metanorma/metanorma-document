@@ -123,6 +123,31 @@ module Metanorma
           nil
         end
 
+        # Parsed identity [series, number, part] via the native pubid
+        # parse — the single identity parser. OIML's series letter
+        # lives in the pubid type (recommendation → R, document → D,
+        # basic publication → B, guide → G, expert report → E,
+        # vocabulary → V); publishers without a series letter (ISO,
+        # IEC) yield nil series. Returns nil when no flavor covers the
+        # identifier — callers fall back, never guess.
+        OIML_SERIES = {
+          "recommendation" => "R", "document" => "D",
+          "basic-publication" => "B", "basic_publication" => "B",
+          "guide" => "G", "expert-report" => "E", "expert_report" => "E",
+          "vocabulary" => "V",
+        }.freeze
+
+        def pubid_identity(text)
+          pubid = parse_pubid(text)
+          return nil unless pubid
+
+          native = JSON.parse(pubid.to_json)
+          series = if native["_type"].to_s.start_with?("pubid:oiml:")
+                     OIML_SERIES[native["_type"].split(":").last]
+                   end
+          [series, native["number"]&.to_s, native["part"]&.to_s]
+        end
+
         # Formula as a native Plurimath::Math::Formula. Plurimath is the
         # Metanorma math ecosystem: parse from the stem's AsciiMath, or
         # from its MathML (the mml model's own XML serialization) when
