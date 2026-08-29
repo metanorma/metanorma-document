@@ -13,7 +13,7 @@ module Metanorma
                     :bibliography, :identifiers, :assets, :flavor
 
         def initialize(document:, units:, edges:, glossary:, bibdata:,
-                       bibliography:, identifiers:, assets: [], flavor:)
+                       bibliography:, identifiers:, flavor:, assets: [])
           @document = document
           @units = units
           @edges = edges
@@ -199,6 +199,7 @@ module Metanorma
       def parse_identity(canonical)
         m = canonical.to_s.match(/\A(?:[A-Z][A-Za-z0-9&-]*\s+)?([A-Z])\s*(\d+)(?:-(\d+|[A-Za-z][A-Za-z0-9]*))?\b/)
         return [m[1], m[2], m[3]] if m
+
         []
       end
 
@@ -513,7 +514,7 @@ module Metanorma
         caption = Document::PlainText.call(val(figure, :name))
         img = val(figure, :image)
         uri = val(figure, :source) || val(img, :source) ||
-              val(img, :filename)
+          val(img, :filename)
         payload = Schema::FigurePayload.new(
           alt: val(figure, :alt) || val(img, :alt), uri: uri,
           asset: @assets&.attach(uri),
