@@ -317,6 +317,7 @@ RSpec.describe Metanorma::Mko do
           semantic_xml, to: zip_dir,
                         presentation_xml: presentation_xml, zip: true
         )
+        zip_path = zip_path.path
         expect(zip_path).to end_with(".mko.zip")
         expect(File.file?(zip_path)).to be true
         require "zip"

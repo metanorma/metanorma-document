@@ -11,7 +11,19 @@ RSpec.describe Metanorma::Mko::Collection do
   end
   let(:out) { Dir.mktmpdir("mko-collection") }
 
-  after { FileUtils.remove_entry(out) }
+  before do
+    # member-2 is generated from member-1 (docid SNR-1 -> SNR-2): the
+    # spec owns exactly what it varies, nothing else
+    dir = File.dirname(yml_path)
+    src = File.read(File.join(dir, "member-1.xml"))
+    File.write(File.join(dir, "member-2.xml"),
+               src.sub('primary="true">SNR-1<', 'primary="true">SNR-2<'))
+  end
+
+  after do
+    FileUtils.rm_f(File.join(File.dirname(yml_path), "member-2.xml"))
+    FileUtils.remove_entry(out)
+  end
 
   def read_json(bundle, file)
     JSON.parse(File.read(File.join(bundle, file)))

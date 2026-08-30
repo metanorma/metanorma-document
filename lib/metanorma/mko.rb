@@ -16,6 +16,7 @@ module Metanorma
     autoload :Project, "metanorma/mko/project"
     autoload :Writer, "metanorma/mko/writer"
     autoload :Exporter, "metanorma/mko/exporter"
+    autoload :Export, "metanorma/mko/export"
     autoload :Assets, "metanorma/mko/assets"
     autoload :Bundle, "metanorma/mko/bundle"
     autoload :Collection, "metanorma/mko/collection"
@@ -65,7 +66,7 @@ module Metanorma
                        end
         projection = Project.call(model, presentation: presentation,
                                          assets: Assets.new(source_dir: assets_from))
-        Writer.write(projection, to: to, zip: zip)
+        Export.new(Writer.write(projection, to: to, zip: zip), projection)
       end
 
       # The format adapter over the central flavor registry (mirrors

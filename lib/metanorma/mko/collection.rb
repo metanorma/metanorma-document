@@ -15,7 +15,8 @@ module Metanorma
     # reference labels only.
     class Collection
       Member = Struct.new(:fileref, :xml_path, :identifier,
-                          :bundle_path, :skipped, keyword_init: true)
+                          :bundle_path, :result, :skipped,
+                          keyword_init: true)
 
       class Result
         attr_reader :collection_bundle, :members
@@ -55,11 +56,13 @@ module Metanorma
           member = resolve_member(ref)
           next member if member.skipped
 
-          member.bundle_path = Mko.export(
+          export = Mko.export(
             File.read(member.xml_path), to: @to,
                                         presentation_xml: presentation_for(member.xml_path),
                                         assets_from: @assets_from || File.dirname(member.xml_path)
           )
+          member.bundle_path = export.path
+          member.result = export.result
           member
         end
         Result.new(collection_bundle: write_collection_bundle(members),
@@ -112,15 +115,15 @@ module Metanorma
         Mko.slug(canonical.empty? ? "collection" : canonical)
       end
 
+      # Member identity from the export's own Result — the same truth
+      # the bundle was written from, never a read-back of our output.
       def member_data(member)
-        document = JSON.parse(File.read(File.join(member.bundle_path,
-                                                  "document.json")))
-        short = document.dig("ids", "short")
-        { "bundle" => "#{short}.mko",
-          "docidentifier" => document.dig("ids", "canonical"),
+        document = member.result.document
+        { "bundle" => "#{document.ids.short}.mko",
+          "docidentifier" => document.ids.canonical,
           "identifier" => member.identifier,
-          "title" => Array(document["titles"]).first.to_h["text"],
-          "edition" => document["edition"] }
+          "title" => document.titles.first&.text,
+          "edition" => document.edition }
       rescue StandardError
         nil
       end
