@@ -93,6 +93,9 @@ module Metanorma
         attribute :edition, :string
         attribute :languages, :string, collection: true
         attribute :status, StatusInfo
+        # derived from succession edges (Relaton relations verbatim) —
+        # authoritative over the hand-entered status field when present
+        attribute :derived_status, :string
         attribute :dates, DateEntry, collection: true
         attribute :relations, RelationEntry, collection: true
         attribute :structure, StructureNode, collection: true
@@ -105,6 +108,7 @@ module Metanorma
           map "edition", to: :edition
           map "languages", to: :languages
           map "status", to: :status
+          map "derived_status", to: :derived_status, render_nil: false
           map "dates", to: :dates
           map "relations", to: :relations
           map "structure", to: :structure

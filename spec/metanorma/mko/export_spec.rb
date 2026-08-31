@@ -91,6 +91,14 @@ RSpec.describe Metanorma::Mko do
       expect(document["doctype"]).to eq("international-standard")
       expect(document["ids"]["number"]).to eq("17301")
       expect(document["ids"]["part"]).to eq("1")
+      # every unit carries its language (#53 item 3) and retrievable
+      # text — caption, alt, title, or body (#53 item 1)
+      units = read_lines(bundle, "units.jsonl")
+      units.each { |u| expect(u["lang"]).to eq("en") }
+      units.each do |u|
+        retrievable = [u["text"], u["title"]].compact.join.strip
+        expect(retrievable).not_to be_empty, "#{u['id']} carries no retrievable text"
+      end
       expect(document["edition"]).to eq("2")
       expect(document["status"]["stage"]).to eq("60")
       expect(document["status"]["abbreviation"]).to eq("IS")
@@ -390,7 +398,13 @@ RSpec.describe Metanorma::Mko do
           "kind" => "obsoletes" },
         { "from" => "doc:#{short}", "to" => "ext:SNR-2",
           "kind" => "hasPart" },
+        { "from" => "doc:#{short}", "to" => "ext:SNR-3",
+          "kind" => "hasSuccessor" },
       )
+
+      # derived status (#53 item 4): edges are structure — the
+      # successor link supersedes whatever the status field claims
+      expect(document["derived_status"]).to eq("superseded")
     end
   end
 

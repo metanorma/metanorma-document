@@ -230,6 +230,7 @@ module Metanorma
           edition: scalar(val(bib, :edition)),
           languages: vals(bib, :language).filter_map { |l| scalar(l) },
           status: build_status(bib),
+          derived_status: derived_status(build_relations(bib)),
           dates: build_dates(bib),
           relations: build_relations(bib),
           structure: @structure,
@@ -266,6 +267,20 @@ module Metanorma
         return abbr.to_s unless abbr.to_s.empty?
 
         scalar(dt)
+      end
+
+      # Hand-entered status fields contradict their own succession
+      # links (#53 item 4: 58 of 224 OIML families); edges are
+      # structure. Derived from the Relaton relations verbatim:
+      # superseded iff this record names a successor.
+      SUCCESSOR_TYPES = %w[hasSuccessor obsoletedBy succeededBy
+                           supersededBy updatedBy].freeze
+
+      def derived_status(relations)
+        has_successor = relations.any? do |r|
+          SUCCESSOR_TYPES.include?(r.type) && r.to && !r.to.empty?
+        end
+        has_successor ? "superseded" : nil
       end
 
       def build_titles(bib)
@@ -517,8 +532,12 @@ module Metanorma
         img = val(figure, :image)
         uri = val(figure, :source) || val(img, :source) ||
           val(img, :filename)
+        alt = val(figure, :alt) || val(img, :alt)
+        # retrievability invariant (#53 item 1): an uncaptioned figure
+        # still carries retrievable text — its alt text
+        retrievable = [caption, alt].compact.reject { |s| s.to_s.empty? }
         payload = Schema::FigurePayload.new(
-          alt: val(figure, :alt) || val(img, :alt), uri: uri,
+          alt: alt, uri: uri,
           asset: @assets&.attach(uri),
           caption: caption,
           mirror: Document::NativeModels.mirror_object(figure)
@@ -527,7 +546,7 @@ module Metanorma
           type: "figure", anchor: element_anchor(figure),
           number: val(figure, :autonum), title: caption,
           parent: parent_id, breadcrumb: breadcrumb,
-          text: caption.to_s, model: figure, payload: payload
+          text: retrievable.join(". "), model: figure, payload: payload
         )
       end
 
