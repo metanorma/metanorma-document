@@ -18,6 +18,7 @@ module Metanorma
     autoload :Exporter, "metanorma/mko/exporter"
     autoload :Export, "metanorma/mko/export"
     autoload :Diff, "metanorma/mko/diff"
+    autoload :Mcp, "metanorma/mko/mcp"
     autoload :Assets, "metanorma/mko/assets"
     autoload :Bundle, "metanorma/mko/bundle"
     autoload :Collection, "metanorma/mko/collection"

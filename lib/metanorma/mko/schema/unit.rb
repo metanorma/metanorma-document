@@ -144,6 +144,10 @@ module Metanorma
         attribute :breadcrumb, :string, collection: true, default: -> { [] }
         attribute :obligation, :string
         attribute :lang, :string
+        # authoring-time situating note (#53 item 7): AI-assisted,
+        # editor-approved, versioned with the document. Wire-ready —
+        # emitted the day the authoring system ships it.
+        attribute :ai_note, :string
         attribute :text, :string
         attribute :payload, :hash
         attribute :hash, :string
@@ -159,6 +163,7 @@ module Metanorma
           map "breadcrumb", to: :breadcrumb
           map "obligation", to: :obligation
           map "lang", to: :lang
+          map "ai_note", to: :ai_note, render_nil: false
           map "text", to: :text
           map "payload", to: :payload
           map "hash", to: :hash
