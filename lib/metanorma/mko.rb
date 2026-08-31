@@ -17,6 +17,7 @@ module Metanorma
     autoload :Writer, "metanorma/mko/writer"
     autoload :Exporter, "metanorma/mko/exporter"
     autoload :Export, "metanorma/mko/export"
+    autoload :Diff, "metanorma/mko/diff"
     autoload :Assets, "metanorma/mko/assets"
     autoload :Bundle, "metanorma/mko/bundle"
     autoload :Collection, "metanorma/mko/collection"
