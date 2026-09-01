@@ -45,5 +45,8 @@ module Metanorma
   autoload :Collection, "metanorma/collection"
   autoload :Html, "metanorma/html"
   autoload :Mirror, "metanorma/mirror"
-  autoload :Mko, "metanorma/mko"
+  # Mko: the format lives in the metanorma-mko gem; Metanorma::Mko is
+  # REOPENED by the model side (document/mko.rb) with the projection
+  # walk and export entry points.
+  autoload :Mko, "metanorma/document/mko"
 end

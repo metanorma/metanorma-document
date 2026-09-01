@@ -8,24 +8,6 @@ module Metanorma
     # keyed on lutaml attribute declarations — flavor classes may omit
     # attributes the base trees carry.
     class Project
-      class Result
-        attr_reader :document, :units, :edges, :glossary, :bibdata,
-                    :bibliography, :identifiers, :assets, :flavor
-
-        def initialize(document:, units:, edges:, glossary:, bibdata:,
-                       bibliography:, identifiers:, flavor:, assets: [])
-          @document = document
-          @units = units
-          @edges = edges
-          @glossary = glossary
-          @bibdata = bibdata
-          @bibliography = bibliography
-          @identifiers = identifiers
-          @assets = assets
-          @flavor = flavor
-        end
-      end
-
       include Metanorma::Document::ModelAccess
 
       class << self
@@ -57,7 +39,7 @@ module Metanorma
         @edges.concat(document_relation_edges(identity))
         # Native object models (Glossarist concepts, Relaton bibdata)
         # come from the model layer; the projection only serializes.
-        Result.new(document: identity, units: @units, edges: @edges,
+        Mko::Result.new(document: identity, units: @units, edges: @edges,
                    glossary: Document::NativeModels.glossarist_concepts(
                      @model, lang: @lang, date: @doc_date
                    ),

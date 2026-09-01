@@ -21,6 +21,7 @@ gem "isodoc", github: "metanorma/isodoc", branch: "rt-pubid-2-migration"
 gem "pubid", ">= 2.0.0.pre.alpha.9"
 gem "glossarist", "~> 2.13"
 gem "plurimath", "~> 0.11"
+gem "metanorma-mko", github: "metanorma/metanorma-mko", branch: "main"
 
 # Dependency sources. Default (no env vars): released gems, exactly the
 # contract downstream users get — CI and local dev must test that.

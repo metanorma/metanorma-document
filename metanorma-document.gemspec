@@ -50,5 +50,9 @@ Gem::Specification.new do |spec|
   # Native object-model decomposition (Glossarist concepts, Relaton
   # bibdata, Plurimath formulas) is a model-layer capability.
   spec.add_dependency "glossarist", "~> 2.13"
+  # The MN 116 format (wire schema, bundle, diffs, MCP) lives in its
+  # own versioned gem; this gem reopens Metanorma::Mko with the model
+  # side. Unreleased until metanorma-mko ships — github pin meanwhile.
+  spec.add_dependency "metanorma-mko", ">= 1.0.0"
   spec.add_dependency "plurimath", "~> 0.11"
 end
