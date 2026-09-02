@@ -38,10 +38,10 @@ RSpec.describe Metanorma::Mko::Diff do
     added = diff["added"].map { |u| u["anchor"] }
     expect(added).to include("new-clause")
 
-    # NB: the standoc tree's Term does not declare :anchor (the iso
-    # tree does) — anchorless elements key by id; upstream model gap.
+    # the standoc Term maps :anchor (ported with the #48 grammar
+    # mappings) — semantic anchors key the diff, not GUID-ish ids
     removed = diff["removed"].map { |u| u["anchor"] }
-    expect(removed).to include("_term-annex-load-cell", "_annex-terms")
+    expect(removed).to include("term-annex-load-cell", "_annex-terms")
 
     changed = diff["changed"]
     restated = changed.find { |u| u["anchor"] == "req-sensor-accuracy" }
