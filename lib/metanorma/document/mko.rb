@@ -23,6 +23,7 @@ module Metanorma
       # ducktypes as the bundle path String for existing callers.
       def export(source, to:, presentation_xml: nil, zip: false,
                  assets_from: nil)
+        seed_flavors!
         model = source.is_a?(String) ? model_from_xml(source) : source
         presentation = case presentation_xml
                        when String then model_from_xml(presentation_xml)
@@ -39,11 +40,13 @@ module Metanorma
       # renderer; with none, the harness Exporter serves any model tree
       # — the walk is class/attribute-driven, zero flavor knowledge.
       def generate(document, **)
+        seed_flavors!
         renderer_for(document, **)
           .new.generate_full_document(document, **)
       end
 
       def renderer_for(document, **)
+        seed_flavors!
         Metanorma::Core::Flavors.renderer_for(document, format: :mko,
                                                         **) || Exporter
       end
@@ -89,16 +92,27 @@ module Metanorma
       standoc: "Metanorma::Standoc::Document::Root",
     }.freeze
 
-    SEED_MODEL_ROOTS.each do |seed, model_root|
-      entry = Metanorma::Core::Flavors.find(seed)
-      if entry
-        entry.renderers[:mko] ||= Exporter
-      else
-        Metanorma::Core::Flavors.register(Metanorma::Core::Flavor.new(
-                                            name: seed,
-                                            model_root: model_root,
-                                            renderers: { mko: Exporter },
-                                          ))
+    # Lazy: seeding touches the core flavor registry, which only the
+    # flavor-table line of metanorma-core defines. Requiring this gem
+    # must never depend on it — seeds on first use, no-op without it.
+    class << self
+      def seed_flavors!
+        return unless defined?(Metanorma::Core::Flavors)
+        return if @flavors_seeded
+
+        @flavors_seeded = true
+        SEED_MODEL_ROOTS.each do |seed, model_root|
+          entry = Metanorma::Core::Flavors.find(seed)
+          if entry
+            entry.renderers[:mko] ||= Exporter
+          else
+            Metanorma::Core::Flavors.register(Metanorma::Core::Flavor.new(
+                                                name: seed,
+                                                model_root: model_root,
+                                                renderers: { mko: Exporter },
+                                              ))
+          end
+        end
       end
     end
   end
