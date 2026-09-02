@@ -30,7 +30,7 @@ module Metanorma
                        else presentation_xml
                        end
         projection = Project.call(model, presentation: presentation,
-                                  assets: Assets.new(source_dir: assets_from))
+                                         assets: Assets.new(source_dir: assets_from))
         Export.new(Writer.write(projection, to: to, zip: zip), projection)
       end
 
@@ -38,14 +38,14 @@ module Metanorma
       # Html::Generator): a flavor entry may register its own :mko
       # renderer; with none, the harness Exporter serves any model tree
       # — the walk is class/attribute-driven, zero flavor knowledge.
-      def generate(document, **options)
-        renderer_for(document, **options)
-               .new.generate_full_document(document, **options)
+      def generate(document, **)
+        renderer_for(document, **)
+          .new.generate_full_document(document, **)
       end
 
-      def renderer_for(document, **options)
+      def renderer_for(document, **)
         Metanorma::Core::Flavors.renderer_for(document, format: :mko,
-                                               **options) || Exporter
+                                                        **) || Exporter
       end
 
       private
@@ -64,10 +64,12 @@ module Metanorma
           klass = candidate
           break
         end
-        raise ArgumentError,
-              "no document model registered for flavor #{flavor.inspect}; " \
-              "require the flavor gem (metanorma-standoc or a flavor) " \
-              "before exporting" unless klass
+        unless klass
+          raise ArgumentError,
+                "no document model registered for flavor #{flavor.inspect}; " \
+                "require the flavor gem (metanorma-standoc or a flavor) " \
+                "before exporting"
+        end
 
         klass.from_xml(xml)
       end

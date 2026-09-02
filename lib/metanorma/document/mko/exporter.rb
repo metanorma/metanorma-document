@@ -10,7 +10,7 @@ module Metanorma
         output = options[:output] || options[:output_filename] || "."
         to = File.directory?(output) ? output : File.dirname(output)
         Mko.export(document, to: to,
-                              presentation_xml: options[:presentation_xml])
+                             presentation_xml: options[:presentation_xml])
       end
     end
   end

@@ -15,6 +15,7 @@ RSpec.describe Metanorma::Mko::Schema::JsonSchema do
     value.each do |key, v|
       prop = schema_props[key]
       return "#{path}.#{key}: not in schema (schema drift)" unless prop
+
       expected = prop["type"]
       if expected == "array" && !v.is_a?(Array)
         return "#{path}.#{key}: expected array"
@@ -32,7 +33,7 @@ RSpec.describe Metanorma::Mko::Schema::JsonSchema do
     begin
       bundle = Metanorma::Mko.export(xml, to: dir)
       units = File.readlines(File.join(bundle, "units.jsonl"))
-                  .map { |l| JSON.parse(l) }
+        .map { |l| JSON.parse(l) }
       payloads = units.group_by { |u| u["type"] }
       payloads.each do |type, typed|
         typed.reject { |u| u["payload"].nil? }.each do |u|

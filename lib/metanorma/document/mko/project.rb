@@ -49,15 +49,15 @@ module Metanorma
         # Native object models (Glossarist concepts, Relaton bibdata)
         # come from the model layer; the projection only serializes.
         Mko::Result.new(document: identity, units: @units, edges: @edges,
-                   unitsml: @unitsml,
-                   glossary: Document::NativeModels.glossarist_concepts(
-                     @model, lang: @lang, date: @doc_date
-                   ),
-                   bibdata: Document::NativeModels.relaton_bibdata(@model),
-                   bibliography:
+                        unitsml: @unitsml,
+                        glossary: Document::NativeModels.glossarist_concepts(
+                          @model, lang: @lang, date: @doc_date
+                        ),
+                        bibdata: Document::NativeModels.relaton_bibdata(@model),
+                        bibliography:
                      Document::NativeModels.relaton_bibliography(@model),
-                   identifiers: build_identifiers(@model),
-                   assets: @assets&.entries || [], flavor: @flavor)
+                        identifiers: build_identifiers(@model),
+                        assets: @assets&.entries || [], flavor: @flavor)
       end
 
       # Cross-document relations from the bibliographic record, as
@@ -79,6 +79,50 @@ module Metanorma
         bib = val(model, :bibdata)
         vals(bib, :date).filter_map { |d| scalar(val(d, :on)) }.first
       end
+
+      # Base-quantity attr -> SI vector symbol; the model-side spelling
+      # of Mko::Units::BASE_QUANTITY_SYMBOLS (which is keyed by XML
+      # element name). Composition itself is shared: vectorize.
+      DIMENSION_SYMBOLS = {
+        length: "L", mass: "M", time: "T", electric_current: "I",
+        thermodynamic_temperature: "Θ", amount_of_substance: "N",
+        luminous_intensity: "J", plane_angle: "φ"
+      }.freeze
+      # Hand-entered status fields contradict their own succession
+      # links (#53 item 4: 58 of 224 OIML families); edges are
+      # structure. Derived from the Relaton relations verbatim:
+      # superseded iff this record names a successor.
+      SUCCESSOR_TYPES = %w[hasSuccessor obsoletedBy succeededBy
+                           supersededBy updatedBy].freeze
+      # Prose containers hold paragraphs and lists (lists are not
+      # separate units — their content belongs in the clause text).
+      # Composed in document order via element_order, like
+      # extract_plain_text, but scoped to prose: tables/figures/
+      # formulas are their own units and stay out.
+      SECTION_PROSE_SOURCES = {
+        "p" => :paragraphs, "ul" => :unordered_lists,
+        "ol" => :ordered_lists, "dl" => :definition_lists
+      }.freeze
+      BLOCK_SOURCES = {
+        "table" => :tables, "figure" => :figures, "formula" => :formulas,
+        "note" => :notes, "example" => :examples,
+        "sourcecode" => :sourcecode_blocks
+      }.freeze
+      # Element-name -> mapped attributes, for re-ordering a section's
+      # child units into document order from element_order (the same
+      # interleave trick section_text uses for prose). "clause" and
+      # "term" cover both tree spellings (subsections/clause, term/terms).
+      SECTION_CHILD_SOURCES = {
+        "clause" => %i[subsections clause], "terms" => %i[terms],
+        "term" => %i[term terms],
+        "table" => %i[tables], "figure" => %i[figures],
+        "formula" => %i[formulas], "note" => %i[notes],
+        "example" => %i[examples], "sourcecode" => %i[sourcecode_blocks],
+        "requirement" => %i[requirement],
+        "recommendation" => %i[recommendation],
+        "permission" => %i[permission],
+        "p" => %i[paragraphs]
+      }.freeze
 
       private
 
@@ -120,23 +164,23 @@ module Metanorma
 
       # Term entries: the iso tree declares them as :term with nested
       # terms-sections in :terms; the standoc tree maps them to :terms.
-      def term_entries(ts)
-        entries = vals(ts, :term)
-        entries = vals(ts, :terms) if entries.empty?
+      def term_entries(tsec)
+        entries = vals(tsec, :term)
+        entries = vals(tsec, :terms) if entries.empty?
         entries
       end
 
-      def nested_terms_sections(ts)
-        vals(ts, :term).empty? ? [] : vals(ts, :terms)
+      def nested_terms_sections(tsec)
+        vals(tsec, :term).empty? ? [] : vals(tsec, :terms)
       end
 
       def number_tree(section, parent)
         register_number(section, parent)
         vals(section, :subsections).each { |s| number_tree(s, section) }
         vals(section, :clause).each { |s| number_tree(s, section) }
-        vals(section, :terms).each do |ts|
-          term_entries(ts).each { |t| register_number(t, ts) }
-          nested_terms_sections(ts).each { |nested| number_tree(nested, section) }
+        vals(section, :terms).each do |tsec|
+          term_entries(tsec).each { |t| register_number(t, tsec) }
+          nested_terms_sections(tsec).each { |nested| number_tree(nested, section) }
         end
       end
 
@@ -185,15 +229,6 @@ module Metanorma
 
       # -- units register (#55) ---------------------------------------
 
-      # Base-quantity attr -> SI vector symbol; the model-side spelling
-      # of Mko::Units::BASE_QUANTITY_SYMBOLS (which is keyed by XML
-      # element name). Composition itself is shared: vectorize.
-      DIMENSION_SYMBOLS = {
-        length: "L", mass: "M", time: "T", electric_current: "I",
-        thermodynamic_temperature: "Θ", amount_of_substance: "N",
-        luminous_intensity: "J", plane_angle: "φ"
-      }.freeze
-
       # The register from the model's typed UnitsML container. The
       # container rides the root-level metanorma-extension (semantic
       # XML puts UnitsML beside presentation-metadata); some trees also
@@ -204,7 +239,7 @@ module Metanorma
         root = [val(model, :metanorma_extension),
                 val(val_any(val(model, :bibdata), :ext, :extension),
                     :metanorma_extension)]
-               .filter_map { |mnx| val(mnx, :unitsml) }.first
+          .filter_map { |mnx| val(mnx, :unitsml) }.first
         return [] unless root
 
         dimensions = dimension_vectors(root)
@@ -213,7 +248,7 @@ module Metanorma
           [unit, unit_entry(unit, dimensions, quantity_kinds)]
         end
         entries = pairs.map(&:last)
-        by_id = entries.each_with_object({}) { |e, h| h[e.id] = e }
+        by_id = entries.to_h { |e| [e.id, e] }
         prefixes = prefix_symbols(root)
         pairs.each do |unit, entry|
           expr = si_expression(unit, by_id, prefixes)
@@ -233,7 +268,7 @@ module Metanorma
           name: scalar(val(unit, :unit_name)),
           quantity_kind: quantity_kinds[url],
           dimension_url: url.empty? ? nil : url,
-          dimension: dimensions[url]
+          dimension: dimensions[url],
         )
       end
 
@@ -252,15 +287,15 @@ module Metanorma
 
       def dimension_vectors(root)
         vals(val(root, :dimension_set), :dimension)
-          .each_with_object({}) do |dim, h|
-            h[val(dim, :id)] = Mko::Units.vectorize(
-              DIMENSION_SYMBOLS.filter_map do |attr, sym|
-                part = val(dim, attr) or next
-                [sym, val(part, :power_numerator),
-                 val(part, :power_denominator)]
-              end
-            )
-          end
+          .to_h do |dim|
+          [val(dim, :id), Mko::Units.vectorize(
+            DIMENSION_SYMBOLS.filter_map do |attr, sym|
+              part = val(dim, attr) or next
+              [sym, val(part, :power_numerator),
+               val(part, :power_denominator)]
+            end,
+          )]
+        end
       end
 
       # Quantity kinds keyed by dimension URL: a unit's kind is the
@@ -270,17 +305,17 @@ module Metanorma
           .each_with_object({}) do |q, h|
             url = val(q, :dimension_url).to_s.sub("#", "")
             name = vals(q, :quantity_name).map { |n| scalar(n) }
-                             .reject(&:empty?).first
+              .reject(&:empty?).first
             h[url] ||= name if name && !url.empty?
           end
       end
 
       def prefix_symbols(root)
         vals(val(root, :prefix_set), :prefix)
-          .each_with_object({}) do |p, h|
-            h[val(p, :id)] = vals(p, :prefix_symbol)
-                              .map { |s| scalar(s) }.join
-          end
+          .to_h do |p|
+          [val(p, :id), vals(p, :prefix_symbol)
+            .map { |s| scalar(s) }.join]
+        end
       end
 
       # The unit's composition as the source enumerates it: root-unit
@@ -374,13 +409,6 @@ module Metanorma
         scalar(dt)
       end
 
-      # Hand-entered status fields contradict their own succession
-      # links (#53 item 4: 58 of 224 OIML families); edges are
-      # structure. Derived from the Relaton relations verbatim:
-      # superseded iff this record names a successor.
-      SUCCESSOR_TYPES = %w[hasSuccessor obsoletedBy succeededBy
-                           supersededBy updatedBy].freeze
-
       def derived_status(relations)
         has_successor = relations.any? do |r|
           SUCCESSOR_TYPES.include?(r.type) && r.to && !r.to.empty?
@@ -437,8 +465,8 @@ module Metanorma
         names.filter_map { |n| val(obj, n) }.flat_map { |v| Array(v) }
       end
 
-      def docid_is_urn?(d)
-        val(d, :type) == "URN" || docid_text(d).to_s.start_with?("urn:")
+      def docid_is_urn?(docid)
+        val(docid, :type) == "URN" || docid_text(docid).to_s.start_with?("urn:")
       end
 
       # -- the walk ----------------------------------------------------
@@ -492,8 +520,8 @@ module Metanorma
           node.children << child if child
           children << child if child
         end
-        vals(section, :terms).each do |ts|
-          ts_unit = walk_terms_section(ts, parent: unit.id, breadcrumb: crumb)
+        vals(section, :terms).each do |tsec|
+          ts_unit = walk_terms_section(tsec, parent: unit.id, breadcrumb: crumb)
           children << ts_unit if ts_unit
         end
         finalize_section(unit,
@@ -501,32 +529,31 @@ module Metanorma
         node
       end
 
-      def walk_terms_section(ts, parent: nil, breadcrumb: [])
-        anchor = element_anchor(ts)
-        number = @numbers[anchor] || section_autonum(ts)
-        title = Document::PlainText.call(val(ts, :title))
+      def walk_terms_section(tsec, parent: nil, breadcrumb: [])
+        anchor = element_anchor(tsec)
+        number = @numbers[anchor] || section_autonum(tsec)
+        title = Document::PlainText.call(val(tsec, :title))
         unit = emit_unit(
           type: "clause", anchor: anchor, number: number, title: title,
           parent: parent, breadcrumb: breadcrumb,
-          obligation: val(ts, :obligation), text: section_text(ts),
-          model: ts
+          obligation: val(tsec, :obligation), text: section_text(tsec),
+          model: tsec
         )
         crumb = breadcrumb + [title]
-        children = []
-        term_entries(ts).each do |t|
-          children << walk_term(t, parent: unit.id, breadcrumb: crumb,
-                                section: ts)
+        children = term_entries(tsec).map do |t|
+          walk_term(t, parent: unit.id, breadcrumb: crumb,
+                       section: tsec)
         end
-        nested_terms_sections(ts).each do |nested|
+        nested_terms_sections(tsec).each do |nested|
           children << walk_terms_section(nested, parent: unit.id,
-                                         breadcrumb: crumb)
+                                                 breadcrumb: crumb)
         end
-        vals_any(ts, :paragraphs, :p).each do |p|
+        vals_any(tsec, :paragraphs, :p).each do |p|
           children << emit_unit(type: "note", anchor: element_anchor(p),
                                 parent: unit.id, breadcrumb: crumb,
                                 text: Document::PlainText.call(p), model: p)
         end
-        finalize_section(unit, ordered_child_ids(ts, children.map(&:id)))
+        finalize_section(unit, ordered_child_ids(tsec, children.map(&:id)))
         unit
       end
 
@@ -571,16 +598,6 @@ module Metanorma
         unit
       end
 
-      # Prose containers hold paragraphs and lists (lists are not
-      # separate units — their content belongs in the clause text).
-      # Composed in document order via element_order, like
-      # extract_plain_text, but scoped to prose: tables/figures/
-      # formulas are their own units and stay out.
-      SECTION_PROSE_SOURCES = {
-        "p" => :paragraphs, "ul" => :unordered_lists,
-        "ol" => :ordered_lists, "dl" => :definition_lists
-      }.freeze
-
       def section_text(section)
         collections = SECTION_PROSE_SOURCES.each_with_object({}) do |(_name, attr), h|
           h[attr] = vals(section, attr)
@@ -605,12 +622,6 @@ module Metanorma
         end
         parts.join("\n")
       end
-
-      BLOCK_SOURCES = {
-        "table" => :tables, "figure" => :figures, "formula" => :formulas,
-        "note" => :notes, "example" => :examples,
-        "sourcecode" => :sourcecode_blocks
-      }.freeze
 
       def walk_blocks(section, parent_id, breadcrumb)
         BLOCK_SOURCES.flat_map do |type, attr|
@@ -690,9 +701,9 @@ module Metanorma
       end
 
       def derived_form(plurimath, serializer)
-        form = plurimath && plurimath.public_send(serializer)
+        form = plurimath&.public_send(serializer)
         form && Schema::FormulaPayload::DerivedForm.new(
-          form: form, converter: "plurimath"
+          form: form, converter: "plurimath",
         )
       end
 
@@ -701,8 +712,8 @@ module Metanorma
       # compare quantity kinds, never unit strings (#55).
       def register_refs(asciimath)
         asciimath.to_s.scan(/unitsml\(([^)]+)\)/)
-                 .map(&:first).filter_map { |sym| @units_by_symbol[sym] }
-                 .uniq
+          .map(&:first).filter_map { |sym| @units_by_symbol[sym] }
+          .uniq
       end
 
       def mathml_of(stem)
@@ -828,22 +839,6 @@ module Metanorma
 
       # -- unit assembly -------------------------------------------------
 
-      # Element-name -> mapped attributes, for re-ordering a section's
-      # child units into document order from element_order (the same
-      # interleave trick section_text uses for prose). "clause" and
-      # "term" cover both tree spellings (subsections/clause, term/terms).
-      SECTION_CHILD_SOURCES = {
-        "clause" => %i[subsections clause], "terms" => %i[terms],
-        "term" => %i[term terms],
-        "table" => %i[tables], "figure" => %i[figures],
-        "formula" => %i[formulas], "note" => %i[notes],
-        "example" => %i[examples], "sourcecode" => %i[sourcecode_blocks],
-        "requirement" => %i[requirement],
-        "recommendation" => %i[recommendation],
-        "permission" => %i[permission],
-        "p" => %i[paragraphs]
-      }.freeze
-
       # Document order, not walk order (#56): children are the ids of
       # this section's direct units, interleaved as the author wrote
       # them. Falls back to emission order when element_order is not
@@ -876,7 +871,7 @@ module Metanorma
       def finalize_section(unit, child_ids)
         children = child_ids.filter_map { |id| @units_by_id[id] }
         payload = Schema::SectionPayload.new(
-          summary: section_summary(unit, children), children: child_ids
+          summary: section_summary(unit, children), children: child_ids,
         )
         # Retrievability invariant: a container section with no direct
         # prose still carries retrievable text — its summary
@@ -902,12 +897,13 @@ module Metanorma
           .compact.join(" ")
       end
 
+      # rubocop:disable-next Metrics/ParameterLists
       def emit_unit(type:, anchor:, parent:, breadcrumb:, text:, model:,
                     payload: nil, number: nil, title: nil, obligation: nil)
         anchor ||= content_anchor(model, type)
         id = "u:#{anchor}"
         cite_as = citation_anchor(anchor: anchor, number: number,
-                                  parent: parent, type: type)
+                                  parent: parent)
         unit = Schema::Unit.new(
           id: id, type: type, anchor: anchor, number: number,
           ordinal: @ordinal, cite_as: cite_as, title: title,
@@ -928,7 +924,7 @@ module Metanorma
       # Embedded objects cite their containing clause: a table in §4.1.2
       # is cited as 4.1.2, not as its own anchor. Top-level sections and
       # parentless units cite their own number/anchor.
-      def citation_anchor(anchor:, number:, parent:, type:)
+      def citation_anchor(anchor:, number:, parent:)
         own = number || anchor
         if parent && @units_by_id
           pu = @units_by_id[parent]

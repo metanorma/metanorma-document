@@ -5,13 +5,9 @@ require "rspec/core/rake_task"
 
 RSpec::Core::RakeTask.new(:spec)
 
-# Fast gate: the full suite minus the roundtrip specs over multi-MB
-# fixtures (spec/metanorma/iso_document/roundtrip/**), which dominate
-# runtime. Those run in .github/workflows/roundtrip.yml; run the full
-# suite locally with `rake spec`.
-RSpec::Core::RakeTask.new(:spec_fast) do |t|
-  t.exclude_pattern = "spec/metanorma/iso_document/roundtrip/**"
-end
+# Fast gate: the full suite minus the multi-MB-fixture specs; the
+# per-flavor roundtrips moved to the flavor gems (Phase 5).
+RSpec::Core::RakeTask.new(:spec_fast)
 
 require "rubocop/rake_task"
 

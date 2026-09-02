@@ -35,25 +35,39 @@ module RoundtripSamples
 
   HTTP_TIMEOUT = 30
 
-  # Maps mn-samples-* repo name to the model class for round-tripping.
-  # nil means no document model exists yet — reported as "no_model".
+  # Maps mn-samples-* repo name to the model class name for
+  # round-tripping. Resolved lazily: the flavor trees moved to their
+  # gems (Phase 5), and this task must not require every flavor gem at
+  # load time — missing constants resolve to nil ("no_model").
   # OIML moved to the metanorma-oiml gem — its roundtrip lives there.
   FLAVOR_MODEL_MAP = {
-    "iso"     => Metanorma::IsoDocument::Root,
-    "iec"     => Metanorma::IecDocument::Root,
-    "ieee"    => Metanorma::IeeeDocument::Root,
-    "iho"     => Metanorma::IhoDocument::Root,
-    "cc"      => Metanorma::CcDocument::Root,
-    "bipm"    => Metanorma::BipmDocument::Root,
-    "itu"     => Metanorma::ItuDocument::Root,
-    "ogc"     => Metanorma::OgcDocument::Root,
-    "ribose"  => Metanorma::RiboseDocument::Root,
-    "ietf"    => Metanorma::IetfDocument::Root,
-    "csa"     => Metanorma::CsaDocument::Root,
+    "iso"     => "Metanorma::Iso::Document::Root",
+    "iec"     => "Metanorma::Iec::Document::Root",
+    "ieee"    => "Metanorma::Ieee::Document::Root",
+    "iho"     => "Metanorma::Iho::Document::Root",
+    "cc"      => "Metanorma::Cc::Document::Root",
+    "bipm"    => "Metanorma::Bipm::Document::Root",
+    "itu"     => "Metanorma::Itu::Document::Root",
+    "ogc"     => "Metanorma::Ogc::Document::Root",
+    "ribose"  => "Metanorma::Ribose::Document::Root",
+    "ietf"    => "Metanorma::Ietf::Document::Root",
+    "csa"     => "Metanorma::Csa::Document::Root",
     "un"      => nil,
   }.freeze
 
   module_function
+
+
+  # Flavor gems load on demand; a missing gem resolves to nil
+  # ("no_model"), never a load-time NameError.
+  def resolve_flavor_model(repo_name)
+    name = FLAVOR_MODEL_MAP[repo_name]
+    return nil if name.nil?
+
+    Object.const_get(name)
+  rescue NameError
+    nil
+  end
 
   # --- Entry Points ---
 
@@ -267,7 +281,7 @@ module RoundtripSamples
 
   def resolve_model(xml, repo_name)
     if repo_name
-      model = FLAVOR_MODEL_MAP[repo_name]
+      model = resolve_flavor_model(repo_name)
       return model if model
     end
 
@@ -281,7 +295,7 @@ module RoundtripSamples
     # Check for <metanorma flavor="...">
     if xml =~ /<metanorma[^>]*flavor="([^"]*)"/
       flavor = Regexp.last_match(1)
-      model = FLAVOR_MODEL_MAP[flavor]
+      model = resolve_flavor_model(flavor)
       return model if model
     end
 

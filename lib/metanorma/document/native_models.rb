@@ -134,7 +134,7 @@ module Metanorma
           "recommendation" => "R", "document" => "D",
           "basic-publication" => "B", "basic_publication" => "B",
           "guide" => "G", "expert-report" => "E", "expert_report" => "E",
-          "vocabulary" => "V",
+          "vocabulary" => "V"
         }.freeze
 
         def pubid_identity(text)
@@ -170,11 +170,6 @@ module Metanorma
         rescue StandardError, LoadError
           nil
         end
-
-        private
-
-        # -- publisher → pubid flavor --------------------------------
-
         # "OIML" engages the day the flavor ships (pubid/pubid#342);
         # until then Pubid::Oiml is undefined and parses nil.
         PUBID_FLAVORS = {
@@ -183,6 +178,17 @@ module Metanorma
           "OIML" => :Oiml
         }.freeze
 
+        # ISO 639-1 → 639-2/B for Glossarist language codes.
+        GLOSSARIST_LANG = {
+          "en" => "eng", "fr" => "fre", "de" => "ger", "es" => "spa",
+          "ar" => "ara", "ru" => "rus", "zh" => "zho", "ja" => "jpn",
+          "ko" => "kor"
+        }.freeze
+
+        private
+
+        # -- publisher → pubid flavor --------------------------------
+
         def parse_pubid(text)
           return nil if text.nil? || text.empty?
 
@@ -190,7 +196,7 @@ module Metanorma
           return nil unless flavor
 
           Pubid.const_get(flavor).parse(text)
-        rescue StandardError, LoadError, NameError
+        rescue StandardError
           nil
         end
 
@@ -252,13 +258,6 @@ module Metanorma
           )
         end
 
-        # ISO 639-1 → 639-2/B for Glossarist language codes.
-        GLOSSARIST_LANG = {
-          "en" => "eng", "fr" => "fre", "de" => "ger", "es" => "spa",
-          "ar" => "ara", "ru" => "rus", "zh" => "zho", "ja" => "jpn",
-          "ko" => "kor"
-        }.freeze
-
         # -- term-entry traversal (both trees) -----------------------
         #
         # The iso tree declares entries as :term inside terms sections;
@@ -277,22 +276,22 @@ module Metanorma
         def collect_entries(container, out)
           return unless container
 
-          vals(container, :terms).each do |ts|
-            term_entries(ts).each { |t| out << t }
-            vals(ts, :terms).each { |nested| collect_terms(nested, out) }
+          vals(container, :terms).each do |tsec|
+            term_entries(tsec).each { |t| out << t }
+            vals(tsec, :terms).each { |nested| collect_terms(nested, out) }
           end
           vals(container, :clause).each { |c| collect_entries(c, out) }
           vals(container, :subsections).each { |c| collect_entries(c, out) }
         end
 
-        def collect_terms(ts, out)
-          term_entries(ts).each { |t| out << t }
-          vals(ts, :terms).each { |nested| collect_terms(nested, out) }
+        def collect_terms(tsec, out)
+          term_entries(tsec).each { |t| out << t }
+          vals(tsec, :terms).each { |nested| collect_terms(nested, out) }
         end
 
-        def term_entries(ts)
-          entries_ = vals(ts, :term)
-          entries_ = vals(ts, :terms) if entries_.empty?
+        def term_entries(tsec)
+          entries_ = vals(tsec, :term)
+          entries_ = vals(tsec, :terms) if entries_.empty?
           entries_
         end
 

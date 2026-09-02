@@ -17,6 +17,10 @@ module FixtureModel
   end
 end
 
+COUNTED_COMPONENTS = %w[units edges].freeze
+SECTION_TYPES = %w[clause annex].freeze
+FORMULA_REPRESENTATIONS = %w[asciimath mathml latex omml description].freeze
+
 RSpec.describe Metanorma::Mko do
   let(:semantic_xml) do
     File.read(fixture_path("iso/is/document-en.xml"),
@@ -73,7 +77,7 @@ RSpec.describe Metanorma::Mko do
       manifest["components"].each do |c|
         digest = Digest::SHA256.file(File.join(bundle, c["file"])).hexdigest
         expect(c["hash"]).to eq("sha256:#{digest}")
-        expect(c["count"]).to be > 0 if %w[units edges].include?(c["name"])
+        expect(c["count"]).to be > 0 if COUNTED_COMPONENTS.include?(c["name"])
       end
     end
 
@@ -94,8 +98,8 @@ RSpec.describe Metanorma::Mko do
       # every unit carries its language (#53 item 3) and retrievable
       # text — caption, alt, title, or body (#53 item 1)
       units = read_lines(bundle, "units.jsonl")
-      units.each { |u| expect(u["lang"]).to eq("en") }
       units.each do |u|
+        expect(u["lang"]).to eq("en")
         retrievable = [u["text"], u["title"]].compact.join.strip
         expect(retrievable).not_to be_empty, "#{u['id']} carries no retrievable text"
       end
@@ -110,7 +114,8 @@ RSpec.describe Metanorma::Mko do
   end
 
   describe "units" do
-    it "emits typed units with ids, parents, and breadcrumbs" do      bundle = export!
+    it "emits typed units with ids, parents, and breadcrumbs" do
+      bundle = export!
       units = read_lines(bundle, "units.jsonl")
       expect(units.size).to be > 10
       types = units.map { |u| u["type"] }.uniq
@@ -144,8 +149,8 @@ RSpec.describe Metanorma::Mko do
       it "carries section payloads: summaries and ordered children" do
         bundle = export!
         units = read_lines(bundle, "units.jsonl")
-        by_id = units.each_with_object({}) { |u, h| h[u["id"]] = u }
-        sections = units.select { |u| %w[clause annex].include?(u["type"]) }
+        by_id = units.to_h { |u| [u["id"], u] }
+        sections = units.select { |u| SECTION_TYPES.include?(u["type"]) }
         expect(sections).not_to be_empty
         sections.each do |s|
           expect(s.dig("payload", "summary")).to be_a(String)
@@ -172,7 +177,7 @@ RSpec.describe Metanorma::Mko do
       it "composes deterministic summaries — no model in the loop" do
         bundle = export!
         units = read_lines(bundle, "units.jsonl")
-        by_id = units.each_with_object({}) { |u, h| h[u["id"]] = u }
+        by_id = units.to_h { |u| [u["id"], u] }
         container = units.find do |u|
           u["type"] == "clause" && u["number"] &&
             (u.dig("payload", "children") || []).any?
@@ -189,11 +194,11 @@ RSpec.describe Metanorma::Mko do
       it "keeps every section retrievable — containers carry their summary" do
         bundle = export!
         units = read_lines(bundle, "units.jsonl")
-        sections = units.select { |u| %w[clause annex].include?(u["type"]) }
+        sections = units.select { |u| SECTION_TYPES.include?(u["type"]) }
         expect(sections).not_to be_empty
         sections.each do |s|
           expect(s["text"].to_s).not_to be_empty,
-                 "#{s['id']} has no retrievable text"
+                                        "#{s['id']} has no retrievable text"
         end
       end
     end
@@ -217,7 +222,7 @@ RSpec.describe Metanorma::Mko do
         u["type"] == "formula"
       end
       formulas.each do |f|
-        reps = %w[asciimath mathml latex omml description].count do |k|
+        reps = FORMULA_REPRESENTATIONS.count do |k|
           f["payload"][k] && !f["payload"][k].empty?
         end
         expect(reps).to be >= 1 # semantic-only docs may lack mathml
@@ -361,7 +366,7 @@ RSpec.describe Metanorma::Mko do
     it "emits data-URI figures as hash-addressed bundle assets" do
       bundle = export!
       figures = read_lines(bundle, "units.jsonl")
-                       .select { |u| u["type"] == "figure" }
+        .select { |u| u["type"] == "figure" }
       with_asset = figures.select { |f| f.dig("payload", "asset") }
       expect(with_asset).not_to be_empty
       with_asset.each do |f|
@@ -372,7 +377,7 @@ RSpec.describe Metanorma::Mko do
       end
       manifest = read_json(bundle, "manifest.json")
       asset_components = manifest["components"]
-                            .select { |c| c["name"].start_with?("assets/") }
+        .select { |c| c["name"].start_with?("assets/") }
       expect(asset_components.size).to eq(with_asset.size)
       asset_components.each do |c|
         expect(c["media_type"]).to eq("image/png")
@@ -542,17 +547,6 @@ RSpec.describe Metanorma::Mko do
       requirements = units.select { |u| u["type"] == "requirement" }
       expect(requirements.size).to eq(5)
 
-      # annex terms reach the native glossary too (amendments keep
-      # their terms in annexes)
-      terms = units.select { |u| u["type"] == "term" }
-      concepts = read_json(bundle, "glossary.json")["concepts"]
-      expect(concepts.size).to eq(terms.size)
-      annex_term = concepts.find do |c|
-        c.dig("data", "terms", 0, "designation") == "annex load cell"
-      end
-      expect(annex_term.dig("data", "definition", 0, "content"))
-        .to eq("a load cell defined in an annex")
-
       accuracy = requirements.find { |r| r["anchor"] == "req-sensor-accuracy" }
       expect(accuracy["payload"]["identifier"]).to eq("req-sensor-accuracy")
       expect(accuracy["payload"]["class"]).to eq("accuracy")
@@ -580,29 +574,48 @@ RSpec.describe Metanorma::Mko do
       end
       expect(nested.size).to eq(1)
     end
-  end
 
-  describe "units register (#55)" do
-    it "projects the UnitsML container; formulas reference it by id" do
+    it "annex terms reach the native glossary (amendments keep terms in annexes)" do
       bundle = described_class.export(
         File.read(fixture_path("standoc/requirements/document.xml"),
                   encoding: "utf-8"),
         to: tmpdir,
       )
-      register = read_lines(bundle, "unitsml.jsonl")
-      expect(register.size).to eq(1)
-      kelvin = register.first
-      expect(kelvin).to include(
-        "id" => "U_NISTu5", "symbol" => "K", "name" => "kelvin",
-        "quantity_kind" => "thermodynamic temperature", "dimension" => "Θ",
-      )
+      terms = read_lines(bundle, "units.jsonl").select { |u| u["type"] == "term" }
+      concepts = read_json(bundle, "glossary.json")["concepts"]
+      expect(concepts.size).to eq(terms.size)
+      annex_term = concepts.find do |c|
+        c.dig("data", "terms", 0, "designation") == "annex load cell"
+      end
+      expect(annex_term.dig("data", "definition", 0, "content"))
+        .to eq("a load cell defined in an annex")
+    end
+  end
 
-      formula = read_lines(bundle, "units.jsonl")
+  describe "units register (#55)" do
+    let(:register_bundle) do
+      described_class.export(
+        File.read(fixture_path("standoc/requirements/document.xml"),
+                  encoding: "utf-8"),
+        to: tmpdir,
+      )
+    end
+
+    it "projects the UnitsML container into unitsml.jsonl" do
+      register = read_lines(register_bundle, "unitsml.jsonl")
+      expect(register.size).to eq(1)
+      expect(register.first).to include(
+        "id" => "U_NISTu5", "symbol" => "K", "name" => "kelvin",
+        "quantity_kind" => "thermodynamic temperature", "dimension" => "Θ"
+      )
+    end
+
+    it "formula unit references resolve against the register by id" do
+      formula = read_lines(register_bundle, "units.jsonl")
         .find { |u| u["anchor"] == "formula-temp" }
       expect(formula.dig("payload", "asciimath"))
         .to eq('T = 273.15 "unitsml(K)"')
-      # unit references resolve against the register — consumers
-      # compare quantity kinds, never unit strings
+      # consumers compare quantity kinds, never unit strings
       expect(formula.dig("payload", "units")).to eq(["U_NISTu5"])
     end
   end

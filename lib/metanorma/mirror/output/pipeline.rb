@@ -69,6 +69,7 @@ id_strategy: nil)
               if Object.const_defined?(new_namespace)
                 return Object.const_get(new_namespace).const_get(:Root)
               end
+
               begin
                 require "metanorma/standoc"
               rescue LoadError

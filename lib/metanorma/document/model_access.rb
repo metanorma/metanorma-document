@@ -36,8 +36,8 @@ module Metanorma
 
       # The identifier's text: the base tree maps content to :id; iso
       # declares :value.
-      def docid_text(d)
-        val(d, :id) || val(d, :value)
+      def docid_text(docid)
+        val(docid, :id) || val(docid, :value)
       end
     end
   end

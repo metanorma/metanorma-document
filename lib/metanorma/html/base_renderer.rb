@@ -64,39 +64,40 @@ module Metanorma
       METANORMA_LOGO = "metanorma-logo.svg"
 
       class << self
-  def render_registry
-    @render_registry ||= {}
-  end
+        def render_registry
+          @render_registry ||= {}
+        end
 
-  def register_render(type_class, method_name)
-    resolved = resolve_type(type_class)
-    render_registry[resolved] = method_name if resolved
-  end
+        def register_render(type_class, method_name)
+          resolved = resolve_type(type_class)
+          render_registry[resolved] = method_name if resolved
+        end
 
-  def inline_registry
-    @inline_registry ||= {}
-  end
+        def inline_registry
+          @inline_registry ||= {}
+        end
 
-  def register_inline_render(type_class, method_name)
-    resolved = resolve_type(type_class)
-    inline_registry[resolved] = method_name if resolved
-  end
+        def register_inline_render(type_class, method_name)
+          resolved = resolve_type(type_class)
+          inline_registry[resolved] = method_name if resolved
+        end
 
-  # type_class may be a Class or a String constant name. String form
-  # requires the owning flavor gem, then resolves; if the gem is not
-  # installed the registration is skipped (that flavor cannot be
-  # rendered in this process anyway).
-  def resolve_type(type_class)
-    return type_class unless type_class.is_a?(String)
-    flavor = type_class.split("::")[1].to_s.downcase
-    begin
-      require "metanorma/#{flavor}/document"
-    rescue LoadError
-      nil
-    end
-    Object.const_defined?(type_class) ? Object.const_get(type_class) : nil
-  end
-end
+        # type_class may be a Class or a String constant name. String form
+        # requires the owning flavor gem, then resolves; if the gem is not
+        # installed the registration is skipped (that flavor cannot be
+        # rendered in this process anyway).
+        def resolve_type(type_class)
+          return type_class unless type_class.is_a?(String)
+
+          flavor = type_class.split("::")[1].to_s.downcase
+          begin
+            require "metanorma/#{flavor}/document"
+          rescue LoadError
+            nil
+          end
+          Object.const_defined?(type_class) ? Object.const_get(type_class) : nil
+        end
+      end
 
       attr_reader :inline_renderer, :block_renderer, :section_renderer,
                   :pubid_renderer, :index_term_collector, :footnote_collector
@@ -126,10 +127,10 @@ end
         end
 
         def render_paragraph(...) = @renderer.render_paragraph(...)
-        def render_inline_element(...)= @renderer.render_inline_element(...)
-        def render_unordered_list(...)= @renderer.render_unordered_list(...)
-        def render_ordered_list(...)= @renderer.render_ordered_list(...)
-        def render_definition_list(...)= @renderer.render_definition_list(...)
+        def render_inline_element(...) = @renderer.render_inline_element(...)
+        def render_unordered_list(...) = @renderer.render_unordered_list(...)
+        def render_ordered_list(...) = @renderer.render_ordered_list(...)
+        def render_definition_list(...) = @renderer.render_definition_list(...)
         def render_sourcecode(...)  = @renderer.render_sourcecode(...)
         def render_table(...)       = @renderer.render_table(...)
         def render_figure(...)      = @renderer.render_figure(...)
@@ -137,8 +138,8 @@ end
         def render_formula(...)     = @renderer.render_formula(...)
         def render_note(...)        = @renderer.render_note(...)
         def render_image(...)       = @renderer.render_image(...)
-        def render_stem_content(...)= @renderer.render_stem_content(...)
-        def register_figure_entry(...)= @renderer.register_figure_entry(...)
+        def render_stem_content(...) = @renderer.render_stem_content(...)
+        def register_figure_entry(...) = @renderer.register_figure_entry(...)
         def render_note_children(...) = @renderer.render_note_children(...)
         def render_simple_children(...) = @renderer.render_simple_children(...)
         def render_full_block_children(...) = @renderer.render_full_block_children(...)

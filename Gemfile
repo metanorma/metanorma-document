@@ -11,17 +11,17 @@ gemspec
 #   - https://github.com/metanorma/metanorma-standoc/pull/1232
 #   - https://github.com/metanorma/metanorma-iso/pull/1618
 #   - https://github.com/metanorma/metanorma-itu/pull/832
-gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "feat/move-standard-document"
+gem "glossarist", "~> 2.13"
+gem "isodoc", github: "metanorma/isodoc", branch: "rt-pubid-2-migration"
 gem "metanorma-core", github: "metanorma/metanorma-core", branch: "feat/flavor-table"
+gem "metanorma-iec", github: "metanorma/metanorma-iec", branch: "feat/move-iec-document"
 gem "metanorma-iso", github: "metanorma/metanorma-iso", branch: "feat/model-validation-migration"
 gem "metanorma-itu", github: "metanorma/metanorma-itu", branch: "feat/move-itu-document"
+gem "metanorma-mko"  # 1.0.0 released from rubygems
 gem "metanorma-ogc", github: "metanorma/metanorma-ogc", branch: "feat/move-ogc-document"
-gem "metanorma-iec", github: "metanorma/metanorma-iec", branch: "feat/move-iec-document"
-gem "isodoc", github: "metanorma/isodoc", branch: "rt-pubid-2-migration"
-gem "pubid", ">= 2.0.0.pre.alpha.9"
-gem "glossarist", "~> 2.13"
+gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "feat/move-standard-document"
 gem "plurimath", "~> 0.11"
-gem "metanorma-mko", github: "metanorma/metanorma-mko", branch: "main"
+gem "pubid", ">= 2.0.0.pre.alpha.9"
 
 # Dependency sources. Default (no env vars): released gems, exactly the
 # contract downstream users get — CI and local dev must test that.
@@ -29,17 +29,15 @@ gem "metanorma-mko", github: "metanorma/metanorma-mko", branch: "main"
 # METANORMA_DEV_LOCAL=1 -> sibling checkouts on the author's machine.
 if ENV["METANORMA_CI_EDGE"]
   gem "canon", github: "lutaml/canon", branch: "main"
-  gem "lutaml-model", github: "lutaml/lutaml-model", branch: "main"
   gem "mml", github: "plurimath/mml", branch: "main"
   gem "moxml", github: "lutaml/moxml", branch: "main"
 elsif ENV["METANORMA_DEV_LOCAL"]
   gem "canon", path: "../../lutaml/canon"
-  gem "lutaml-model", path: "../../lutaml/lutaml-model"
   gem "mml", path: "../../plurimath/mml"
 end
 
 gem "nokogiri"
-# 0.8.20 yanked; keep the lock below it
+# 0.8.20 yanked; keep the lock below it (github/path pins above override)
 gem "lutaml-model", "~> 0.8.0", "< 0.8.20"
 gem "rake", "~> 13.0"
 gem "rdoc"

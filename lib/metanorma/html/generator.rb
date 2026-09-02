@@ -10,18 +10,15 @@ module Metanorma
         # variant resolvers — publisher/doctype/profile selection); with
         # no flavor match, the harness default by ancestry. Options are
         # per-call runtime knobs threaded to the resolver.
-        def generate(document, **options)
-          renderer_for(document, **options)
-                 .new.generate_full_document(document, **options)
+        def generate(document, **)
+          renderer_for(document, **)
+            .new.generate_full_document(document, **)
         end
 
-        def renderer_for(document, **options)
+        def renderer_for(document, **)
           Metanorma::Core::Flavors.renderer_for(document, format: :html,
-                                                **options) || BaseRenderer
+                                                          **) || BaseRenderer
         end
-
-        private
-
       end
     end
   end

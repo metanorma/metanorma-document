@@ -231,12 +231,12 @@ module SpecFlavors
                     })
     end
 
-    def render_foreword(fw, level: 1, **_opts)
-      attrs = element_attrs(id: safe_attr(fw, :id))
-      title = safe_attr(fw, :fmt_title) || safe_attr(fw, :title)
+    def render_foreword(foreword, level: 1, **_opts)
+      attrs = element_attrs(id: safe_attr(foreword, :id))
+      title = safe_attr(foreword, :fmt_title) || safe_attr(foreword, :title)
       parts = []
       if title
-        fw_id = safe_attr(fw, :id)
+        fw_id = safe_attr(foreword, :id)
         title_content = render_mixed_inline(title)
         register_toc_entry(id: fw_id, level: level,
                            text: extract_plain_text(title))
@@ -246,7 +246,7 @@ module SpecFlavors
                                  "content" => title_content,
                                })
       end
-      parts << (render_ordered_content(fw) || "")
+      parts << (render_ordered_content(foreword) || "")
       render_liquid("_element.html.liquid", "tag" => "div",
                                             "extra_attrs" => attrs, "content" => parts.join)
     end
@@ -314,7 +314,7 @@ module SpecFlavors
       register_toc_entry(id: annex_id, level: level,
                          text: extract_plain_text(title_element))
 
-      h = "h#{[[level, 6].min, 1].max}"
+      h = "h#{level.clamp(1, 6)}"
       render_liquid("_heading.html.liquid", {
                       "tag" => h,
                       "class_attr" => " class=\"annex-title\"",
@@ -483,7 +483,7 @@ module SpecFlavors
       register_toc_entry(id: section_id, level: level,
                          text: extract_plain_text(title_element))
 
-      h = "h#{[[level, 6].min, 1].max}"
+      h = "h#{level.clamp(1, 6)}"
       render_liquid("_heading.html.liquid", tag: h, class_attr: "",
                                             content: title_content)
     end
@@ -570,28 +570,28 @@ module SpecFlavors
 
     @registered = true
     Metanorma::Core::Flavors.register(Metanorma::Core::Flavor.new(
-                                 name: :iso,
-                                 model_root: "Metanorma::Iso::Document::Root",
-                                 pubid_module: :"Pubid::Iso",
-                                 renderers: {
-                                   html: lambda do |_document, **options|
-                                     if options[:profile] == :draft
-                                       DraftProfileRenderer
-                                     else
-                                       IsoRenderer
-                                     end
-                                   end,
-                                 },
-                               ))
+                                        name: :iso,
+                                        model_root: "Metanorma::Iso::Document::Root",
+                                        pubid_module: :"Pubid::Iso",
+                                        renderers: {
+                                          html: lambda do |_document, **options|
+                                            if options[:profile] == :draft
+                                              DraftProfileRenderer
+                                            else
+                                              IsoRenderer
+                                            end
+                                          end,
+                                        },
+                                      ))
     Metanorma::Core::Flavors.register(Metanorma::Core::Flavor.new(
-                                 name: :bipm,
-                                 model_root: "Metanorma::Bipm::Document::Root",
-                                 renderers: { html: BipmRenderer },
-                               ))
+                                        name: :bipm,
+                                        model_root: "Metanorma::Bipm::Document::Root",
+                                        renderers: { html: BipmRenderer },
+                                      ))
     Metanorma::Core::Flavors.register(Metanorma::Core::Flavor.new(
-                                 name: :ogc,
-                                 model_root: "Metanorma::Ogc::Document::Root",
-                                 renderers: { html: OgcRenderer },
-                               ))
+                                        name: :ogc,
+                                        model_root: "Metanorma::Ogc::Document::Root",
+                                        renderers: { html: OgcRenderer },
+                                      ))
   end
 end

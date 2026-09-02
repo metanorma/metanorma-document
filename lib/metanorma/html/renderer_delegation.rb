@@ -12,9 +12,9 @@ module Metanorma
     module RendererDelegation
       def safe_attr(...)        = @renderer.safe_attr(...)
       def escape_html(...)      = @renderer.escape_html(...)
-      def extract_block_label(...)= @renderer.extract_block_label(...)
+      def extract_block_label(...) = @renderer.extract_block_label(...)
       def extract_plain_text(...) = @renderer.extract_plain_text(...)
-      def render_mixed_inline(...)= @renderer.render_mixed_inline(...)
+      def render_mixed_inline(...) = @renderer.render_mixed_inline(...)
       def render_liquid(...) = @renderer.render_liquid(...)
     end
   end

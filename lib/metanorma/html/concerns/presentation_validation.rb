@@ -20,7 +20,7 @@ module Metanorma
 
         # Name kept for API stability (public renderer API); the boolean
         # return predates the Naming/PredicateMethod convention.
-        # rubocop:disable Naming/PredicateMethod
+        # rubocop:disable-next Naming/PredicateMethod
         def check_presentation_markers(node)
           return false unless node
           return false if node.is_a?(String)
@@ -54,7 +54,6 @@ module Metanorma
 
           false
         end
-        # rubocop:enable Naming/PredicateMethod
       end
     end
   end
