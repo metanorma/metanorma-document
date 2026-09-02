@@ -17,7 +17,7 @@ gem "metanorma-core", github: "metanorma/metanorma-core", branch: "feat/flavor-t
 gem "metanorma-iec", github: "metanorma/metanorma-iec", branch: "feat/move-iec-document"
 gem "metanorma-iso", github: "metanorma/metanorma-iso", branch: "feat/model-validation-migration"
 gem "metanorma-itu", github: "metanorma/metanorma-itu", branch: "feat/move-itu-document"
-gem "metanorma-mko"  # 1.0.0 released from rubygems
+gem "metanorma-mko" # 1.0.0 released from rubygems
 gem "metanorma-ogc", github: "metanorma/metanorma-ogc", branch: "feat/move-ogc-document"
 gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "feat/move-standard-document"
 gem "plurimath", "~> 0.11"
