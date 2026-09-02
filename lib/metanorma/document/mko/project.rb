@@ -22,9 +22,17 @@ module Metanorma
         @assets = assets
         @units = []
         @units_by_id = {}
+        # model element -> unit, by object identity: what re-orders
+        # children into document order from element_order
+        @element_units = {}
         @edges = []
         @numbers = {}
         @structure = []
+        # document order (#56): assigned at emission, never re-derived
+        @ordinal = 0
+        # units register (#55): entries + symbol lookup for formula refs
+        @unitsml = []
+        @units_by_symbol = {}
         @lang = first_lang(model)
         @flavor = flavor_of(model)
         @doc_date = published_on(model)
@@ -34,12 +42,14 @@ module Metanorma
       # @numbers, @structure) is owned by this export, never shared.
       def call
         collect_numbers(@presentation)
+        build_units_register(@model)
         walk_root(@model)
         identity = build_identity(@model)
         @edges.concat(document_relation_edges(identity))
         # Native object models (Glossarist concepts, Relaton bibdata)
         # come from the model layer; the projection only serializes.
         Mko::Result.new(document: identity, units: @units, edges: @edges,
+                   unitsml: @unitsml,
                    glossary: Document::NativeModels.glossarist_concepts(
                      @model, lang: @lang, date: @doc_date
                    ),
@@ -171,6 +181,119 @@ module Metanorma
             collect_semx_autonums(v, out)
           end
         end
+      end
+
+      # -- units register (#55) ---------------------------------------
+
+      # Base-quantity attr -> SI vector symbol; the model-side spelling
+      # of Mko::Units::BASE_QUANTITY_SYMBOLS (which is keyed by XML
+      # element name). Composition itself is shared: vectorize.
+      DIMENSION_SYMBOLS = {
+        length: "L", mass: "M", time: "T", electric_current: "I",
+        thermodynamic_temperature: "Θ", amount_of_substance: "N",
+        luminous_intensity: "J", plane_angle: "φ"
+      }.freeze
+
+      # The register from the model's typed UnitsML container. The
+      # container rides the root-level metanorma-extension (semantic
+      # XML puts UnitsML beside presentation-metadata); some trees also
+      # nest an extension under bibdata/ext — both are checked. A
+      # projection of what the source carries: no re-parsing, no
+      # invention.
+      def build_units_register(model)
+        root = [val(model, :metanorma_extension),
+                val(val_any(val(model, :bibdata), :ext, :extension),
+                    :metanorma_extension)]
+               .filter_map { |mnx| val(mnx, :unitsml) }.first
+        return [] unless root
+
+        dimensions = dimension_vectors(root)
+        quantity_kinds = dimension_quantity_kinds(root)
+        pairs = vals(val(root, :unit_set), :unit).map do |unit|
+          [unit, unit_entry(unit, dimensions, quantity_kinds)]
+        end
+        entries = pairs.map(&:last)
+        by_id = entries.each_with_object({}) { |e, h| h[e.id] = e }
+        prefixes = prefix_symbols(root)
+        pairs.each do |unit, entry|
+          expr = si_expression(unit, by_id, prefixes)
+          entry.si_expression = expr if expr
+        end
+        @units_by_symbol = entries.each_with_object({}) do |e, h|
+          h[e.symbol] = e.id if e.symbol
+        end
+        @unitsml = entries
+      end
+
+      def unit_entry(unit, dimensions, quantity_kinds)
+        url = val(unit, :dimension_url).to_s.sub("#", "")
+        Mko::Units::Entry.new(
+          id: val(unit, :id),
+          symbol: html_symbol(unit),
+          name: scalar(val(unit, :unit_name)),
+          quantity_kind: quantity_kinds[url],
+          dimension_url: url.empty? ? nil : url,
+          dimension: dimensions[url]
+        )
+      end
+
+      # The display symbol: the HTML-typed UnitSymbol, else the first.
+      # Composite symbols carry XML whitespace from pretty-printing —
+      # squashed, never significant.
+      def html_symbol(unit)
+        symbols = vals(unit, :unit_symbol)
+        pick = symbols.find { |s| val(s, :type) == "HTML" } || symbols.first
+        return nil unless pick
+
+        text = vals(pick, :text).map { |t| scalar(t).to_s.strip }.join(" ")
+        text = text.gsub(/\s+/, " ").strip
+        text.empty? ? Document::PlainText.call(pick) : text
+      end
+
+      def dimension_vectors(root)
+        vals(val(root, :dimension_set), :dimension)
+          .each_with_object({}) do |dim, h|
+            h[val(dim, :id)] = Mko::Units.vectorize(
+              DIMENSION_SYMBOLS.filter_map do |attr, sym|
+                part = val(dim, attr) or next
+                [sym, val(part, :power_numerator),
+                 val(part, :power_denominator)]
+              end
+            )
+          end
+      end
+
+      # Quantity kinds keyed by dimension URL: a unit's kind is the
+      # name of the quantity with the same dimension.
+      def dimension_quantity_kinds(root)
+        vals(val(root, :quantity_set), :quantity)
+          .each_with_object({}) do |q, h|
+            url = val(q, :dimension_url).to_s.sub("#", "")
+            name = vals(q, :quantity_name).map { |n| scalar(n) }
+                             .reject(&:empty?).first
+            h[url] ||= name if name && !url.empty?
+          end
+      end
+
+      def prefix_symbols(root)
+        vals(val(root, :prefix_set), :prefix)
+          .each_with_object({}) do |p, h|
+            h[val(p, :id)] = vals(p, :prefix_symbol)
+                              .map { |s| scalar(s) }.join
+          end
+      end
+
+      # The unit's composition as the source enumerates it: root-unit
+      # symbols with prefixes and powers, resolved within the register.
+      def si_expression(unit, by_id, prefixes)
+        parts = vals(val(unit, :root_units), :enumerated_root_unit)
+          .filter_map do |eru|
+            sym = by_id[val(eru, :unit)]&.symbol or next
+            sym = "#{prefixes[val(eru, :prefix)]}#{sym}"
+            power = val(eru, :power_numerator)
+            power && power != 1 ? "#{sym}^#{power}" : sym
+          end
+        parts.empty? ? nil : parts.join("·")
       end
 
       # -- identity ----------------------------------------------------
@@ -358,18 +481,23 @@ module Metanorma
         node = Schema::StructureNode.new(id: unit.id, number: number,
                                          title: title)
         @structure << node
-        walk_blocks(section, unit.id, crumb)
+        children = walk_blocks(section, unit.id, crumb)
         vals(section, :subsections).each do |sub|
           child = walk_section(sub, parent: unit.id, breadcrumb: crumb)
           node.children << child if child
+          children << child if child
         end
         vals(section, :clause).each do |sub|
           child = walk_section(sub, parent: unit.id, breadcrumb: crumb)
           node.children << child if child
+          children << child if child
         end
         vals(section, :terms).each do |ts|
-          walk_terms_section(ts, parent: unit.id, breadcrumb: crumb)
+          ts_unit = walk_terms_section(ts, parent: unit.id, breadcrumb: crumb)
+          children << ts_unit if ts_unit
         end
+        finalize_section(unit,
+                         ordered_child_ids(section, children.map(&:id)))
         node
       end
 
@@ -384,17 +512,22 @@ module Metanorma
           model: ts
         )
         crumb = breadcrumb + [title]
+        children = []
         term_entries(ts).each do |t|
-          walk_term(t, parent: unit.id, breadcrumb: crumb, section: ts)
+          children << walk_term(t, parent: unit.id, breadcrumb: crumb,
+                                section: ts)
         end
         nested_terms_sections(ts).each do |nested|
-          walk_terms_section(nested, parent: unit.id, breadcrumb: crumb)
+          children << walk_terms_section(nested, parent: unit.id,
+                                         breadcrumb: crumb)
         end
         vals_any(ts, :paragraphs, :p).each do |p|
-          emit_unit(type: "note", anchor: element_anchor(p),
-                    parent: unit.id, breadcrumb: crumb,
-                    text: Document::PlainText.call(p), model: p)
+          children << emit_unit(type: "note", anchor: element_anchor(p),
+                                parent: unit.id, breadcrumb: crumb,
+                                text: Document::PlainText.call(p), model: p)
         end
+        finalize_section(unit, ordered_child_ids(ts, children.map(&:id)))
+        unit
       end
 
       def walk_term(term, parent:, breadcrumb:, section: nil)
@@ -435,6 +568,7 @@ module Metanorma
             from: unit.id, to: "ext:#{cited}", kind: "cites",
           )
         end
+        unit
       end
 
       # Prose containers hold paragraphs and lists (lists are not
@@ -479,12 +613,10 @@ module Metanorma
       }.freeze
 
       def walk_blocks(section, parent_id, breadcrumb)
-        BLOCK_SOURCES.each do |type, attr|
-          vals(section, attr).each do |block|
-            send("walk_#{type}", block, parent_id, breadcrumb)
-          end
-        end
-        walk_requirements(section, parent_id, breadcrumb)
+        BLOCK_SOURCES.flat_map do |type, attr|
+          vals(section, attr)
+            .map { |block| send("walk_#{type}", block, parent_id, breadcrumb) }
+        end + walk_requirements(section, parent_id, breadcrumb)
       end
 
       def walk_table(table, parent_id, breadcrumb)
@@ -538,11 +670,14 @@ module Metanorma
         mathml = mathml_of(stem)
         description = Document::PlainText.call(val(formula, :name))
         # Native math object: Plurimath's own serializations (it has no
-        # data to_json; to_* are the native forms).
+        # data to_json; to_* are the native forms). Derived encodings
+        # are marked with their converter — never canonical (#55).
         plurimath = Document::NativeModels.plurimath_formula(formula)
         payload = Schema::FormulaPayload.new(
           asciimath: asciimath, mathml: mathml,
-          latex: plurimath&.to_latex, omml: plurimath&.to_omml,
+          units: register_refs(asciimath),
+          latex: derived_form(plurimath, :to_latex),
+          omml: derived_form(plurimath, :to_omml),
           description: description
         )
         emit_unit(
@@ -552,6 +687,22 @@ module Metanorma
           text: [asciimath, description].compact.join(" — "),
           model: formula, payload: payload
         )
+      end
+
+      def derived_form(plurimath, serializer)
+        form = plurimath && plurimath.public_send(serializer)
+        form && Schema::FormulaPayload::DerivedForm.new(
+          form: form, converter: "plurimath"
+        )
+      end
+
+      # Units a formula uses: the unitsml() tokens of its AsciiMath,
+      # resolved against the bundle register by symbol — so consumers
+      # compare quantity kinds, never unit strings (#55).
+      def register_refs(asciimath)
+        asciimath.to_s.scan(/unitsml\(([^)]+)\)/)
+                 .map(&:first).filter_map { |sym| @units_by_symbol[sym] }
+                 .uniq
       end
 
       def mathml_of(stem)
@@ -589,10 +740,9 @@ module Metanorma
       end
 
       def walk_requirements(section, parent_id, breadcrumb)
-        %i[requirement recommendation permission].each do |attr|
-          vals(section, attr).each do |req|
-            walk_requirement(req, parent_id, breadcrumb)
-          end
+        %i[requirement recommendation permission].flat_map do |attr|
+          vals(section, attr)
+            .map { |req| walk_requirement(req, parent_id, breadcrumb) }
         end
       end
 
@@ -655,7 +805,7 @@ module Metanorma
           # tree nests BibliographicItems in :references.
           items = vals(refs, :bibitem)
           items = vals(refs, :references) if items.empty?
-          items.each do |item|
+          children = items.map do |item|
             key = val(item, :anchor) || val(item, :id)
             cited = docid_text(vals(item, :docidentifier).first) ||
               Document::PlainText.call(val(item, :formatted_ref))
@@ -670,11 +820,87 @@ module Metanorma
                 from: unit.id, to: "ext:#{cited}", kind: "cites",
               )
             end
+            unit
           end
+          finalize_section(section_unit, children.map(&:id))
         end
       end
 
       # -- unit assembly -------------------------------------------------
+
+      # Element-name -> mapped attributes, for re-ordering a section's
+      # child units into document order from element_order (the same
+      # interleave trick section_text uses for prose). "clause" and
+      # "term" cover both tree spellings (subsections/clause, term/terms).
+      SECTION_CHILD_SOURCES = {
+        "clause" => %i[subsections clause], "terms" => %i[terms],
+        "term" => %i[term terms],
+        "table" => %i[tables], "figure" => %i[figures],
+        "formula" => %i[formulas], "note" => %i[notes],
+        "example" => %i[examples], "sourcecode" => %i[sourcecode_blocks],
+        "requirement" => %i[requirement],
+        "recommendation" => %i[recommendation],
+        "permission" => %i[permission],
+        "p" => %i[paragraphs]
+      }.freeze
+
+      # Document order, not walk order (#56): children are the ids of
+      # this section's direct units, interleaved as the author wrote
+      # them. Falls back to emission order when element_order is not
+      # available; unmapped stragglers append so no child is lost.
+      def ordered_child_ids(section, emitted)
+        return emitted if emitted.empty?
+
+        pools = SECTION_CHILD_SOURCES.each_with_object({}) do |(name, attrs), h|
+          h[name] = { list: attrs.flat_map { |a| vals(section, a) }, idx: 0 }
+        end
+        ordered = []
+        section.element_order.each do |el|
+          next unless el.is_a?(Lutaml::Xml::Element)
+
+          pool = pools[el.name.to_s] or next
+          item = pool[:list][pool[:idx]]
+          pool[:idx] += 1
+          unit = item && @element_units[item]
+          ordered << unit.id if unit
+        end
+        return emitted if ordered.empty?
+
+        ordered + (emitted - ordered)
+      end
+
+      # The section contract (#56): coverage payload, retrievable text,
+      # and a hash over the finalized content. Runs after the section's
+      # children are walked — summaries and membership are only known
+      # then.
+      def finalize_section(unit, child_ids)
+        children = child_ids.filter_map { |id| @units_by_id[id] }
+        payload = Schema::SectionPayload.new(
+          summary: section_summary(unit, children), children: child_ids
+        )
+        # Retrievability invariant: a container section with no direct
+        # prose still carries retrievable text — its summary
+        unit.text = payload.summary if unit.text.to_s.empty?
+        unit.payload = payload_hash(payload)
+        unit.hash = content_hash(unit.text, payload)
+        unit
+      end
+
+      # Deterministic composition — title plus the covered sub-clauses.
+      # Never model-inferred: consumers may build their own LLM
+      # summaries, but the shipped default requires none.
+      def section_summary(unit, children)
+        head = [unit.number, unit.title].compact
+          .reject { |s| s.to_s.empty? }.join(" ")
+        covered = children.filter_map do |c|
+          parts = [c.number, c.title].compact.reject { |s| s.to_s.empty? }
+          parts.empty? ? nil : parts.join(" ")
+        end
+        return head if covered.empty?
+
+        [head.empty? ? nil : "#{head}.", "Covers: #{covered.join('; ')}."]
+          .compact.join(" ")
+      end
 
       def emit_unit(type:, anchor:, parent:, breadcrumb:, text:, model:,
                     payload: nil, number: nil, title: nil, obligation: nil)
@@ -684,13 +910,15 @@ module Metanorma
                                   parent: parent, type: type)
         unit = Schema::Unit.new(
           id: id, type: type, anchor: anchor, number: number,
-          cite_as: cite_as, title: title,
+          ordinal: @ordinal, cite_as: cite_as, title: title,
           parent: parent, breadcrumb: breadcrumb.compact,
           obligation: obligation, lang: @lang, text: text,
           payload: payload_hash(payload), hash: content_hash(text, payload)
         )
+        @ordinal += 1
         @units << unit
         @units_by_id[id] = unit
+        @element_units[model] = unit if model
         if parent
           @edges << Schema::Edge.new(from: id, to: parent, kind: "part_of")
         end

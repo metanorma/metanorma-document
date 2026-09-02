@@ -13,10 +13,32 @@
 <relation type="hasPart"><bibitem><docidentifier type="ogc-internal">SNR-2</docidentifier></bibitem></relation>
 <relation type="hasSuccessor"><bibitem><docidentifier type="ogc-internal">SNR-3</docidentifier></bibitem></relation>
 </bibdata>
+<metanorma-extension>
+<UnitsML xmlns="https://schema.unitsml.org/unitsml/1.0">
+<UnitSet>
+<Unit dimensionURL="#NISTd5" id="U_NISTu5">
+<UnitSystem name="SI" type="SI_base" lang="en"/>
+<UnitName lang="en">kelvin</UnitName>
+<UnitSymbol type="HTML">K</UnitSymbol>
+</Unit>
+</UnitSet>
+<DimensionSet>
+<Dimension id="NISTd5">
+<ThermodynamicTemperature symbol="Theta" powerNumerator="1"/>
+</Dimension>
+</DimensionSet>
+<QuantitySet>
+<Quantity id="NISTq588" dimensionURL="#NISTd5">
+<QuantityName lang="en">thermodynamic temperature</QuantityName>
+</Quantity>
+</QuantitySet>
+</UnitsML>
+</metanorma-extension>
 <sections>
 <clause id="_sec-req" anchor="sensor-requirements" obligation="normative" displayorder="2">
 <title>Sensor requirements</title>
 <p id="_p-intro">This clause states the requirements for sensor nodes.</p>
+<formula id="_formula-temp" anchor="formula-temp"><stem block="true" type="AsciiMath"><asciimath>T = 273.15 "unitsml(K)"</asciimath></stem><name>Reference temperature</name></formula>
 <requirement id="_req-accuracy" anchor="req-sensor-accuracy" obligation="requirement">
 <subject>sensors</subject>
 <classification><tag>class</tag><value>accuracy</value></classification>

@@ -110,8 +110,7 @@ RSpec.describe Metanorma::Mko do
   end
 
   describe "units" do
-    it "emits typed units with ids, parents, and breadcrumbs" do
-      bundle = export!
+    it "emits typed units with ids, parents, and breadcrumbs" do      bundle = export!
       units = read_lines(bundle, "units.jsonl")
       expect(units.size).to be > 10
       types = units.map { |u| u["type"] }.uniq
@@ -133,6 +132,70 @@ RSpec.describe Metanorma::Mko do
       numbered = units.select { |u| u["number"] }
       expect(numbered).not_to be_empty
       expect(numbered.map { |u| u["number"] }).to all(match(/\A[\dA-Z.-]+/))
+    end
+
+    describe "hierarchy (#56)" do
+      it "gives every unit an integer ordinal in document order" do
+        bundle = export!
+        units = read_lines(bundle, "units.jsonl")
+        expect(units.map { |u| u["ordinal"] }).to eq((0...units.size).to_a)
+      end
+
+      it "carries section payloads: summaries and ordered children" do
+        bundle = export!
+        units = read_lines(bundle, "units.jsonl")
+        by_id = units.each_with_object({}) { |u, h| h[u["id"]] = u }
+        sections = units.select { |u| %w[clause annex].include?(u["type"]) }
+        expect(sections).not_to be_empty
+        sections.each do |s|
+          expect(s.dig("payload", "summary")).to be_a(String)
+          children = s.dig("payload", "children") || []
+          # children are known units, in document order (monotonic
+          # ordinals), and mirror the part_of edges exactly
+          child_ordinals = children.map { |id| by_id.fetch(id)["ordinal"] }
+          expect(child_ordinals).to eq(child_ordinals.sort)
+          children.each do |id|
+            expect(by_id.fetch(id)["parent"]).to eq(s["id"])
+          end
+        end
+        part_of = read_lines(bundle, "edges.jsonl")
+          .select { |e| e["kind"] == "part_of" }
+          .each_with_object(Hash.new { |h, k| h[k] = [] }) do |e, h|
+            h[e["to"]] << e["from"]
+          end
+        sections.each do |s|
+          children = s.dig("payload", "children") || []
+          expect(children.sort).to eq((part_of[s["id"]] || []).sort)
+        end
+      end
+
+      it "composes deterministic summaries — no model in the loop" do
+        bundle = export!
+        units = read_lines(bundle, "units.jsonl")
+        by_id = units.each_with_object({}) { |u, h| h[u["id"]] = u }
+        container = units.find do |u|
+          u["type"] == "clause" && u["number"] &&
+            (u.dig("payload", "children") || []).any?
+        end
+        expect(container).not_to be_nil
+        covered = container.dig("payload", "children")
+          .map { |id| by_id.fetch(id) }
+          .map { |c| [c["number"], c["title"]].compact.join(" ") }
+        expect(container.dig("payload", "summary"))
+          .to eq("#{container['number']} #{container['title']}. " \
+                 "Covers: #{covered.join('; ')}.")
+      end
+
+      it "keeps every section retrievable — containers carry their summary" do
+        bundle = export!
+        units = read_lines(bundle, "units.jsonl")
+        sections = units.select { |u| %w[clause annex].include?(u["type"]) }
+        expect(sections).not_to be_empty
+        sections.each do |s|
+          expect(s["text"].to_s).not_to be_empty,
+                 "#{s['id']} has no retrievable text"
+        end
+      end
     end
 
     it "carries tables as typed payloads, never only linearized text" do
@@ -170,8 +233,11 @@ RSpec.describe Metanorma::Mko do
       formulas.each do |f|
         next unless f.dig("payload", "asciimath")
 
-        expect(f["payload"]["latex"]).to be_a(String) # native to_latex
-        expect(f["payload"]["omml"]).to include("<m:oMath") # native to_omml
+        # derived encodings are marked with their converter (#55)
+        expect(f.dig("payload", "latex", "converter")).to eq("plurimath")
+        expect(f.dig("payload", "latex", "form")).to be_a(String)
+        expect(f.dig("payload", "omml", "form")).to include("<m:oMath")
+        expect(f.dig("payload", "omml", "converter")).to eq("plurimath")
       end
     end
 
@@ -513,6 +579,31 @@ RSpec.describe Metanorma::Mko do
           e["from"] == "u:req-battery-life" && e["to"] == "u:req-battery"
       end
       expect(nested.size).to eq(1)
+    end
+  end
+
+  describe "units register (#55)" do
+    it "projects the UnitsML container; formulas reference it by id" do
+      bundle = described_class.export(
+        File.read(fixture_path("standoc/requirements/document.xml"),
+                  encoding: "utf-8"),
+        to: tmpdir,
+      )
+      register = read_lines(bundle, "unitsml.jsonl")
+      expect(register.size).to eq(1)
+      kelvin = register.first
+      expect(kelvin).to include(
+        "id" => "U_NISTu5", "symbol" => "K", "name" => "kelvin",
+        "quantity_kind" => "thermodynamic temperature", "dimension" => "Θ",
+      )
+
+      formula = read_lines(bundle, "units.jsonl")
+        .find { |u| u["anchor"] == "formula-temp" }
+      expect(formula.dig("payload", "asciimath"))
+        .to eq('T = 273.15 "unitsml(K)"')
+      # unit references resolve against the register — consumers
+      # compare quantity kinds, never unit strings
+      expect(formula.dig("payload", "units")).to eq(["U_NISTu5"])
     end
   end
 
