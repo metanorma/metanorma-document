@@ -406,16 +406,20 @@ RSpec.describe Metanorma::Mko do
                                  "glossary.json", "identifiers.json")
         Zip::File.open(zip_path) do |z|
           names.each do |n|
-            a = z.read(n).force_encoding("UTF-8")
-            b = File.read(File.join(dir_bundle, n))
+            # byte comparison: zip reads and binread stay ASCII-8BIT —
+            # text-mode File.read translates CRLF on Windows and
+            # corrupts binary assets; force_encoding only for JSON
+            a = z.read(n)
+            b = File.binread(File.join(dir_bundle, n))
             if n == "manifest.json"
               # timestamps are the sanctioned exception (MN 116)
-              ja = JSON.parse(a)
-              jb = JSON.parse(b)
+              ja = JSON.parse(a.dup.force_encoding("UTF-8"))
+              jb = JSON.parse(b.dup.force_encoding("UTF-8"))
               ja["generated"].delete("timestamp")
               jb["generated"].delete("timestamp")
               expect(ja).to eq(jb), n
             else
+              expect(a.bytesize).to eq(b.bytesize), n
               expect(a).to eq(b), n
             end
           end
