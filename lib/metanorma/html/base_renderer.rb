@@ -153,6 +153,7 @@ module Metanorma
       attr_writer :document, :theme
 
       def generate_full_document(document, theme: nil, **)
+        Metanorma::Html.seed_flavors!
         @document = document
         @theme_override = theme
         validate_presentation_xml!
