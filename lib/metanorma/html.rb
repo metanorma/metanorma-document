@@ -15,6 +15,7 @@ module Metanorma
     end
 
     autoload :BaseRenderer, "metanorma/html/base_renderer"
+    autoload :Concerns, "metanorma/html/concerns"
     autoload :Generator, "metanorma/html/generator"
     autoload :RendererDelegation, "metanorma/html/renderer_delegation"
     autoload :Theme, "metanorma/html/theme"

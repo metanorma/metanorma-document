@@ -15,16 +15,6 @@ module Metanorma
                "metanorma/html/renderers/element_order_traversal"
     end
 
-    module Concerns
-      autoload :MetadataExtraction,
-               "metanorma/html/concerns/metadata_extraction"
-      autoload :PresentationValidation,
-               "metanorma/html/concerns/presentation_validation"
-      autoload :SvgProcessing, "metanorma/html/concerns/svg_processing"
-      autoload :TextExtraction, "metanorma/html/concerns/text_extraction"
-      autoload :TocRegistry, "metanorma/html/concerns/toc_registry"
-    end
-
     class BaseRenderer
       include Concerns::MetadataExtraction
       include Concerns::PresentationValidation
