@@ -10,7 +10,7 @@ RSpec.describe Metanorma::Document::Components::Tables do
   it "parses stems inside td as typed inline content" do
     cell = described_class::TextTableCell.from_xml(
       '<td id="_c1">n <stem type="AsciiMath"><asciimath>n_{"LC"}</asciimath>' \
-      "</stem> max</td>"
+      "</stem> max</td>",
     )
 
     expect(cell.id).to eq("_c1")
@@ -27,7 +27,7 @@ RSpec.describe Metanorma::Document::Components::Tables do
 
   it "keeps stems through serialization round-trip" do
     cell = described_class::TextTableCell.from_xml(
-      '<td><stem type="AsciiMath"><asciimath>v</asciimath></stem></td>'
+      '<td><stem type="AsciiMath"><asciimath>v</asciimath></stem></td>',
     )
     expect(cell.to_xml).to include("stem")
   end

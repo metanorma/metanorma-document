@@ -156,7 +156,6 @@ module Metanorma
             TableCellXmlMapping.apply(self)
           end
         end
-
       end
     end
   end
