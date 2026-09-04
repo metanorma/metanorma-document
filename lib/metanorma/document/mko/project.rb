@@ -33,7 +33,11 @@ module Metanorma
         # units register (#55): entries + symbol lookup for formula refs
         @unitsml = []
         @units_by_symbol = {}
-        @lang = first_lang(model)
+        # The document language resolution (#53 item 3): every unit's
+        # lang carries its provenance — markup, heuristic, default, or
+        # the explicit fallback (Mko::Language).
+        @document_lang = resolve_document_lang(model)
+        @lang = @document_lang
         @flavor = flavor_of(model)
         @doc_date = published_on(model)
       end
@@ -51,7 +55,7 @@ module Metanorma
         Mko::Result.new(document: identity, units: @units, edges: @edges,
                         unitsml: @unitsml,
                         glossary: Document::NativeModels.glossarist_concepts(
-                          @model, lang: @lang, date: @doc_date
+                          @model, lang: @lang.lang, date: @doc_date
                         ),
                         bibdata: Document::NativeModels.relaton_bibdata(@model),
                         bibliography:
@@ -131,20 +135,45 @@ module Metanorma
           model.class.name.to_s.split("::")[1]&.downcase
       end
 
-      # Element-level language override (#53 item 3): returns the
-      # @lang to restore when the scope ends. The model layer carries
-      # :lang only when it maps xml:lang — absent attributes read nil
-      # and the document language stands.
-      def push_element_lang(element)
+      # Element-level language resolution (#53 item 3): the element's
+      # own :lang wins the day the models map xml:lang
+      # (metanorma-standoc#1243) — markup stays authoritative; with no
+      # xml:lang in scope the element's own prose decides (the stopword
+      # langid the RAG consumer shares — a translated annex tags
+      # itself); else the enclosing scope, then the document default,
+      # stands. Returns the resolution to restore when the scope ends.
+      def push_element_lang(element, text: nil)
         previous = @lang
-        lang = val(element, :lang)
-        @lang = lang unless lang.nil? || lang.to_s.empty?
+        @lang = Mko::Language.resolve(own: val(element, :lang),
+                                      text: text, inherited: previous,
+                                      default: @document_lang)
         previous
+      end
+
+      # The document-level chain: the root's :lang the day the models
+      # map the root xml:lang, else the declared bibdata language, else
+      # detection over the document's own prose, else the explicit
+      # fallback.
+      def resolve_document_lang(model)
+        Mko::Language.document(markup: val(model, :lang),
+                               declared: first_lang(model),
+                               text: document_sample(model))
       end
 
       def first_lang(model)
         bib = val(model, :bibdata)
         scalar(vals(bib, :language).first)
+      end
+
+      # The document-level detection sample: the direct prose of every
+      # top-level section (SAMPLE_WORDS caps what detect reads).
+      def document_sample(model)
+        parts = []
+        each_top_section(model) do |s|
+          text = section_text(s)
+          parts << text unless text.empty?
+        end
+        parts.join("\n")
       end
 
       # -- numbering (presentation model) ----------------------------
@@ -506,11 +535,13 @@ module Metanorma
         walk_bibliography(model)
       end
 
-      # Sections scope the element-level language (#53 item 3): a
-      # translated annex/term carries its own xml:lang the day the
-      # models map it — every unit emitted inside inherits it.
+      # Sections scope the element-level language (#53 item 3): the
+      # section's resolution — its own xml:lang the day the models map
+      # it, else its own prose, else the enclosing scope — applies to
+      # every unit emitted inside.
       def walk_section(section, type: "clause", parent: nil, breadcrumb: [])
-        restore_lang = push_element_lang(section)
+        text = section_text(section)
+        restore_lang = push_element_lang(section, text: text)
         begin
           anchor = element_anchor(section)
           number = @numbers[anchor] || section_autonum(section)
@@ -519,7 +550,7 @@ module Metanorma
             type: type, anchor: anchor, number: number, title: title,
             parent: parent, breadcrumb: breadcrumb,
             obligation: val(section, :obligation),
-            text: section_text(section), model: section
+            text: text, model: section
           )
           crumb = breadcrumb + [number ? "#{number} #{title}" : title]
           node = Schema::StructureNode.new(id: unit.id, number: number,
@@ -550,7 +581,8 @@ module Metanorma
       end
 
       def walk_terms_section(tsec, parent: nil, breadcrumb: [])
-        restore_lang = push_element_lang(tsec)
+        text = section_text(tsec)
+        restore_lang = push_element_lang(tsec, text: text)
         begin
           anchor = element_anchor(tsec)
           number = @numbers[anchor] || section_autonum(tsec)
@@ -558,7 +590,7 @@ module Metanorma
           unit = emit_unit(
             type: "clause", anchor: anchor, number: number, title: title,
             parent: parent, breadcrumb: breadcrumb,
-            obligation: val(tsec, :obligation), text: section_text(tsec),
+            obligation: val(tsec, :obligation), text: text,
             model: tsec
           )
           crumb = breadcrumb + [title]
@@ -629,7 +661,9 @@ module Metanorma
         end
         indices = Hash.new(0)
         parts = []
-        section.element_order.each do |el|
+        # element_order is nil on programmatically built (unparsed)
+        # models — the declaration-order fallback below covers them
+        Array(section.element_order).each do |el|
           next unless el.is_a?(Lutaml::Xml::Element)
 
           attr = SECTION_PROSE_SOURCES[el.name.to_s] or next
@@ -875,7 +909,7 @@ module Metanorma
           h[name] = { list: attrs.flat_map { |a| vals(section, a) }, idx: 0 }
         end
         ordered = []
-        section.element_order.each do |el|
+        Array(section.element_order).each do |el|
           next unless el.is_a?(Lutaml::Xml::Element)
 
           pool = pools[el.name.to_s] or next
@@ -933,7 +967,8 @@ module Metanorma
           id: id, type: type, anchor: anchor, number: number,
           ordinal: @ordinal, cite_as: cite_as, title: title,
           parent: parent, breadcrumb: breadcrumb.compact,
-          obligation: obligation, lang: @lang, text: text,
+          obligation: obligation, lang: @lang.lang,
+          lang_source: @lang.source, text: text,
           payload: payload_hash(payload), hash: content_hash(text, payload)
         )
         @ordinal += 1
