@@ -131,6 +131,17 @@ module Metanorma
           model.class.name.to_s.split("::")[1]&.downcase
       end
 
+      # Element-level language override (#53 item 3): returns the
+      # @lang to restore when the scope ends. The model layer carries
+      # :lang only when it maps xml:lang — absent attributes read nil
+      # and the document language stands.
+      def push_element_lang(element)
+        previous = @lang
+        lang = val(element, :lang)
+        @lang = lang unless lang.nil? || lang.to_s.empty?
+        previous
+      end
+
       def first_lang(model)
         bib = val(model, :bibdata)
         scalar(vals(bib, :language).first)
@@ -495,66 +506,80 @@ module Metanorma
         walk_bibliography(model)
       end
 
+      # Sections scope the element-level language (#53 item 3): a
+      # translated annex/term carries its own xml:lang the day the
+      # models map it — every unit emitted inside inherits it.
       def walk_section(section, type: "clause", parent: nil, breadcrumb: [])
-        anchor = element_anchor(section)
-        number = @numbers[anchor] || section_autonum(section)
-        title = Document::PlainText.call(val(section, :title))
-        unit = emit_unit(
-          type: type, anchor: anchor, number: number, title: title,
-          parent: parent, breadcrumb: breadcrumb,
-          obligation: val(section, :obligation),
-          text: section_text(section), model: section
-        )
-        crumb = breadcrumb + [number ? "#{number} #{title}" : title]
-        node = Schema::StructureNode.new(id: unit.id, number: number,
-                                         title: title)
-        @structure << node
-        children = walk_blocks(section, unit.id, crumb)
-        vals(section, :subsections).each do |sub|
-          child = walk_section(sub, parent: unit.id, breadcrumb: crumb)
-          node.children << child if child
-          children << child if child
+        restore_lang = push_element_lang(section)
+        begin
+          anchor = element_anchor(section)
+          number = @numbers[anchor] || section_autonum(section)
+          title = Document::PlainText.call(val(section, :title))
+          unit = emit_unit(
+            type: type, anchor: anchor, number: number, title: title,
+            parent: parent, breadcrumb: breadcrumb,
+            obligation: val(section, :obligation),
+            text: section_text(section), model: section
+          )
+          crumb = breadcrumb + [number ? "#{number} #{title}" : title]
+          node = Schema::StructureNode.new(id: unit.id, number: number,
+                                           title: title)
+          @structure << node
+          children = walk_blocks(section, unit.id, crumb)
+          vals(section, :subsections).each do |sub|
+            child = walk_section(sub, parent: unit.id, breadcrumb: crumb)
+            node.children << child if child
+            children << child if child
+          end
+          vals(section, :clause).each do |sub|
+            child = walk_section(sub, parent: unit.id, breadcrumb: crumb)
+            node.children << child if child
+            children << child if child
+          end
+          vals(section, :terms).each do |tsec|
+            ts_unit = walk_terms_section(tsec, parent: unit.id,
+                                               breadcrumb: crumb)
+            children << ts_unit if ts_unit
+          end
+          finalize_section(unit,
+                           ordered_child_ids(section, children.map(&:id)))
+          node
+        ensure
+          @lang = restore_lang
         end
-        vals(section, :clause).each do |sub|
-          child = walk_section(sub, parent: unit.id, breadcrumb: crumb)
-          node.children << child if child
-          children << child if child
-        end
-        vals(section, :terms).each do |tsec|
-          ts_unit = walk_terms_section(tsec, parent: unit.id, breadcrumb: crumb)
-          children << ts_unit if ts_unit
-        end
-        finalize_section(unit,
-                         ordered_child_ids(section, children.map(&:id)))
-        node
       end
 
       def walk_terms_section(tsec, parent: nil, breadcrumb: [])
-        anchor = element_anchor(tsec)
-        number = @numbers[anchor] || section_autonum(tsec)
-        title = Document::PlainText.call(val(tsec, :title))
-        unit = emit_unit(
-          type: "clause", anchor: anchor, number: number, title: title,
-          parent: parent, breadcrumb: breadcrumb,
-          obligation: val(tsec, :obligation), text: section_text(tsec),
-          model: tsec
-        )
-        crumb = breadcrumb + [title]
-        children = term_entries(tsec).map do |t|
-          walk_term(t, parent: unit.id, breadcrumb: crumb,
-                       section: tsec)
+        restore_lang = push_element_lang(tsec)
+        begin
+          anchor = element_anchor(tsec)
+          number = @numbers[anchor] || section_autonum(tsec)
+          title = Document::PlainText.call(val(tsec, :title))
+          unit = emit_unit(
+            type: "clause", anchor: anchor, number: number, title: title,
+            parent: parent, breadcrumb: breadcrumb,
+            obligation: val(tsec, :obligation), text: section_text(tsec),
+            model: tsec
+          )
+          crumb = breadcrumb + [title]
+          children = term_entries(tsec).map do |t|
+            walk_term(t, parent: unit.id, breadcrumb: crumb,
+                         section: tsec)
+          end
+          nested_terms_sections(tsec).each do |nested|
+            children << walk_terms_section(nested, parent: unit.id,
+                                                   breadcrumb: crumb)
+          end
+          vals_any(tsec, :paragraphs, :p).each do |p|
+            children << emit_unit(type: "note", anchor: element_anchor(p),
+                                  parent: unit.id, breadcrumb: crumb,
+                                  text: Document::PlainText.call(p), model: p)
+          end
+          finalize_section(unit, ordered_child_ids(tsec, children.map(&:id)))
+          unit
+        ensure
+          @lang = restore_lang
         end
-        nested_terms_sections(tsec).each do |nested|
-          children << walk_terms_section(nested, parent: unit.id,
-                                                 breadcrumb: crumb)
-        end
-        vals_any(tsec, :paragraphs, :p).each do |p|
-          children << emit_unit(type: "note", anchor: element_anchor(p),
-                                parent: unit.id, breadcrumb: crumb,
-                                text: Document::PlainText.call(p), model: p)
-        end
-        finalize_section(unit, ordered_child_ids(tsec, children.map(&:id)))
-        unit
       end
 
       def walk_term(term, parent:, breadcrumb:, section: nil)
