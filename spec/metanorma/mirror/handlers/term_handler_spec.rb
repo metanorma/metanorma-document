@@ -2,7 +2,7 @@
 
 require "spec_helper"
 require "metanorma/mirror"
-require "metanorma/iso_document"
+require "metanorma/iso/document"
 
 RSpec.describe Metanorma::Mirror::Handlers::Term do
   let(:registry) { Metanorma::Mirror.build_default_registry }
@@ -13,7 +13,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Term do
   end
 
   def parse_term(xml)
-    Metanorma::IsoDocument::Terms::IsoTerm.from_xml(xml)
+    Metanorma::Iso::Document::Terms::IsoTerm.from_xml(xml)
   end
 
   describe ".call" do

@@ -9,7 +9,7 @@ RSpec.describe Metanorma::Html::Generator do
                      __dir__)
   end
   let(:xml) { File.read(xml_path) }
-  let(:doc) { Metanorma::IsoDocument::Root.from_xml(xml) }
+  let(:doc) { Metanorma::Iso::Document::Root.from_xml(xml) }
   let(:html) { described_class.generate(doc) }
   let(:page) { Nokogiri::HTML(html) }
 

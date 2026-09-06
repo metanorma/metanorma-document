@@ -3,30 +3,30 @@
 module Metanorma
   module Html
     class StandardRenderer < BaseRenderer
-      register_render Metanorma::StandardDocument::Root,
+      register_render "Metanorma::Standoc::Document::Root",
                       :render_standard_document
-      register_render Metanorma::StandardDocument::Terms::Term, :render_term
-      register_render Metanorma::StandardDocument::Sections::TermsSection,
+      register_render "Metanorma::Standoc::Document::Terms::Term", :render_term
+      register_render "Metanorma::Standoc::Document::Sections::TermsSection",
                       :render_terms_section
-      register_render Metanorma::StandardDocument::Sections::StandardReferencesSection,
+      register_render "Metanorma::Standoc::Document::Sections::StandardReferencesSection",
                       :render_references_section
-      register_render Metanorma::StandardDocument::Sections::BibliographySection,
+      register_render "Metanorma::Standoc::Document::Sections::BibliographySection",
                       :render_bibliography
-      register_render Metanorma::StandardDocument::Sections::ClauseSection,
+      register_render "Metanorma::Standoc::Document::Sections::ClauseSection",
                       :render_clause_section
-      register_render Metanorma::StandardDocument::Sections::AnnexSection,
+      register_render "Metanorma::Standoc::Document::Sections::AnnexSection",
                       :render_annex_section
-      register_render Metanorma::StandardDocument::Sections::StandardSection,
+      register_render "Metanorma::Standoc::Document::Sections::StandardSection",
                       :render_standard_section
-      register_render Metanorma::StandardDocument::Sections::Abstract,
+      register_render "Metanorma::Standoc::Document::Sections::Abstract",
                       :render_abstract_section
-      register_render Metanorma::StandardDocument::Sections::Foreword,
+      register_render "Metanorma::Standoc::Document::Sections::Foreword",
                       :render_foreword_section
-      register_render Metanorma::StandardDocument::Sections::Introduction,
+      register_render "Metanorma::Standoc::Document::Sections::Introduction",
                       :render_introduction_section
-      register_render Metanorma::StandardDocument::Sections::FloatingTitle,
+      register_render "Metanorma::Standoc::Document::Sections::FloatingTitle",
                       :render_floating_title
-      register_render Metanorma::StandardDocument::Blocks::AmendBlock,
+      register_render "Metanorma::Standoc::Document::Blocks::AmendBlock",
                       :render_amend_block
 
       def render_standard_document(doc, **_opts)
@@ -56,16 +56,7 @@ module Metanorma
         bibdata = doc.bibdata
         return "" unless bibdata
 
-        cover_id = nil
-        bibdata.doc_identifier&.each do |di|
-          next unless safe_attr(di, :type) == "iso-reference"
-
-          id = extract_text_value(di)
-          next if id.to_s.empty?
-
-          cover_id = id
-          break
-        end
+        cover_id = extract_primary_doc_id
 
         title_text = extract_display_title(bibdata)
 
@@ -681,7 +672,7 @@ module Metanorma
         docids = Array(item.docidentifier)
         primary = docids.find do |di|
           val = extract_text_value(di).to_s
-          val.match?(/\A\[?\d+\]?\z/) ? false : !val.match?(/\A(?:iso-reference|URN)\s/)
+          val.match?(/\A\[?\d+\]?\z/) ? false : !val.match?(/\A(?:URN|[a-z]+-reference)\s/)
         end
         return nil unless primary
 
@@ -700,7 +691,7 @@ module Metanorma
         docids = Array(item.docidentifier)
         primary = docids.find do |di|
           val = extract_text_value(di).to_s
-          val.match?(/\A\[?\d+\]?\z/) ? false : !val.match?(/\A(?:iso-reference|URN)\s/)
+          val.match?(/\A\[?\d+\]?\z/) ? false : !val.match?(/\A(?:URN|[a-z]+-reference)\s/)
         end
         return unless primary
 

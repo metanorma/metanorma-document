@@ -59,6 +59,22 @@ id_strategy: nil)
             end
 
             def flavor_class(flavor)
+              camel = flavor.split("_").map(&:capitalize).join
+              new_namespace = "Metanorma::#{camel}::Document"
+              begin
+                require "metanorma/#{flavor}/document"
+              rescue LoadError
+                nil
+              end
+              if Object.const_defined?(new_namespace)
+                return Object.const_get(new_namespace).const_get(:Root)
+              end
+
+              begin
+                require "metanorma/standoc"
+              rescue LoadError
+                nil
+              end
               class_name = self.class.flavor_map[flavor] || "StandardDocument"
               Metanorma.const_get(class_name).const_get(:Root)
             end

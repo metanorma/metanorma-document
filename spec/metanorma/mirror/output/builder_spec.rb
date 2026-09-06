@@ -2,7 +2,7 @@
 
 require "spec_helper"
 require "metanorma/mirror"
-require "metanorma/iso_document"
+require "metanorma/iso/document"
 require "tmpdir"
 require "fileutils"
 

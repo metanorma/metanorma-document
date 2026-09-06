@@ -13,7 +13,7 @@ module Metanorma
       attribute :type, :string
       attribute :title, :string
       attribute :format, :string, collection: true
-      attribute :bibdata, Metanorma::IsoDocument::Metadata::IsoBibliographicItem
+      attribute :bibdata, Metanorma::Document::Components::BibData::BibliographicItem
       attribute :entry, Entry, collection: true
 
       xml do

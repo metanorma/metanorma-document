@@ -20,6 +20,20 @@ module Metanorma
 
     DEFAULT_ID_STRATEGY = IdStrategy::Preserve.new
 
+    # Pre-build registration seam: flavor gems add handler entries to
+    # the default registry via blocks, run in registration order during
+    # build. Keeps the harness free of flavor knowledge while default
+    # consumers (CLI JSON export) see the complete registry.
+    @default_hooks = []
+
+    def self.register_default(&block)
+      @default_hooks << block
+    end
+
+    def self.default_hooks
+      @default_hooks
+    end
+
     def self.default_registry
       @default_registry ||= build_default_registry
     end

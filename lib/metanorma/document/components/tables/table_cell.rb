@@ -4,6 +4,62 @@ module Metanorma
   module Document
     module Components
       module Tables
+        # Shared XML mapping for TableCell and its <td>/<th> subclasses.
+        # lutaml-model does not inherit xml mappings into a subclass's
+        # `xml do` block — a bare redeclaration silently drops every
+        # parent map_element (the #51 root cause: stems inside cells
+        # parsed hollow). Each subclass applies this module after
+        # declaring its element name.
+        module TableCellXmlMapping
+          module_function
+
+          def apply(mapping)
+            mapping.map_attribute "id", to: :id
+            mapping.map_attribute "anchor", to: :anchor
+            mapping.map_attribute "colspan", to: :colspan
+            mapping.map_attribute "rowspan", to: :rowspan
+            mapping.map_attribute "align", to: :align
+            mapping.map_attribute "valign", to: :valign
+            mapping.map_attribute "semx-id", to: :semx_id
+            mapping.map_content to: :text
+            mapping.map_element "em", to: :em
+            mapping.map_element "strong", to: :strong
+            mapping.map_element "tt", to: :tt
+            mapping.map_element "sub", to: :sub
+            mapping.map_element "sup", to: :sup
+            mapping.map_element "smallcap", to: :smallcap
+            mapping.map_element "br", to: :br
+            mapping.map_element "xref", to: :xref
+            mapping.map_element "eref", to: :eref
+            mapping.map_element "link", to: :link
+            mapping.map_element "stem", to: :stem
+            mapping.map_element "fn", to: :fn
+            mapping.map_element "strike", to: :strike
+            mapping.map_element "underline", to: :underline
+            mapping.map_element "p", to: :p
+            mapping.map_element "dl", to: :dl
+            mapping.map_element "ul", to: :ul
+            mapping.map_element "ol", to: :ol
+            mapping.map_element "figure", to: :figure
+            mapping.map_element "formula", to: :formula
+            mapping.map_element "note", to: :note
+            mapping.map_element "example", to: :example
+            mapping.map_element "quote", to: :quote
+            mapping.map_element "sourcecode", to: :sourcecode
+            mapping.map_element "source", to: :source
+            mapping.map_element "table", to: :table
+            mapping.map_element "key", to: :key
+            mapping.map_element "fmt-stem", to: :fmt_stem
+            mapping.map_element "fmt-fn-label", to: :fmt_fn_label
+            mapping.map_element "semx", to: :semx
+            mapping.map_element "span", to: :span
+            mapping.map_element "bookmark", to: :bookmark
+            mapping.map_element "input", to: :input
+            mapping.map_element "fmt-annotation-start", to: :fmt_annotation_start
+            mapping.map_element "fmt-annotation-end", to: :fmt_annotation_end
+          end
+        end
+
         # Base class for table cells with common attributes and mixed content.
         class TableCell < Lutaml::Model::Serializable
           attribute :id, :string
@@ -66,8 +122,11 @@ module Metanorma
                     Metanorma::Document::Components::ReferenceElements::SourceElement,
                     collection: true
 
-          # Nested tables (table inside td/th)
-          attribute :table, TableBlock,
+          # Nested tables (table inside td/th). String-typed: breaks the
+          # TableCell ⇄ TableBlock autoload cycle (cell → nested table →
+          # rows → cells).
+          attribute :table,
+                    "Metanorma::Document::Components::Tables::TableBlock",
                     collection: true
 
           # Key definitions inside table cells
@@ -94,49 +153,7 @@ module Metanorma
 
           xml do
             mixed_content
-            map_attribute "id", to: :id
-            map_attribute "anchor", to: :anchor
-            map_attribute "colspan", to: :colspan
-            map_attribute "rowspan", to: :rowspan
-            map_attribute "align", to: :align
-            map_attribute "valign", to: :valign
-            map_attribute "semx-id", to: :semx_id
-            map_content to: :text
-            map_element "em", to: :em
-            map_element "strong", to: :strong
-            map_element "tt", to: :tt
-            map_element "sub", to: :sub
-            map_element "sup", to: :sup
-            map_element "smallcap", to: :smallcap
-            map_element "br", to: :br
-            map_element "xref", to: :xref
-            map_element "eref", to: :eref
-            map_element "link", to: :link
-            map_element "stem", to: :stem
-            map_element "fn", to: :fn
-            map_element "strike", to: :strike
-            map_element "underline", to: :underline
-            map_element "p", to: :p
-            map_element "dl", to: :dl
-            map_element "ul", to: :ul
-            map_element "ol", to: :ol
-            map_element "figure", to: :figure
-            map_element "formula", to: :formula
-            map_element "note", to: :note
-            map_element "example", to: :example
-            map_element "quote", to: :quote
-            map_element "sourcecode", to: :sourcecode
-            map_element "source", to: :source
-            map_element "table", to: :table
-            map_element "key", to: :key
-            map_element "fmt-stem", to: :fmt_stem
-            map_element "fmt-fn-label", to: :fmt_fn_label
-            map_element "semx", to: :semx
-            map_element "span", to: :span
-            map_element "bookmark", to: :bookmark
-            map_element "input", to: :input
-            map_element "fmt-annotation-start", to: :fmt_annotation_start
-            map_element "fmt-annotation-end", to: :fmt_annotation_end
+            TableCellXmlMapping.apply(self)
           end
         end
       end

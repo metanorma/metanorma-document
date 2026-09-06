@@ -9,6 +9,7 @@ module Metanorma
           xml do
             element "td"
             mixed_content
+            TableCellXmlMapping.apply(self)
           end
         end
       end

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metanorma xmlns="https://www.metanorma.org/ns/standoc" type="semantic" flavor="ogc">
+<bibdata type="standard">
+<title language="en" type="main">Sensor network requirements</title>
+<docidentifier type="ogc-internal" primary="true">SNR-1</docidentifier>
+<docnumber>1</docnumber>
+<edition>1</edition>
+<language>en</language>
+<status><stage>published</stage></status>
+<contributor><role type="publisher"/><organization><name>Metanorma</name></organization></contributor>
+<copyright><from>2026</from><owner><organization><name>Metanorma</name></organization></owner></copyright>
+<relation type="obsoletes"><bibitem><docidentifier type="ogc-internal">SNR-0</docidentifier></bibitem></relation>
+<relation type="hasPart"><bibitem><docidentifier type="ogc-internal">SNR-2</docidentifier></bibitem></relation>
+<relation type="hasSuccessor"><bibitem><docidentifier type="ogc-internal">SNR-3</docidentifier></bibitem></relation>
+</bibdata>
+<metanorma-extension>
+<UnitsML xmlns="https://schema.unitsml.org/unitsml/1.0">
+<UnitSet>
+<Unit dimensionURL="#NISTd5" id="U_NISTu5">
+<UnitSystem name="SI" type="SI_base" lang="en"/>
+<UnitName lang="en">kelvin</UnitName>
+<UnitSymbol type="HTML">K</UnitSymbol>
+</Unit>
+</UnitSet>
+<DimensionSet>
+<Dimension id="NISTd5">
+<ThermodynamicTemperature symbol="Theta" powerNumerator="1"/>
+</Dimension>
+</DimensionSet>
+<QuantitySet>
+<Quantity id="NISTq588" dimensionURL="#NISTd5">
+<QuantityName lang="en">thermodynamic temperature</QuantityName>
+</Quantity>
+</QuantitySet>
+</UnitsML>
+</metanorma-extension>
+<sections>
+<clause id="_sec-req" anchor="sensor-requirements" obligation="normative" displayorder="2">
+<title>Sensor requirements</title>
+<p id="_p-intro">This clause states the requirements for sensor nodes.</p>
+<formula id="_formula-temp" anchor="formula-temp"><stem block="true" type="AsciiMath"><asciimath>T = 273.15 "unitsml(K)"</asciimath></stem><name>Reference temperature</name></formula>
+<requirement id="_req-accuracy" anchor="req-sensor-accuracy" obligation="requirement">
+<subject>sensors</subject>
+<classification><tag>class</tag><value>accuracy</value></classification>
+<description><p id="_p-acc">Sensor readings shall be accurate to within ±0.1 % of the reference value.</p></description>
+<inherit><eref type="inline" bibitemid="SNR0" citeas="SNR 0">SNR 0</eref></inherit>
+</requirement>
+<permission id="_perm-maintenance" anchor="perm-maintenance" obligation="permission">
+<subject>sensors</subject>
+<description><p id="_p-maint">Maintenance may be performed while the network is operational.</p></description>
+</permission>
+<recommendation id="_rec-calibration" anchor="rec-calibration" obligation="recommendation">
+<subject>sensors</subject>
+<description><p id="_p-cal">Sensors should be calibrated at least every twelve months.</p></description>
+</recommendation>
+<requirement id="_req-parent" anchor="req-battery" obligation="requirement">
+<subject>sensors</subject>
+<classification><tag>class</tag><value>battery</value></classification>
+<description><p id="_p-bat">Battery-powered sensors shall sleep between measurements.</p></description>
+<requirement id="_req-child" anchor="req-battery-life" obligation="requirement">
+<subject>sensors</subject>
+<description><p id="_p-life">Battery life shall exceed twelve months.</p></description>
+</requirement>
+</requirement>
+</clause>
+</sections>
+<annex id="_annex-terms" obligation="normative">
+<title>Additional terms</title>
+<terms id="_annex-terms-sec">
+<title>Terms and definitions</title>
+<term id="_term-annex-load-cell" anchor="term-annex-load-cell">
+<preferred><expression><name>annex load cell</name></expression></preferred>
+<definition><verbal-definition><p id="_p-annex-def">a load cell defined in an annex</p></verbal-definition></definition>
+</term>
+</terms>
+</annex>
+<bibliography><references id="_rf-norm" normative="true" obligation="informative">
+<title>Normative references</title>
+<bibitem id="SNR0"><formattedref format="application/x-isodoc+xml"><em>SNR 0</em></formattedref><docidentifier type="ogc-internal">SNR-0</docidentifier></bibitem>
+</references></bibliography>
+</metanorma>

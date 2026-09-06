@@ -2,29 +2,29 @@
 
 require "spec_helper"
 require "metanorma/html"
-require "metanorma/iso_document"
+require "metanorma/iso/document"
 
-RSpec.describe Metanorma::Html::FlavorRegistry do
+RSpec.describe Metanorma::Core::FlavorRegistry do
   let(:registry) { described_class.new }
   let(:base_flavor) do
-    Metanorma::Html::Flavor.new(
+    Metanorma::Core::Flavor.new(
       name: nil,
-      model_class: Metanorma::Document::Root,
-      renderer_class: Metanorma::Html::BaseRenderer,
+      model_root: Metanorma::Document::Root,
+      renderers: { html: Metanorma::Html::BaseRenderer },
     )
   end
   let(:standard_flavor) do
-    Metanorma::Html::Flavor.new(
+    Metanorma::Core::Flavor.new(
       name: nil,
-      model_class: Metanorma::StandardDocument::Root,
-      renderer_class: Metanorma::Html::StandardRenderer,
+      model_root: Metanorma::Standoc::Document::Root,
+      renderers: { html: Metanorma::Html::StandardRenderer },
     )
   end
   let(:iso_flavor) do
-    Metanorma::Html::Flavor.new(
+    Metanorma::Core::Flavor.new(
       name: :iso,
-      model_class: Metanorma::IsoDocument::Root,
-      renderer_class: Metanorma::Html::IsoRenderer,
+      model_root: Metanorma::Iso::Document::Root,
+      renderers: { html: SpecFlavors::IsoRenderer },
       pubid_module: :"Pubid::Iso",
     )
   end
@@ -33,55 +33,56 @@ RSpec.describe Metanorma::Html::FlavorRegistry do
     [base_flavor, standard_flavor, iso_flavor].each { |f| registry.register(f) }
   end
 
-  describe "#find_for" do
+  describe "#flavor_for" do
     it "returns the most-specific registered flavor" do
-      flavor = registry.find_for(Metanorma::IsoDocument::Root)
+      flavor = registry.flavor_for(Metanorma::Iso::Document::Root.new)
       expect(flavor).to equal(iso_flavor)
     end
 
     it "returns a parent flavor when no exact match registered" do
-      flavor = registry.find_for(Metanorma::StandardDocument::Root)
+      flavor = registry.flavor_for(Metanorma::Standoc::Document::Root.new)
       expect(flavor).to equal(standard_flavor)
     end
 
     it "returns the base flavor for the base model class" do
-      flavor = registry.find_for(Metanorma::Document::Root)
+      flavor = registry.flavor_for(Metanorma::Document::Root.new)
       expect(flavor).to equal(base_flavor)
     end
 
     it "returns nil when no flavor matches" do
-      flavor = registry.find_for(String)
+      flavor = registry.flavor_for(String)
       expect(flavor).to be_nil
     end
   end
 
-  describe "#name_for" do
+  describe "#name (via flavor_for)" do
     it "returns the symbolic name for the matching flavor" do
-      expect(registry.name_for(Metanorma::IsoDocument::Root)).to eq(:iso)
+      expect(registry.flavor_for(Metanorma::Iso::Document::Root.new)&.name).to eq(:iso)
     end
 
     it "returns nil for flavors without a name" do
-      expect(registry.name_for(Metanorma::Document::Root)).to be_nil
+      expect(registry.flavor_for(Metanorma::Document::Root.new)&.name).to be_nil
     end
   end
 
   describe "#renderer_for" do
     it "returns the renderer class for the matching flavor" do
-      expect(registry.renderer_for(Metanorma::IsoDocument::Root)).to eq(Metanorma::Html::IsoRenderer)
+      document = Metanorma::Iso::Document::Root.new
+      expect(registry.renderer_for(:html, document)).to eq(SpecFlavors::IsoRenderer)
     end
   end
 
-  describe "#pubid_module_for" do
+  describe "#pubid (via flavor_for)" do
     it "returns the Pubid module constant when flavor has one and it is loadable" do
       # Pubid::Iso may not be autoloaded in the test env unless a flavor
       # document has been parsed. Verify the resolution mechanism by
       # checking that const-get either succeeds or returns nil.
-      result = registry.pubid_module_for(Metanorma::IsoDocument::Root)
+      result = registry.flavor_for(Metanorma::Iso::Document::Root.new)&.pubid_module_const
       expect(result).to(satisfy { |v| v.nil? || v.is_a?(Module) })
     end
 
     it "returns nil when flavor has no Pubid module" do
-      expect(registry.pubid_module_for(Metanorma::Document::Root)).to be_nil
+      expect(registry.flavor_for(Metanorma::Document::Root.new)&.pubid_module_const).to be_nil
     end
   end
 
@@ -93,23 +94,23 @@ RSpec.describe Metanorma::Html::FlavorRegistry do
   end
 end
 
-RSpec.describe Metanorma::Html::Flavor do
+RSpec.describe Metanorma::Core::Flavor do
   let(:flavor) do
     described_class.new(
       name: :iso,
-      model_class: Metanorma::IsoDocument::Root,
-      renderer_class: Metanorma::Html::IsoRenderer,
+      model_root: Metanorma::Iso::Document::Root,
+      renderers: { html: SpecFlavors::IsoRenderer },
       pubid_module: :"Pubid::Iso",
     )
   end
 
   describe "#matches?" do
     it "matches the exact model class" do
-      expect(flavor.matches?(Metanorma::IsoDocument::Root)).to be(true)
+      expect(flavor.matches?(Metanorma::Iso::Document::Root)).to be(true)
     end
 
     it "matches descendant classes" do
-      subclass = Class.new(Metanorma::IsoDocument::Root)
+      subclass = Class.new(Metanorma::Iso::Document::Root)
       expect(flavor.matches?(subclass)).to be(true)
     end
 
@@ -126,8 +127,8 @@ RSpec.describe Metanorma::Html::Flavor do
 
     it "returns nil when no pubid_module" do
       bare = described_class.new(name: :other,
-                                 model_class: Metanorma::Document::Root,
-                                 renderer_class: Metanorma::Html::BaseRenderer)
+                                 model_root: Metanorma::Document::Root,
+                                 renderers: { html: Metanorma::Html::BaseRenderer })
       expect(bare.pubid_module_const).to be_nil
     end
   end

@@ -354,6 +354,87 @@ metanorma-document to-mirror document.presentation.xml \
   --id-strategy positional \
   --title "My Document"
 
+== Native object-model decomposition
+
+`Metanorma::Document::NativeModels` decomposes a typed document model
+into the native object models of the Metanorma ecosystem — the owning
+gems' own classes and serializations, never re-flattened into a parallel
+schema:
+
+[source,ruby]
+require "metanorma/document"
+
+model = Metanorma::Iso::Document::Root.from_xml(xml)
+
+Metanorma::Document::NativeModels.glossarist_concepts(model)
+# => [Glossarist::Concept] — term entries as native concepts (to_json)
+
+Metanorma::Document::NativeModels.relaton_bibdata(model)
+# => Relaton::Bib::ItemData — the bibliographic record as native Relaton
+
+Metanorma::Document::NativeModels.relaton_bibliography(model)
+# => [BibliographyEntry] — every cited document as a native Relaton item
+#    plus a native Pubid::Identifier parse (what citation edges resolve to)
+
+Metanorma::Document::NativeModels.pubid_identifiers(model)
+# => [{ original:, type:, primary:, pubid: }] — native pubid parses
+
+This is a model-layer capability available to any consumer; MKO below is
+one of them.
+
+== Machine serialization (MKO)
+
+*Metanorma Knowledge Objects* (MN 116) is the machine-first output
+format: a derived bundle of typed, addressable knowledge objects
+projected from the document model — like a rendering, never a source
+format.
+
+[source,ruby]
+require "metanorma/mko"
+
+Metanorma::Mko.export(xml_or_model, to: dir, presentation_xml: nil, zip: false)
+# => <short>.mko/ bundle: manifest.json, document.json, units.jsonl,
+#    edges.jsonl, bibdata.json, bibliography.jsonl, identifiers.json,
+#    glossary.json
+
+Collections export as document families — every member document as
+its own bundle plus one small collection bundle (collection.json and
+the doc:<member> part_of doc:<family> membership edges):
+
+[source,ruby]
+Metanorma::Mko::Collection.export("collection.yml", to: dir)
+
+Figure bytes are emitted as hash-addressed, manifest-verified bundle
+assets (data URIs from the model, or `assets_from:` paths). Language
+editions align by stable anchors:
+
+[source,ruby]
+Metanorma::Mko::Alignment.export(bundle_en, bundle_fr)
+# => alignment.jsonl of variant_of unit edges
+
+The wire contract ships as generated JSON Schema (the schema classes
+are the single source of truth):
+
+[source,ruby]
+Metanorma::Mko.json_schemas # => { "unit" => …, "collection" => …, "excerpt" => … }
+
+The bundle carries: typed units (clause, term, table, figure, formula,
+note, example, sourcecode, requirement, reference) with typed payloads;
+the edge graph (part_of containment, cites from reference and term units,
+defines, class_of, and document-level relations with Relaton types
+verbatim); and the native object-model components (Relaton bibdata and
+bibliography, Glossarist concepts, pubid parses). Semantic anchors are
+preferred over GUIDs; unit ids are content-hash stable, and repeated
+exports are byte-identical.
+
+The walk dispatches on class/attribute declarations only — zero flavor
+knowledge; one format serves every flavor. `Mko.renderer_for(document)`
+follows the `Html::Generator` pattern (flavor entries may override;
+otherwise the harness exporter serves any model tree). From the CLI:
+
+[source,bash]
+metanorma compile document.adoc -x mko   # writes <short>.mko/
+
 == Documentation
 
 Detailed architecture documentation is in the `docs/` directory:

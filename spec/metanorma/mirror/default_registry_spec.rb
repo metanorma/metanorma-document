@@ -2,7 +2,7 @@
 
 require "spec_helper"
 require "metanorma/mirror"
-require "metanorma/iso_document"
+require "metanorma/iso/document"
 
 RSpec.describe Metanorma::Mirror::DefaultRegistry do
   describe ".build" do
@@ -33,8 +33,8 @@ RSpec.describe Metanorma::Mirror::DefaultRegistry do
     it "registers section handlers" do
       registry = described_class.build
       [
-        Metanorma::StandardDocument::Sections::ClauseSection,
-        Metanorma::StandardDocument::Sections::AnnexSection,
+        Metanorma::Standoc::Document::Sections::ClauseSection,
+        Metanorma::Standoc::Document::Sections::AnnexSection,
       ].each do |klass|
         expect(registry.registered?(klass)).to be(true)
       end
@@ -65,9 +65,9 @@ RSpec.describe Metanorma::Mirror::DefaultRegistry do
     it "registers structural handlers" do
       registry = described_class.build
       [
-        Metanorma::StandardDocument::Sections::Preface,
-        Metanorma::StandardDocument::Sections::Sections,
-        Metanorma::StandardDocument::Sections::BibliographySection,
+        Metanorma::Standoc::Document::Sections::Preface,
+        Metanorma::Standoc::Document::Sections::Sections,
+        Metanorma::Standoc::Document::Sections::BibliographySection,
       ].each do |klass|
         expect(registry.registered?(klass)).to be(true)
       end

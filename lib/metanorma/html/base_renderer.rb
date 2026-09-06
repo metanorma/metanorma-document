@@ -15,16 +15,6 @@ module Metanorma
                "metanorma/html/renderers/element_order_traversal"
     end
 
-    module Concerns
-      autoload :MetadataExtraction,
-               "metanorma/html/concerns/metadata_extraction"
-      autoload :PresentationValidation,
-               "metanorma/html/concerns/presentation_validation"
-      autoload :SvgProcessing, "metanorma/html/concerns/svg_processing"
-      autoload :TextExtraction, "metanorma/html/concerns/text_extraction"
-      autoload :TocRegistry, "metanorma/html/concerns/toc_registry"
-    end
-
     class BaseRenderer
       include Concerns::MetadataExtraction
       include Concerns::PresentationValidation
@@ -69,7 +59,8 @@ module Metanorma
         end
 
         def register_render(type_class, method_name)
-          render_registry[type_class] = method_name
+          resolved = resolve_type(type_class)
+          render_registry[resolved] = method_name if resolved
         end
 
         def inline_registry
@@ -77,7 +68,24 @@ module Metanorma
         end
 
         def register_inline_render(type_class, method_name)
-          inline_registry[type_class] = method_name
+          resolved = resolve_type(type_class)
+          inline_registry[resolved] = method_name if resolved
+        end
+
+        # type_class may be a Class or a String constant name. String form
+        # requires the owning flavor gem, then resolves; if the gem is not
+        # installed the registration is skipped (that flavor cannot be
+        # rendered in this process anyway).
+        def resolve_type(type_class)
+          return type_class unless type_class.is_a?(String)
+
+          flavor = type_class.split("::")[1].to_s.downcase
+          begin
+            require "metanorma/#{flavor}/document"
+          rescue LoadError
+            nil
+          end
+          Object.const_defined?(type_class) ? Object.const_get(type_class) : nil
         end
       end
 
@@ -109,10 +117,10 @@ module Metanorma
         end
 
         def render_paragraph(...) = @renderer.render_paragraph(...)
-        def render_inline_element(...)= @renderer.render_inline_element(...)
-        def render_unordered_list(...)= @renderer.render_unordered_list(...)
-        def render_ordered_list(...)= @renderer.render_ordered_list(...)
-        def render_definition_list(...)= @renderer.render_definition_list(...)
+        def render_inline_element(...) = @renderer.render_inline_element(...)
+        def render_unordered_list(...) = @renderer.render_unordered_list(...)
+        def render_ordered_list(...) = @renderer.render_ordered_list(...)
+        def render_definition_list(...) = @renderer.render_definition_list(...)
         def render_sourcecode(...)  = @renderer.render_sourcecode(...)
         def render_table(...)       = @renderer.render_table(...)
         def render_figure(...)      = @renderer.render_figure(...)
@@ -120,8 +128,8 @@ module Metanorma
         def render_formula(...)     = @renderer.render_formula(...)
         def render_note(...)        = @renderer.render_note(...)
         def render_image(...)       = @renderer.render_image(...)
-        def render_stem_content(...)= @renderer.render_stem_content(...)
-        def register_figure_entry(...)= @renderer.register_figure_entry(...)
+        def render_stem_content(...) = @renderer.render_stem_content(...)
+        def register_figure_entry(...) = @renderer.register_figure_entry(...)
         def render_note_children(...) = @renderer.render_note_children(...)
         def render_simple_children(...) = @renderer.render_simple_children(...)
         def render_full_block_children(...) = @renderer.render_full_block_children(...)
@@ -135,6 +143,7 @@ module Metanorma
       attr_writer :document, :theme
 
       def generate_full_document(document, theme: nil, **)
+        Metanorma::Html.seed_flavors!
         @document = document
         @theme_override = theme
         validate_presentation_xml!
@@ -183,7 +192,7 @@ module Metanorma
       def flavor_name
         return nil unless defined?(@document) && @document
 
-        Metanorma::Html::Generator.flavors.name_for(@document.class)
+        Metanorma::Core::Flavors.flavor_for(@document)&.name
       end
 
       # Pubid module for the current document's flavor, or nil if the
@@ -191,7 +200,7 @@ module Metanorma
       def pubid_module
         return nil unless defined?(@document) && @document
 
-        Metanorma::Html::Generator.flavors.pubid_module_for(@document.class)
+        Metanorma::Core::Flavors.flavor_for(@document)&.pubid_module_const
       end
 
       def flavor_publishers(_doc_id)
@@ -382,7 +391,7 @@ module Metanorma
                       :render_note
       register_render Metanorma::Document::Components::AncillaryBlocks::ExampleBlock,
                       :render_example
-      register_render Metanorma::StandardDocument::Blocks::Form,
+      register_render "Metanorma::Standoc::Document::Blocks::Form",
                       :render_form
       register_render Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock,
                       :render_sourcecode
@@ -449,7 +458,7 @@ module Metanorma
                              :render_fmt_stem
       register_inline_render Metanorma::Document::Components::Inline::CommaElement,
                              :render_comma
-      register_inline_render Metanorma::StandardDocument::Elements::Input,
+      register_inline_render "Metanorma::Standoc::Document::Elements::Input",
                              :render_input
       register_inline_render Metanorma::Document::Components::Inline::EnumCommaElement,
                              :render_comma

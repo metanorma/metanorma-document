@@ -6,8 +6,17 @@ if ENV["COVERAGE"]
 end
 
 require_relative "../lib/metanorma/document"
-
+# The Html/Mirror subsystems render flavor documents; their specs
+# exercise Standoc/ISO/ITU models. The gems are dev-time Gemfile pins.
+require "metanorma/standoc"
+require "metanorma/iso/document"
+require "metanorma/itu/document"
+require "metanorma/ogc/document"
 Dir[File.join(__dir__, "support/**/*.rb")].each { |f| require f }
+
+# Spec-side flavor registration (mirrors what flavour gems ship via
+# Metanorma::Html.register_flavor); exercises the extension seam.
+SpecFlavors.register!
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

@@ -20,15 +20,15 @@ RSpec.describe "Config-driven preface rendering" do
     end
 
     it "returns empty string when preface has no sections" do
-      preface = Metanorma::IsoDocument::Sections::IsoPreface.new
+      preface = Metanorma::Iso::Document::Sections::IsoPreface.new
       result = renderer.render_preface(preface)
       expect(result).to eq("")
     end
 
     it "renders sections in config order" do
-      foreword = Metanorma::IsoDocument::Sections::IsoForewordSection.new(id: "fw-1")
-      introduction = Metanorma::IsoDocument::Sections::IsoClauseSection.new(id: "intro-1")
-      preface = Metanorma::IsoDocument::Sections::IsoPreface.new(
+      foreword = Metanorma::Iso::Document::Sections::IsoForewordSection.new(id: "fw-1")
+      introduction = Metanorma::Iso::Document::Sections::IsoClauseSection.new(id: "intro-1")
+      preface = Metanorma::Iso::Document::Sections::IsoPreface.new(
         foreword: foreword,
         introduction: introduction,
       )
@@ -46,15 +46,15 @@ RSpec.describe "Config-driven preface rendering" do
     end
 
     it "wraps clauses in preface container" do
-      clause1 = Metanorma::IsoDocument::Sections::IsoClauseSection.new(id: "cl-1")
-      preface = Metanorma::IsoDocument::Sections::IsoPreface.new(clause: [clause1])
+      clause1 = Metanorma::Iso::Document::Sections::IsoClauseSection.new(id: "cl-1")
+      preface = Metanorma::Iso::Document::Sections::IsoPreface.new(clause: [clause1])
 
       result = renderer.render_preface(preface)
       expect(result).to include("preface")
     end
 
     it "returns nil when no content" do
-      preface = Metanorma::IsoDocument::Sections::IsoPreface.new
+      preface = Metanorma::Iso::Document::Sections::IsoPreface.new
 
       result = renderer.render_preface(preface)
       expect(result).to be_nil

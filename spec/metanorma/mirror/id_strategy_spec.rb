@@ -8,12 +8,12 @@ RSpec.describe Metanorma::Mirror::IdStrategy do
     let(:strategy) { described_class.new }
 
     it "returns the element's id via assign_id" do
-      element = Metanorma::StandardDocument::Sections::ClauseSection.new(id: "sec-3.2")
+      element = Metanorma::Standoc::Document::Sections::ClauseSection.new(id: "sec-3.2")
       expect(strategy.assign_id(element)).to eq("sec-3.2")
     end
 
     it "returns nil when element has no id" do
-      element = Metanorma::StandardDocument::Sections::ClauseSection.new
+      element = Metanorma::Standoc::Document::Sections::ClauseSection.new
       expect(strategy.assign_id(element)).to be_nil
     end
 
@@ -27,7 +27,7 @@ RSpec.describe Metanorma::Mirror::IdStrategy do
     let(:strategy) { described_class.new }
 
     it "returns the element's id unchanged" do
-      element = Metanorma::StandardDocument::Sections::ClauseSection.new(id: "sec-3.2")
+      element = Metanorma::Standoc::Document::Sections::ClauseSection.new(id: "sec-3.2")
       expect(strategy.assign_id(element)).to eq("sec-3.2")
     end
 
@@ -42,33 +42,33 @@ RSpec.describe Metanorma::Mirror::IdStrategy do
 
     describe "#assign_id" do
       it "preserves explicit (non-UUID) IDs" do
-        element = Metanorma::StandardDocument::Sections::ClauseSection.new(
+        element = Metanorma::Standoc::Document::Sections::ClauseSection.new(
           id: "sec-3.2", number: "3.2",
         )
         expect(strategy.assign_id(element)).to eq("sec-3.2")
       end
 
       it "derives positional ID for UUID section elements with number" do
-        element = Metanorma::StandardDocument::Sections::ClauseSection.new(
+        element = Metanorma::Standoc::Document::Sections::ClauseSection.new(
           id: "_abc123", number: "5.4",
         )
         expect(strategy.assign_id(element)).to eq("sec-5.4")
       end
 
       it "returns raw UUID when no number and no derivable position" do
-        element = Metanorma::StandardDocument::Sections::ClauseSection.new(id: "_abc123")
+        element = Metanorma::Standoc::Document::Sections::ClauseSection.new(id: "_abc123")
         expect(strategy.assign_id(element)).to eq("_abc123")
       end
 
       it "returns nil when element has no id" do
-        element = Metanorma::StandardDocument::Sections::ClauseSection.new
+        element = Metanorma::Standoc::Document::Sections::ClauseSection.new
         expect(strategy.assign_id(element)).to be_nil
       end
     end
 
     describe "uuid? detection" do
       it "recognizes UUID-prefixed IDs starting with underscore" do
-        element = Metanorma::StandardDocument::Sections::ClauseSection.new(
+        element = Metanorma::Standoc::Document::Sections::ClauseSection.new(
           id: "_abc123-def456", number: "3.1",
         )
         expect(strategy.assign_id(element)).to eq("sec-3.1")
@@ -77,21 +77,21 @@ RSpec.describe Metanorma::Mirror::IdStrategy do
 
     describe "element_category" do
       it "categorizes ClauseSection as :section" do
-        element = Metanorma::StandardDocument::Sections::ClauseSection.new(
+        element = Metanorma::Standoc::Document::Sections::ClauseSection.new(
           id: "_uuid1", number: "4.1",
         )
         expect(strategy.assign_id(element)).to eq("sec-4.1")
       end
 
       it "categorizes ContentSection as :section" do
-        element = Metanorma::StandardDocument::Sections::ContentSection.new(
+        element = Metanorma::Standoc::Document::Sections::ContentSection.new(
           id: "_uuid2", number: "2.3",
         )
         expect(strategy.assign_id(element)).to eq("sec-2.3")
       end
 
       it "categorizes AnnexSection as :annex" do
-        element = Metanorma::StandardDocument::Sections::AnnexSection.new(
+        element = Metanorma::Standoc::Document::Sections::AnnexSection.new(
           id: "_uuid3", number: "A.2",
         )
         expect(strategy.assign_id(element)).to eq("anx-A.2")
@@ -116,7 +116,7 @@ RSpec.describe Metanorma::Mirror::IdStrategy do
 
     describe "#finalize!" do
       it "remaps xref mark targets from UUID to positional IDs" do
-        section = Metanorma::StandardDocument::Sections::ClauseSection.new(
+        section = Metanorma::Standoc::Document::Sections::ClauseSection.new(
           id: "_abc123", number: "5.4",
         )
         strategy.assign_id(section)
@@ -142,7 +142,7 @@ RSpec.describe Metanorma::Mirror::IdStrategy do
       end
 
       it "does not modify xref targets not in the id_map" do
-        section = Metanorma::StandardDocument::Sections::ClauseSection.new(
+        section = Metanorma::Standoc::Document::Sections::ClauseSection.new(
           id: "_mapped", number: "1.1",
         )
         strategy.assign_id(section)

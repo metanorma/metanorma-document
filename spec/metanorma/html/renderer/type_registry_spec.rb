@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "metanorma/ogc/document"
 require "metanorma/html/generator"
 
 RSpec.describe "OCP type registry" do
@@ -27,33 +28,33 @@ RSpec.describe "OCP type registry" do
   describe "StandardRenderer registry" do
     it "registers StandardDocument::Root" do
       registry = Metanorma::Html::StandardRenderer.render_registry
-      expect(registry).to have_key(Metanorma::StandardDocument::Root)
-      expect(registry[Metanorma::StandardDocument::Root]).to eq(:render_standard_document)
+      expect(registry).to have_key(Metanorma::Standoc::Document::Root)
+      expect(registry[Metanorma::Standoc::Document::Root]).to eq(:render_standard_document)
     end
 
     it "does not leak into BaseRenderer registry" do
       base = Metanorma::Html::BaseRenderer.render_registry
-      expect(base).not_to have_key(Metanorma::StandardDocument::Root)
+      expect(base).not_to have_key(Metanorma::Standoc::Document::Root)
     end
   end
 
   describe "IsoRenderer registry" do
     it "registers IsoDocument::Root" do
-      registry = Metanorma::Html::IsoRenderer.render_registry
-      expect(registry).to have_key(Metanorma::IsoDocument::Root)
-      expect(registry[Metanorma::IsoDocument::Root]).to eq(:render_document)
+      registry = SpecFlavors::IsoRenderer.render_registry
+      expect(registry).to have_key(Metanorma::Iso::Document::Root)
+      expect(registry[Metanorma::Iso::Document::Root]).to eq(:render_document)
     end
 
     it "registers TermOrigin in inline_registry" do
-      registry = Metanorma::Html::IsoRenderer.inline_registry
-      expect(registry).to have_key(Metanorma::IsoDocument::Terms::TermOrigin)
+      registry = SpecFlavors::IsoRenderer.inline_registry
+      expect(registry).to have_key(Metanorma::Iso::Document::Terms::TermOrigin)
     end
 
     it "does not leak into BaseRenderer or StandardRenderer registries" do
       base = Metanorma::Html::BaseRenderer.render_registry
       standard = Metanorma::Html::StandardRenderer.render_registry
-      expect(base).not_to have_key(Metanorma::IsoDocument::Root)
-      expect(standard).not_to have_key(Metanorma::IsoDocument::Root)
+      expect(base).not_to have_key(Metanorma::Iso::Document::Root)
+      expect(standard).not_to have_key(Metanorma::Iso::Document::Root)
     end
   end
 
@@ -63,7 +64,7 @@ RSpec.describe "OCP type registry" do
                        __dir__)
     end
     let(:xml) { File.read(xml_path) }
-    let(:doc) { Metanorma::IsoDocument::Root.from_xml(xml) }
+    let(:doc) { Metanorma::Iso::Document::Root.from_xml(xml) }
     let(:html) { Metanorma::Html::Generator.generate(doc) }
     let(:page) { Nokogiri::HTML(html) }
 
@@ -85,25 +86,26 @@ RSpec.describe "OCP type registry" do
 
   describe "flavor independence" do
     it "each flavor renderer has its own registry object" do
-      iso_reg = Metanorma::Html::IsoRenderer.render_registry
-      iec_reg = Metanorma::Html::IecRenderer.render_registry
-      expect(iso_reg).not_to equal(iec_reg)
+      iso_reg = SpecFlavors::IsoRenderer.render_registry
+      ogc_reg = SpecFlavors::OgcRenderer.render_registry
+      expect(iso_reg).not_to equal(ogc_reg)
     end
 
     it "flavor registry contains only its own types, not parent types" do
-      # IecRenderer registers IecDocument::Root but not IsoDocument::Root
-      iec_reg = Metanorma::Html::IecRenderer.render_registry
-      expect(iec_reg).to have_key(Metanorma::IecDocument::Root)
-      expect(iec_reg).not_to have_key(Metanorma::IsoDocument::Root)
+      # OgcRenderer registers the Ogc root and standoc sections, not the
+      # ISO model classes its parent IsoRenderer registers
+      ogc_reg = SpecFlavors::OgcRenderer.render_registry
+      expect(ogc_reg).to have_key(Metanorma::Ogc::Document::Root)
+      expect(ogc_reg).not_to have_key(Metanorma::Iso::Document::Root)
     end
 
     it "flavor renderer can register its own types independently" do
       # Simulate a new flavor registering a type
-      flavor_class = Class.new(Metanorma::Html::IsoRenderer) do
+      flavor_class = Class.new(SpecFlavors::IsoRenderer) do
         register_render String, :render_noop
       end
       expect(flavor_class.render_registry).to have_key(String)
-      expect(Metanorma::Html::IsoRenderer.render_registry).not_to have_key(String)
+      expect(SpecFlavors::IsoRenderer.render_registry).not_to have_key(String)
     end
   end
 end

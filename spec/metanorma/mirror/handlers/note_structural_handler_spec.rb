@@ -2,7 +2,7 @@
 
 require "spec_helper"
 require "metanorma/mirror"
-require "metanorma/iso_document"
+require "metanorma/iso/document"
 
 RSpec.describe Metanorma::Mirror::Handlers::Note do
   let(:registry) { Metanorma::Mirror.build_default_registry }

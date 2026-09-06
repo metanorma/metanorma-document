@@ -47,15 +47,15 @@ module Metanorma
           end
         end
 
-        register_category Metanorma::StandardDocument::Sections::ClauseSection,
+        register_category Metanorma::Standoc::Document::Sections::ClauseSection,
                           :section
-        register_category Metanorma::StandardDocument::Sections::ContentSection,
+        register_category Metanorma::Standoc::Document::Sections::ContentSection,
                           :section
-        register_category Metanorma::StandardDocument::Sections::TermsSection,
+        register_category Metanorma::Standoc::Document::Sections::TermsSection,
                           :section
-        register_category Metanorma::StandardDocument::Sections::DefinitionSection,
+        register_category Metanorma::Standoc::Document::Sections::DefinitionSection,
                           :section
-        register_category Metanorma::StandardDocument::Sections::AnnexSection,
+        register_category Metanorma::Standoc::Document::Sections::AnnexSection,
                           :annex
         register_category Metanorma::Document::Components::AncillaryBlocks::FigureBlock,
                           :figure

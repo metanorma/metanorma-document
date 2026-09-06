@@ -39,11 +39,20 @@ Gem::Specification.new do |spec|
 
   # Uncomment to register a new dependency of your gem
   spec.add_dependency "lutaml-model", "~> 0.8.0"
+  spec.add_dependency "metanorma-core"
   spec.add_dependency "mml", "~> 2.4"
   # pubid has no stable 2.x release yet (latest: 2.0.0.pre.alpha.x);
   # relax this pin once pubid 2.0.0 ships.
   spec.add_dependency "pubid", "~> 2.0.0.pre.alpha"
-  # Tracking the relaton 2.0 prerelease line for the relaton-bib
-  # migration (P3.18); pin to stable once relaton-bib 2.2.0 ships.
-  spec.add_dependency "relaton-bib", ">= 2.2.0.pre.alpha.1", "< 2.3.0"
+  # relaton v3 monogem provides Relaton::Bib (require "relaton/bib");
+  # the former standalone relaton-bib gem is consolidated into it.
+  spec.add_dependency "relaton", ">= 3.0.0.pre.alpha.1"
+  # Native object-model decomposition (Glossarist concepts, Relaton
+  # bibdata, Plurimath formulas) is a model-layer capability.
+  spec.add_dependency "glossarist", "~> 2.13"
+  # The MN 116 format (wire schema, bundle, diffs, MCP) lives in its
+  # own versioned gem; this gem reopens Metanorma::Mko with the model
+  # side. Unreleased until metanorma-mko ships — github pin meanwhile.
+  spec.add_dependency "metanorma-mko", ">= 1.0.0"
+  spec.add_dependency "plurimath", "~> 0.11"
 end

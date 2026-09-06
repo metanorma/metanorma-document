@@ -9,7 +9,7 @@ RSpec.describe "Theme override via Generator.generate" do
     File.expand_path("../../../fixtures/iso/is/document-en.presentation.xml",
                      __dir__)
   end
-  let(:doc) { Metanorma::IsoDocument::Root.from_xml(File.read(xml_path)) }
+  let(:doc) { Metanorma::Iso::Document::Root.from_xml(File.read(xml_path)) }
 
   it "uses an external theme directory (theme.yaml + custom.css)" do
     Dir.mktmpdir do |dir|
