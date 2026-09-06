@@ -41,7 +41,7 @@ module Metanorma
 
             warn_missing_bundle unless iife_bundle_exists?
 
-            data_script = "window.METANORMA_DATA = #{safe_json(guide.to_h)};"
+            data_script = "window.METANORMA_DATA = #{safe_json(guide.to_hash)};"
             ssr_body = render_ssr_body(guide)
             head_parts = [build_style(classic_content_css)]
             css_inline = read_css_inline

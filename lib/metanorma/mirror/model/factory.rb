@@ -3,46 +3,28 @@
 module Metanorma
   module Mirror
     module Model
+      # Semantic dispatcher: the wire's "type" and "content" shape pick
+      # the model class; deserialization itself is the framework's
+      # from_hash on the chosen class.
       class Factory
-        INVALID_INPUT = "Factory.from_h expects a Hash, got %<class>s"
+        INVALID_INPUT = "Factory.from_hash expects a Hash, got %<class>s"
+        MISSING_TYPE = "Factory.from_hash requires a 'type' key, got %<hash>s"
 
-        def self.from_h(hash)
+        def self.from_hash(hash)
           unless hash.is_a?(Hash)
-            raise ArgumentError,
-                  format(INVALID_INPUT, class: hash.class)
+            raise ArgumentError, format(INVALID_INPUT, class: hash.class)
           end
 
-          type = hash["type"]
-
-          case type
-          when "text"
-            build_text(hash)
-          when "soft_break"
-            SoftBreak.new
+          case hash["type"]
+          when "text" then Text.from_hash(hash)
+          when "soft_break" then SoftBreak.from_hash(hash)
           when nil
-            raise ArgumentError,
-                  "Factory.from_h requires a 'type' key, got #{hash.inspect}"
+            raise ArgumentError, format(MISSING_TYPE, hash: hash.inspect)
           else
-            build_node(hash, type)
-          end
-        end
-
-        class << self
-          private
-
-          def build_text(hash)
-            marks = Array(hash["marks"]).map { |m| Mark.from_h(m) }
-            Text.new(text: hash["text"] || "", marks: marks)
-          end
-
-          def build_node(hash, type)
-            content = hash["content"]
-            if content.is_a?(Array)
-              children = content.map { |c| c.is_a?(Hash) ? from_h(c) : c }
-              Container.new(type: type, attrs: hash["attrs"] || {},
-                            content: children)
+            if hash["content"].is_a?(Array)
+              Container.from_hash(hash)
             else
-              Leaf.new(type: type, attrs: hash["attrs"] || {})
+              Leaf.from_hash(hash)
             end
           end
         end

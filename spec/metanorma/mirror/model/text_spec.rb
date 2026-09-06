@@ -29,7 +29,7 @@ RSpec.describe Metanorma::Mirror::Model::Text do
   it "serializes to hash with marks" do
     mark = Metanorma::Mirror::Model::Mark.new(type: "strong")
     text = described_class.new(text: "bold", marks: [mark])
-    h = text.to_h
+    h = text.to_hash
     expect(h).to eq({
                       "type" => "text",
                       "text" => "bold",
@@ -39,7 +39,7 @@ RSpec.describe Metanorma::Mirror::Model::Text do
 
   it "omits marks when empty" do
     text = described_class.new(text: "plain")
-    h = text.to_h
+    h = text.to_hash
     expect(h).not_to have_key("marks")
   end
 

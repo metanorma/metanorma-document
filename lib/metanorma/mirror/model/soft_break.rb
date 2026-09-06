@@ -3,15 +3,14 @@
 module Metanorma
   module Mirror
     module Model
-      class SoftBreak
-        def type
-          "soft_break"
+      class SoftBreak < Lutaml::Model::Serializable
+        attribute :type, :string, default: -> { "soft_break" }
+
+        key_value do
+          map "type", to: :type, render_default: true
         end
 
-        def to_h
-          { "type" => "soft_break" }
-        end
-
+        # rewriter contract: a soft break carries no attrs or content
         def attrs
           {}
         end

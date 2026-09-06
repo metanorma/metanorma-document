@@ -3,18 +3,21 @@
 module Metanorma
   module Mirror
     module Model
-      class Node
-        attr_reader :type, :attrs
+      class Node < Lutaml::Model::Serializable
+        attribute :type, :string
+        attribute :attrs, :hash, default: -> { {} }
 
-        def initialize(type:, attrs: {})
-          @type = type
-          @attrs = normalize_attrs(attrs)
+        key_value do
+          map "type", to: :type
+          map "attrs", to: :attrs, render_empty: false
         end
 
-        def to_h
-          h = { "type" => type }
-          h["attrs"] = @attrs.dup unless @attrs.empty?
-          h
+        # **options carries framework construction kwargs
+        # (e.g. lutaml_register) through to the base serializer
+        def initialize(type: nil, attrs: {}, **)
+          # wire keys are strings; handlers and the transformer build
+          # attrs with symbol keys
+          super(type: type, attrs: (attrs || {}).transform_keys(&:to_s), **)
         end
 
         def leaf?
@@ -32,14 +35,6 @@ module Metanorma
         def accept_rewriter(_rewriter)
           raise NotImplementedError,
                 "#{self.class}#accept_rewriter not implemented"
-        end
-
-        private
-
-        def normalize_attrs(attrs)
-          return {} if attrs.nil?
-
-          attrs.transform_keys(&:to_s)
         end
       end
     end

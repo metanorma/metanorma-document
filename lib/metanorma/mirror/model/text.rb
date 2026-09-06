@@ -3,26 +3,19 @@
 module Metanorma
   module Mirror
     module Model
-      class Text
-        attr_reader :text, :marks
+      class Text < Lutaml::Model::Serializable
+        attribute :type, :string, default: -> { "text" }
+        attribute :text, :string, default: -> { "" }
+        attribute :marks, Mark, collection: true, default: -> { [] }
 
-        def initialize(text:, marks: [])
-          @text = text.to_s
-          @marks = Array(marks)
-        end
-
-        def type
-          "text"
-        end
-
-        def to_h
-          h = { "type" => "text", "text" => @text }
-          h["marks"] = @marks.map(&:to_h) unless @marks.empty?
-          h
+        key_value do
+          map "type", to: :type, render_default: true
+          map "text", to: :text, render_default: true, render_empty: true
+          map "marks", to: :marks, render_empty: false
         end
 
         def text_content
-          @text
+          text
         end
 
         def accept_rewriter(rewriter)

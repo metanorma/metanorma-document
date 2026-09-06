@@ -28,13 +28,13 @@ RSpec.describe Metanorma::Mirror::Model::Node do
 
   it "serializes to hash" do
     node = described_class.new(type: "clause", attrs: { id: "s1" })
-    h = node.to_h
+    h = node.to_hash
     expect(h).to eq({ "type" => "clause", "attrs" => { "id" => "s1" } })
   end
 
   it "omits attrs when empty" do
     node = described_class.new(type: "clause")
-    expect(node.to_h).to eq({ "type" => "clause" })
+    expect(node.to_hash).to eq({ "type" => "clause" })
   end
 
   it "is not a leaf or container by default" do
