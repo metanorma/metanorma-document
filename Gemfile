@@ -11,15 +11,14 @@ gemspec
 # merged and now track main. Still pinned until their PRs reach main:
 #   - iso: #1618 merged into the feat/sts-transformer-architecture stack,
 #     not main; flip once that stack lands on main
-#   - ogc: https://github.com/metanorma/metanorma-ogc/pull/989
-gem "glossarist", "~> 2.13"
+#gem "glossarist", "~> 2.13"
 gem "isodoc", github: "metanorma/isodoc", branch: "main"
 gem "metanorma-core", github: "metanorma/metanorma-core", branch: "main"
 gem "metanorma-iec", github: "metanorma/metanorma-iec", branch: "main"
 gem "metanorma-iso", github: "metanorma/metanorma-iso", branch: "feat/model-validation-migration"
 gem "metanorma-itu", github: "metanorma/metanorma-itu", branch: "main"
 gem "metanorma-mko"
-gem "metanorma-ogc", github: "metanorma/metanorma-ogc", branch: "feat/move-ogc-document"
+gem "metanorma-ogc", github: "metanorma/metanorma-ogc", branch: "main"
 gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "main"
 gem "plurimath", "~> 0.11"
 gem "pubid", ">= 2.0.0.pre.alpha.9"
