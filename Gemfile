@@ -11,7 +11,7 @@ gemspec
 # merged and now track main. Still pinned until their PRs reach main:
 #   - iso: #1618 merged into the feat/sts-transformer-architecture stack,
 #     not main; flip once that stack lands on main
-#gem "glossarist", "~> 2.13"
+# gem "glossarist", "~> 2.13"
 gem "isodoc", github: "metanorma/isodoc", branch: "main"
 gem "metanorma-core", github: "metanorma/metanorma-core", branch: "main"
 gem "metanorma-iec", github: "metanorma/metanorma-iec", branch: "main"
