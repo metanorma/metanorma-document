@@ -18,9 +18,10 @@ gem "metanorma-iec", github: "metanorma/metanorma-iec", branch: "main"
 gem "metanorma-iso", github: "metanorma/metanorma-iso", branch: "feat/model-validation-migration"
 gem "metanorma-itu", github: "metanorma/metanorma-itu", branch: "main"
 # mko >= 1.1.0 from rubygems carries Mko::Language
+gem "metanorma-mirror", github: "metanorma/metanorma-mirror", branch: "main" # flip to version on release
 gem "metanorma-mko"
 gem "metanorma-ogc", github: "metanorma/metanorma-ogc", branch: "main"
-gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "main"
+gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "feat/mirror-seed" # TEMPORARY: carries the MirrorSeed until its PR merges; then main
 gem "plurimath", "~> 0.11"
 gem "pubid", ">= 2.0.0.pre.alpha.9"
 
