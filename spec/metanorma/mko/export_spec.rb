@@ -70,7 +70,7 @@ RSpec.describe Metanorma::Mko do
       expect(Dir.exist?(bundle)).to be true
       manifest = read_json(bundle, "manifest.json")
       expect(manifest["schema"]).to eq("metanorma-mko")
-      expect(manifest["schema_version"]).to eq("1.0.0")
+      expect(manifest["schema_version"]).to eq(Metanorma::Mko::VERSION)
       names = manifest["components"].map { |c| c["name"] }
       expect(names).to include("document", "units", "edges", "identifiers",
                                "glossary", "bibliography")

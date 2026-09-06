@@ -5,21 +5,22 @@ source "https://rubygems.org"
 # Specify your gem's dependencies in metanorma-document.gemspec
 gemspec
 
-# TEMPORARY: cross-PR branch pins so the Html/Mirror specs (which render
-# flavor documents) resolve against the new canonical homes during the
-# model-ownership migration. Revert each once its PR merges:
-#   - https://github.com/metanorma/metanorma-standoc/pull/1232
-#   - https://github.com/metanorma/metanorma-iso/pull/1618
-#   - https://github.com/metanorma/metanorma-itu/pull/832
+# TEMPORARY branch pins so the Html/Mirror specs (which render flavor
+# documents) resolve against the new canonical homes during the
+# model-ownership migration. standoc#1232, itu#832, core#18 and isodoc#825
+# merged and now track main. Still pinned until their PRs reach main:
+#   - iso: #1618 merged into the feat/sts-transformer-architecture stack,
+#     not main; flip once that stack lands on main
+#   - ogc: https://github.com/metanorma/metanorma-ogc/pull/989
 gem "glossarist", "~> 2.13"
-gem "isodoc", github: "metanorma/isodoc", branch: "rt-pubid-2-migration"
-gem "metanorma-core", github: "metanorma/metanorma-core", branch: "feat/flavor-table"
-gem "metanorma-iec", github: "metanorma/metanorma-iec", branch: "feat/move-iec-document"
+gem "isodoc", github: "metanorma/isodoc", branch: "main"
+gem "metanorma-core", github: "metanorma/metanorma-core", branch: "main"
+gem "metanorma-iec", github: "metanorma/metanorma-iec", branch: "main"
 gem "metanorma-iso", github: "metanorma/metanorma-iso", branch: "feat/model-validation-migration"
-gem "metanorma-itu", github: "metanorma/metanorma-itu", branch: "feat/move-itu-document"
-gem "metanorma-mko" # 1.0.0 released from rubygems
+gem "metanorma-itu", github: "metanorma/metanorma-itu", branch: "main"
+gem "metanorma-mko"
 gem "metanorma-ogc", github: "metanorma/metanorma-ogc", branch: "feat/move-ogc-document"
-gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "feat/move-standard-document"
+gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "main"
 gem "plurimath", "~> 0.11"
 gem "pubid", ">= 2.0.0.pre.alpha.9"
 
