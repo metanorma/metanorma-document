@@ -3,22 +3,25 @@
 module Metanorma
   module Mirror
     module Model
-      class Guide
-        attr_reader :content, :meta, :title, :document
+      class Guide < Lutaml::Model::Serializable
+        attribute :content, [Container, :string]
+        attribute :meta, :hash, default: -> { {} }
+        attribute :title, :string
 
-        def initialize(content:, meta: {}, title: nil, document: nil)
-          @content = content
-          @meta = meta
-          @title = title
-          @document = document
+        key_value do
+          map "content", to: :content
+          map "meta", to: :meta, render_empty: false
+          map "title", to: :title, render_nil: false
         end
 
-        def to_h
-          h = {}
-          h["content"] = @content.is_a?(Container) ? @content.to_h : @content
-          h["meta"] = @meta unless @meta.nil? || @meta.empty?
-          h["title"] = @title if @title
-          h
+        # the parsed source document rides along for output formats; it
+        # is deliberately outside the serialization contract
+        attr_accessor :document
+
+        def initialize(content: nil, meta: {}, title: nil, document: nil,
+                       **)
+          super(content: content, meta: meta, title: title, **)
+          self.document = document
         end
       end
     end

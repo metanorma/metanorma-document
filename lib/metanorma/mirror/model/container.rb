@@ -4,27 +4,17 @@ module Metanorma
   module Mirror
     module Model
       class Container < Node
-        attr_reader :content
-
-        def initialize(type:, attrs: {}, content: [])
-          super(type: type, attrs: attrs)
-          @content = Array(content)
+        def initialize(type: nil, attrs: {}, content: [], **)
+          super(type: type, attrs: attrs, **)
+          self.content = Array(content)
         end
 
         def container?
           true
         end
 
-        def to_h
-          h = super
-          unless @content.empty?
-            h["content"] = @content.map { |c| serialize_child(c) }
-          end
-          h
-        end
-
         def text_content
-          @content.map do |item|
+          content.map do |item|
             item.is_a?(String) ? item : item.text_content
           end.join
         end
@@ -32,13 +22,26 @@ module Metanorma
         def accept_rewriter(rewriter)
           rewriter.rewrite_container(self)
         end
+      end
 
-        private
+      # content is declared after the sibling node classes exist: the
+      # union member list references Container itself, and lutaml-model
+      # resolves union members eagerly at declaration time. Deserialized
+      # children dispatch through Factory (the child's shape — content
+      # array vs leaf vs text — picks the class), which is why the union
+      # never receives raw hashes on the way in.
+      class Container
+        attribute :content, [Text, SoftBreak, Leaf, Container, :string],
+                  collection: true, default: -> { [] }
 
-        def serialize_child(child)
-          case child
-          when String then child
-          else child.to_h
+        key_value do
+          map "content", to: :content, render_empty: false,
+                         with: { from: :content_from_mapping }
+        end
+
+        def content_from_mapping(model, value)
+          model.content = Array(value).map do |child|
+            child.is_a?(Hash) ? Factory.from_hash(child) : child
           end
         end
       end

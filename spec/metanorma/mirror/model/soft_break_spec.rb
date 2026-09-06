@@ -11,7 +11,7 @@ RSpec.describe Metanorma::Mirror::Model::SoftBreak do
 
   it "serializes to hash" do
     sb = described_class.new
-    expect(sb.to_h).to eq({ "type" => "soft_break" })
+    expect(sb.to_hash).to eq({ "type" => "soft_break" })
   end
 
   it "has empty attrs and content" do

@@ -14,7 +14,7 @@ RSpec.describe Metanorma::Mirror::Model::Leaf do
 
   it "serializes to hash without content" do
     leaf = described_class.new(type: "image", attrs: { src: "img.png" })
-    h = leaf.to_h
+    h = leaf.to_hash
     expect(h).to eq({ "type" => "image", "attrs" => { "src" => "img.png" } })
   end
 

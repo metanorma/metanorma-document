@@ -3,49 +3,35 @@
 module Metanorma
   module Mirror
     module Model
-      class Mark
-        attr_reader :type, :attrs
+      class Mark < Lutaml::Model::Serializable
+        attribute :type, :string
+        attribute :attrs, :hash, default: -> { {} }
 
-        def initialize(type:, attrs: {})
-          @type = type
-          @attrs = normalize_attrs(attrs)
+        key_value do
+          map "type", to: :type
+          map "attrs", to: :attrs, render_empty: false
         end
 
-        def to_h
-          h = { "type" => type }
-          h["attrs"] = @attrs.dup unless @attrs.empty?
-          h
+        def initialize(type: nil, attrs: {}, **)
+          # wire keys are strings; handlers build attrs with symbol keys
+          super(type: type, attrs: (attrs || {}).transform_keys(&:to_s), **)
         end
 
         def [](key)
-          @attrs[key.to_s]
+          attrs[key.to_s]
         end
 
         def []=(key, value)
-          @attrs[key.to_s] = value
+          attrs[key.to_s] = value
         end
 
         def set_attr(key, value)
-          @attrs[key.to_s] = value
+          attrs[key.to_s] = value
           self
         end
 
         def fetch(key, default = nil, &)
-          @attrs.fetch(key.to_s, default, &)
-        end
-
-        def self.from_h(hash)
-          return nil unless hash
-
-          new(type: hash["type"], attrs: hash["attrs"] || {})
-        end
-
-        private
-
-        def normalize_attrs(attrs)
-          return {} if attrs.nil?
-
-          attrs.transform_keys(&:to_s)
+          attrs.fetch(key.to_s, default, &)
         end
       end
     end

@@ -57,7 +57,7 @@ RSpec.describe Metanorma::Mirror::Rewriter do
   end
 
   let(:complex_doc) do
-    Metanorma::Mirror::Model::Factory.from_h(complex_doc_hash)
+    Metanorma::Mirror::Model::Factory.from_hash(complex_doc_hash)
   end
 
   describe "mirror model round-trip through serialization" do
@@ -113,7 +113,7 @@ RSpec.describe Metanorma::Mirror::Rewriter do
           },
         ],
       }
-      doc = Metanorma::Mirror::Model::Factory.from_h(doc_hash)
+      doc = Metanorma::Mirror::Model::Factory.from_hash(doc_hash)
 
       json = Metanorma::Mirror::Serialization::JsonSerializer.serialize(doc)
       restored = Metanorma::Mirror::Serialization::JsonSerializer.deserialize(json)
@@ -131,7 +131,7 @@ RSpec.describe Metanorma::Mirror::Rewriter do
           { "type" => "bibliography", "content" => [] },
         ],
       }
-      doc = Metanorma::Mirror::Model::Factory.from_h(doc_hash)
+      doc = Metanorma::Mirror::Model::Factory.from_hash(doc_hash)
 
       yaml = Metanorma::Mirror::Serialization::YamlSerializer.serialize(doc)
       restored = Metanorma::Mirror::Serialization::YamlSerializer.deserialize(yaml)

@@ -7,7 +7,7 @@ RSpec.describe Metanorma::Mirror::Rewriter do
   let(:transformer) { described_class.new }
 
   def container_from(hash)
-    Metanorma::Mirror::Model::Factory.from_h(hash)
+    Metanorma::Mirror::Model::Factory.from_hash(hash)
   end
 
   describe "#call" do

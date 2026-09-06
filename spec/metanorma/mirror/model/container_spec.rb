@@ -31,7 +31,7 @@ RSpec.describe Metanorma::Mirror::Model::Container do
     child = described_class.new(type: "paragraph", attrs: { id: "p1" })
     container = described_class.new(type: "clause", attrs: { id: "s1" },
                                     content: [child])
-    h = container.to_h
+    h = container.to_hash
     expect(h["type"]).to eq("clause")
     expect(h["attrs"]).to eq("id" => "s1")
     expect(h["content"]).to be_an(Array)
@@ -41,14 +41,14 @@ RSpec.describe Metanorma::Mirror::Model::Container do
 
   it "omits content when empty" do
     container = described_class.new(type: "clause")
-    h = container.to_h
+    h = container.to_hash
     expect(h).not_to have_key("content")
   end
 
   it "serializes string children directly" do
     text = Metanorma::Mirror::Model::Text.new(text: "hello")
     container = described_class.new(type: "paragraph", content: [text])
-    h = container.to_h
+    h = container.to_hash
     expect(h["content"][0]).to eq({ "type" => "text", "text" => "hello" })
   end
 

@@ -16,7 +16,7 @@ RSpec.describe Metanorma::Mirror::Serialization::JsonSerializer do
   end
 
   let(:node) do
-    Metanorma::Mirror::Model::Factory.from_h(node_hash)
+    Metanorma::Mirror::Model::Factory.from_hash(node_hash)
   end
 
   describe ".serialize" do
@@ -110,7 +110,7 @@ RSpec.describe Metanorma::Mirror::Serialization::YamlSerializer do
   end
 
   let(:node) do
-    Metanorma::Mirror::Model::Factory.from_h(node_hash)
+    Metanorma::Mirror::Model::Factory.from_hash(node_hash)
   end
 
   describe ".serialize" do

@@ -18,28 +18,30 @@ RSpec.describe Metanorma::Mirror::Model::Mark do
 
   it "serializes to hash" do
     mark = described_class.new(type: "emphasis")
-    expect(mark.to_h).to eq({ "type" => "emphasis" })
+    expect(mark.to_hash).to eq({ "type" => "emphasis" })
   end
 
   it "omits attrs when empty" do
     mark = described_class.new(type: "emphasis")
-    expect(mark.to_h).not_to have_key("attrs")
+    expect(mark.to_hash).not_to have_key("attrs")
   end
 
-  describe ".from_h" do
+  describe ".from_hash" do
     it "creates mark from hash" do
-      mark = described_class.from_h({ "type" => "link",
-                                      "attrs" => { "href" => "http://x.co" } })
+      mark = described_class.from_hash({ "type" => "link",
+                                         "attrs" => { "href" => "http://x.co" } })
       expect(mark.type).to eq("link")
       expect(mark.attrs["href"]).to eq("http://x.co")
     end
 
-    it "returns nil for nil input" do
-      expect(described_class.from_h(nil)).to be_nil
+    it "rejects nil input" do
+      # nil is not a wire value; the framework owns the contract
+      expect { described_class.from_hash(nil) }
+        .to raise_error(Lutaml::Model::InvalidFormatError)
     end
 
     it "defaults attrs to empty hash" do
-      mark = described_class.from_h({ "type" => "emphasis" })
+      mark = described_class.from_hash({ "type" => "emphasis" })
       expect(mark.attrs).to eq({})
     end
   end
@@ -87,12 +89,12 @@ RSpec.describe Metanorma::Mirror::Model::Mark do
   end
 
   describe "round-trip" do
-    it "to_h then from_h yields equivalent mark" do
+    it "to_hash then from_hash yields equivalent mark" do
       original = described_class.new(type: "link",
                                      attrs: {
                                        "href" => "http://x.co", "title" => "X"
                                      })
-      restored = described_class.from_h(original.to_h)
+      restored = described_class.from_hash(original.to_hash)
       expect(restored.type).to eq(original.type)
       expect(restored.attrs).to eq(original.attrs)
     end
