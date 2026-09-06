@@ -89,6 +89,16 @@ RSpec.describe Metanorma::Mko do
       expect(document["ids"]["short"]).to match(/\A[a-z0-9.-]+\z/)
     end
 
+    # lang provenance (#53 item 3): every unit carries how its lang
+    # was resolved — an all-English fixture resolves via section prose
+    # or the declared document language (no xml:lang anywhere)
+    it "carries the language resolution's provenance on every unit" do
+      bundle = export!
+      read_lines(bundle, "units.jsonl").each do |u|
+        expect(u["lang_source"]).to match(/\A(heuristic|default)\z/)
+      end
+    end
+
     it "carries parsed identity: doctype, edition, status, structure" do
       bundle = export!
       document = read_json(bundle, "document.json")

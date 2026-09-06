@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metanorma xmlns="https://www.metanorma.org/ns/standoc" type="semantic" version="3.3.4" schema-version="v2.1.5" flavor="iso">
+<bibdata type="standard">
+<title language="en" type="main">Weighing instruments — Metrological and technical requirements</title>
+<docidentifier type="ISO" primary="true">ISO 9999:2026</docidentifier>
+<docnumber>9999</docnumber>
+<edition>1</edition>
+<language>en</language>
+<status><stage abbreviation="IS">60</stage></status>
+<contributor><role type="publisher"/><organization><name>International Organization for Standardization</name><abbreviation>ISO</abbreviation></organization></contributor>
+<copyright><from>2026</from><owner><organization><name>International Organization for Standardization</name><abbreviation>ISO</abbreviation></organization></owner></copyright>
+<ext><doctype>international-standard</doctype><flavor>iso</flavor><stagename abbreviation="IS">International Standard</stagename></ext>
+</bibdata>
+<sections>
+<clause id="_sec-scope" type="scope" inline-header="false" obligation="normative">
+<title id="_t-scope">Scope</title>
+<p id="_p-scope-1">This document specifies the metrological and technical requirements that weighing instruments shall satisfy. For the purposes of this document, the terms and definitions given in the following clauses apply. The requirements of this clause are normative and shall be verified by the tests that are described in the annex.</p>
+</clause>
+<clause id="_sec-reserved" inline-header="false" obligation="normative">
+<title id="_t-reserved">Future requirements</title>
+<p id="_p-reserved">Reserved.</p>
+</clause>
+</sections>
+<annex id="_annex-a" anchor="annex-a" obligation="informative">
+<title id="_t-annex-a">Termes et définitions</title>
+<p id="_p-annex-intro">Le présent document spécifie les exigences métrologiques et techniques auxquelles les instruments de pesage doivent satisfaire. Pour les besoins du présent document, les termes et définitions suivants s'appliquent. Les définitions données dans la présente section sont conformes au Vocabulaire international de métrologie.</p>
+<terms id="_annex-terms" obligation="informative">
+<title id="_t-annex-terms">Termes</title>
+<term id="_term-instrument" anchor="term-instrument-de-pesage"><preferred><expression>
+<name>instrument de pesage</name>
+</expression>
+</preferred>
+<definition id="_def-instrument"><verbal-definition id="_vd-instrument"><p id="_p-def-instrument">instrument servant à déterminer la masse d'un corps en utilisant l'action de la pesanteur sur ce corps</p></verbal-definition></definition>
+</term>
+<term id="_term-charge" anchor="term-charge"><preferred><expression>
+<name>charge</name>
+</expression>
+</preferred>
+<definition id="_def-charge"><verbal-definition id="_vd-charge"><p id="_p-def-charge">valeur de la masse du poids ou de la marchandise que l'instrument doit mesurer dans les conditions normales d'utilisation</p></verbal-definition></definition>
+</term>
+</terms>
+</annex>
+</metanorma>
