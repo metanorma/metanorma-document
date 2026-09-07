@@ -16,6 +16,7 @@ module Metanorma
           attribute :group, :string
           attribute :spacing, :string
           attribute :indent, :string
+          attribute :fmt_ol, "Metanorma::Document::Components::Lists::FmtOlElement"
 
           def json_type
             "ol"
@@ -40,6 +41,7 @@ module Metanorma
             map_attribute "group", to: :group
             map_attribute "spacing", to: :spacing
             map_attribute "indent", to: :indent
+            map_element "fmt-ol", to: :fmt_ol
           end
         end
       end

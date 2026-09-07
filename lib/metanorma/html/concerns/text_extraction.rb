@@ -14,6 +14,21 @@ module Metanorma
         # display text.
         INVISIBLE_MATH_CHARS = "\u2060\u2061\u2062\u2063\u2064\u200b"
 
+        # Rendered fmt-* twins never contribute plain text alongside
+        # their semantic siblings — the pair linearizes one logical
+        # content (#51). Sibling-keyed twins skip only when the
+        # semantic element parsed; the always-skipped set are
+        # whole-block re-renderings (rendered to the exclusion of the
+        # semantic children by the overlay's own contract).
+        RENDERED_TWIN_SIBLING = {
+          "fmt-stem" => :stem,
+          "fmt-eref" => :eref,
+          "fmt-origin" => :origin,
+        }.freeze
+        RENDERED_TWIN_ALWAYS_SKIP = %w[
+          fmt-figure fmt-ul fmt-ol fmt-source fmt-date-inline
+        ].freeze
+
         # The quoted unitsml(...) macro reference names a unit symbol;
         # its linear form is the symbol itself ("unitsml(mV/V)" ->
         # "mV/V"). One nesting level for grouped exponents.
@@ -65,10 +80,7 @@ module Metanorma
               # text, it is not content: display text is the base alone
               next
             elsif el.element?
-              # The rendered twin of an already-walked semantic stem:
-              # presentation XML carries both forms; extracting both
-              # duplicates the math text (#51).
-              next if el.name == "fmt-stem" && semantic_stems?(node)
+              next if rendered_twin?(el.name, node)
 
               attr_name = element_to_attr[el.name]
               if attr_name
@@ -126,9 +138,19 @@ module Metanorma
           attrs.key?(:asciimath) && attrs.key?(:math)
         end
 
-        def semantic_stems?(node)
-          stems = safe_attr(node, :stem)
-          stems.is_a?(Array) ? stems.any? : !stems.nil?
+        def rendered_twin?(name, node)
+          return true if RENDERED_TWIN_ALWAYS_SKIP.include?(name)
+
+          sibling = RENDERED_TWIN_SIBLING[name] or return false
+
+          values = safe_attr(node, sibling)
+          siblings = Array(values).compact
+          return false if siblings.empty?
+
+          # The semantic form is authoritative when it carries text; an
+          # empty semantic element defers its label to the rendered
+          # twin (the overlay resolves empty erefs into fmt-eref).
+          siblings.any? { |s| !extract_plain_text(s).to_s.strip.empty? }
         end
 
         def normalize_math_text(text)

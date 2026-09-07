@@ -32,6 +32,7 @@ module Metanorma
             mapping.map_element "br", to: :br
             mapping.map_element "xref", to: :xref
             mapping.map_element "eref", to: :eref
+            mapping.map_element "fmt-eref", to: :fmt_eref
             mapping.map_element "link", to: :link
             mapping.map_element "stem", to: :stem
             mapping.map_element "fn", to: :fn
@@ -90,6 +91,9 @@ module Metanorma
           attribute :xref, Metanorma::Document::Components::Inline::XrefElement,
                     collection: true
           attribute :eref, Metanorma::Document::Components::Inline::ErefElement,
+                    collection: true
+          attribute :fmt_eref,
+                    Metanorma::Document::Components::Inline::FmtErefElement,
                     collection: true
           attribute :link, Metanorma::Document::Components::Inline::LinkElement,
                     collection: true
