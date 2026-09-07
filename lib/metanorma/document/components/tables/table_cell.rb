@@ -23,6 +23,7 @@ module Metanorma
             mapping.map_attribute "semx-id", to: :semx_id
             mapping.map_content to: :text
             mapping.map_element "em", to: :em
+            mapping.map_element "ruby", to: :ruby
             mapping.map_element "strong", to: :strong
             mapping.map_element "tt", to: :tt
             mapping.map_element "sub", to: :sub
@@ -31,6 +32,7 @@ module Metanorma
             mapping.map_element "br", to: :br
             mapping.map_element "xref", to: :xref
             mapping.map_element "eref", to: :eref
+            mapping.map_element "fmt-eref", to: :fmt_eref
             mapping.map_element "link", to: :link
             mapping.map_element "stem", to: :stem
             mapping.map_element "fn", to: :fn
@@ -73,6 +75,8 @@ module Metanorma
           # Inline elements
           attribute :em, Metanorma::Document::Components::Inline::EmRawElement,
                     collection: true
+          attribute :ruby, Metanorma::Document::Components::TextElements::RubyElement,
+                    collection: true
           attribute :strong, Metanorma::Document::Components::Inline::StrongRawElement,
                     collection: true
           attribute :tt, Metanorma::Document::Components::Inline::TtElement,
@@ -87,6 +91,9 @@ module Metanorma
           attribute :xref, Metanorma::Document::Components::Inline::XrefElement,
                     collection: true
           attribute :eref, Metanorma::Document::Components::Inline::ErefElement,
+                    collection: true
+          attribute :fmt_eref,
+                    Metanorma::Document::Components::Inline::FmtErefElement,
                     collection: true
           attribute :link, Metanorma::Document::Components::Inline::LinkElement,
                     collection: true

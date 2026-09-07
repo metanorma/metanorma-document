@@ -18,7 +18,9 @@ gem "metanorma-iec", github: "metanorma/metanorma-iec", branch: "main"
 gem "metanorma-iso", github: "metanorma/metanorma-iso", branch: "feat/model-validation-migration"
 gem "metanorma-itu", github: "metanorma/metanorma-itu", branch: "main"
 # mko >= 1.1.0 from rubygems carries Mko::Language
-gem "metanorma-mirror", github: "metanorma/metanorma-mirror", branch: "main" # flip to version on release
+# TEMPORARY pin: the svgmap/imagemap handlers (metanorma-mirror#1) —
+# flip to main on merge, to the version on release.
+gem "metanorma-mirror", github: "metanorma/metanorma-mirror", branch: "feat/svgmap-imagemap-handlers"
 gem "metanorma-mko"
 gem "metanorma-ogc", github: "metanorma/metanorma-ogc", branch: "main"
 gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "main"
@@ -42,7 +44,9 @@ gem "nokogiri"
 # 0.8.20 was yanked; 0.8.22+ pairs with moxml 0.5 whose preferred
 # adapter is leptris (fastest on every measured op per lutaml/moxml#96)
 gem "leptris", "~> 1.9"
-gem "lutaml-model", "~> 0.8.0", ">= 0.8.22", "< 0.9"
+# TEMPORARY pin: the json 3.0 to_json fix (lutaml-model#769) — flip to
+# the released version when it ships.
+gem "lutaml-model", github: "lutaml/lutaml-model", branch: "fix/767-json-register-kwarg"
 gem "moxml", "~> 0.5.30"
 gem "omml", github: "plurimath/omml", branch: "moxml-0.5-range" # TEMPORARY: moxml-0.5 range (plurimath/omml#11); flip to released version
 gem "rake", "~> 13.0"
