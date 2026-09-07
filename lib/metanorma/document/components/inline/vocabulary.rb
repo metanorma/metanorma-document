@@ -128,6 +128,18 @@ module Metanorma
               base.attribute :fmt_stem,
                              Metanorma::Document::Components::Inline::FmtStemElement,
                              collection: true
+              base.attribute :fmt_eref,
+                             Metanorma::Document::Components::Inline::FmtErefElement,
+                             collection: true
+              base.attribute :fmt_origin,
+                             Metanorma::Document::Components::Inline::FmtOriginElement,
+                             collection: true
+              base.attribute :fmt_source,
+                             Metanorma::Document::Components::Inline::FmtSourceElement,
+                             collection: true
+              base.attribute :fmt_date_inline,
+                             Metanorma::Document::Components::Inline::FmtDateInlineElement,
+                             collection: true
               base.attribute :fmt_concept,
                              Metanorma::Document::Components::Inline::FmtConceptElement,
                              collection: true
@@ -185,6 +197,10 @@ module Metanorma
               "fmt-date" => :fmt_date,
               "erefstack" => :erefstack,
               "fmt-stem" => :fmt_stem,
+              "fmt-eref" => :fmt_eref,
+              "fmt-origin" => :fmt_origin,
+              "fmt-source" => :fmt_source,
+              "fmt-date-inline" => :fmt_date_inline,
               "fmt-concept" => :fmt_concept,
               "fmt-fn-label" => :fmt_fn_label,
               "fmt-annotation-start" => :fmt_annotation_start,

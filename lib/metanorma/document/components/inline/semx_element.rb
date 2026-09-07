@@ -19,6 +19,12 @@ module Metanorma
           attribute :text, :string, collection: true
           attribute :fmt_xref, "Metanorma::Document::Components::Inline::FmtXrefElement",
                     collection: true
+          attribute :fmt_eref,
+                    "Metanorma::Document::Components::Inline::FmtErefElement",
+                    collection: true
+          attribute :fmt_origin,
+                    "Metanorma::Document::Components::Inline::FmtOriginElement",
+                    collection: true
           attribute :fmt_concept, "Metanorma::Document::Components::Inline::FmtConceptElement",
                     collection: true
           attribute :asciimath, AsciimathElement, collection: true
@@ -80,6 +86,8 @@ module Metanorma
             map_attribute "source", to: :source
             map_content to: :text
             map_element "fmt-xref", to: :fmt_xref
+            map_element "fmt-eref", to: :fmt_eref
+            map_element "fmt-origin", to: :fmt_origin
             map_element "fmt-concept", to: :fmt_concept
             map_element "asciimath", to: :asciimath
             map_element "math", to: :math

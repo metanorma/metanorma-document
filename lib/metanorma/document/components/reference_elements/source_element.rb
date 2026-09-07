@@ -10,6 +10,9 @@ module Metanorma
           attribute :type, :string
           attribute :origin, SourceOrigin
           attribute :modification, SourceModification
+          attribute :fmt_source,
+                    "Metanorma::Document::Components::Inline::FmtSourceElement",
+                    collection: true
 
           xml do
             element "source"
@@ -18,6 +21,7 @@ module Metanorma
             map_attribute "type", to: :type
             map_element "origin", to: :origin
             map_element "modification", to: :modification
+            map_element "fmt-source", to: :fmt_source
           end
         end
       end
