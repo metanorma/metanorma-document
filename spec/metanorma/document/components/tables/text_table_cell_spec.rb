@@ -31,4 +31,56 @@ RSpec.describe Metanorma::Document::Components::Tables do
     )
     expect(cell.to_xml).to include("stem")
   end
+
+  # #51: a stem carries the MathML rendering AND the AsciiMath source
+  # of one expression — linearizing both concatenates duplicates.
+  it "linearizes one stem form when math and asciimath both parse" do
+    cell = described_class::TextTableCell.from_xml(
+      '<td>Class C, <stem type="MathML"><math><mstyle><mn>3000</mn>' \
+      "</mstyle></math><asciimath>3000</asciimath></stem> intervals</td>",
+    )
+
+    expect(Metanorma::Document::PlainText.call(cell))
+      .to eq("Class C, 3000 intervals")
+  end
+
+  it "unwraps the quoted unitsml macro to the unit symbol" do
+    cell = described_class::TextTableCell.from_xml(
+      '<td>(<stem type="MathML"><math><mrow><mi>mV</mi></mrow></math>' \
+      '<asciimath>"unitsml(mV/V)"</asciimath></stem> or counts)</td>',
+    )
+
+    expect(Metanorma::Document::PlainText.call(cell))
+      .to eq("(mV/V or counts)")
+  end
+
+  it "falls back to the MathML token walk for math-only stems" do
+    cell = described_class::TextTableCell.from_xml(
+      "<td><stem type=\"MathML\"><math><mi>v</mi></math></stem></td>",
+    )
+
+    expect(Metanorma::Document::PlainText.call(cell)).to eq("v")
+  end
+
+  # Presentation XML carries the semantic stem and its rendered
+  # fmt-stem twin — the twin must not duplicate the math text.
+  it "skips the fmt-stem rendered twin when the semantic stem parsed" do
+    cell = described_class::TextTableCell.from_xml(
+      '<td><stem type="AsciiMath"><asciimath>x</asciimath></stem>' \
+      '<fmt-stem type="AsciiML"><semx element="stem" source="_s1">' \
+      "<asciimath>x</asciimath></semx></fmt-stem></td>",
+    )
+
+    expect(Metanorma::Document::PlainText.call(cell)).to eq("x")
+  end
+
+  # semx declares stem attributes for stem slices; an autonum slice
+  # populates none of them and must keep the plain text walk.
+  it "extracts semx autonum fragments that carry no math forms" do
+    cell = described_class::TextTableCell.from_xml(
+      '<td>see <semx element="autonum" source="_t1">7.2.1</semx></td>',
+    )
+
+    expect(Metanorma::Document::PlainText.call(cell)).to eq("see 7.2.1")
+  end
 end
