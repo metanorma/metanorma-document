@@ -21,7 +21,7 @@ gem "metanorma-itu", github: "metanorma/metanorma-itu", branch: "main"
 gem "metanorma-mirror", github: "metanorma/metanorma-mirror", branch: "main" # flip to version on release
 gem "metanorma-mko"
 gem "metanorma-ogc", github: "metanorma/metanorma-ogc", branch: "main"
-gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "feat/mirror-seed" # TEMPORARY: carries the MirrorSeed until its PR merges; then main
+gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "main"
 gem "plurimath", "~> 0.11"
 gem "pubid", ">= 2.0.0.pre.alpha.9"
 
