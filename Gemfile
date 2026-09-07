@@ -42,7 +42,9 @@ gem "nokogiri"
 # 0.8.20 was yanked; 0.8.22+ pairs with moxml 0.5 whose preferred
 # adapter is leptris (fastest on every measured op per lutaml/moxml#96)
 gem "leptris", "~> 1.9"
-gem "lutaml-model", "~> 0.8.0", ">= 0.8.22", "< 0.9"
+# TEMPORARY pin: the json 3.0 to_json fix (lutaml-model#769) — flip to
+# the released version when it ships.
+gem "lutaml-model", github: "lutaml/lutaml-model", branch: "fix/767-json-register-kwarg"
 gem "moxml", "~> 0.5.30"
 gem "omml", github: "plurimath/omml", branch: "moxml-0.5-range" # TEMPORARY: moxml-0.5 range (plurimath/omml#11); flip to released version
 gem "rake", "~> 13.0"
