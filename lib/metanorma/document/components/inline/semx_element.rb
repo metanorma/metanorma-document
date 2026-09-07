@@ -30,6 +30,7 @@ module Metanorma
           attribute :strong, StrongRawElement, collection: true
           attribute :origin, ErefElement, collection: true
           attribute :em, EmRawElement, collection: true
+          attribute :ruby, "Metanorma::Document::Components::TextElements::RubyElement", collection: true
           attribute :fmt_link, LinkElement, collection: true
           attribute :sup, SupElement, collection: true
           attribute :span, "Metanorma::Document::Components::Inline::SpanElement",
@@ -87,6 +88,7 @@ module Metanorma
             map_element "strong", to: :strong
             map_element "origin", to: :origin
             map_element "em", to: :em
+            map_element "ruby", to: :ruby
             map_element "fmt-link", to: :fmt_link
             map_element "sup", to: :sup
             map_element "span", to: :span

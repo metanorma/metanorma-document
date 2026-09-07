@@ -60,6 +60,10 @@ module Metanorma
             elsif el.name == "br"
               parts << " "
             # rubocop:enable Lint/DuplicateBranch
+            elsif el.name == "rt"
+              # ruby annotation (pronunciation) rides along the base
+              # text, it is not content: display text is the base alone
+              next
             elsif el.element?
               # The rendered twin of an already-walked semantic stem:
               # presentation XML carries both forms; extracting both
