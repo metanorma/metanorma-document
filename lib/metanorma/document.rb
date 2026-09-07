@@ -16,6 +16,10 @@ module Metanorma
   # for a seamless migration from/to those.
   module Document
     autoload :Components, "metanorma/document/components"
+    # Mirror: the format lives in the metanorma-mirror gem; this gem
+    # registers its model knowledge (handlers, mark tables, id
+    # categories) through the gem's seams.
+    autoload :MirrorSeed, "metanorma/document/mirror_seed"
     autoload :DataTypes, "metanorma/document/data_types"
     autoload :Elements, "metanorma/document/elements"
     autoload :ModelAccess, "metanorma/document/model_access"
@@ -44,9 +48,11 @@ module Metanorma
   autoload :BasicDocument, "#{__dir__}/basic_document"
   autoload :Collection, "metanorma/collection"
   autoload :Html, "metanorma/html"
-  autoload :Mirror, "metanorma/mirror"
   # Mko: the format lives in the metanorma-mko gem; Metanorma::Mko is
   # REOPENED by the model side (document/mko.rb) with the projection
   # walk and export entry points.
   autoload :Mko, "metanorma/document/mko"
 end
+
+require "metanorma/mirror"
+Metanorma::Document::MirrorSeed.register

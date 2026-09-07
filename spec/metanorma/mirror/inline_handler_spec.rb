@@ -16,9 +16,9 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
     Metanorma::Document::Components::Paragraphs::ParagraphBlock.from_xml(xml)
   end
 
-  describe "MARK_BUILDERS" do
+  describe "MirrorSeed::MARK_BUILDERS" do
     it "maps every inline element class to a callable builder" do
-      map = described_class::MARK_BUILDERS
+      map = Metanorma::Document::MirrorSeed::MARK_BUILDERS
       map.each_value do |builder|
         expect(builder).to be_a(Method).or be_a(Proc)
         result = builder.call(nil)
@@ -28,7 +28,7 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
     end
 
     it "includes emphasis and strong mappings" do
-      map = described_class::MARK_BUILDERS
+      map = Metanorma::Document::MirrorSeed::MARK_BUILDERS
       em_class = Metanorma::Document::Components::Inline::EmRawElement
       strong_class = Metanorma::Document::Components::Inline::StrongRawElement
       expect(map[em_class]).not_to be_nil
@@ -171,9 +171,9 @@ RSpec.describe Metanorma::Mirror::Handlers::Inline do
     end
   end
 
-  describe "RichHtmlRenderer::COMPLEX_RENDERERS" do
+  describe "MirrorSeed::RICH_RENDERERS" do
     it "maps each element class to a callable" do
-      described_class::RichHtmlRenderer::COMPLEX_RENDERERS.each_value do |renderer|
+      Metanorma::Document::MirrorSeed::RICH_RENDERERS.each_value do |renderer|
         expect(renderer).to be_a(Proc)
       end
     end
