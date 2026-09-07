@@ -32,7 +32,6 @@ gem "pubid", ">= 2.0.0.pre.alpha.9"
 if ENV["METANORMA_CI_EDGE"]
   gem "canon", github: "lutaml/canon", branch: "main"
   gem "mml", github: "plurimath/mml", branch: "main"
-  gem "moxml", github: "lutaml/moxml", branch: "main"
 elsif ENV["METANORMA_DEV_LOCAL"]
   gem "canon", path: "../../lutaml/canon"
   gem "mml", path: "../../plurimath/mml"
@@ -40,7 +39,12 @@ end
 
 gem "nokogiri"
 # 0.8.20 yanked; keep the lock below it (github/path pins above override)
-gem "lutaml-model", "~> 0.8.0", "< 0.8.20"
+# 0.8.20 was yanked; 0.8.22+ pairs with moxml 0.5 whose preferred
+# adapter is leptris (fastest on every measured op per lutaml/moxml#96)
+gem "leptris", "~> 1.9"
+gem "lutaml-model", "~> 0.8.0", ">= 0.8.22", "< 0.9"
+gem "moxml", "~> 0.5.30"
+gem "omml", github: "plurimath/omml", branch: "moxml-0.5-range" # TEMPORARY: moxml-0.5 range (plurimath/omml#11); flip to released version
 gem "rake", "~> 13.0"
 gem "rdoc"
 gem "rspec", "~> 3.0"
