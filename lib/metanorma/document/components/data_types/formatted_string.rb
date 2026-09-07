@@ -19,6 +19,8 @@ module Metanorma
                     collection: true
           attribute :em, Metanorma::Document::Components::Inline::EmRawElement,
                     collection: true
+          attribute :ruby, Metanorma::Document::Components::TextElements::RubyElement,
+                    collection: true
           attribute :strong, Metanorma::Document::Components::Inline::StrongRawElement,
                     collection: true
           attribute :smallcap, Metanorma::Document::Components::Inline::SmallCapElement,
@@ -68,6 +70,7 @@ module Metanorma
             map_element "semx", to: :semx
             map_element "span", to: :span
             map_element "em", to: :em
+            map_element "ruby", to: :ruby
             map_element "strong", to: :strong
             map_element "smallcap", to: :smallcap
             map_element "link", to: :link

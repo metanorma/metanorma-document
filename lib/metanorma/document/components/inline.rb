@@ -20,6 +20,7 @@ module Metanorma
                  "metanorma/document/components/inline/link_element"
         autoload :BrElement, "metanorma/document/components/inline/br_element"
         autoload :TabElement, "metanorma/document/components/inline/tab_element"
+        autoload :ColumnbreakElement, "metanorma/document/components/inline/columnbreak_element"
         autoload :AsciimathElement,
                  "metanorma/document/components/inline/asciimath_element"
         autoload :MathElement,

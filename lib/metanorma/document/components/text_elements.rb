@@ -12,6 +12,8 @@ module Metanorma
 
         autoload :MonospaceElement, "#{__dir__}/text_elements/monospace_element"
         autoload :RubyElement, "#{__dir__}/text_elements/ruby_element"
+        autoload :RubyPronunciationElement, "#{__dir__}/text_elements/ruby_pronunciation_element"
+        autoload :RubyAnnotationElement, "#{__dir__}/text_elements/ruby_annotation_element"
         autoload :SmallCapsElement,
                  "#{__dir__}/text_elements/small_caps_element"
         autoload :StemElement, "#{__dir__}/text_elements/stem_element"
