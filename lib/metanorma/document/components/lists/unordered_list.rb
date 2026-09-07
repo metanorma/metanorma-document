@@ -14,6 +14,7 @@ module Metanorma
           attribute :indent, :string
           attribute :bare, :boolean
           attribute :json_type, :string
+          attribute :fmt_ul, "Metanorma::Document::Components::Lists::FmtUlElement"
 
           def json_type
             "ul"
@@ -34,6 +35,7 @@ module Metanorma
             map_attribute "spacing", to: :spacing
             map_attribute "indent", to: :indent
             map_attribute "bare", to: :bare
+            map_element "fmt-ul", to: :fmt_ul
           end
         end
       end

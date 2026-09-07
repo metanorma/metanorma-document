@@ -10,6 +10,9 @@ module Metanorma
           attribute :script, :string
           attribute :value, :string
           attribute :format, :string
+          attribute :fmt_date_inline,
+                    "Metanorma::Document::Components::Inline::FmtDateInlineElement",
+                    collection: true
 
           xml do
             element "date"
@@ -17,6 +20,7 @@ module Metanorma
             map_attribute "script", to: :script
             map_attribute "value", to: :value
             map_attribute "format", to: :format
+            map_element "fmt-date-inline", to: :fmt_date_inline
           end
         end
       end

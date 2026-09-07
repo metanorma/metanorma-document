@@ -8,6 +8,7 @@ module Metanorma
                  "#{__dir__}/ancillary_blocks/callout_annotation"
         autoload :ExampleBlock, "#{__dir__}/ancillary_blocks/example_block"
         autoload :FigureBlock, "#{__dir__}/ancillary_blocks/figure_block"
+        autoload :FmtFigureElement, "#{__dir__}/ancillary_blocks/fmt_figure_element"
         autoload :SvgmapElement, "#{__dir__}/ancillary_blocks/svgmap_element"
         autoload :SvgTargetElement, "#{__dir__}/ancillary_blocks/svg_target_element"
         autoload :ImagemapElement, "#{__dir__}/ancillary_blocks/imagemap_element"

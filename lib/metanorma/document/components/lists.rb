@@ -8,6 +8,8 @@ module Metanorma
         autoload :Definition, "#{__dir__}/lists/definition"
         autoload :DefinitionList, "#{__dir__}/lists/definition_list"
         autoload :DtElement, "#{__dir__}/lists/dt_element"
+        autoload :FmtUlElement, "#{__dir__}/lists/fmt_list_element"
+        autoload :FmtOlElement, "#{__dir__}/lists/fmt_list_element"
         autoload :List, "#{__dir__}/lists/list"
         autoload :ListItem, "#{__dir__}/lists/list_item"
         autoload :OrderedList, "#{__dir__}/lists/ordered_list"

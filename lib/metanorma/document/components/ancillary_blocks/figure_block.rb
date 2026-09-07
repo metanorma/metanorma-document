@@ -81,6 +81,10 @@ module Metanorma
             map "name", to: :name
           end
 
+          attribute :fmt_figure,
+                    "Metanorma::Document::Components::AncillaryBlocks::FmtFigureElement",
+                    collection: true
+
           xml do
             element "figure"
             map_attribute "id", to: :id
@@ -105,6 +109,7 @@ module Metanorma
             map_element "key", to: :key
             map_element "fn", to: :footnotes
             map_element "note", to: :note
+            map_element "fmt-figure", to: :fmt_figure
             map_element "fmt-name", to: :fmt_name
             map_element "fmt-xref-label", to: :fmt_xref_label
           end
