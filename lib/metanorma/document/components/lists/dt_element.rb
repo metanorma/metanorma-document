@@ -19,6 +19,8 @@ module Metanorma
                     collection: true
           attribute :em, "Metanorma::Document::Components::Inline::EmRawElement",
                     collection: true
+          attribute :ruby, "Metanorma::Document::Components::TextElements::RubyElement",
+                    collection: true
           attribute :strong, "Metanorma::Document::Components::Inline::StrongRawElement",
                     collection: true
           attribute :sub, :string, collection: true
@@ -52,6 +54,7 @@ module Metanorma
             map_element "span", to: :span
             map_element "tt", to: :tt
             map_element "em", to: :em
+            map_element "ruby", to: :ruby
             map_element "strong", to: :strong
             map_element "sub", to: :sub
             map_element "sup", to: :sup
