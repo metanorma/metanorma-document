@@ -79,19 +79,23 @@ module Metanorma
         standoc: %w[
           abbreviation-type acknowledgements amend annex annotation-container
           appendix autonumber bibliography boilerplate clause colophon
-          copyright-statement document executivesummary expression
+          copyright-statement executivesummary expression
           feedback-statement field-of-application floating-title foreword form
           gender graphical-symbol grammar grammar-value indexsect introduction
           isAdjective isAdverb isNoun isParticiple isPreposition isVerb label
           legal-statement letter-symbol license-statement metanorma-extension
           newcontent non-verbal-representation option preface pronunciation
-          related section sections select source-highlighter-css term
+          related sections select source-highlighter-css term
           termdocsource termexample termnote terms textarea toc usage-info
           fmt-deprecates fmt-related
         ],
         relaton: %w[altsource],
         reqt: %w[attribute],
-        basicdoc_only: %w[variable-ref],
+        # basicdoc's own parallel document structure (basicdoc root
+        # `document`, generic nested `section`) — standoc content
+        # models reference neither; the collection manifest root is the
+        # metanorma gem's own model.
+        basicdoc_only: %w[document section variable-ref],
       }.freeze
 
       # Presentation-overlay elements with no model yet. EMPTY since
