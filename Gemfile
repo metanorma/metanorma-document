@@ -23,7 +23,9 @@ gem "metanorma-itu", github: "metanorma/metanorma-itu", branch: "main"
 gem "metanorma-mirror", github: "metanorma/metanorma-mirror", branch: "feat/svgmap-imagemap-handlers"
 gem "metanorma-mko"
 gem "metanorma-ogc", github: "metanorma/metanorma-ogc", branch: "main"
-gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "main"
+# TEMPORARY pin: svgmap/imagemap/columnbreak section wiring
+# (standoc#1251) for the renderer specs — flip to main on merge.
+gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "feat/svgmap-block-wiring"
 gem "plurimath", "~> 0.11"
 gem "pubid", ">= 2.0.0.pre.alpha.9"
 

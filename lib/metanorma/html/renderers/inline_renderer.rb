@@ -183,6 +183,24 @@ module Metanorma
           render_liquid("_br.html.liquid", {})
         end
 
+        def render_ruby(ruby)
+          annotation = safe_attr(ruby, :pronunciation) ||
+            safe_attr(ruby, :annotation)
+          annotation_value = annotation && safe_attr(annotation, :value)
+          annotation_value ||= Array(safe_attr(ruby, :ruby_text)).join
+          render_liquid("_ruby.html.liquid",
+                        "base" => ruby_base_text(ruby),
+                        "annotation" => annotation_value)
+        end
+
+        # Semantic form: the annotated text is the ruby's own mixed
+        # content; presentation form: the rb element carries it.
+        def ruby_base_text(ruby)
+          base = safe_attr(ruby, :ruby_base)
+          source = base || ruby
+          Array(safe_attr(source, :text)).join
+        end
+
         def render_tab(*)
           "  "
         end

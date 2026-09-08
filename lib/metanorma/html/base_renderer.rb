@@ -413,6 +413,12 @@ module Metanorma
                       :render_bookmark
       register_render Metanorma::Document::Components::Inline::SemxElement,
                       :render_semx_content
+      register_render Metanorma::Document::Components::Inline::ColumnbreakElement,
+                      :render_columnbreak
+      register_render Metanorma::Document::Components::AncillaryBlocks::SvgmapElement,
+                      :render_svgmap
+      register_render Metanorma::Document::Components::AncillaryBlocks::ImagemapElement,
+                      :render_imagemap
 
       register_inline_render Metanorma::Document::Components::Inline::EmRawElement,
                              :render_em
@@ -432,6 +438,10 @@ module Metanorma
                              :render_strike
       register_inline_render Metanorma::Document::Components::Inline::BrElement,
                              :render_br
+      register_inline_render Metanorma::Document::Components::TextElements::RubyElement,
+                             :render_ruby
+      register_inline_render Metanorma::Document::Components::Inline::ColumnbreakElement,
+                             :render_columnbreak
       register_inline_render Metanorma::Document::Components::Inline::TabElement,
                              :render_tab
       register_inline_render Metanorma::Document::Components::Inline::LinkElement,
@@ -550,6 +560,10 @@ module Metanorma
         ""
       end
 
+      def render_columnbreak(*)
+        render_liquid("_columnbreak.html.liquid", {})
+      end
+
       # Block-dispatch entry point for inline content reached as a direct
       # child of a block container (render passes keyword args; the inline
       # pipeline does not accept them).
@@ -582,6 +596,7 @@ module Metanorma
       def render_underline(el) = @inline_renderer.render_underline(el)
       def render_strike(el) = @inline_renderer.render_strike(el)
       def render_br(*) = @inline_renderer.render_br
+      def render_ruby(el) = @inline_renderer.render_ruby(el)
       def render_tab(*) = @inline_renderer.render_tab
       def render_span(el) = @inline_renderer.render_span(el)
       def render_fn_inline(el) = @inline_renderer.render_fn_inline(el)
@@ -633,6 +648,16 @@ module Metanorma
       def render_definition_list(dl,
 **)
         @block_renderer.render_definition_list(dl, **)
+      end
+
+      def render_svgmap(svgmap,
+                        **)
+        @block_renderer.render_svgmap(svgmap, **)
+      end
+
+      def render_imagemap(imagemap,
+                          **)
+        @block_renderer.render_imagemap(imagemap, **)
       end
 
       def render_figure(figure,
