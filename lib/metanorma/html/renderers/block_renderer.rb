@@ -263,6 +263,23 @@ module Metanorma
           render_liquid("_figure.html.liquid", { "block" => drop })
         end
 
+        # Image maps render as their wrapped figure(s): the href
+        # rewriting they carry is an SVG asset transformation, not
+        # page markup.
+        def render_svgmap(svgmap, **)
+          render_wrapped_figures(svgmap, **)
+        end
+
+        def render_imagemap(imagemap, **)
+          render_wrapped_figures(imagemap, **)
+        end
+
+        def render_wrapped_figures(container, **opts)
+          Array(safe_attr(container, :figure)).map do |fig|
+            render_figure(fig, **opts)
+          end.join
+        end
+
         def render_image(image)
           src_val = image_source(image)
           attrs = element_attrs(
