@@ -42,7 +42,9 @@ module Metanorma
           bibdata = @document.bibdata
           return nil unless bibdata
 
-          identifiers = bibdata.doc_identifier
+          # Flavor bibdata shapes diverge (e.g. IETF carries no ISO-ish
+          # doc_identifier): no id rather than a method error.
+          identifiers = safe_attr(bibdata, :doc_identifier)
           return nil unless identifiers && !identifiers.empty?
 
           first_id = identifiers.first
