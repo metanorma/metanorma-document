@@ -24,6 +24,12 @@ module Metanorma
                       :render_foreword_section
       register_render "Metanorma::Standoc::Document::Sections::Introduction",
                       :render_introduction_section
+      register_render "Metanorma::Standoc::Document::Sections::Preface",
+                      :render_preface
+      register_render "Metanorma::Standoc::Document::Sections::ContentSection",
+                      :render_clause
+      register_render "Metanorma::Standoc::Document::Sections::DefinitionSection",
+                      :render_clause
       register_render "Metanorma::Standoc::Document::Sections::FloatingTitle",
                       :render_floating_title
       register_render "Metanorma::Standoc::Document::Blocks::AmendBlock",
