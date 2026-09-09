@@ -85,6 +85,16 @@ module Metanorma
           }.compact
           Mirror::Handlers.build_mark("span", attrs: attrs)
         },
+        Components::TextElements::RubyElement => ->(el) {
+          pron = Mirror::SafeAttr.read(el, :pronunciation)
+          ann = Mirror::SafeAttr.read(el, :annotation)
+          attrs = {
+            pronunciation: pron && Mirror::SafeAttr.read(pron, :value),
+            annotation: ann && Mirror::SafeAttr.read(ann, :value),
+            ruby_text: Array(Mirror::SafeAttr.read(el, :ruby_text)).join,
+          }.compact
+          Mirror::Handlers.build_mark("ruby", attrs: attrs)
+        },
       }.freeze
 
       SIMPLE_MARK_TYPES = {
@@ -164,6 +174,14 @@ module Metanorma
             registry.register(
               Components::AncillaryBlocks::FigureBlock,
               Mirror::Handlers::Figure,
+            )
+            registry.register(
+              Components::AncillaryBlocks::SvgmapElement,
+              Mirror::Handlers::Svgmap,
+            )
+            registry.register(
+              Components::AncillaryBlocks::ImagemapElement,
+              Mirror::Handlers::Imagemap,
             )
             registry.register(
               Components::AncillaryBlocks::SourcecodeBlock,

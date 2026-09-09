@@ -13,6 +13,7 @@ module Metanorma
 
           # Inline elements
           attribute :em, EmRawElement, collection: true
+          attribute :ruby, "Metanorma::Document::Components::TextElements::RubyElement", collection: true
           attribute :strong, StrongRawElement, collection: true
           attribute :sub, SubElement, collection: true
           attribute :sup, SupElement, collection: true
@@ -36,6 +37,7 @@ module Metanorma
             map_attribute "semx-id", to: :semx_id
             map_content to: :text
             map_element "em", to: :em
+            map_element "ruby", to: :ruby
             map_element "strong", to: :strong
             map_element "sub", to: :sub
             map_element "sup", to: :sup

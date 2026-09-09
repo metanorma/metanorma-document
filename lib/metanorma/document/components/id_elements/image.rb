@@ -12,6 +12,7 @@ module Metanorma
           attribute :anchor, :string
           attribute :semx_id, :string
           attribute :inline_svg, :string
+          attribute :inline_emf, :string
 
           xml do
             element "image"
@@ -21,6 +22,7 @@ module Metanorma
             map_attribute "anchor", to: :anchor
             map_attribute "semx-id", to: :semx_id
             map_element "svg", to: :inline_svg, raw: :element
+            map_element "emf", to: :inline_emf, raw: :element
           end
         end
       end

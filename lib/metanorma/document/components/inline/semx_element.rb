@@ -19,6 +19,12 @@ module Metanorma
           attribute :text, :string, collection: true
           attribute :fmt_xref, "Metanorma::Document::Components::Inline::FmtXrefElement",
                     collection: true
+          attribute :fmt_eref,
+                    "Metanorma::Document::Components::Inline::FmtErefElement",
+                    collection: true
+          attribute :fmt_origin,
+                    "Metanorma::Document::Components::Inline::FmtOriginElement",
+                    collection: true
           attribute :fmt_concept, "Metanorma::Document::Components::Inline::FmtConceptElement",
                     collection: true
           attribute :asciimath, AsciimathElement, collection: true
@@ -30,6 +36,7 @@ module Metanorma
           attribute :strong, StrongRawElement, collection: true
           attribute :origin, ErefElement, collection: true
           attribute :em, EmRawElement, collection: true
+          attribute :ruby, "Metanorma::Document::Components::TextElements::RubyElement", collection: true
           attribute :fmt_link, LinkElement, collection: true
           attribute :sup, SupElement, collection: true
           attribute :span, "Metanorma::Document::Components::Inline::SpanElement",
@@ -79,6 +86,8 @@ module Metanorma
             map_attribute "source", to: :source
             map_content to: :text
             map_element "fmt-xref", to: :fmt_xref
+            map_element "fmt-eref", to: :fmt_eref
+            map_element "fmt-origin", to: :fmt_origin
             map_element "fmt-concept", to: :fmt_concept
             map_element "asciimath", to: :asciimath
             map_element "math", to: :math
@@ -87,6 +96,7 @@ module Metanorma
             map_element "strong", to: :strong
             map_element "origin", to: :origin
             map_element "em", to: :em
+            map_element "ruby", to: :ruby
             map_element "fmt-link", to: :fmt_link
             map_element "sup", to: :sup
             map_element "span", to: :span

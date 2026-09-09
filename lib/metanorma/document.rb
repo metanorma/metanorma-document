@@ -22,6 +22,7 @@ module Metanorma
     autoload :MirrorSeed, "metanorma/document/mirror_seed"
     autoload :DataTypes, "metanorma/document/data_types"
     autoload :Elements, "metanorma/document/elements"
+    autoload :GrammarVocabulary, "metanorma/document/grammar_vocabulary"
     autoload :ModelAccess, "metanorma/document/model_access"
     autoload :NativeModels, "metanorma/document/native_models"
     autoload :PlainText, "metanorma/document/plain_text"

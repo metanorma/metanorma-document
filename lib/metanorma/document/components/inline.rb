@@ -20,6 +20,7 @@ module Metanorma
                  "metanorma/document/components/inline/link_element"
         autoload :BrElement, "metanorma/document/components/inline/br_element"
         autoload :TabElement, "metanorma/document/components/inline/tab_element"
+        autoload :ColumnbreakElement, "metanorma/document/components/inline/columnbreak_element"
         autoload :AsciimathElement,
                  "metanorma/document/components/inline/asciimath_element"
         autoload :MathElement,
@@ -44,6 +45,16 @@ module Metanorma
                  "metanorma/document/components/inline/span_element"
         autoload :FmtStemElement,
                  "metanorma/document/components/inline/fmt_stem_element"
+        autoload :FmtErefElement,
+                 "metanorma/document/components/inline/fmt_eref_element"
+        autoload :FmtOriginElement,
+                 "metanorma/document/components/inline/fmt_origin_element"
+        autoload :FmtSourceElement,
+                 "metanorma/document/components/inline/fmt_source_element"
+        autoload :FmtDateInlineElement,
+                 "metanorma/document/components/inline/fmt_date_inline_element"
+        autoload :SourcelocalityStackElement,
+                 "metanorma/document/components/inline/sourcelocality_stack_element"
         autoload :FmtFnLabelElement,
                  "metanorma/document/components/inline/fmt_fn_label_element"
         autoload :FmtConceptElement,

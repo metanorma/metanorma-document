@@ -110,7 +110,11 @@ module Metanorma
       BLOCK_SOURCES = {
         "table" => :tables, "figure" => :figures, "formula" => :formulas,
         "note" => :notes, "example" => :examples,
-        "sourcecode" => :sourcecode_blocks
+        "sourcecode" => :sourcecode_blocks,
+        # image maps: their wrapped figures are the content — each
+        # emits as a figure unit, the map's link geometry rides the
+        # native mirror object
+        "svgmap" => :svgmaps, "imagemap" => :imagemaps
       }.freeze
       # Element-name -> mapped attributes, for re-ordering a section's
       # child units into document order from element_order (the same
@@ -120,6 +124,7 @@ module Metanorma
         "clause" => %i[subsections clause], "terms" => %i[terms],
         "term" => %i[term terms],
         "table" => %i[tables], "figure" => %i[figures],
+        "svgmap" => %i[svgmaps], "imagemap" => %i[imagemaps],
         "formula" => %i[formulas], "note" => %i[notes],
         "example" => %i[examples], "sourcecode" => %i[sourcecode_blocks],
         "requirement" => %i[requirement],
@@ -685,7 +690,7 @@ module Metanorma
       def walk_blocks(section, parent_id, breadcrumb)
         BLOCK_SOURCES.flat_map do |type, attr|
           vals(section, attr)
-            .map { |block| send("walk_#{type}", block, parent_id, breadcrumb) }
+            .flat_map { |block| Array(send("walk_#{type}", block, parent_id, breadcrumb)) }
         end + walk_requirements(section, parent_id, breadcrumb)
       end
 
@@ -709,6 +714,21 @@ module Metanorma
           breadcrumb: breadcrumb, text: payload.embed_text,
           model: table, payload: payload
         )
+      end
+
+      # Image maps: the wrapped figures are the content — each emits
+      # as a figure unit (caption, image, native mirror); the map's
+      # link geometry travels in the mirror object.
+      def walk_svgmap(svgmap, parent_id, breadcrumb)
+        vals(svgmap, :figure).map do |figure|
+          walk_figure(figure, parent_id, breadcrumb)
+        end
+      end
+
+      def walk_imagemap(imagemap, parent_id, breadcrumb)
+        vals(imagemap, :figure).map do |figure|
+          walk_figure(figure, parent_id, breadcrumb)
+        end
       end
 
       def walk_figure(figure, parent_id, breadcrumb)
