@@ -13,6 +13,7 @@
 
 ### Fixed
 
+- `Moxml::Adapter::Nokogiri.children` override accepts the `entity_bearing:` keyword of moxml 0.5.36 and later (#66)
 - Roundtrip fidelity: missing attributes, model corrections, and Canon config alignment
 - Stale `Semantic::Root` reference in rake task
 
