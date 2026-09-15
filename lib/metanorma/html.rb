@@ -18,7 +18,9 @@ module Metanorma
           remove_method :children
         end
 
-        def self.children(node)
+        # moxml 0.5.36+ passes `entity_bearing:`. The Nokogiri adapter
+        # does not use it, so accept it and ignore it.
+        def self.children(node, **)
           node.children.to_a
         end
       end
