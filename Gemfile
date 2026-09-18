@@ -48,6 +48,7 @@ gem "leptris", "~> 1.9"
 # the released version when it ships.
 gem "lutaml-model", github: "lutaml/lutaml-model", branch: "fix/767-json-register-kwarg"
 gem "moxml", "~> 0.5.30"
+# 0.2.6 (2026-09-08) carries the moxml-0.5 range (plurimath/omml#11)
 gem "omml", "~> 0.2.6"
 gem "rake", "~> 13.0"
 gem "rdoc"
