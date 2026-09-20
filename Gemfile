@@ -46,7 +46,7 @@ gem "leptris", "~> 1.9"
 # the released version when it ships.
 gem "lutaml-model", github: "lutaml/lutaml-model", branch: "fix/767-json-register-kwarg"
 gem "moxml", "~> 0.5.30"
-gem "omml", github: "plurimath/omml", branch: "moxml-0.5-range" # TEMPORARY: moxml-0.5 range (plurimath/omml#11); flip to released version
+gem "omml", "~> 0.2.6"
 gem "rake", "~> 13.0"
 gem "rdoc"
 gem "rspec", "~> 3.0"
