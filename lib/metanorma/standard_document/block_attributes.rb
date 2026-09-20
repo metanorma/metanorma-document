@@ -54,12 +54,29 @@ module Metanorma
     # Provides `blocks` method for ordered-content section types.
     # Returns child nodes in document order via `each_mixed_content`.
     module OrderedContent
+      # Section metadata mapped by SectionXmlMapping (title machinery
+      # and annotation markers) precedes the content alternation in
+      # the grammar — `blocks` answers content children only.
+      SECTION_METADATA_ELEMENTS = [
+        Metanorma::Document::Components::Inline::TitleWithAnnotationElement,
+        Metanorma::Document::Components::Inline::VariantTitleElement,
+        Metanorma::Document::Components::Inline::FmtTitleElement,
+        Metanorma::Document::Components::Inline::FmtXrefLabelElement,
+        Metanorma::Document::Components::Inline::FmtAnnotationStartElement,
+        Metanorma::Document::Components::Inline::FmtAnnotationEndElement,
+      ].freeze
+
       def blocks
         @blocks ||=
           begin
             result = []
             each_mixed_content do |node|
-              result << node unless node.is_a?(String)
+              next if node.is_a?(String)
+              next if SECTION_METADATA_ELEMENTS.any? do |klass|
+                node.is_a?(klass)
+              end
+
+              result << node
             end
             result
           end
