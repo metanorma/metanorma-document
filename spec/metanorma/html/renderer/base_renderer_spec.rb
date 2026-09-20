@@ -198,6 +198,28 @@ RSpec.describe Metanorma::Html::BaseRenderer do
       )
       expect(method).to eq(:render_noop)
     end
+
+    it "no-ops the annotation boundary markers at block dispatch" do
+      aggregate_failures do
+        %i[FmtAnnotationStartElement FmtAnnotationEndElement].each do |short|
+          klass = Metanorma::Document::Components::Inline.const_get(short)
+          method = renderer.lookup_dispatch(klass, :render_registry)
+          expect(method).to eq(:render_noop), "#{short} must render as a no-op"
+        end
+      end
+    end
+
+    it "renders a section whose children include annotation markers without warnings" do
+      model = Metanorma::StandardDocument::Sections::ClauseSection.from_xml(<<~XML)
+        <clause id="_c1"><title>Annotated</title>
+          <fmt-annotation-start id="_a1"/>
+          <p>Annotated region</p>
+          <fmt-annotation-end target="_a1"/>
+        </clause>
+      XML
+      expect { renderer.render_ordered_content(model) }
+        .not_to output(/no renderer registered/).to_stderr
+    end
   end
 
   describe "labeled lists (fmt-name markers)" do

@@ -533,6 +533,12 @@ module Metanorma
       # through when it appears in block context.
       register_render Metanorma::Document::Components::Inline::FmtXrefLabelElement,
                       :render_block_inline_content
+      # Annotation boundary markers fence an annotated region; they carry
+      # no renderable content of their own at block dispatch.
+      register_render Metanorma::Document::Components::Inline::FmtAnnotationStartElement,
+                      :render_noop
+      register_render Metanorma::Document::Components::Inline::FmtAnnotationEndElement,
+                      :render_noop
 
       def lookup_dispatch(type_class, registry_method)
         # Registry contents are fixed once renderer classes are loaded, so
