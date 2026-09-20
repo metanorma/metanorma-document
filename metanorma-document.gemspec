@@ -43,7 +43,6 @@ Gem::Specification.new do |spec|
   # pubid has no stable 2.x release yet (latest: 2.0.0.pre.alpha.x);
   # relax this pin once pubid 2.0.0 ships.
   spec.add_dependency "pubid", "~> 2.0.0.pre.alpha"
-  # Tracking the relaton 2.0 prerelease line for the relaton-bib
-  # migration (P3.18); pin to stable once relaton-bib 2.2.0 ships.
-  spec.add_dependency "relaton-bib", ">= 2.2.0.pre.alpha.1", "< 2.3.0"
+  # relaton v3 monorepo absorbed relaton-bib; track it until stable.
+  spec.add_dependency "relaton", ">= 3.0.0.pre.alpha.1"
 end
