@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require "metanorma/registers"
 
 module Metanorma
   module CsaDocument
