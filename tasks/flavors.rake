@@ -69,8 +69,11 @@ def flavor_probe_script(flavor, dir, fixtures)
     require "metanorma/html/generator"
     require "timeout"
     root = nil
-    [Metanorma::Core::Flavors].each do |_|
-      Metanorma::Core::Flavors.table.reverse_each do |entry|
+    # Older metanorma-core resolutions predate the Flavors table; the
+    # constant lookup then falls through to the Root convention below.
+    flavors_mod = Object.const_defined?("Metanorma::Core::Flavors") ? Metanorma::Core::Flavors : nil
+    [flavors_mod].compact.each do |mod|
+      mod.table.reverse_each do |entry|
         next if entry.respond_to?(:taste?) && entry.taste?
         next unless entry.name.to_s == "\#{flavor}"
         mc = entry.model_root_class rescue nil
