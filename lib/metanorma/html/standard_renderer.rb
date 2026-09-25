@@ -324,7 +324,11 @@ module Metanorma
           if fmt_definition.respond_to?(:dl) && fmt_definition.dl
             parts << (render(fmt_definition.dl) || "")
           end
-          return parts.join
+          # Some flavors nest the fmt content inside <semx> wrappers the
+          # FmtDefinition model does not decompose; when the fmt block
+          # yields nothing, fall through to the semantic definition so
+          # the term content is not lost.
+          return parts.join unless parts.join.strip.empty?
         end
 
         parts = []
