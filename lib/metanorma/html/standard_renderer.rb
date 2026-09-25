@@ -302,7 +302,30 @@ module Metanorma
       end
 
       def render_term_definitions(term, fmt_definition)
-        return render_ordered_content(fmt_definition) || "" if fmt_definition
+        if fmt_definition
+          parts = []
+          if fmt_definition.respond_to?(:p)
+            Array(fmt_definition.p).each do |para|
+              parts << (render_paragraph(para) || "")
+            end
+          end
+          if fmt_definition.respond_to?(:termnote)
+            Array(fmt_definition.termnote).each do |note|
+              parts << (render_term_note(note) || "")
+            end
+          end
+          %i[ol ul].each do |list_type|
+            next unless fmt_definition.respond_to?(list_type)
+
+            Array(fmt_definition.public_send(list_type)).each do |list|
+              parts << (render(list) || "")
+            end
+          end
+          if fmt_definition.respond_to?(:dl) && fmt_definition.dl
+            parts << (render(fmt_definition.dl) || "")
+          end
+          return parts.join
+        end
 
         parts = []
         safe_attr(term, :p)&.each do |para|
