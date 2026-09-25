@@ -13,8 +13,9 @@ module Metanorma
       # subtree are dropped, lutaml-model#871).
       begin
         require "leptris"
+        adapter = ENV["METANORMA_DOCUMENT_XML_ADAPTER"]
         Lutaml::Model.configure do |config|
-          config.xml_adapter_type = :leptris
+          config.xml_adapter_type = (adapter && !adapter.empty?) ? adapter.to_sym : :leptris
         end
       rescue LoadError
         nil
