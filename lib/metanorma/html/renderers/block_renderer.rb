@@ -175,11 +175,7 @@ module Metanorma
           items = ul.listitem&.filter_map do |li|
             render_list_item_content(li, labeled: labeled)
           end || []
-          render_liquid("_list.html.liquid", {
-                          "list_tag" => "ul",
-                          "attrs" => attrs,
-                          "items" => items,
-                        })
+          render_list_with_attached_notes(ul, items, "ul", attrs)
         end
 
         def render_table_cell(cell, force_tag = nil)
@@ -206,11 +202,30 @@ module Metanorma
           items = ol.listitem&.filter_map do |li|
             render_list_item_content(li, labeled: labeled)
           end || []
-          render_liquid("_list.html.liquid", {
-                          "list_tag" => "ol",
-                          "attrs" => attrs,
-                          "items" => items,
-                        })
+          render_list_with_attached_notes(ol, items, "ol", attrs)
+        end
+
+        # Lists can carry attached notes (e.g. <note> siblings of the
+        # <li> children); render them after the list items so they are
+        # not dropped.
+        def render_list_with_attached_notes(list, items, list_tag, attrs)
+          items_html = render_liquid("_list.html.liquid", {
+                                       "list_tag" => list_tag,
+                                       "attrs" => attrs,
+                                       "items" => items,
+                                     })
+          notes = safe_attr(list, :note)
+          note_parts = Array(notes).filter_map { |note| coordinator.render(note) || "" }
+          return items_html if note_parts.empty?
+
+          note_html = render_liquid("_element.html.liquid", {
+                                      "tag" => "div",
+                                      "extra_attrs" => element_attrs(
+                                        class: "list-attached-notes",
+                                      ),
+                                      "content" => note_parts.join,
+                                    })
+          items_html + note_html
         end
 
         def render_list_item_content(li, labeled: false)
