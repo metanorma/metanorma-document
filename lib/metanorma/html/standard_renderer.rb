@@ -37,6 +37,8 @@ module Metanorma
 
       def render_standard_document(doc, **_opts)
         cover = render_coverpage(doc)
+        cover += render_boilerplate(doc) if doc.respond_to?(:boilerplate) &&
+          doc.boilerplate
 
         content_parts = []
         content_parts << (render(doc.preface) || "") if doc.preface
@@ -69,6 +71,27 @@ module Metanorma
         render_liquid("_cover.html.liquid", {
                         "doc_id" => cover_id,
                         "title" => title_text,
+                      })
+      end
+
+      # The document <boilerplate> front-matter block (copyright,
+      # licence, legal and feedback statements): part of the native
+      # cover matter, rendered right after the title cover.
+      def render_boilerplate(doc)
+        boilerplate = doc.boilerplate
+        parts = []
+        %i[copyright_statement license_statement legal_statement
+           feedback_statement clause paragraphs quote_blocks].each do |grouping|
+          Array(boilerplate.public_send(grouping)).each do |child|
+            parts << (render(child, level: 1) || "")
+          end
+        end
+        render_liquid("_element.html.liquid", {
+                        "tag" => "div",
+                        "extra_attrs" => element_attrs(
+                          class: "document-boilerplate",
+                        ),
+                        "content" => parts.join,
                       })
       end
 
@@ -369,7 +392,10 @@ module Metanorma
 
       def extract_term_name(term)
         fmt_pref = safe_attr(term, :fmt_preferred)
-        if fmt_pref && !fmt_pref.empty?
+        if fmt_pref.is_a?(String) && !fmt_pref.empty?
+          return fmt_pref
+        end
+        if fmt_pref.is_a?(Array) && !fmt_pref.empty?
           fp = fmt_pref.first
           if fp.p && !fp.p.empty?
             return extract_plain_text(fp.p.first)
@@ -395,10 +421,12 @@ module Metanorma
       end
 
       def render_term_designation(designation, _type)
-        name = extract_designation_name(designation)
-        return nil unless name
+        name_element = designation_name_element(designation)
+        return nil unless name_element
 
-        inner = escape_html(name)
+        inner = Array(name_element).map do |n|
+          n.is_a?(String) ? escape_html(n) : render_mixed_inline(n)
+        end.join
         dfn = render_liquid("_element.html.liquid",
                             { "tag" => "dfn", "extra_attrs" => "",
                               "content" => inner })
@@ -412,17 +440,42 @@ module Metanorma
                       })
       end
 
+      # The raw name element(s) of a designation — String or
+      # mixed-content name elements (e.g. TermNameElement) — for rich
+      # inline rendering by the caller.
+      def designation_name_element(designation)
+        if designation.is_a?(Metanorma::StandardDocument::Terms::Designation) && designation.expression
+          expr = designation.expression
+          if expr.is_a?(Metanorma::StandardDocument::Terms::TermExpression) && expr.name
+            expr.name
+          end
+        elsif designation.is_a?(Metanorma::StandardDocument::Terms::TermExpression)
+          designation.name
+        end
+      end
+
       def extract_designation_name(designation)
         if designation.is_a?(Metanorma::StandardDocument::Terms::Designation) && designation.expression
           expr = designation.expression
           if expr.is_a?(Metanorma::StandardDocument::Terms::TermExpression) && expr.name
-            Array(expr.name).join
+            join_designation_names(expr.name)
           end
         elsif designation.is_a?(Metanorma::StandardDocument::Terms::TermExpression) && designation.name
-          Array(designation.name).join
+          join_designation_names(designation.name)
         else
           extract_text_value(designation)
         end
+      end
+
+      # Designation names may be plain strings or mixed-content name
+      # elements (e.g. TermNameElement); stringify through the text
+      # extractors instead of Object#to_s.
+      def join_designation_names(names)
+        Array(names).map do |n|
+          next n if n.is_a?(String)
+
+          extract_plain_text(n) || extract_text_value(n) || ""
+        end.join
       end
 
       def render_term_definition(definition)
@@ -431,6 +484,11 @@ module Metanorma
 
         ve = definition.verbalexpression
         return nil unless ve
+
+        walked = collect_ordered_children(ve)
+        unless walked.empty?
+          return walked.filter_map { |child| render(child) }.join
+        end
 
         parts = []
         ve.paragraph&.each { |para| parts << (render_paragraph(para) || "") }
