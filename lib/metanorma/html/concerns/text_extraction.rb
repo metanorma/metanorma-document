@@ -179,7 +179,10 @@ module Metanorma
                 if v
                   extract_text_value(v)
                 else
-                  val.to_s
+                  # NEVER fall back to val.to_s here: Serializable#to_s
+                  # serializes the whole XML subtree, which over large
+                  # documents costs quadratic time and memory.
+                  extract_plain_text(val) || ""
                 end
               end
             end
