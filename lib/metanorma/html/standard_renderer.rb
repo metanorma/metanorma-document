@@ -99,11 +99,29 @@ module Metanorma
         if with_terms
           section.terms&.each { |term| parts << (render_term(term, level: level + 1) || "") }
         end
+        parts << (render_section_groupings(section, level,
+                                           skip_terms: with_terms) || "")
         render_liquid("_element.html.liquid", {
                         "tag" => "div",
                         "extra_attrs" => attrs,
                         "content" => parts.join,
                       })
+      end
+
+      # Clause-embedded terms/definitions/references groupings are not
+      # `clause` children, so render_subsections skips them and their
+      # content would be lost. Render each grouping's children through
+      # the normal dispatch (DefinitionSection, ReferenceSection, Term).
+      def render_section_groupings(section, level, skip_terms: false)
+        parts = []
+        %i[terms definitions references].each do |grouping|
+          next if skip_terms && grouping == :terms
+
+          Array(safe_attr(section, grouping)).each do |child|
+            parts << (render(child, level: level + 1) || "")
+          end
+        end
+        parts.join
       end
 
       def render_clause_section(section, level: 1, **)
