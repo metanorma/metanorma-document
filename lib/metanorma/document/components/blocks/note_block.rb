@@ -63,6 +63,9 @@ module Metanorma
             map_attribute "anchor", to: :anchor
             map_attribute "removeInRFC", to: :remove_in_rfc
             map_element "name", to: :name
+            # Presentation term notes carry their label in <fmt-name>
+            # ("Note 1 to entry"); treat it as the note name.
+            map_element "fmt-name", to: :name
             map_element "p", to: :content
             map_element "formula", to: :formula
             map_element "dl", to: :dl
