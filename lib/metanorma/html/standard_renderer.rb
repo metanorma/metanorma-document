@@ -597,8 +597,11 @@ module Metanorma
                    end
 
           modification = safe_attr(source, :modification)
-          if modification && !modification.to_s.empty?
-            parts << ", modified — #{escape_html(modification.to_s)}"
+          if modification
+            mod_html = Array(modification.p).filter_map do |para|
+              render_mixed_inline(para) || ""
+            end.join(" ")
+            parts << ", modified — #{mod_html}" unless mod_html.strip.empty?
           end
         else
           parts << (render_mixed_inline(source) || "")
