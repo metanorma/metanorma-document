@@ -86,7 +86,7 @@ module Metanorma
           legal-statement letter-symbol license-statement metanorma-extension
           newcontent non-verbal-representation option preface pronunciation
           related sections select source-highlighter-css term
-          termdocsource termexample termnote terms textarea toc usage-info
+          termdocsource termexample terms textarea toc usage-info
           fmt-deprecates fmt-related
         ],
         relaton: %w[altsource],
