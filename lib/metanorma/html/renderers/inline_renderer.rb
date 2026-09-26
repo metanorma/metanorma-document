@@ -540,7 +540,12 @@ module Metanorma
             return escape_html(element)
           end
 
-          method = coordinator.lookup_dispatch(element.class, :inline_registry)
+          # A block container nested in a mixed-content position (e.g. a
+          # definition list inside a <dd>) has no inline dispatch of its
+          # own; fall through to the block registry so it renders instead
+          # of being dropped.
+          method = coordinator.lookup_dispatch(element.class, :inline_registry) ||
+                   coordinator.lookup_dispatch(element.class, :render_registry)
           if method
             coordinator.public_send(method, element)
           elsif element.is_a?(Lutaml::Model::Serializable) && element.mixed?
