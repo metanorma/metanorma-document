@@ -6,6 +6,8 @@ module Metanorma
       register_render "Metanorma::Standoc::Document::Root",
                       :render_standard_document
       register_render "Metanorma::Standoc::Document::Terms::Term", :render_term
+      register_render "Metanorma::Standoc::Document::Terms::FmtDefinitionSemx",
+                      :render_fmt_definition_semx
       register_render "Metanorma::Standoc::Document::Sections::TermsSection",
                       :render_terms_section
       register_render "Metanorma::Standoc::Document::Sections::StandardReferencesSection",
@@ -312,6 +314,30 @@ module Metanorma
           parts << (render_term_definition(definition) || "")
         end
         parts.join
+      end
+
+      # The <semx> wrapper inside <fmt-definition> carries the definition's
+      # block content one level down (standoc FmtDefinitionSemx); render
+      # its children in document order.
+      def render_fmt_definition_semx(semx, **_opts)
+        parts = []
+        walk_ordered(semx) do |type, obj|
+          next unless type == :element
+
+          parts << case obj
+                   when Metanorma::Document::Components::Paragraphs::ParagraphBlock
+                     render_paragraph(obj)
+                   when Metanorma::Standoc::Document::Terms::TermNote
+                     render_term_note(obj)
+                   when Metanorma::Document::Components::Lists::DefinitionList
+                     render_definition_list(obj)
+                   when Metanorma::Document::Components::Lists::OrderedList
+                     render_ordered_list(obj)
+                   when Metanorma::Document::Components::Lists::UnorderedList
+                     render_unordered_list(obj)
+                   end
+        end
+        parts.compact.join
       end
 
       def render_term_note_parts(term)
