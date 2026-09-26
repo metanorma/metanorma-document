@@ -82,6 +82,8 @@ module Metanorma
         parts = []
         %i[copyright_statement license_statement legal_statement
            feedback_statement clause paragraphs quote_blocks].each do |grouping|
+          next unless boilerplate.respond_to?(grouping)
+
           Array(boilerplate.public_send(grouping)).each do |child|
             parts << (render(child, level: 1) || "")
           end
@@ -324,10 +326,34 @@ module Metanorma
           if fmt_definition.respond_to?(:dl) && fmt_definition.dl
             parts << (render(fmt_definition.dl) || "")
           end
-          # Some flavors nest the fmt content inside <semx> wrappers the
-          # FmtDefinition model does not decompose; when the fmt block
-          # yields nothing, fall through to the semantic definition so
-          # the term content is not lost.
+          # Some flavors wrap the fmt content in <semx> (iho/standoc);
+          # render its children in place.
+          if fmt_definition.respond_to?(:semx)
+            Array(fmt_definition.semx).each do |sx|
+              if sx.respond_to?(:p)
+                Array(sx.p).each do |para|
+                  parts << (render_paragraph(para) || "")
+                end
+              end
+              if sx.respond_to?(:termnote)
+                Array(sx.termnote).each do |note|
+                  parts << (render_term_note(note) || "")
+                end
+              end
+              %i[ol ul].each do |list_type|
+                next unless sx.respond_to?(list_type)
+
+                Array(sx.public_send(list_type)).each do |list|
+                  parts << (render(list) || "")
+                end
+              end
+              if sx.respond_to?(:dl) && sx.dl
+                parts << (render(sx.dl) || "")
+              end
+            end
+          end
+          # When the fmt block yields nothing, fall through to the
+          # semantic definition so the term content is not lost.
           return parts.join unless parts.join.strip.empty?
         end
 
