@@ -28,10 +28,12 @@ module Metanorma
                       :render_introduction_section
       register_render "Metanorma::Standoc::Document::Sections::Preface",
                       :render_preface
+      register_render "Metanorma::Standoc::Document::Sections::Sections",
+                      :render_standard_section
       register_render "Metanorma::Standoc::Document::Sections::ContentSection",
-                      :render_clause
+                      :render_standard_section
       register_render "Metanorma::Standoc::Document::Sections::DefinitionSection",
-                      :render_clause
+                      :render_standard_section
       register_render "Metanorma::Standoc::Document::Sections::FloatingTitle",
                       :render_floating_title
       register_render "Metanorma::Standoc::Document::Blocks::AmendBlock",
@@ -121,13 +123,20 @@ module Metanorma
                  else
                    render_standard_title(section, level) || ""
                  end
-        parts << (render_standard_section_blocks(section, level) || "")
-        parts << (render_subsections(section, level) || "") if with_subsections
-        if with_terms
-          section.terms&.each { |term| parts << (render_term(term, level: level + 1) || "") }
+        if section.respond_to?(:element_order) && Array(section.element_order).any?
+          # Document order (element_order) preserves interleaved blocks —
+          # paragraphs between figures, notes between lists — which the
+          # attribute-grouping path below cannot express.
+          parts << (render_ordered_content(section, level) || "")
+        else
+          parts << (render_standard_section_blocks(section, level) || "")
+          parts << (render_subsections(section, level) || "") if with_subsections
+          if with_terms
+            section.terms&.each { |term| parts << (render_term(term, level: level + 1) || "") }
+          end
+          parts << (render_section_groupings(section, level,
+                                             skip_terms: with_terms) || "")
         end
-        parts << (render_section_groupings(section, level,
-                                           skip_terms: with_terms) || "")
         render_liquid("_element.html.liquid", {
                         "tag" => "div",
                         "extra_attrs" => attrs,
