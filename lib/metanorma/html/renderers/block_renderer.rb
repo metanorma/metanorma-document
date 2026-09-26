@@ -266,10 +266,27 @@ module Metanorma
             dd_html = dd ? coordinator.render_mixed_inline(dd) : nil
             { "dt" => dt_html, "dd" => dd_html }
           end || []
-          render_liquid("_definition_list.html.liquid", {
-                          "attrs" => attrs,
-                          "terms" => terms,
-                        })
+          html = render_liquid("_definition_list.html.liquid", {
+                                 "attrs" => attrs,
+                                 "terms" => terms,
+                               })
+          attached_notes_html(dl, html)
+        end
+
+        # Notes attached to a rendered list container (dl notes are not
+        # list items); emitted after the list body so they are not dropped.
+        def attached_notes_html(list, html)
+          note_parts = Array(safe_attr(list, :note))
+                       .filter_map { |note| coordinator.render(note) || "" }
+          return html if note_parts.empty?
+
+          html + render_liquid("_element.html.liquid", {
+                                 "tag" => "div",
+                                 "extra_attrs" => element_attrs(
+                                   class: "list-attached-notes",
+                                 ),
+                                 "content" => note_parts.join,
+                               })
         end
 
         def render_figure(figure, **_opts)
