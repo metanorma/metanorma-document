@@ -15,6 +15,8 @@ module Metanorma
           attribute :name, Metanorma::Document::Components::Inline::NameWithIdElement
           attribute :dt, DtElement, collection: true
           attribute :dd, DdElement, collection: true
+          attribute :note, "Metanorma::Document::Components::Blocks::NoteBlock",
+                    collection: true
           attribute :fmt_name, Metanorma::Document::Components::Inline::FmtNameElement
           attribute :json_type, :string
 
@@ -41,6 +43,7 @@ module Metanorma
             map_element "name", to: :name
             map_element "dt", to: :dt
             map_element "dd", to: :dd
+            map_element "note", to: :note
             map_element "fmt-name", to: :fmt_name
           end
         end
