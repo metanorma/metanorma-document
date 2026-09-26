@@ -70,9 +70,14 @@ module Metanorma
             map_element "dl", to: :dl
             map_element "example", to: :example
             map_element "note", to: :note
+<<<<<<< HEAD
             # Presentation XML nests term notes inside list items (e.g.
             # term definitions rendered as ordered lists); capture them
             # through the generic NoteBlock so the text is not lost.
+=======
+            # Term entries embed <termnote> (a note with an autonum label)
+            # inside list items; capture it through the note model.
+>>>>>>> 3c377a8 (model: capture termnote inside list items)
             map_element "termnote", to: :note
             map_element "quote", to: :quote
             map_element "table", to: :table
