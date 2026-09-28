@@ -770,24 +770,27 @@ module Metanorma
           citeas = safe_attr(origin, :citeas)
           bibitemid = safe_attr(origin, :bibitemid)
 
-          parts << if citeas && !citeas.to_s.empty?
-                     if bibitemid && !bibitemid.to_s.empty?
-                       render_liquid("_link.html.liquid", {
-                                       "attrs" => element_attrs(
-                                         href: "##{escape_html(bibitemid.to_s)}", class: "bibref",
-                                       ),
-                                       "content" => escape_html(citeas.to_s),
-                                     })
-                     else
-                       escape_html(citeas.to_s)
-                     end
+          # isodoc shows the origin's own text when the source states it
+          # (<origin citeas="ISO 19101">ISO 19101-1:2014</origin>),
+          # falling back to the citeas anchor.
+          display = Array(safe_attr(origin, :content)).join.strip
+          display = citeas.to_s if display.empty? && citeas && !citeas.to_s.empty?
+          parts << if !display.empty? && bibitemid && !bibitemid.to_s.empty?
+                     render_liquid("_link.html.liquid", {
+                                     "attrs" => element_attrs(
+                                       href: "##{escape_html(bibitemid.to_s)}", class: "bibref",
+                                     ),
+                                     "content" => escape_html(display),
+                                   })
+                   elsif !display.empty?
+                     escape_html(display)
                    else
                      render_mixed_inline(origin) || ""
                    end
 
           modification = safe_attr(source, :modification)
           if modification
-            mod_html = Array(modification.p).filter_map do |para|
+            mod_html = Array(safe_attr(modification, :p)).filter_map do |para|
               render_mixed_inline(para) || ""
             end.join(" ")
             parts << ", modified — #{mod_html}" unless mod_html.strip.empty?

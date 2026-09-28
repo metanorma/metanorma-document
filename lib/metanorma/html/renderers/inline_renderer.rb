@@ -325,7 +325,8 @@ module Metanorma
           parts = []
           display_attrs = %i[text fmt_xref fmt_link fmt_concept span strong em sup p semx
                              asciimath math sub_child tt_child br_child tab_child
-                             stem_child figure_child formula_child sourcecode_child]
+                             stem_child figure_child formula_child sourcecode_child
+                             fn_child]
           label_stripped = false
 
           walked = walk_ordered(element,
@@ -392,13 +393,12 @@ module Metanorma
         def render_link(link)
           target = safe_attr(link, :target) || safe_attr(link, :href)
           attrs = element_attrs(href: target, id: safe_attr(link, :id))
-          content = safe_attr(link, :content)
-          if content && !Array(content).join.strip.empty?
-            inner = render_mixed_inline(link)
+          inner = render_mixed_inline(link)
+          if inner && !inner.strip.empty?
             render_liquid("_link.html.liquid", {
                             "attrs" => attrs,
                             "content" => inner,
-                          })
+                            })
           else
             display_text = escape_html(target.to_s.delete_prefix("mailto:"))
             render_liquid("_link.html.liquid", {

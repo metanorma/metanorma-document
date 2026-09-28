@@ -5,29 +5,12 @@ module Metanorma
     module Components
       module Inline
         class TitleWithAnnotationElement < Lutaml::Model::Serializable
+          include Metanorma::Document::Components::Inline::Vocabulary
+
           attribute :id, :string
           attribute :anchor, :string
           attribute :semx_id, :string
-          attribute :text, :string, collection: true
           attribute :fmt_annotation_end, FmtAnnotationBodyElement
-
-          # Inline elements
-          attribute :em, EmRawElement, collection: true
-          attribute :ruby, "Metanorma::Document::Components::TextElements::RubyElement", collection: true
-          attribute :strong, StrongRawElement, collection: true
-          attribute :sub, SubElement, collection: true
-          attribute :sup, SupElement, collection: true
-          attribute :tt, TtElement, collection: true
-          attribute :underline, "Metanorma::Document::Components::TextElements::UnderlineElement",
-                    collection: true
-          attribute :strike, "Metanorma::Document::Components::TextElements::StrikeElement",
-                    collection: true
-          attribute :smallcap, SmallCapElement, collection: true
-          attribute :br, BrElement, collection: true
-          attribute :stem, TextElements::StemElement, collection: true
-          attribute :xref, XrefElement, collection: true
-          attribute :eref, ErefElement, collection: true
-          attribute :link, LinkElement, collection: true
 
           xml do
             element "title"
@@ -36,21 +19,13 @@ module Metanorma
             map_attribute "anchor", to: :anchor
             map_attribute "semx-id", to: :semx_id
             map_content to: :text
-            map_element "em", to: :em
-            map_element "ruby", to: :ruby
-            map_element "strong", to: :strong
-            map_element "sub", to: :sub
-            map_element "sup", to: :sup
-            map_element "tt", to: :tt
-            map_element "underline", to: :underline
-            map_element "strike", to: :strike
-            map_element "smallcap", to: :smallcap
-            map_element "br", to: :br
-            map_element "stem", to: :stem
-            map_element "xref", to: :xref
-            map_element "eref", to: :eref
-            map_element "link", to: :link
             map_element "fmt-annotation-end", to: :fmt_annotation_end
+
+            # Titles carry the full inline vocabulary (footnotes on
+            # clause titles, formatted links, math); including the
+            # shared vocabulary keeps every child at parse time.
+            Metanorma::Document::Components::Inline::Vocabulary::VocabularyXmlMapping
+              .apply_inline_mappings(self)
           end
         end
       end
