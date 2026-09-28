@@ -46,6 +46,8 @@ module Metanorma
                       :render_floating_title
       register_render "Metanorma::Standoc::Document::Blocks::AmendBlock",
                       :render_amend_block
+      register_render "Metanorma::Standoc::Document::Sections::Colophon",
+                      :render_colophon
       register_render "Metanorma::Standoc::Document::Blocks::ToC",
                       :render_toc
 
@@ -60,6 +62,8 @@ module Metanorma
         content_parts << (render(doc.sections) || "") if doc.sections
         doc.annex&.each { |annex| content_parts << (render(annex) || "") }
         content_parts << (render(doc.bibliography) || "") if doc.bibliography
+        content_parts << (render(doc.colophon) || "") if doc.respond_to?(:colophon) &&
+          doc.colophon
 
         unless @index_term_collector.empty?
           index_component = Component::IndexSection.new(self)
@@ -832,6 +836,16 @@ module Metanorma
       end
 
       # --- Bibliography / References ---
+
+      # The document <colophon> (e.g. the BIPM "Document Control" and
+      # "Revision History" clauses): trailing display clauses rendered
+      # like any other clause content.
+      def render_colophon(colophon, **_opts)
+        parts = Array(colophon.clause).filter_map do |clause|
+          render(clause)
+        end
+        parts.join
+      end
 
       def render_bibliography(bib, level: 1, **_opts)
         parts = []

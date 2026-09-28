@@ -12,11 +12,15 @@ module Metanorma
       class VersionInfo < Lutaml::Model::Serializable
         attribute :revision_date, :string
         attribute :draft, :string
+        # Legacy presentation XML states the version as bare text
+        # (<version>2018-01-17</version>), e.g. the BIPM draft date.
+        attribute :content, :string
 
         xml do
           element "version"
           map_element "revision-date", to: :revision_date
           map_element "draft", to: :draft
+          map_content to: :content
         end
       end
     end
