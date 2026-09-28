@@ -14,6 +14,12 @@ module Metanorma
           attribute :original_reference, :string
           attribute :p, "Metanorma::Document::Components::Paragraphs::ParagraphBlock",
                     collection: true
+          attribute :ul, "Metanorma::Document::Components::Lists::UnorderedList",
+                    collection: true
+          attribute :ol, "Metanorma::Document::Components::Lists::OrderedList",
+                    collection: true
+          attribute :table, "Metanorma::Document::Components::Tables::TableBlock",
+                    collection: true
           attribute :fmt_fn_label, "Metanorma::Document::Components::Inline::FmtFnLabelElement"
 
           xml do
@@ -26,6 +32,9 @@ module Metanorma
             map_attribute "semx-id", to: :semx_id
             map_attribute "original-reference", to: :original_reference
             map_element "p", to: :p
+            map_element "ul", to: :ul
+            map_element "ol", to: :ol
+            map_element "table", to: :table
             map_element "fmt-fn-label", to: :fmt_fn_label
           end
         end

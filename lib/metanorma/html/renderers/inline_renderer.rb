@@ -467,6 +467,14 @@ module Metanorma
           popup_parts = Array(fn.p).map do |para|
             render_mixed_inline(para) || ""
           end
+          # Footnotes may carry block content (bibliography notes use
+          # lists): render it after the paragraphs.
+          %i[ul ol table].each do |attr|
+            next unless fn.respond_to?(attr)
+            Array(fn.send(attr)).each do |block|
+              popup_parts << (coordinator.render(block) || "")
+            end
+          end
           popup_html = popup_parts.join
 
           assigns = {
