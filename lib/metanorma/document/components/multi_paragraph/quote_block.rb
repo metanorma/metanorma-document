@@ -14,6 +14,17 @@ module Metanorma
                     collection: true
           attribute :ol, Metanorma::Document::Components::Lists::OrderedList,
                     collection: true
+          attribute :table, Metanorma::Document::Components::Tables::TableBlock,
+                    collection: true
+          attribute :note, Metanorma::Document::Components::Blocks::NoteBlock,
+                    collection: true
+          attribute :dl, Metanorma::Document::Components::Lists::DefinitionList,
+                    collection: true
+          attribute :formula,
+                    Metanorma::Document::Components::AncillaryBlocks::FormulaBlock,
+                    collection: true
+          attribute :bookmark, Metanorma::Document::Components::IdElements::Bookmark,
+                    collection: true
           attribute :attribution, "Metanorma::Document::Components::Inline::AttributionElement"
           attribute :json_type, :string
 
@@ -36,6 +47,11 @@ module Metanorma
             map_element "p", to: :paragraphs
             map_element "ul", to: :ul
             map_element "ol", to: :ol
+            map_element "table", to: :table
+            map_element "note", to: :note
+            map_element "dl", to: :dl
+            map_element "formula", to: :formula
+            map_element "bookmark", to: :bookmark
             map_element "attribution", to: :attribution
           end
         end

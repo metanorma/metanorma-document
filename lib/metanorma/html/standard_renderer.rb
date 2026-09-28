@@ -46,6 +46,8 @@ module Metanorma
                       :render_floating_title
       register_render "Metanorma::Standoc::Document::Blocks::AmendBlock",
                       :render_amend_block
+      register_render "Metanorma::Standoc::Document::Blocks::ToC",
+                      :render_toc
 
       def render_standard_document(doc, **_opts)
         cover = render_coverpage(doc)
@@ -326,6 +328,21 @@ module Metanorma
         render_liquid("_element.html.liquid", {
                         "tag" => "div",
                         "extra_attrs" => attrs,
+                        "content" => content,
+                      })
+      end
+
+      # Authored table-of-contents blocks (clause type="toc"): a list of
+      # cross-references rendered as a toc div, mirroring the native
+      # isodoc layout.
+      def render_toc(toc, **_opts)
+        list = safe_attr(toc, :list)
+        content = Array(list).filter_map do |ul|
+          coordinator.render_unordered_list(ul)
+        end.join
+        render_liquid("_element.html.liquid", {
+                        "tag" => "div",
+                        "extra_attrs" => element_attrs(class: "toc"),
                         "content" => content,
                       })
       end
