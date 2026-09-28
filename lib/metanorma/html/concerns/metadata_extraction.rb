@@ -13,8 +13,11 @@ module Metanorma
 
           langs = bibdata.language
           if langs && !langs.empty?
-            lang = langs.find { |l| l.current == "true" } || langs.first
-            lang.value || lang.to_s
+            # Base bibdata carries plain Iso639Code entries (no
+            # `current` marker); flavor bibdata models mark one current.
+            lang = langs.find { |l| l.respond_to?(:current) && l.current == "true" } ||
+                   langs.first
+            lang.respond_to?(:value) ? (lang.value || lang.to_s) : lang.to_s
           else
             "en"
           end
