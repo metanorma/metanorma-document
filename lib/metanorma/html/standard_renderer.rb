@@ -532,23 +532,23 @@ module Metanorma
       # mixed-content name elements (e.g. TermNameElement) — for rich
       # inline rendering by the caller.
       def designation_name_element(designation)
-        if designation.is_a?(Metanorma::StandardDocument::Terms::Designation) && designation.expression
+        if designation.is_a?(Metanorma::Standoc::Document::Terms::Designation) && designation.expression
           expr = designation.expression
-          if expr.is_a?(Metanorma::StandardDocument::Terms::TermExpression) && expr.name
+          if expr.is_a?(Metanorma::Standoc::Document::Terms::TermExpression) && expr.name
             expr.name
           end
-        elsif designation.is_a?(Metanorma::StandardDocument::Terms::TermExpression)
+        elsif designation.is_a?(Metanorma::Standoc::Document::Terms::TermExpression)
           designation.name
         end
       end
 
       def extract_designation_name(designation)
-        if designation.is_a?(Metanorma::StandardDocument::Terms::Designation) && designation.expression
+        if designation.is_a?(Metanorma::Standoc::Document::Terms::Designation) && designation.expression
           expr = designation.expression
-          if expr.is_a?(Metanorma::StandardDocument::Terms::TermExpression) && expr.name
+          if expr.is_a?(Metanorma::Standoc::Document::Terms::TermExpression) && expr.name
             join_designation_names(expr.name)
           end
-        elsif designation.is_a?(Metanorma::StandardDocument::Terms::TermExpression) && designation.name
+        elsif designation.is_a?(Metanorma::Standoc::Document::Terms::TermExpression) && designation.name
           join_designation_names(designation.name)
         else
           extract_text_value(designation)
@@ -568,7 +568,7 @@ module Metanorma
 
       def render_term_definition(definition)
         return nil unless definition
-        return nil unless definition.is_a?(Metanorma::StandardDocument::Terms::TermDefinition)
+        return nil unless definition.is_a?(Metanorma::Standoc::Document::Terms::TermDefinition)
 
         ve = definition.verbalexpression
         return nil unless ve
