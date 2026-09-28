@@ -202,6 +202,14 @@ module Metanorma
         # rendered table — when present it carries the full content.
         if req.respond_to?(:fmt_provision) && req.fmt_provision
           parts << (render(req.fmt_provision) || "")
+
+          # Nested requirements (tests inside conformance classes) are
+          # not part of the formatted table — render them after it.
+          %i[requirement recommendation permission].each do |attr|
+            next unless req.respond_to?(attr)
+            Array(req.send(attr)).each { |nested| parts << (render(nested) || "") }
+          end
+
           parts << %(</div>)
           return parts.join
         end
