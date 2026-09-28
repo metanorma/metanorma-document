@@ -20,9 +20,13 @@ module Metanorma
                     collection: true
           attribute :bib_item, Metanorma::Document::Components::BibData::BibliographicItem
           attribute :display_text, "Metanorma::Document::Components::Inline::DisplayTextElement"
+          # The origin's own rendered text (<origin>ISO 19101-1:2014</origin>)
+          attribute :content, :string, collection: true
 
           xml do
             element "citation"
+            mixed_content
+            map_content to: :content
             map_attribute "bibitemid", to: :bibitemid
             map_attribute "date", to: :date
             map_attribute "type", to: :type

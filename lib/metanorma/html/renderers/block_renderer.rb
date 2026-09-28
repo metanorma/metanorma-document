@@ -16,6 +16,9 @@ module Metanorma
           figure: :render_figure,
           quote: :render_quote,
           formula: :render_formula,
+          requirement: :render_nested_requirement,
+          recommendation: :render_nested_requirement,
+          permission: :render_nested_requirement,
         }.freeze
 
         SIMPLE_CHILDREN = {
@@ -454,6 +457,13 @@ module Metanorma
 
         def render_simple_children(model)
           render_block_children(model, children: SIMPLE_CHILDREN)
+        end
+
+        # Requirements nested in a block container (conformance-class
+        # requirements inside annex examples) dispatch through the main
+        # renderer's registered requirement render.
+        def render_nested_requirement(req)
+          coordinator.render(req)
         end
 
         def render_full_block_children(model, first_paragraph_label: nil,
