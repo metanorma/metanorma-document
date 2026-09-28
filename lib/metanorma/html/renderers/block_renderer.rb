@@ -398,6 +398,21 @@ module Metanorma
           quote.ol&.each do |ol|
             content_parts << (render_ordered_list(ol) || "")
           end
+          quote.dl&.each do |dl|
+            content_parts << (render_definition_list(dl) || "")
+          end
+          quote.table&.each do |table|
+            content_parts << (render_table(table) || "")
+          end
+          quote.formula&.each do |formula|
+            content_parts << (render_formula(formula) || "")
+          end
+          quote.note&.each do |note|
+            content_parts << (coordinator.render_note(note) || "")
+          end
+          quote.bookmark&.each do |bookmark|
+            content_parts << (coordinator.render_bookmark(bookmark) || "")
+          end
           content = content_parts.join
           attribution_html = if quote.attribution
                                coordinator.render_mixed_inline(quote.attribution)
