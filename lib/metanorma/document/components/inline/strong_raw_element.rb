@@ -4,21 +4,18 @@ module Metanorma
   module Document
     module Components
       module Inline
+        # Strongly emphasised raw text: accepts the full inline
+        # vocabulary as children so no inline payload inside <strong>
+        # is dropped at parse time.
         class StrongRawElement < Lutaml::Model::Serializable
-          attribute :text, :string, collection: true
-          attribute :semx, "Metanorma::Document::Components::Inline::SemxElement",
-                    collection: true
-          attribute :span, "Metanorma::Document::Components::Inline::SpanElement",
-                    collection: true
-          attribute :br, BrElement, collection: true
+          include Metanorma::Document::Components::Inline::Vocabulary
 
           xml do
             element "strong"
             mixed_content
             map_content to: :text
-            map_element "semx", to: :semx
-            map_element "span", to: :span
-            map_element "br", to: :br
+            Metanorma::Document::Components::Inline::Vocabulary::VocabularyXmlMapping
+              .apply_inline_mappings(self)
           end
         end
       end

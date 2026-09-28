@@ -4,19 +4,18 @@ module Metanorma
   module Document
     module Components
       module Inline
+        # Emphasised raw text: accepts the full inline vocabulary as
+        # children (footnotes, links, nested formatting, math) so no
+        # inline payload inside <em> is dropped at parse time.
         class EmRawElement < Lutaml::Model::Serializable
-          attribute :text, :string, collection: true
-          attribute :semx, "Metanorma::Document::Components::Inline::SemxElement",
-                    collection: true
-          attribute :span, "Metanorma::Document::Components::Inline::SpanElement",
-                    collection: true
+          include Metanorma::Document::Components::Inline::Vocabulary
 
           xml do
             element "em"
             mixed_content
             map_content to: :text
-            map_element "semx", to: :semx
-            map_element "span", to: :span
+            Metanorma::Document::Components::Inline::Vocabulary::VocabularyXmlMapping
+              .apply_inline_mappings(self)
           end
         end
       end
