@@ -10,6 +10,14 @@ module Metanorma
                       :render_fmt_definition_semx
       register_render "Metanorma::Standoc::Document::Sections::TermsSection",
                       :render_terms_section
+      register_render "Metanorma::Document::Components::Blocks::RequirementModel",
+                      :render_requirement
+      register_render "Metanorma::Document::Components::Blocks::RecommendationModel",
+                      :render_requirement
+      register_render "Metanorma::Document::Components::Blocks::PermissionModel",
+                      :render_requirement
+      register_render "Metanorma::Document::Components::Blocks::FmtProvision",
+                      :render_reqt_component
       register_render "Metanorma::Standoc::Document::Sections::StandardReferencesSection",
                       :render_references_section
       register_render "Metanorma::Standoc::Document::Sections::BibliographySection",
@@ -170,6 +178,84 @@ module Metanorma
 
       def render_standard_section(section, level: 1, **)
         render_section(section, level: level)
+      end
+
+      # Requirement / recommendation / permission blocks: the requirements
+      # table — label row, then one row per populated component
+      # (subject, statement, specification, etc.). Component children
+      # (p/ol/ul/...) render through the regular dispatch.
+      REQ_COMPONENTS = {
+        description: "Description",
+        specification: "Statement",
+        measurement_target: "Measurement target",
+        verification: "Verification",
+        inherit: "Inheritance",
+        import: "Imported",
+      }.freeze
+
+      def render_requirement(req, **_opts)
+        parts = []
+        label = req.respond_to?(:fmt_name) && req.fmt_name ? render(req.fmt_name) : reqt_label(req)
+        parts << %(<div class="reqt"><p class="reqt-label">#{escape_html(label.to_s)}</p>)
+
+        # Presentation-layer formatted provision: the requirement's own
+        # rendered table — when present it carries the full content.
+        if req.respond_to?(:fmt_provision) && req.fmt_provision
+          parts << (render(req.fmt_provision) || "")
+          parts << %(</div>)
+          return parts.join
+        end
+
+        REQ_COMPONENTS.each do |attr, row_label|
+          value = req.respond_to?(attr) ? req.send(attr) : nil
+          next if value.nil? || (value.respond_to?(:empty?) && value.empty?)
+
+          cells = Array(value).filter_map { |component| render_reqt_component(component) }.join
+          next if cells.empty?
+
+          parts << %(<div class="reqt-row"><span class="reqt-key">#{row_label}:</span> #{cells}</div>)
+        end
+
+        if req.respond_to?(:classification) && req.classification&.any?
+          cls = req.classification.filter_map do |c|
+            next unless c.respond_to?(:value)
+            "#{c.respond_to?(:tag) ? c.tag : ''} #{c.value}".strip
+          end.reject(&:empty?).join("; ")
+          parts << %(<div class="reqt-row"><span class="reqt-key">Classification:</span> #{escape_html(cls)}</div>) unless cls.empty?
+        end
+
+        parts << %(</div>)
+        parts.join
+      end
+
+      def reqt_label(req)
+        base = req.class.name.split("::").last.to_s.delete_suffix("Model").downcase
+        ident = req.identifier.to_s if req.respond_to?(:identifier)
+        ident&.empty? ? base.capitalize : "#{base.capitalize} #{ident}"
+      end
+
+      def render_reqt_component(component, **_opts)
+        return "" if component.nil? || component.is_a?(String)
+
+        component.class.attributes.each_key.filter_map do |attr|
+          value = component.send(attr) rescue next
+          if value.is_a?(Array)
+            value.map { |v| v.is_a?(String) ? v : render(v) }.join
+          elsif !value.nil? && !value.is_a?(String)
+            render(value)
+          end
+        end.join
+      end
+
+      # fmt-xref-label: the cross-reference label text ("Requirement
+      # A.14-1", "Clause 3") carried ahead of blocks in mixed content.
+      def render_fmt_xref_label(el, **_opts)
+        parts = []
+        parts << Array(el.text).join if el.respond_to?(:text) && el.text
+        Array(el.semx).each { |s| parts << render(s) } if el.respond_to?(:semx)
+        Array(el.span).each { |s| parts << render(s) } if el.respond_to?(:span)
+        joined = parts.join
+        joined.empty? ? "" : %(<span class="fmt-xref-label">#{joined}</span>)
       end
 
       def render_terms_section(section, level: 1, **)
@@ -935,7 +1021,7 @@ module Metanorma
         end
 
         %i[tables figures formulas examples notes admonitions sourcecode_blocks
-           quote_blocks].each do |attr|
+           quote_blocks requirement recommendation permission].each do |attr|
           values = safe_attr(section, attr)
           if values
             Array(values).each do |v|
