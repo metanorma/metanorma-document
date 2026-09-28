@@ -447,9 +447,9 @@ module Metanorma
       register_inline_render Metanorma::Document::Components::Inline::LinkElement,
                              :render_link
       register_inline_render Metanorma::Document::Components::Inline::XrefElement,
-                             :render_noop_inline
+                             :render_xref
       register_inline_render Metanorma::Document::Components::Inline::ErefElement,
-                             :render_noop_inline
+                             :render_eref
       register_inline_render Metanorma::Document::Components::Inline::SpanElement,
                              :render_span
       register_inline_render Metanorma::Document::Components::Inline::FnElement,
@@ -457,7 +457,7 @@ module Metanorma
       register_inline_render Metanorma::Document::Components::Inline::ConceptElement,
                              :render_concept
       register_inline_render Metanorma::Document::Components::Inline::StemInlineElement,
-                             :render_noop_inline
+                             :render_stem_inline
       register_inline_render Metanorma::Document::Components::TextElements::StemElement,
                              :render_stem
       register_inline_render Metanorma::Document::Components::Inline::SemxElement,
@@ -607,6 +607,7 @@ module Metanorma
       def render_span(el) = @inline_renderer.render_span(el)
       def render_fn_inline(el) = @inline_renderer.render_fn_inline(el)
       def render_stem(el) = @inline_renderer.render_stem(el)
+      def render_stem_inline(el) = @inline_renderer.render_stem_inline(el)
       def render_semx_inline(el) = @inline_renderer.render_semx_inline(el)
       def render_fmt_xref(el) = @inline_renderer.render_fmt_xref(el)
       def render_comma(*) = @inline_renderer.render_comma

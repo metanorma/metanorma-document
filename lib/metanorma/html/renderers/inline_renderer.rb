@@ -224,6 +224,29 @@ module Metanorma
           nil
         end
 
+        # Semantic <stem> blocks (StemInlineElement) carry canonical math;
+        # isodoc renders them as a stem span holding the MathML (whose
+        # text nodes stay part of the page text) or the AsciiMath source.
+        def render_stem_inline(el)
+          return nil if el.nil?
+
+          math = Array(el.math).filter_map do |m|
+            m.to_xml if m.respond_to?(:to_xml)
+          end.join
+          unless math.empty?
+            return render_liquid("_stem_span.html.liquid",
+                                 { "data_attrs" => "", "text" => math })
+          end
+
+          text = Array(el.asciimath).filter_map do |a|
+            a.is_a?(String) ? a : a.text
+          end.join
+          return nil if text.empty?
+
+          render_liquid("_stem_span.html.liquid",
+                        { "data_attrs" => "", "text" => escape_html(text) })
+        end
+
         def render_semx_inline(el)
           render_semx_content(el)
         end
@@ -413,18 +436,24 @@ module Metanorma
           attrs = element_attrs(href: "##{escape_html(target)}",
                                 id: safe_attr(xref, :id))
           content = render_mixed_inline(xref)
+          # Cross-references carry no computed labels in this pipeline, so
+          # unresolvable targets keep isodoc's literal "[id]" fallback,
+          # emitted ahead of the link text like the native presentation.
+          text = content.empty? ? "[#{escape_html(target.to_s)}]"
+                                : "[#{escape_html(target.to_s)}] #{content}"
           render_liquid("_link.html.liquid", {
                           "attrs" => attrs,
-                          "content" => content,
+                          "content" => text,
                         })
         end
 
         def render_eref(eref)
           citeas = safe_attr(eref, :citeas)
-          if citeas
+          content = render_mixed_inline(eref)
+          if !content.empty?
+            content
+          elsif citeas
             escape_html(citeas)
-          else
-            render_mixed_inline(eref)
           end
         end
 
