@@ -45,7 +45,12 @@ logos_light:
 
 # Section ordering
 preface_order:
+  - foreword
+  - introduction
+  - abstract
   - clause
+  - acknowledgements
+  - executivesummary
 preface_wrap: true
 toc_filter_types:
   - toc

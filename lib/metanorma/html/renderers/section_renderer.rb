@@ -151,8 +151,18 @@ module Metanorma
 
           coordinator.register_toc_entry(id: "preface", level: 1,
                                          text: "Preface")
-          content = clauses.filter_map do |cl|
-            coordinator.render(cl, level: 2)
+          # Render in the theme's declared order: the named preface
+          # sections (foreword, introduction, abstract, ...) AND the
+          # clauses — the others were previously only emptiness-checked,
+          # silently dropping every non-clause preface section.
+          content = order.filter_map do |name|
+            if name == "clause"
+              clauses.filter_map { |cl| coordinator.render(cl, level: 2) }.join
+            else
+              out = Array(safe_attr(preface, name.to_sym))
+                     .filter_map { |sec| coordinator.render(sec, level: 2) }.join
+              out.empty? ? nil : out
+            end
           end.join
           render_liquid("_wrapped_preface.html.liquid", content: content)
         end
