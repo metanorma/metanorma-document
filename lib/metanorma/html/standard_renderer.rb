@@ -6,6 +6,8 @@ module Metanorma
       register_render "Metanorma::Standoc::Document::Root",
                       :render_standard_document
       register_render "Metanorma::Standoc::Document::Terms::Term", :render_term
+      register_render "Metanorma::Standoc::Document::Terms::TermSource",
+                      :render_term_source
       register_render "Metanorma::Standoc::Document::Terms::FmtDefinitionSemx",
                       :render_fmt_definition_semx
       register_render "Metanorma::Standoc::Document::Sections::TermsSection",
@@ -1233,7 +1235,8 @@ module Metanorma
         end
 
         %i[tables figures formulas examples notes admonitions sourcecode_blocks
-           quote_blocks requirement recommendation permission].each do |attr|
+           quote_blocks requirement recommendation permission
+           term_sources].each do |attr|
           values = safe_attr(section, attr)
           if values
             Array(values).each do |v|
