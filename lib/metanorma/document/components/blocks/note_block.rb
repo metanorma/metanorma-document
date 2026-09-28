@@ -32,6 +32,7 @@ module Metanorma
           attribute :format, :string
           attribute :semx_id, :string
           attribute :autonum, :string
+          attribute :number, :string
 
           def json_type
             "note"
@@ -60,6 +61,7 @@ module Metanorma
             map_attribute "format", to: :format
             map_attribute "semx-id", to: :semx_id
             map_attribute "autonum", to: :autonum, render_empty: true
+            map_attribute "number", to: :number
             map_attribute "anchor", to: :anchor
             map_attribute "removeInRFC", to: :remove_in_rfc
             map_element "name", to: :name
