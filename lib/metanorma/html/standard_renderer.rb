@@ -660,6 +660,8 @@ module Metanorma
           end
         elsif designation.is_a?(Metanorma::Standoc::Document::Terms::TermExpression)
           designation.name
+        elsif designation.is_a?(Metanorma::Standoc::Document::Terms::Designation)
+          designation
         end
       end
 
@@ -692,7 +694,12 @@ module Metanorma
         return nil unless definition.is_a?(Metanorma::Standoc::Document::Terms::TermDefinition)
 
         ve = definition.verbalexpression
-        return nil unless ve
+        unless ve
+          # Legacy presentation XML states the definition's blocks
+          # directly under <definition>: render them in document order.
+          legacy = collect_ordered_children(definition)
+          return legacy.empty? ? nil : legacy.filter_map { |child| render(child) }.join
+        end
 
         walked = collect_ordered_children(ve)
         unless walked.empty?
@@ -927,6 +934,8 @@ module Metanorma
           return parts.join
         end
 
+        parts << (bibitem_author_prefix(item) || "")
+
         rendered_pubid = render_pubid_identifier(item)
         unless rendered_pubid
           render_docidentifier_fallback_into(parts, item)
@@ -957,7 +966,81 @@ module Metanorma
                                    })
           end
         end
+
+        parts << (bibitem_publisher_statement(item) || "")
+        parts << (bibitem_uri_statement(item) || "")
         parts.join
+      end
+
+      # isodoc reference layout: authors lead the entry ("A. Phillips,
+      # M. Davis: ") ahead of the document identifier. Author entities
+      # are persons (completename) or organizations (name).
+      def bibitem_author_prefix(item)
+        names = Array(item.contributor).filter_map do |contributor|
+          next unless Array(contributor.role).any? { |r| safe_attr(r, :type) == "author" }
+
+          if contributor.person
+            Array(contributor.person.name&.completename).map do |name|
+              extract_text_value(name).to_s
+            end.join
+          elsif contributor.organization
+            Array(contributor.organization.name).map do |name|
+              extract_text_value(name).to_s
+            end.join(", ")
+          end
+        end.map(&:strip).reject(&:empty?)
+        return nil if names.empty?
+
+        render_liquid("_inline_span.html.liquid", {
+                        "attrs" => " class=\"ref-authors\"",
+                        "content" => "#{escape_html(names.join(', '))}: ",
+                      })
+      end
+
+      # Publisher, place and publication year close the entry
+      # ("Open Geospatial Consortium , Geneva (2004).").
+      def bibitem_publisher_statement(item)
+        publishers = Array(item.contributor).filter_map do |contributor|
+          next unless Array(contributor.role).any? { |r| safe_attr(r, :type) == "publisher" }
+          next unless contributor.organization
+
+          Array(contributor.organization.name).map do |name|
+            extract_text_value(name).to_s
+          end.join(", ").strip
+        end.reject(&:empty?)
+
+        places = Array(item.place).map do |place|
+          extract_text_value(place).to_s
+        end.map(&:strip).reject(&:empty?)
+
+        segments = publishers + places
+        return nil if segments.empty?
+
+        year = Array(item.date).filter_map do |date|
+          next unless safe_attr(date, :type) == "published"
+
+          date_on = date.is_a?(Metanorma::Document::Relaton::BibliographicDate) ? date.on : nil
+          value = extract_text_value(date_on || safe_attr(date, :text)).to_s
+          value[/\d{4}/]
+        end.first
+
+        closing = year ? " (#{escape_html(year)})." : "."
+        render_liquid("_inline_span.html.liquid", {
+                        "attrs" => " class=\"ref-publisher\"",
+                        "content" => "#{escape_html(segments.join(', '))}#{closing} ",
+                      })
+      end
+
+      # The reference's canonical URI is visible text in isodoc output,
+      # not only an href on the identifier anchor.
+      def bibitem_uri_statement(item)
+        url = bibitem_url(item)
+        return nil unless url
+
+        render_liquid("_inline_span.html.liquid", {
+                        "attrs" => " class=\"ref-uri\"",
+                        "content" => escape_html(url),
+                      })
       end
 
       def render_pubid_identifier(item)
