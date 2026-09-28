@@ -228,10 +228,25 @@ module Metanorma
         parts.join
       end
 
+      # Canonical labels per mn-requirements' i18n vocabulary,
+      # selected by the requirement's type attribute.
+      REQT_TYPE_LABELS = {
+        "requirementclass" => "Requirements class",
+        "recommendationclass" => "Recommendations class",
+        "permissionclass" => "Permissions class",
+        "requirementtest" => "Requirement test",
+        "recommendationtest" => "Recommendation test",
+        "permissiontest" => "Permission test",
+        "conformanceclass" => "Conformance class",
+        "abstracttest" => "Abstract test",
+      }.freeze
+
       def reqt_label(req)
-        base = req.class.name.split("::").last.to_s.delete_suffix("Model").downcase
+        type = req.respond_to?(:type) ? req.type.to_s : ""
+        base = REQT_TYPE_LABELS[type] ||
+               req.class.name.split("::").last.to_s.delete_suffix("Model").capitalize
         ident = req.identifier.to_s if req.respond_to?(:identifier)
-        ident&.empty? ? base.capitalize : "#{base.capitalize} #{ident}"
+        ident&.empty? ? base : "#{base} #{ident}"
       end
 
       def render_reqt_component(component, **_opts)
