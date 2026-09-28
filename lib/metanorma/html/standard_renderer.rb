@@ -228,22 +228,34 @@ module Metanorma
         parts.join
       end
 
-      # Canonical labels per mn-requirements' i18n vocabulary,
-      # selected by the requirement's type attribute.
-      REQT_TYPE_LABELS = {
-        "requirementclass" => "Requirements class",
-        "recommendationclass" => "Recommendations class",
-        "permissionclass" => "Permissions class",
-        "requirementtest" => "Requirement test",
-        "recommendationtest" => "Recommendation test",
-        "permissiontest" => "Permission test",
-        "conformanceclass" => "Conformance class",
-        "abstracttest" => "Abstract test",
-      }.freeze
+      # Requirement labels come from mn-requirements' i18n vocabulary
+      # (the same strings the native isodoc pipeline renders), selected
+      # by the requirement's type attribute.
+      def reqt_labels
+        @reqt_labels ||= begin
+          require "isodoc-i18n"
+          gem_path = Gem.loaded_specs["mn-requirements"]&.full_gem_path
+            gem_path && require(File.join(gem_path, "lib/isodoc/i18n"))
+          i18n = IsoDoc::MnRequirementsI18n.new(document_language, nil)
+          req = Hash(i18n.get["requirements"])
+          # vocabulary nests under default: and modspec: — merge them
+          Hash(req["default"]).merge(Hash(req["modspec"]))
+        rescue StandardError
+          {}
+        end
+      end
+
+      def document_language
+        lang = respond_to?(:language) ? language : nil
+        lang.to_s.empty? ? "en" : lang.to_s
+      rescue StandardError
+        "en"
+      end
 
       def reqt_label(req)
         type = req.respond_to?(:type) ? req.type.to_s : ""
-        base = REQT_TYPE_LABELS[type] ||
+        base = reqt_labels[type] ||
+               reqt_labels[req.class.name.split("::").last.to_s.delete_suffix("Model").downcase] ||
                req.class.name.split("::").last.to_s.delete_suffix("Model").capitalize
         ident = req.identifier.to_s if req.respond_to?(:identifier)
         ident&.empty? ? base : "#{base} #{ident}"

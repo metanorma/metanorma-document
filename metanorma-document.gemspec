@@ -39,6 +39,7 @@ Gem::Specification.new do |spec|
 
   # Uncomment to register a new dependency of your gem
   spec.add_dependency "lutaml-model", "~> 0.8.0"
+  spec.add_dependency "mn-requirements", ">= 0.2.1" # requirement labels & ModSpec semantics
   spec.add_dependency "metanorma-core"
   spec.add_dependency "mml", "~> 2.4"
   # pubid has no stable 2.x release yet (latest: 2.0.0.pre.alpha.x);
