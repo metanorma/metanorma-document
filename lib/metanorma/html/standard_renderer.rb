@@ -326,13 +326,73 @@ module Metanorma
                       })
       end
 
-      def render_amend_block(amend, **_opts)
-        attrs = element_attrs(id: safe_attr(amend, :id))
-        content = render_mixed_inline(amend)
+      # Amend block (machine-readable change): the description paragraphs
+      # render bare, the new content blocks render inside a single
+      # Quote AmendNewcontent wrapper — matching native isodoc output.
+      def render_amend_block(amend, **opts)
+        parts = []
+        Array(safe_attr(amend, :description)).each do |desc|
+          parts << render_amend_content(desc, **opts)
+        end
+        new_contents = Array(safe_attr(amend, :new_content))
+        if new_contents.any?
+          inner = new_contents.map { |nc| render_amend_content(nc, **opts) }.join
+          attrs = element_attrs(id: safe_attr(amend, :id),
+                                class: "Quote AmendNewcontent")
+          parts << render_liquid("_element.html.liquid", {
+                                   "tag" => "div",
+                                   "extra_attrs" => attrs,
+                                   "content" => inner,
+                                 })
+        end
+        parts.join
+      end
+
+      def render_amend_content(content, **opts)
+        parts = []
+        %i[paragraphs note ol ul dl figure clause].each do |attr|
+          Array(safe_attr(content, attr)).each do |child|
+            parts << (render_amend_child(child, **opts) || "")
+          end
+        end
+        parts.join
+      end
+
+      def render_amend_child(child, **opts)
+        if child.is_a?(Metanorma::Standoc::Document::Sections::ClauseSection)
+          render_amend_clause(child, **opts)
+        else
+          render(child, **opts)
+        end
+      end
+
+      # An annex introduced by an amendment carries its identity in
+      # number/obligation attributes rather than a formatted title:
+      # native isodoc renders the Annex label, the obligation and the
+      # title as one heading paragraph.
+      def render_amend_clause(clause, level: 1, **opts)
+        return render(clause, level: level, **opts) unless safe_attr(clause, :type) == "annex"
+
+        heading = +""
+        number = safe_attr(clause, :number)
+        heading << "<b>Annex #{escape_html(number)}</b><br />" if number
+        obligation = safe_attr(clause, :obligation)
+        if obligation
+          heading << %(<span class="obligation">(#{escape_html(obligation)})</span><br />)
+        end
+        title = safe_attr(clause, :fmt_title) || safe_attr(clause, :title)
+        heading << render_mixed_inline(title).to_s if title
+
+        body = Array(clause.blocks).filter_map do |node|
+          next if is_title_element?(node, clause)
+
+          render(node, level: level + 1)
+        end.join
+        attrs = element_attrs(id: safe_attr(clause, :id))
         render_liquid("_element.html.liquid", {
                         "tag" => "div",
                         "extra_attrs" => attrs,
-                        "content" => content,
+                        "content" => %(<p class="h1">#{heading}</p>#{body}),
                       })
       end
 
@@ -1204,6 +1264,20 @@ module Metanorma
         return "Note #{autonum} to entry" if autonum && !autonum.to_s.empty?
 
         "Note to entry"
+      end
+
+      # Semantic notes (e.g. inside amendment newcontent) carry their
+      # number as the number attribute, with no fmt-name or autonum.
+      def extract_block_label(block, default)
+        label = super
+        return label unless label == default
+
+        number = safe_attr(block, :number)
+        if number && !number.to_s.empty?
+          "#{default} #{number}"
+        else
+          label
+        end
       end
     end
   end
