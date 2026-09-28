@@ -402,7 +402,7 @@ module Metanorma
       def render_toc(toc, **_opts)
         list = safe_attr(toc, :list)
         content = Array(list).filter_map do |ul|
-          coordinator.render_unordered_list(ul)
+          render_unordered_list(ul)
         end.join
         render_liquid("_element.html.liquid", {
                         "tag" => "div",
