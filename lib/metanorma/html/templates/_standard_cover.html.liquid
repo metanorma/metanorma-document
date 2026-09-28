@@ -14,16 +14,54 @@
 {% if pub_date %}
   <p class="cover-date">{{ pub_date | escape }}</p>
 {% endif %}
+{% comment %} Cover identity block, laid out like the isodoc titlepage.
+  The flavor passes its bibdata model as `cover`; the model's lutaml-model
+  auto-Drop (plus its `liquid` mappings) serves every fact. {% endcomment %}
+{% if cover.tc_docnumber.size > 0 %}
+  {% for num in cover.tc_docnumber %}
+  <p class="cover-doc-id">{{ num | escape }}</p>
+  {% endfor %}
+{% else %}
+  {% if cover.docnumber_undated %}
+  <p class="cover-doc-id">{{ cover.docnumber_undated | escape }}{% if cover.draftinfo %} {{ cover.draftinfo | escape }}{% endif %}</p>
+  {% endif %}
+{% endif %}
+{% if cover.edition_display %}
+  <p class="cover-doc-id">{{ cover.edition_display | escape }}</p>
+{% endif %}
+{% if cover.revdate %}
+  <p class="cover-doc-id">Date: {{ cover.revdate | escape }}</p>
+{% endif %}
+{% if cover.tc_docnumber.size > 0 %}
+  {% if cover.docnumber_undated %}
+  <p class="cover-doc-id">{{ cover.docnumber_undated | escape }}{% if cover.draftinfo %} {{ cover.draftinfo | escape }}{% endif %}</p>
+  {% endif %}
+{% endif %}
+{% if cover.editorialgroup %}
+  <p class="cover-doc-id">{{ cover.editorialgroup | escape }}</p>
+{% endif %}
+{% if cover.secretariat %}
+  <p class="cover-doc-id">Secretariat: {{ cover.secretariat | escape }}</p>
+{% endif %}
 </div>
 <div class="cover-body">
 {% if doctype %}
   <p class="cover-doctype">{{ doctype | escape }}</p>
 {% endif %}
+{% if cover.ext.subdoctype %}
+  <p class="cover-docsubtype">Document subtype: {{ cover.ext.subdoctype | capitalize | escape }}</p>
+{% endif %}
 {% if title %}
   <div class="cover-title"><span>{{ title | escape }}</span></div>
 {% endif %}
+{% if title_fr %}
+  <div class="cover-title-fr"><span>{{ title_fr | escape }}</span></div>
+{% endif %}
 {% if stage %}
   <div class="cover-stage"><p>{{ stage | escape }}</p></div>
+{% endif %}
+{% if cover.ics %}
+  <p class="cover-ics"><strong>ICS:</strong> {{ cover.ics | escape }}</p>
 {% endif %}
 </div>
 </div>
