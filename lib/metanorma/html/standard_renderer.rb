@@ -706,8 +706,13 @@ module Metanorma
         candidates.any? { |n| semx_tree_has_source?(n) }
       end
 
-      def semx_tree_has_source?(node)
+      def semx_tree_has_source?(node, seen = {}.compare_by_identity)
         return false unless node.is_a?(Lutaml::Model::Serializable)
+
+        # fmt content can reference its own container (cyclic model
+        # graph); guard the walk or the recursion never terminates.
+        return false if seen[node]
+        seen[node] = true
 
         return true if node.is_a?(Metanorma::Document::Components::Inline::SemxElement) &&
                        node.element_attr.to_s == "source"
@@ -716,7 +721,7 @@ module Metanorma
           next unless node.respond_to?(attr)
 
           Array(node.public_send(attr)).each do |child|
-            return true if semx_tree_has_source?(child)
+            return true if semx_tree_has_source?(child, seen)
           end
         end
         false
