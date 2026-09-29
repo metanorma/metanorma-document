@@ -4,37 +4,38 @@ module Metanorma
   module Html
     module Component
       # Collects footnote content encountered during rendering.
-      # Deduplicates by reference letter/number so each footnote definition
-      # appears once, even when referenced from multiple locations.
+      # Deduplicates by footnote definition (target id, falling back to the
+      # fn id/reference) so each definition appears once, even when several
+      # <fn> references with differing reference attrs point at it.
       class FootnoteCollector
         def initialize
           @footnotes = []
-          @ref_map = {}
-          @id_map = {}
+          @entries_by_key = {}
         end
 
-        # Register a footnote and return its sequential number.
-        # Deduplicates by reference: same reference = same footnote number.
-        def register(fn)
+        # Register a footnote and return its FootnoteEntry.
+        # +label_text+ is the fn's presentation autonum label; the first
+        # registration's label wins.
+        def register(fn, label_text: nil)
           fn_id = fn.id || fn.reference.to_s
-          ref = fn.reference.to_s
+          key = fn.respond_to?(:target) && fn.target && !fn.target.empty? ? fn.target : fn_id
 
-          # If we've seen this reference before, reuse its number
-          if @ref_map.key?(ref)
-            return @ref_map[ref]
+          if (seen = @entries_by_key[key])
+            seen.fmt_label ||= label_text
+            return seen
           end
 
-          number = @footnotes.size + 1
-          @ref_map[ref] = number
-          @id_map[fn_id] = number
-          @footnotes << FootnoteEntry.new(
+          entry = FootnoteEntry.new(
             id: fn_id,
-            number: number,
-            reference: ref,
+            number: @footnotes.size + 1,
+            reference: fn.reference.to_s,
             content: fn.p,
-            fmt_label: fn.fmt_fn_label,
+            fmt_label: label_text,
+            source_fn: fn,
           )
-          number
+          @footnotes << entry
+          @entries_by_key[key] = entry
+          entry
         end
 
         def empty?
@@ -51,7 +52,7 @@ module Metanorma
       end
 
       FootnoteEntry = Struct.new(:id, :number, :reference, :content, :fmt_label,
-                                 keyword_init: true)
+                                 :source_fn, keyword_init: true)
     end
   end
 end
