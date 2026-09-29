@@ -91,7 +91,85 @@ module Metanorma
         render_liquid("_cover.html.liquid", {
                         "doc_id" => cover_id,
                         "title" => title_text,
+                        "stage_html" => cover_stage_html(bibdata),
+                        "dates_html" => cover_dates_html(bibdata),
                       })
+      end
+
+      # The native covers open with type and maturity bands ("IHO
+      # Regulation", "Published 2017-06"); derive both from bibdata.
+      def cover_stage_html(bibdata)
+        bands = []
+        if (doctype = cover_doctype_label(bibdata))
+          bands << %(<span class="coverpage-stage" id="#{escape_html(cover_doctype_id(bibdata))}">#{escape_html(doctype)}</span>)
+        end
+        status = safe_attr(bibdata, :status)
+        stage = safe_attr(status, :stage)
+        if stage
+          label = { "in-force" => "Published" }.fetch(stage, stage.capitalize)
+          pub = Array(safe_attr(bibdata, :date)).find do |d|
+            safe_attr(d, :type) == "published"
+          end
+          on = pub && (safe_attr(pub, :on) || safe_attr(pub, :from))
+          text = on ? "#{label} #{on}" : label
+          bands << %(<p><span class="coverpage-maturity" id="#{escape_html(stage)}">#{escape_html(text)}</span></p>)
+        end
+        return nil if bands.empty?
+
+        render_liquid("_element.html.liquid", "tag" => "div",
+                                                 "extra_attrs" => %( class="coverpage-stage-block"),
+                                                 "content" => bands.join)
+      end
+
+      def cover_doctype_label(bibdata)
+        dt = safe_attr(bibdata, :doctype)
+        return nil unless dt
+
+        pretty = dt.to_s.split('-').map(&:capitalize).join(' ')
+        if (prefix = cover_publisher_prefix(bibdata))
+          "#{prefix} #{pretty}"
+        else
+          pretty
+        end
+      end
+
+      def cover_doctype_id(bibdata)
+        safe_attr(bibdata, :doctype)&.to_s&.downcase
+      end
+
+      def cover_publisher_prefix(bibdata)
+        abbr = bibdata.respond_to?(:publisher_abbr) ? safe_attr(bibdata, :publisher_abbr) : nil
+        return abbr if abbr && !abbr.to_s.empty?
+
+        Array(safe_attr(bibdata, :contributor)).each do |c|
+          roles = Array(safe_attr(c, :role))
+          role_types = roles.map do |r|
+            r.is_a?(String) ? r : safe_attr(r, :type)
+          end
+          next unless role_types.include?("publisher")
+
+          org = safe_attr(c, :organization)
+          name = org ? safe_attr(org, :name) : nil
+          name = name.to_s unless name.nil?
+          return name unless name.nil? || name.empty?
+        end
+        nil
+      end
+
+      # Document dates (issue/implementation/...) as a cover band.
+      def cover_dates_html(bibdata)
+        items = Array(safe_attr(bibdata, :date)).filter_map do |d|
+          type = safe_attr(d, :type)
+          on = safe_attr(d, :on) || safe_attr(d, :from)
+          next unless type && on
+
+          %(<span class="coverpage-date date-#{escape_html(type)}">#{escape_html(type.capitalize)}: #{escape_html(on)}</span>)
+        end
+        return nil if items.empty?
+
+        render_liquid("_element.html.liquid", "tag" => "div",
+                                                 "extra_attrs" => %( class="coverpage-dates"),
+                                                 "content" => items.join)
       end
 
       # The document <boilerplate> front-matter block (copyright,
