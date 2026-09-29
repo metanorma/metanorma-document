@@ -16,7 +16,12 @@
 {% endif %}
 {% comment %} Cover identity block, laid out like the isodoc titlepage.
   The flavor passes its bibdata model as `cover`; the model's lutaml-model
-  auto-Drop (plus its `liquid` mappings) serves every fact. {% endcomment %}
+  auto-Drop (plus its `liquid` mappings) serves every fact. The title
+  precedes the identity lines so the cover reads like the native
+  "title • docnumber (draft …) edition Date: …" sequence. {% endcomment %}
+{% if title %}
+  <div class="cover-title"><span>{{ title | escape }}</span></div>
+{% endif %}
 {% if cover.tc_docnumber.size > 0 %}
   {% for num in cover.tc_docnumber %}
   <p class="cover-doc-id">{{ num | escape }}</p>
@@ -24,6 +29,8 @@
 {% else %}
   {% if cover.docnumber_undated %}
   <p class="cover-doc-id">{{ cover.docnumber_undated | escape }}{% if cover.draftinfo %} {{ cover.draftinfo | escape }}{% endif %}</p>
+  {% elsif cover.draftinfo %}
+  <p class="cover-doc-id">{{ cover.draftinfo | escape }}</p>
   {% endif %}
 {% endif %}
 {% if cover.edition_display %}
@@ -35,6 +42,8 @@
 {% if cover.tc_docnumber.size > 0 %}
   {% if cover.docnumber_undated %}
   <p class="cover-doc-id">{{ cover.docnumber_undated | escape }}{% if cover.draftinfo %} {{ cover.draftinfo | escape }}{% endif %}</p>
+  {% elsif cover.draftinfo %}
+  <p class="cover-doc-id">{{ cover.draftinfo | escape }}</p>
   {% endif %}
 {% endif %}
 {% if cover.editorialgroup %}
@@ -45,12 +54,10 @@
 {% endif %}
 </div>
 <div class="cover-body">
-{% if doctype %}
-  <p class="cover-doctype">{{ doctype | escape }}</p>
-{% endif %}
-{% if cover.ext.subdoctype %}
-  <p class="cover-docsubtype">Document subtype: {{ cover.ext.subdoctype | capitalize | escape }}</p>
-{% endif %}
+{% comment %} Native titlepage order: display title, French title,
+  stage line, then ICS last. The doctype identity labels close the
+  column so they never split the native "… Date: <revdate> TC <title>
+  ICS:" cover band. {% endcomment %}
 {% if title %}
   <div class="cover-title"><span>{{ title | escape }}</span></div>
 {% endif %}
@@ -62,6 +69,12 @@
 {% endif %}
 {% if cover.ics %}
   <p class="cover-ics"><strong>ICS:</strong> {{ cover.ics | escape }}</p>
+{% endif %}
+{% if doctype %}
+  <p class="cover-doctype">{{ doctype | escape }}</p>
+{% endif %}
+{% if cover.ext.subdoctype %}
+  <p class="cover-docsubtype">Document subtype: {{ cover.ext.subdoctype | capitalize | escape }}</p>
 {% endif %}
 </div>
 </div>
