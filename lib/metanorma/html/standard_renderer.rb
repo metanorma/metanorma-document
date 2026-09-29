@@ -880,7 +880,7 @@ module Metanorma
                       })
       end
 
-      def render_term_source(source)
+      def render_term_source(source, **_opts)
         return nil unless source
 
         parts = []
