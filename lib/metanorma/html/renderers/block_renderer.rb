@@ -87,16 +87,25 @@ module Metanorma
                             render_table_colgroup(table.colgroup)
                           end
 
-          thead_html = if table.thead
-                         render_table_section(table.thead, "thead")
-                       end
+          # <fn>s inside cells collect here while the sections render,
+          # then lift into a visible tfoot block like the native render.
+          table_fns = []
+          saved_ctx = coordinator.table_fn_context
+          coordinator.table_fn_context = { fns: table_fns }
+          begin
+            thead_html = if table.thead
+                           render_table_section(table.thead, "thead")
+                         end
 
-          tbody_html = if table.tbody
-                         render_table_section(table.tbody, "tbody")
-                       end
+            tbody_html = if table.tbody
+                           render_table_section(table.tbody, "tbody")
+                         end
+          ensure
+            coordinator.table_fn_context = saved_ctx
+          end
 
           tfoot_html = nil
-          if table.tfoot || (table.note && !table.note.empty?)
+          if table.tfoot || (table.note && !table.note.empty?) || table_fns.any?
             tfoot_inner = render_table_section_rows(table.tfoot) if table.tfoot
             notes_html = nil
             if table.note && !table.note.empty?
@@ -104,8 +113,9 @@ module Metanorma
               notes_html = render_liquid("_element.html.liquid", "tag" => "tr", "extra_attrs" => "",
                                                                  "content" => render_liquid("_element.html.liquid", "tag" => "td", "extra_attrs" => %( colspan="#{col_count}" class="table-notes"), "content" => notes_inner))
             end
+            table_fn_html = table_footnotes_row(table_fns, col_count)
             tfoot_html = render_liquid("_element.html.liquid", "tag" => "tfoot", "extra_attrs" => "",
-                                                               "content" => "#{tfoot_inner}#{notes_html}")
+                                                               "content" => "#{tfoot_inner}#{notes_html}#{table_fn_html}")
           end
 
           render_liquid("_table.html.liquid", {
@@ -116,6 +126,26 @@ module Metanorma
                           "tbody_html" => tbody_html,
                           "tfoot_html" => tfoot_html,
                         })
+        end
+
+        # Native parity: <fn>s used inside a table render as visible
+        # TableFootnote blocks in a spanning tfoot row.
+        def table_footnotes_row(fns, col_count)
+          items = fns.filter_map do |fn|
+            label = coordinator.footnote_label_text(fn) ||
+                    safe_attr(fn, :reference)
+            next unless label
+
+            body = coordinator.fn_content_html(fn)
+            next if body.to_s.empty?
+
+            %(<p class="TableFootnote"><span><span class="TableFootnoteRef">#{escape_html(label.to_s)}</span>&#xA0; </span>#{body}</p>)
+          end
+          return nil if items.empty?
+
+          inner = %(<div class="TableFootnote">#{items.join}</div>)
+          render_liquid("_element.html.liquid", "tag" => "tr", "extra_attrs" => "",
+                                                             "content" => render_liquid("_element.html.liquid", "tag" => "td", "extra_attrs" => %( colspan="#{col_count}" class="table-footnotes"), "content" => inner))
         end
 
         def table_column_count(table)

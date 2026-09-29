@@ -91,6 +91,9 @@ module Metanorma
 
       attr_reader :inline_renderer, :block_renderer, :section_renderer,
                   :pubid_renderer, :index_term_collector, :footnote_collector
+      # While a table renders: table-scoped <fn>s collect here and lift
+      # into the table's visible footnotes row instead of endnote popups.
+      attr_accessor :table_fn_context
       private :inline_renderer, :block_renderer, :section_renderer,
               :pubid_renderer
 
@@ -588,6 +591,8 @@ module Metanorma
         @inline_renderer.walk_ordered(node, allow_filter: allow_filter, &)
       end
 
+      def footnote_label_text(fn) = @inline_renderer.footnote_label_text(fn)
+      def fn_content_html(fn) = @inline_renderer.fn_content_html(fn)
       def render_mixed_inline(node)
         @inline_renderer.render_mixed_inline(node)
       end

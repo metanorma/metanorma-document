@@ -485,27 +485,33 @@ module Metanorma
         end
 
         def render_fn(fn)
+          label = footnote_label_text(fn) || safe_attr(fn, :reference)
+          return nil unless label
+
+          if (ctx = coordinator.table_fn_context)
+            # Table-scoped <fn>: the native render shows the reference
+            # letter in the cell and lifts the definition into a visible
+            # tfoot block (TableFootnote), not an endnote popup.
+            ctx[:fns] << fn
+            assigns = {
+              "attrs" => element_attrs(
+                id: safe_attr(fn, :id) || "table-fn-#{ctx[:fns].size}",
+                class: "fn-marker",
+              ),
+              "number" => ctx[:fns].size,
+              "label" => escape_html(label.to_s),
+              "popup_html" => nil,
+            }
+            return render_liquid("_fn_marker.html.liquid", assigns)
+          end
+
           fn_id = safe_attr(fn, :id)
           entry = coordinator.footnote_collector.register(
             fn, label_text: footnote_label_text(fn)
           )
 
-          label = entry.fmt_label || entry.reference ||
-                  safe_attr(fn, :reference)
-          return nil unless label
-
-          popup_parts = Array(fn.p).map do |para|
-            render_mixed_inline(para) || ""
-          end
-          # Footnotes may carry block content (bibliography notes use
-          # lists): render it after the paragraphs.
-          %i[ul ol table].each do |attr|
-            next unless fn.respond_to?(attr)
-            Array(fn.send(attr)).each do |block|
-              popup_parts << (coordinator.render(block) || "")
-            end
-          end
-          popup_html = popup_parts.join
+          label = entry.fmt_label || entry.reference || label
+          popup_html = fn_content_html(fn)
 
           assigns = {
             "attrs" => element_attrs(id: fn_id, class: "fn-marker"),
@@ -514,6 +520,21 @@ module Metanorma
             "popup_html" => popup_html.strip.empty? ? nil : popup_html,
           }
           render_liquid("_fn_marker.html.liquid", assigns)
+        end
+
+        # The rendered body of a footnote: its paragraphs plus any block
+        # children (bibliography notes carry lists).
+        def fn_content_html(fn)
+          popup_parts = Array(fn.p).map do |para|
+            render_mixed_inline(para) || ""
+          end
+          %i[ul ol table].each do |attr|
+            next unless fn.respond_to?(attr)
+            Array(fn.send(attr)).each do |block|
+              popup_parts << (coordinator.render(block) || "")
+            end
+          end
+          popup_parts.join
         end
 
         # The presentation autonum label of a footnote ("19" for
