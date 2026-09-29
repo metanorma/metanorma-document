@@ -131,6 +131,9 @@ module Metanorma
               base.attribute :fmt_eref,
                              Metanorma::Document::Components::Inline::FmtErefElement,
                              collection: true
+              base.attribute :fmt_link,
+                             Metanorma::Document::Components::Inline::LinkElement,
+                             collection: true
               base.attribute :fmt_origin,
                              Metanorma::Document::Components::Inline::FmtOriginElement,
                              collection: true
@@ -198,6 +201,7 @@ module Metanorma
               "erefstack" => :erefstack,
               "fmt-stem" => :fmt_stem,
               "fmt-eref" => :fmt_eref,
+              "fmt-link" => :fmt_link,
               "fmt-origin" => :fmt_origin,
               "fmt-source" => :fmt_source,
               "fmt-date-inline" => :fmt_date_inline,
