@@ -64,6 +64,11 @@ module Metanorma
             "renderterm" => nil,
             "origin" => "semx",
           }
+          # refterm is semantic-only inside <concept>, but a related-term
+          # semx renders it as escaped literal text (native parity).
+          if node.is_a?(Metanorma::Document::Components::Inline::SemxElement)
+            skip_after = skip_after.reject { |k, _| k == "refterm" }
+          end
           skip = {}
           node.element_order.each_with_index do |el, i|
             next unless el.element?
@@ -251,6 +256,26 @@ module Metanorma
           render_semx_content(el)
         end
 
+        # Native parity: a <refterm> outside <concept> (failed related-term
+        # lookup) renders as escaped literal markup text.
+        def render_refterm(el)
+          text = safe_attr(el, :text).to_s
+          return "" if text.empty?
+
+          "&lt;refterm&gt;#{escape_html(text)}&lt;/refterm&gt;"
+        end
+
+        def render_fmt_preferred_inline(el)
+          parts = []
+          safe_attr(el, :semx)&.each do |s|
+            parts << (render_inline_element(s) || "")
+          end
+          safe_attr(el, :p)&.each do |p|
+            parts << (coordinator.render_paragraph(p) || "")
+          end
+          parts.join
+        end
+
         def render_fmt_xref(el)
           target = safe_attr(el, :target) || safe_attr(el, :to_attr)
           if target
@@ -349,7 +374,7 @@ module Metanorma
           display_attrs = %i[text fmt_xref fmt_link fmt_concept span strong em sup p semx
                              asciimath math sub_child tt_child br_child tab_child
                              stem_child figure_child formula_child sourcecode_child
-                             fn_child]
+                             fn_child refterm fmt_preferred ol ul]
           label_stripped = false
 
           walked = walk_ordered(element,
@@ -365,6 +390,8 @@ module Metanorma
             when :element
               parts << if obj.is_a?(Metanorma::Document::Components::Paragraphs::ParagraphBlock)
                          coordinator.render_paragraph(obj) || ""
+                       elsif coordinator.block_element?(obj)
+                         coordinator.render(obj) || ""
                        else
                          render_inline_element(obj) || ""
                        end
@@ -459,9 +486,12 @@ module Metanorma
 
         def render_fn(fn)
           fn_id = safe_attr(fn, :id)
-          number = coordinator.footnote_collector.register(fn)
+          entry = coordinator.footnote_collector.register(
+            fn, label_text: footnote_label_text(fn)
+          )
 
-          label = safe_attr(fn, :fn_label) || safe_attr(fn, :reference)
+          label = entry.fmt_label || entry.reference ||
+                  safe_attr(fn, :reference)
           return nil unless label
 
           popup_parts = Array(fn.p).map do |para|
@@ -479,11 +509,23 @@ module Metanorma
 
           assigns = {
             "attrs" => element_attrs(id: fn_id, class: "fn-marker"),
-            "number" => number,
+            "number" => entry.number,
             "label" => escape_html(label.to_s),
             "popup_html" => popup_html.strip.empty? ? nil : popup_html,
           }
           render_liquid("_fn_marker.html.liquid", assigns)
+        end
+
+        # The presentation autonum label of a footnote ("19" for
+        # <fmt-fn-label><span><sup>19</sup></span></fmt-fn-label>), which
+        # native footnotes display instead of a renumbered sequence.
+        def footnote_label_text(fn)
+          fmt = safe_attr(fn, :fmt_fn_label)
+          return nil unless fmt
+
+          html = render_mixed_inline(fmt).to_s
+          text = html.gsub(/<[^>]+>/, "").strip
+          text.empty? ? nil : text
         end
 
         def render_concept(concept)

@@ -43,6 +43,14 @@ module Metanorma
                     collection: true
           attribute :xref, XrefElement, collection: true
           attribute :eref, ErefElement, collection: true
+          attribute :refterm, ReftermElement, collection: true
+          attribute :ol, "Metanorma::Document::Components::Lists::OrderedList",
+                    collection: true
+          attribute :ul, "Metanorma::Document::Components::Lists::UnorderedList",
+                    collection: true
+          attribute :fmt_preferred,
+                    "Metanorma::Document::Components::Inline::FmtPreferredElement",
+                    collection: true
 
           # Term/metadata child elements
           attribute :title_child, SemxChildElement, collection: true
@@ -102,6 +110,10 @@ module Metanorma
             map_element "span", to: :span
             map_element "xref", to: :xref
             map_element "eref", to: :eref
+            map_element "refterm", to: :refterm
+            map_element "ol", to: :ol
+            map_element "ul", to: :ul
+            map_element "fmt-preferred", to: :fmt_preferred
             # Term/metadata children
             map_element "title", to: :title_child
             map_element "name", to: :name_child

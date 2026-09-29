@@ -433,6 +433,11 @@ module Metanorma
                                           "admitted")
         parts << render_term_designations(term, :fmt_deprecates, :deprecates,
                                           "deprecated")
+        # IEEE-style metadata definition list (figdl), rendered before the
+        # definition like the native term entry.
+        Array(safe_attr(term, :dl)).each do |list|
+          parts << (render_definition_list(list) || "")
+        end
         parts << (render_term_domain(term, fmt_definition) || "")
         parts << render_term_definitions(term, fmt_definition)
         parts << render_term_note_parts(term)
@@ -674,12 +679,47 @@ module Metanorma
                                    })
           end
         else
-          term.source&.each { |src| parts << (render_term_source(src) || "") }
-          safe_attr(term, :termsource)&.each do |source|
-            parts << (render_term_source_element(source) || "")
+          # When the fmt-definition flow already carries the source inline
+          # (IEEE-style "(adapted from …)" inside the definition), the
+          # semantic [SOURCE: …] line would be a duplicate the native
+          # titlepage never emits.
+          unless fmt_definition_carries_source?(term)
+            term.source&.each { |src| parts << (render_term_source(src) || "") }
+            safe_attr(term, :termsource)&.each do |source|
+              parts << (render_term_source_element(source) || "")
+            end
           end
         end
         parts.join
+      end
+
+      SEMX_SOURCE_SEARCH_ATTRS = %i[semx p span strong em sup sub xref eref
+                                    origin fmt_xref fmt_eref fmt_origin].freeze
+
+      def fmt_definition_carries_source?(term)
+        fmt_def = safe_attr(term, :fmt_definition)
+        return false unless fmt_def
+
+        candidates = Array(fmt_def.semx)
+        candidates << fmt_def if fmt_def.is_a?(Lutaml::Model::Serializable) &&
+                                 !fmt_def.is_a?(Metanorma::Document::Components::Inline::SemxElement)
+        candidates.any? { |n| semx_tree_has_source?(n) }
+      end
+
+      def semx_tree_has_source?(node)
+        return false unless node.is_a?(Lutaml::Model::Serializable)
+
+        return true if node.is_a?(Metanorma::Document::Components::Inline::SemxElement) &&
+                       node.element_attr.to_s == "source"
+
+        SEMX_SOURCE_SEARCH_ATTRS.each do |attr|
+          next unless node.respond_to?(attr)
+
+          Array(node.public_send(attr)).each do |child|
+            return true if semx_tree_has_source?(child)
+          end
+        end
+        false
       end
 
       def extract_term_name(term)

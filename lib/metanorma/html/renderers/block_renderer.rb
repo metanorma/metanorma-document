@@ -27,11 +27,17 @@ module Metanorma
 
         NOTE_CHILDREN = {
           paragraphs: :render_paragraph,
+          semx: :render_note_semx_content,
           ul: :render_unordered_list,
           ol: :render_ordered_list,
           dl: :render_definition_list,
           quote: :render_quote,
         }.freeze
+
+        # Presentation notes whose body arrives wrapped in a semx slice.
+        def render_note_semx_content(semx)
+          coordinator.render_semx_content(semx)
+        end
 
         def initialize(coordinator)
           @coordinator = coordinator
@@ -316,10 +322,23 @@ module Metanorma
         end
 
         def render_image(image)
-          src_val = image_source(image)
+          svg_xml = safe_attr(image, :inline_svg)
+          if svg_xml && !svg_xml.empty?
+            # Native parity: isodoc inlines embedded SVG markup (its text
+            # nodes are page text), not a base64 <img> data URI.
+            return render_liquid("_element.html.liquid", {
+                                   "tag" => "span",
+                                   "extra_attrs" => element_attrs(
+                                     id: safe_attr(image, :id),
+                                     class: "figure-svg",
+                                   ),
+                                   "content" => svg_xml,
+                                 })
+          end
+
           attrs = element_attrs(
             id: safe_attr(image, :id),
-            src: src_val,
+            src: image_source(image),
             alt: safe_attr(image, :alt),
             height: safe_attr(image, :height),
             width: safe_attr(image, :width),
