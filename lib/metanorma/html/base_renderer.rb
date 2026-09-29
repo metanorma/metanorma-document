@@ -873,6 +873,16 @@ level = 1)
               render_paragraph(p)
             end.join
           end
+          # Footnotes may carry list/table block children (OIML R 7's
+          # bibliography lives inside footnote 3) — the native aside
+          # renders them, so the end-of-document entry must too.
+          %i[ul ol table].each do |attr|
+            next unless entry.source_fn.respond_to?(attr)
+
+            Array(entry.source_fn.public_send(attr)).each do |block|
+              content_html << (render(block) || "")
+            end
+          end
           Drops::FootnoteDrop.new(entry, content_html)
         end
 
