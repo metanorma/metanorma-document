@@ -27,6 +27,11 @@ module Metanorma
                     "Metanorma::Document::Components::MultiParagraph::QuoteBlock",
                     collection: true
 
+          # Presentation XML wraps the note body in a semx slice
+          # (<note><semx element="note"><p>…</p></semx></note>).
+          attribute :semx, "Metanorma::Document::Components::Inline::SemxElement",
+                    collection: true
+
           attribute :json_type, :string
           attribute :type_attr, :string
           attribute :format, :string
@@ -65,15 +70,13 @@ module Metanorma
             map_attribute "anchor", to: :anchor
             map_attribute "removeInRFC", to: :remove_in_rfc
             map_element "name", to: :name
-            # Presentation term notes carry their label in <fmt-name>
-            # ("Note 1 to entry"); treat it as the note name.
-            map_element "fmt-name", to: :name
             map_element "p", to: :content
             map_element "formula", to: :formula
             map_element "dl", to: :dl
             map_element "ul", to: :ul
             map_element "ol", to: :ol
             map_element "quote", to: :quote
+            map_element "semx", to: :semx
             map_element "fmt-xref-label", to: :fmt_xref_label
             map_element "fmt-name", to: :fmt_name
           end
