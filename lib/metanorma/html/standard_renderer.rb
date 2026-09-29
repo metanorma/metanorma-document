@@ -1070,8 +1070,12 @@ module Metanorma
 
       def render_bibitem_content(item)
         parts = []
-        if item.formatted_ref
-          parts << (render_mixed_inline(item.formatted_ref) || "")
+        if (fr = item.formatted_ref)
+          # Relaton bibitems can carry several formattedref variants
+          # (rich display + plain); the singular attribute aggregates
+          # them into an array.
+          frs = fr.is_a?(Array) ? fr : [fr]
+          frs.each { |f| parts << (render_mixed_inline(f) || "") }
           return parts.join
         end
 
