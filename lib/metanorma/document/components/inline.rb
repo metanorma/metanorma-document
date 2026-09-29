@@ -37,6 +37,8 @@ module Metanorma
         autoload :ConceptElement,
                  "metanorma/document/components/inline/concept_element"
         autoload :FnElement, "metanorma/document/components/inline/fn_element"
+        autoload :ReftermElement,
+                 "metanorma/document/components/inline/refterm_element"
         autoload :SemxChildElement,
                  "metanorma/document/components/inline/semx_child_element"
         autoload :SemxElement,
