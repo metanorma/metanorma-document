@@ -150,28 +150,20 @@ module Metanorma
         end
 
         # element_order walk: yields [element_name, child_node] in
-        # document order, mapping each occurrence to the corresponding
-        # collection item (same indexing scheme as walk_ordered).
+        # document order. The catch-all children collection holds one
+        # node per non-text element_order entry, in sequence.
         def each_semantic_child(node)
           return enum_for(:each_semantic_child, node) unless block_given?
 
-          name_to_attr = semantic_name_to_attr
-          indices = Hash.new(0)
+          children = Array(node.children)
+          index = 0
           Array(node.element_order).each do |el|
             next if el.text?
 
-            attr = name_to_attr[el.name]
-            next unless attr
-
-            collection = Array(node.public_send(attr))
-            child = collection[indices[attr]]
-            indices[attr] += 1
+            child = children[index]
+            index += 1
             yield el.name, child if child
           end
-        end
-
-        def semantic_name_to_attr
-          @semantic_name_to_attr ||= Metanorma::Document::Components::Semantic::Node::TAG_ATTRS.to_h
         end
 
         def render_semantic_node(node, name:, level:)
