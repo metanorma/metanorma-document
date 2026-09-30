@@ -8,19 +8,6 @@ module Metanorma
     class CLI
       class Error < StandardError; end
 
-      # Prefer the leptris native engine: the nokogiri adapter silently
-      # truncates documents beyond ~10 MB (root children after a large
-      # subtree are dropped, lutaml-model#871).
-      begin
-        require "leptris"
-        adapter = ENV["METANORMA_DOCUMENT_XML_ADAPTER"]
-        Lutaml::Model.configure do |config|
-          config.xml_adapter_type = (adapter && !adapter.empty?) ? adapter.to_sym : :leptris
-        end
-      rescue LoadError
-        nil
-      end
-
       ToMirrorOptions = Struct.new(
         :xml_path,
         :output,

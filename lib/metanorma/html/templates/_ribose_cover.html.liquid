@@ -1,0 +1,30 @@
+<div class="title-section">
+{% if cover.cover_security or cover.cover_recipient %}
+  {% comment %} Ribose Group agency layout: title band, docinfo table. {% endcomment %}
+  {% if title %}
+    <div class="cover-title"><span>{{ title | escape }}</span></div>
+  {% endif %}
+  {% if cover.cover_stage_display %}
+    <p class="cover-stage">{{ cover.cover_stage_display | escape }}</p>
+  {% endif %}
+  {% if cover.cover_publisher_name %}
+    <p class="cover-publisher">{{ cover.cover_publisher_name | escape }}</p>
+  {% endif %}
+  <p class="cover-band">{{ cover.cover_doctype_label | escape }} • {{ cover.cover_primary_docidentifier | escape }} {{ title | escape }} {{ cover.cover_publisher_name | escape }}</p>
+  <p class="cover-doc-year">{{ cover.cover_copyright_year | escape }}</p>
+  <p class="cover-committee">{{ cover.cover_committee_name | escape }}</p>
+  <p class="cover-publisher">{{ cover.cover_publisher_name | escape }}</p>
+  <div class="cover-docinfo">
+    <p>{{ cover.cover_doctype_label | escape }}</p>
+    <p>{{ cover.cover_stage_display | escape }}</p>
+    <p>{{ cover.revdate | escape }}</p>
+    <p>Classification: {{ cover.cover_security | escape }}</p>
+    <p>Recipient: {{ cover.cover_recipient | escape }}</p>
+    <p>© {{ cover.cover_copyright_owner | escape }} {{ cover.cover_copyright_year | escape }}</p>
+  </div>
+{% else %}
+  {% comment %} Publisher layout: title, doctype label, docid, stage. {% endcomment %}
+  <p class="cover-docid-band">{{ title | escape }} • {{ title | escape }} {{ cover.cover_doctype_label | escape }} : {{ cover.cover_primary_docidentifier | escape }} - {{ cover.cover_stage_display | escape }}</p>
+{% endif %}
+</div>
+<hr class="cover-separator" />

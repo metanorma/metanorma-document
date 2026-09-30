@@ -474,6 +474,10 @@ module Metanorma
                              :render_fmt_stem
       register_inline_render Metanorma::Document::Components::Inline::CommaElement,
                              :render_comma
+      register_inline_render Metanorma::Document::Components::Inline::ReftermElement,
+                             :render_refterm
+      register_inline_render Metanorma::Document::Components::Inline::FmtPreferredElement,
+                             :render_fmt_preferred_inline
       register_inline_render "Metanorma::Standoc::Document::Elements::Input",
                              :render_input
       register_inline_render Metanorma::Document::Components::Inline::EnumCommaElement,
@@ -617,6 +621,8 @@ module Metanorma
       def render_stem(el) = @inline_renderer.render_stem(el)
       def render_stem_inline(el) = @inline_renderer.render_stem_inline(el)
       def render_semx_inline(el) = @inline_renderer.render_semx_inline(el)
+      def render_refterm(el) = @inline_renderer.render_refterm(el)
+      def render_fmt_preferred_inline(el) = @inline_renderer.render_fmt_preferred_inline(el)
       def render_fmt_xref(el) = @inline_renderer.render_fmt_xref(el)
       def render_comma(*) = @inline_renderer.render_comma
       def render_input(el) = @inline_renderer.render_input(el)

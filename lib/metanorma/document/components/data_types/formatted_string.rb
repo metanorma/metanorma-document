@@ -27,6 +27,8 @@ module Metanorma
                     collection: true
           attribute :link, Metanorma::Document::Components::Inline::LinkElement,
                     collection: true
+          attribute :fmt_link, Metanorma::Document::Components::Inline::LinkElement,
+                    collection: true
           attribute :br, Metanorma::Document::Components::Inline::BrElement,
                     collection: true
           attribute :p, Metanorma::Document::Components::Paragraphs::ParagraphBlock,
@@ -58,6 +60,8 @@ module Metanorma
                     collection: true
           attribute :underline, Metanorma::Document::Components::TextElements::UnderlineElement,
                     collection: true
+          attribute :note, Metanorma::Document::Components::Blocks::NoteBlock,
+                    collection: true
 
           xml do
             mixed_content
@@ -74,6 +78,7 @@ module Metanorma
             map_element "strong", to: :strong
             map_element "smallcap", to: :smallcap
             map_element "link", to: :link
+            map_element "fmt-link", to: :fmt_link
             map_element "br", to: :br
             map_element "p", to: :p
             map_element "sup", to: :sup
@@ -90,6 +95,7 @@ module Metanorma
             map_element "table", to: :table
             map_element "tt", to: :tt
             map_element "underline", to: :underline
+            map_element "note", to: :note
           end
         end
       end

@@ -354,8 +354,6 @@ module Metanorma
         parts = []
         %i[copyright_statement license_statement legal_statement
            feedback_statement clause paragraphs quote_blocks].each do |grouping|
-          next unless boilerplate.respond_to?(grouping)
-
           Array(boilerplate.public_send(grouping)).each do |child|
             parts << (render(child, level: 1) || "")
           end
@@ -776,58 +774,7 @@ module Metanorma
       end
 
       def render_term_definitions(term, fmt_definition)
-        if fmt_definition
-          parts = []
-          if fmt_definition.respond_to?(:p)
-            Array(fmt_definition.p).each do |para|
-              parts << (render_paragraph(para) || "")
-            end
-          end
-          if fmt_definition.respond_to?(:termnote)
-            Array(fmt_definition.termnote).each do |note|
-              parts << (render_term_note(note) || "")
-            end
-          end
-          %i[ol ul].each do |list_type|
-            next unless fmt_definition.respond_to?(list_type)
-
-            Array(fmt_definition.public_send(list_type)).each do |list|
-              parts << (render(list) || "")
-            end
-          end
-          if fmt_definition.respond_to?(:dl) && fmt_definition.dl
-            parts << (render(fmt_definition.dl) || "")
-          end
-          # Some flavors wrap the fmt content in <semx> (iho/standoc);
-          # render its children in place.
-          if fmt_definition.respond_to?(:semx)
-            Array(fmt_definition.semx).each do |sx|
-              if sx.respond_to?(:p)
-                Array(sx.p).each do |para|
-                  parts << (render_paragraph(para) || "")
-                end
-              end
-              if sx.respond_to?(:termnote)
-                Array(sx.termnote).each do |note|
-                  parts << (render_term_note(note) || "")
-                end
-              end
-              %i[ol ul].each do |list_type|
-                next unless sx.respond_to?(list_type)
-
-                Array(sx.public_send(list_type)).each do |list|
-                  parts << (render(list) || "")
-                end
-              end
-              if sx.respond_to?(:dl) && sx.dl
-                parts << (render(sx.dl) || "")
-              end
-            end
-          end
-          # When the fmt block yields nothing, fall through to the
-          # semantic definition so the term content is not lost.
-          return parts.join unless parts.join.strip.empty?
-        end
+        return render_ordered_content(fmt_definition) || "" if fmt_definition
 
         parts = []
         safe_attr(term, :p)&.each do |para|
@@ -958,14 +905,15 @@ module Metanorma
         candidates.any? { |n| semx_tree_has_source?(n) }
       end
 
-      def semx_tree_has_source?(node, seen = {}.compare_by_identity)
+      def semx_tree_has_source?(node, seen = nil)
         return false unless node.is_a?(Lutaml::Model::Serializable)
 
-        # fmt content can reference its own container (cyclic model
-        # graph); guard the walk or the recursion never terminates.
+        # semx trees may be self-referential (fmt wrappers pointing back
+        # at their own definition); guard the walk with an identity set.
+        seen ||= {}.compare_by_identity
         return false if seen[node]
-        seen[node] = true
 
+        seen[node] = true
         return true if node.is_a?(Metanorma::Document::Components::Inline::SemxElement) &&
                        node.element_attr.to_s == "source"
 
@@ -1170,10 +1118,10 @@ module Metanorma
 
           modification = safe_attr(source, :modification)
           if modification
-            mod_html = Array(safe_attr(modification, :p)).filter_map do |para|
+            mod_content = Array(safe_attr(modification, :p)).map do |para|
               render_mixed_inline(para) || ""
-            end.join(" ")
-            parts << ", modified — #{mod_html}" unless mod_html.strip.empty?
+            end.join
+            parts << ", modified — #{mod_content}" unless mod_content.strip.empty?
           end
         else
           parts << (render_mixed_inline(source) || "")
@@ -1227,6 +1175,12 @@ module Metanorma
                                         default_class: is_normative ? "" : "section-sub") || "")
         section.p&.each { |para| parts << (render_paragraph(para) || "") }
         section.note&.each { |note| parts << (render_paragraph(note) || "") }
+        Array(safe_attr(section, :ol)).each do |list|
+          parts << (render_ordered_list(list) || "")
+        end
+        Array(safe_attr(section, :ul)).each do |list|
+          parts << (render_unordered_list(list) || "")
+        end
         section.references&.each_with_index do |bibitem, i|
           parts << (render_bibitem(bibitem, i + 1,
                                    normative: is_normative) || "")
@@ -1323,11 +1277,10 @@ module Metanorma
       def render_bibitem_content(item)
         parts = []
         if (fr = item.formatted_ref)
-          # Relaton bibitems can carry several formattedref variants
-          # (rich display + plain); the singular attribute aggregates
-          # them into an array.
           frs = fr.is_a?(Array) ? fr : [fr]
-          frs.each { |f| parts << (render_mixed_inline(f) || "") }
+          frs.each do |f|
+            parts << (render_mixed_inline(f) || "")
+          end
           return parts.join
         end
 
