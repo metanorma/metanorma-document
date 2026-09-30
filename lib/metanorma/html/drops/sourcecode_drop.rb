@@ -20,8 +20,10 @@ css_class: nil, annotations_html: nil)
           id = renderer.safe_attr(sc, :id)
           lang = renderer.safe_attr(sc, :lang)
 
-          name_html = if sc.name
-                        renderer.render_inline_element(sc.name)
+          name_html = if renderer.safe_attr(sc, :fmt_name) || sc.name
+                        renderer.render_inline_element(
+                          renderer.safe_attr(sc, :fmt_name) || sc.name
+                        )
                       end
 
           code_text = if sc.body

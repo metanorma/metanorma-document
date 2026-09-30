@@ -6,6 +6,7 @@ module Metanorma
       module AncillaryBlocks
         class SourcecodeBlock < Metanorma::Document::Components::Blocks::BasicBlockNoNotes
           attribute :name, Metanorma::Document::Components::Inline::NameWithIdElement
+          attribute :fmt_name, Metanorma::Document::Components::Inline::FmtNameElement
           attribute :unnumbered, :boolean
           attribute :anchor, :string
           attribute :subsequence, :string
@@ -40,6 +41,7 @@ module Metanorma
             map_attribute "id", to: :id
             map_attribute "anchor", to: :anchor
             map_element "name", to: :name
+            map_element "fmt-name", to: :fmt_name
             map_attribute "unnumbered", to: :unnumbered
             map_attribute "subsequence", to: :subsequence
             map_attribute "filename", to: :filename

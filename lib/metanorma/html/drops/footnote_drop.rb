@@ -14,7 +14,7 @@ module Metanorma
         end
 
         def label
-          @entry.reference
+          @entry.fmt_label.to_s.empty? ? @entry.reference : @entry.fmt_label
         end
 
         def content_html

@@ -137,6 +137,7 @@ module Metanorma
         def register_figure_entry(...) = @renderer.register_figure_entry(...)
         def render_note_children(...) = @renderer.render_note_children(...)
         def render_simple_children(...) = @renderer.render_simple_children(...)
+        def render_admonition_children(...) = @renderer.render_admonition_children(...)
         def render_full_block_children(...) = @renderer.render_full_block_children(...)
         def render_label_paragraph(...) = @renderer.render_label_paragraph(...)
       end
@@ -473,6 +474,10 @@ module Metanorma
                              :render_fmt_stem
       register_inline_render Metanorma::Document::Components::Inline::CommaElement,
                              :render_comma
+      register_inline_render Metanorma::Document::Components::Inline::ReftermElement,
+                             :render_refterm
+      register_inline_render Metanorma::Document::Components::Inline::FmtPreferredElement,
+                             :render_fmt_preferred_inline
       register_inline_render "Metanorma::Standoc::Document::Elements::Input",
                              :render_input
       register_inline_render Metanorma::Document::Components::Inline::EnumCommaElement,
@@ -616,6 +621,8 @@ module Metanorma
       def render_stem(el) = @inline_renderer.render_stem(el)
       def render_stem_inline(el) = @inline_renderer.render_stem_inline(el)
       def render_semx_inline(el) = @inline_renderer.render_semx_inline(el)
+      def render_refterm(el) = @inline_renderer.render_refterm(el)
+      def render_fmt_preferred_inline(el) = @inline_renderer.render_fmt_preferred_inline(el)
       def render_fmt_xref(el) = @inline_renderer.render_fmt_xref(el)
       def render_comma(*) = @inline_renderer.render_comma
       def render_input(el) = @inline_renderer.render_input(el)
@@ -723,6 +730,7 @@ children:, **)
 
       def render_note_children(model) = @block_renderer.render_note_children(model)
       def render_simple_children(model) = @block_renderer.render_simple_children(model)
+      def render_admonition_children(model) = @block_renderer.render_admonition_children(model)
 
       def render_full_block_children(model, **)
         @block_renderer.render_full_block_children(model, **)
