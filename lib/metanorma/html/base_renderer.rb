@@ -137,6 +137,7 @@ module Metanorma
         def register_figure_entry(...) = @renderer.register_figure_entry(...)
         def render_note_children(...) = @renderer.render_note_children(...)
         def render_simple_children(...) = @renderer.render_simple_children(...)
+        def render_admonition_children(...) = @renderer.render_admonition_children(...)
         def render_full_block_children(...) = @renderer.render_full_block_children(...)
         def render_label_paragraph(...) = @renderer.render_label_paragraph(...)
       end
@@ -723,6 +724,7 @@ children:, **)
 
       def render_note_children(model) = @block_renderer.render_note_children(model)
       def render_simple_children(model) = @block_renderer.render_simple_children(model)
+      def render_admonition_children(model) = @block_renderer.render_admonition_children(model)
 
       def render_full_block_children(model, **)
         @block_renderer.render_full_block_children(model, **)

@@ -26,7 +26,14 @@ module Metanorma
           roots = semantic_roots(doc)
           return nil unless roots
 
-          parts = roots.filter_map { |root| render_semantic_children(root, level: 1, only: :annex) }
+          @semantic_main_ids = collect_main_tree_ids(doc)
+          parts = roots.flat_map do |root|
+            each_semantic_child(root).filter_map do |name, child|
+              next unless %w[annex sections preface bibliography].include?(name)
+
+              render_uncovered(child, name, 1)
+            end
+          end
           return nil if parts.empty?
 
           render_liquid("_element.html.liquid", {
@@ -34,6 +41,91 @@ module Metanorma
                           "extra_attrs" => element_attrs(class: "semantic-annexes"),
                           "content" => parts.join,
                         })
+        end
+
+        # Render a semantic subtree unless the main presentation tree
+        # already carries it (ids normalize by stripping the semantic__
+        # prefix). Covered containers still recurse — a clause can be
+        # covered while an admonition inside it is not — but id-less
+        # children of covered containers are mirrored content and skip.
+        def render_uncovered(node, name, level)
+          unless semantic_node_covered?(node)
+            html = render_semantic_node(node, name: name, level: level)
+            return html if html && !html.strip.empty?
+          end
+
+          parts = []
+          each_semantic_child(node) do |child_name, child|
+            next unless child_has_id?(child)
+
+            html = render_uncovered(child, child_name, level + 1)
+            parts << html if html
+          end
+          parts.join
+        end
+
+        def child_has_id?(node)
+          id = safe_attr(node, :id)
+          !id.nil? && !id.to_s.empty?
+        end
+
+        def semantic_node_covered?(node)
+          id = safe_attr(node, :id)
+          return false unless id
+
+          # semantic___<uuid> strips to _<uuid>; semantic__annexB strips
+          # to annexB — the main tree's unprefixed id space.
+          @semantic_main_ids.include?(id.sub("semantic__", ""))
+        end
+
+        # Every element id in the main presentation tree. The
+        # metanorma-extension container is excluded: its embedded
+        # semantic source carries the same ids under the semantic__
+        # prefix, and collecting them would make the tree cover itself.
+        def collect_main_tree_ids(doc)
+          ids = {}
+          collect_main_ids(doc, ids)
+          ids
+        end
+
+        def collect_main_ids(model, ids)
+          return unless model.is_a?(Lutaml::Model::Serializable)
+          return if semantic_source?(model)
+
+          id = safe_attr(model, :id)
+          ids[id] = true if id
+          eo = model.element_order
+          return unless eo.is_a?(Array) && !eo.empty?
+
+          map = begin
+            Renderers::ElementOrderTraversal.element_to_attr_map(
+              model.class.mappings_for(:xml, model.lutaml_register),
+            )
+          rescue StandardError
+            nil
+          end
+          return unless map
+
+          indices = Hash.new(0)
+          eo.each do |el|
+            next if el.text?
+
+            attr = map[el.name]
+            next unless attr && model.respond_to?(attr)
+
+            coll = model.public_send(attr)
+            if coll.is_a?(Array)
+              obj = coll[indices[attr]]
+              indices[attr] += 1
+            else
+              obj = coll
+            end
+            collect_main_ids(obj, ids) if obj.is_a?(Lutaml::Model::Serializable)
+          end
+        end
+
+        def semantic_source?(model)
+          model.class.name == "Metanorma::Standoc::Document::Metadata::MetanormaSemanticSource"
         end
 
         def semantic_roots(doc)
@@ -95,8 +187,15 @@ module Metanorma
           when "table" then semantic_table(node)
           when "title" then nil # rendered with its section
           when "figure" then semantic_figure(node)
+          when "quote" then semantic_quote(node)
           else
-            semantic_inline_or_plain(node, name) if INLINE_TAGS.include?(name)
+            if INLINE_TAGS.include?(name)
+              semantic_inline_node(node, name)
+            else
+              # Unknown structural tags degrade to their content:
+              # nothing inside a rendered subtree drops silently.
+              semantic_passthrough(node, name)
+            end
           end
         end
 
@@ -128,7 +227,9 @@ module Metanorma
                                    "content" => text,
                                  })
           end
-          nil
+          # A figure without an image (a named quote block, a text
+          # figure) still carries content children.
+          semantic_passthrough(node, "figure")
         end
 
         def semantic_terms_section(node, level)
@@ -245,6 +346,51 @@ module Metanorma
                                  })
           end
           nil
+        end
+
+        # A quote with its attribution (author, source) — the native
+        # renders "— {author}, {source}" as QuoteAttribution.
+        def semantic_quote(node)
+          author = nil
+          source = nil
+          body = []
+          each_semantic_child(node) do |name, child|
+            case name
+            when "author" then author = semantic_inline_content(child).strip
+            when "source" then source = semantic_inline_content(child).strip
+            when "p" then body << (semantic_paragraph(child) || "")
+            else
+              html = render_semantic_node(child, name: name, level: 3)
+              body << html if html
+            end
+          end
+          attribution = [author, source].compact.reject(&:empty?).join(", ")
+          attribution = %(<p class="QuoteAttribution">— #{escape_html(attribution)}</p>) unless attribution.empty?
+          render_liquid("_element.html.liquid", {
+                          "tag" => "div",
+                          "extra_attrs" => element_attrs(
+                            id: safe_attr(node, :id), class: "semantic-quote",
+                          ),
+                          "content" => "#{body.join}#{attribution}",
+                        })
+        end
+
+        # Unknown structural tags: render their children in place so
+        # content parity holds across vocabulary extensions.
+        def semantic_passthrough(node, name)
+          inner = render_semantic_children(node, level: 3)
+          inline = semantic_inline_content(node)
+          content = inner.empty? ? inline : (inline + inner)
+          return nil if content.strip.empty?
+
+          render_liquid("_element.html.liquid", {
+                          "tag" => "div",
+                          "extra_attrs" => element_attrs(
+                            id: safe_attr(node, :id),
+                            class: "semantic-#{name.tr('_', '-')}",
+                          ),
+                          "content" => content,
+                        })
         end
 
         # Inline content: mixed text and inline children in order.

@@ -8,7 +8,7 @@ module Metanorma
           type = renderer.safe_attr(admonition, :type) || "note"
           id = renderer.safe_attr(admonition, :id)
 
-          content_html = renderer.render_simple_children(admonition) || ""
+          content_html = renderer.render_admonition_children(admonition) || ""
 
           new(
             id: id,
