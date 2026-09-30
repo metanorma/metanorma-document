@@ -160,9 +160,10 @@ module Metanorma
           pub = Array(safe_attr(bibdata, :date)).find do |d|
             safe_attr(d, :type) == "published"
           end
-          on = pub && (safe_attr(pub, :on) || safe_attr(pub, :from))
-          on = cover_date_text(on)
-          text = on ? "#{label} #{on}" : label
+          # The native maturity band reads <on> only; when absent it
+          # prints the literal placeholder XXX.
+          on = cover_date_text(pub && safe_attr(pub, :on))
+          text = on ? "#{label} #{on}" : "#{label} XXX"
           bands << %(<p><span class="coverpage-maturity" id="#{escape_html(stage)}">#{escape_html(text)}</span></p>)
         end
         return nil if bands.empty?
@@ -277,9 +278,10 @@ module Metanorma
           pub = Array(safe_attr(bibdata, :date)).find do |d|
             safe_attr(d, :type) == "published"
           end
-          on = pub && (safe_attr(pub, :on) || safe_attr(pub, :from))
-          on = cover_date_text(on)
-          text = on ? "#{label} #{on}" : label
+          # The native maturity band reads <on> only; when absent it
+          # prints the literal placeholder XXX.
+          on = cover_date_text(pub && safe_attr(pub, :on))
+          text = on ? "#{label} #{on}" : "#{label} XXX"
           bands << %(<p><span class="coverpage-maturity" id="#{escape_html(stage)}">#{escape_html(text)}</span></p>)
         end
         return nil if bands.empty?
