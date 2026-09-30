@@ -7,7 +7,8 @@
     <span class="subtitle">{{ title | escape }}</span>
   </div></div>
 {% endif %}
-{% if stage_html %}<div class="coverpage-stage-block">{{ stage_html }}</div>{% endif %}
+{% if tc_html %}{{ tc_html }}{% endif %}
+{% if stage_html %}{{ stage_html }}{% endif %}
 </div>
 {% if dates_html %}<div class="coverpage-dates">{{ dates_html }}</div>{% endif %}
 <hr class="cover-separator" />

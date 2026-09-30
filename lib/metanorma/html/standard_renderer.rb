@@ -92,25 +92,74 @@ module Metanorma
                         "doc_id" => cover_id,
                         "title" => title_text,
                         "stage_html" => cover_stage_html(bibdata),
+                        "tc_html" => cover_tc_html(bibdata),
                         "dates_html" => cover_dates_html(bibdata),
                       })
       end
 
+      def cover_tc_html(bibdata)
+        name = cover_tc_name(bibdata)
+        return nil unless name
+
+        render_liquid("_element.html.liquid", "tag" => "div",
+                                                 "extra_attrs" => %( class="coverpage-tc-name"),
+                                                 "content" => %(<span>#{escape_html(name)}</span>))
+      end
+
       # The native covers open with type and maturity bands ("IHO
       # Regulation", "Published 2017-06"); derive both from bibdata.
+      # The committee subdivision name renders as the cover tc-name
+      # ("hssc"); value-only extraction — the contributor graph is
+      # self-referential under to_s/inspect.
+      def cover_tc_name(bibdata)
+        if bibdata.respond_to?(:subdivision_text_for)
+          name = begin
+            bibdata.subdivision_text_for("committee", :name)
+          rescue StandardError
+            nil
+          end
+          return name if name.is_a?(String) && !name.empty?
+        end
+
+        Array(safe_attr(bibdata, :contributor)).each do |c|
+          roles = Array(safe_attr(c, :role))
+          author = roles.any? { |r| r.is_a?(String) ? r == "author" : safe_attr(r, :type) == "author" }
+          next unless author
+
+          org = safe_attr(c, :organization)
+          Array(safe_attr(org, :subdivision)).each do |sub|
+            name = safe_attr(sub, :name)
+            name = cover_date_text(name) unless name.is_a?(String)
+            return name if name && !name.empty?
+          end
+        end
+        nil
+      end
+
       def cover_stage_html(bibdata)
         bands = []
         if (doctype = cover_doctype_label(bibdata))
           bands << %(<span class="coverpage-stage" id="#{escape_html(cover_doctype_id(bibdata))}">#{escape_html(doctype)}</span>)
         end
         status = safe_attr(bibdata, :status)
-        stage = safe_attr(status, :stage)
+        # status.stage is an Array of mixed-content StageElement;
+        # extract the text value (stringifying can hit self-reference).
+        stage_el = Array(safe_attr(status, :stage)).first
+        stage = if stage_el.nil?
+                  nil
+                elsif stage_el.is_a?(String)
+                  stage_el
+                elsif stage_el.respond_to?(:value)
+                  Array(stage_el.value).join.strip
+                end
+        stage = nil if stage.respond_to?(:empty?) && stage.empty?
         if stage
           label = { "in-force" => "Published" }.fetch(stage, stage.capitalize)
           pub = Array(safe_attr(bibdata, :date)).find do |d|
             safe_attr(d, :type) == "published"
           end
           on = pub && (safe_attr(pub, :on) || safe_attr(pub, :from))
+          on = cover_date_text(on)
           text = on ? "#{label} #{on}" : label
           bands << %(<p><span class="coverpage-maturity" id="#{escape_html(stage)}">#{escape_html(text)}</span></p>)
         end
@@ -122,45 +171,168 @@ module Metanorma
       end
 
       def cover_doctype_label(bibdata)
-        dt = safe_attr(bibdata, :doctype)
+        dt = cover_doctype_value(bibdata)
         return nil unless dt
 
-        pretty = dt.to_s.split('-').map(&:capitalize).join(' ')
-        if (prefix = cover_publisher_prefix(bibdata))
-          "#{prefix} #{pretty}"
-        else
-          pretty
-        end
+        pretty = cover_date_text(dt) || dt.to_s
+        pretty = pretty.split('-').map(&:capitalize).join(' ')
+        prefix = cover_publisher_prefix(bibdata)
+        prefix ? "#{prefix} #{pretty}" : pretty
       end
 
       def cover_doctype_id(bibdata)
-        safe_attr(bibdata, :doctype)&.to_s&.downcase
+        cover_date_text(cover_doctype_value(bibdata))&.downcase
       end
 
+      # doctype lives either on the bibdata or its flavor extension.
+      def cover_doctype_value(bibdata)
+        Array(safe_attr(bibdata, :doctype)).first ||
+          Array(safe_attr(safe_attr(bibdata, :ext), :doctype)).first
+      end
+
+      # bibdata dates are Relaton value objects; pull the text out.
+      def cover_date_text(v)
+        return nil if v.nil?
+        return v if v.is_a?(String)
+        return Array(v.value).join.strip if v.respond_to?(:value)
+
+        # Relaton DateTime maps <on>YYYY-MM</on> to content.
+        return v.content if v.respond_to?(:content) && v.content.is_a?(String)
+        return v.text if v.respond_to?(:text) && v.text.is_a?(String)
+
+        nil
+      end
+
+      # Publisher abbreviation (preferred) or name from the bibdata
+      # contributor graph, value-only extraction: to_s/inspect on lutaml
+      # collections recurses into self-referential model graphs.
       def cover_publisher_prefix(bibdata)
-        abbr = bibdata.respond_to?(:publisher_abbr) ? safe_attr(bibdata, :publisher_abbr) : nil
-        return abbr if abbr && !abbr.to_s.empty?
+        Array(safe_attr(bibdata, :contributor)).each do |c|
+          roles = Array(safe_attr(c, :role))
+          publisher = roles.any? do |r|
+            type = r.is_a?(String) ? r : cover_date_text(safe_attr(r, :type))
+            type == "publisher"
+          end
+          next unless publisher
+
+          org = safe_attr(c, :organization)
+          abbr = cover_date_text(safe_attr(org, :abbreviation))
+          return abbr if abbr && !abbr.empty?
+
+          name = cover_date_text(safe_attr(org, :name))
+          return name if name && !name.empty?
+        end
+        nil
+      end
+
+      # The committee subdivision name renders as the cover tc-name
+      # ("hssc"); value-only extraction — the contributor graph is
+      # self-referential under to_s/inspect.
+      def cover_tc_name(bibdata)
+        if bibdata.respond_to?(:subdivision_text_for)
+          name = begin
+            bibdata.subdivision_text_for("committee", :name)
+          rescue StandardError
+            nil
+          end
+          return name if name.is_a?(String) && !name.empty?
+        end
 
         Array(safe_attr(bibdata, :contributor)).each do |c|
           roles = Array(safe_attr(c, :role))
-          role_types = roles.map do |r|
-            r.is_a?(String) ? r : safe_attr(r, :type)
-          end
-          next unless role_types.include?("publisher")
+          author = roles.any? { |r| r.is_a?(String) ? r == "author" : safe_attr(r, :type) == "author" }
+          next unless author
 
           org = safe_attr(c, :organization)
-          name = org ? safe_attr(org, :name) : nil
-          name = name.to_s unless name.nil?
-          return name unless name.nil? || name.empty?
+          Array(safe_attr(org, :subdivision)).each do |sub|
+            name = safe_attr(sub, :name)
+            name = cover_date_text(name) unless name.is_a?(String)
+            return name if name && !name.empty?
+          end
         end
         nil
+      end
+
+      def cover_stage_html(bibdata)
+        bands = []
+        if (doctype = cover_doctype_label(bibdata))
+          bands << %(<span class="coverpage-stage" id="#{escape_html(cover_doctype_id(bibdata))}">#{escape_html(doctype)}</span>)
+        end
+        status = safe_attr(bibdata, :status)
+        # status.stage is an Array of mixed-content StageElement;
+        # extract the text value (stringifying can hit self-reference).
+        stage_el = Array(safe_attr(status, :stage)).first
+        stage = if stage_el.nil?
+                  nil
+                elsif stage_el.is_a?(String)
+                  stage_el
+                elsif stage_el.respond_to?(:value)
+                  Array(stage_el.value).join.strip
+                end
+        stage = nil if stage.respond_to?(:empty?) && stage.empty?
+        if stage
+          label = { "in-force" => "Published" }.fetch(stage, stage.capitalize)
+          pub = Array(safe_attr(bibdata, :date)).find do |d|
+            safe_attr(d, :type) == "published"
+          end
+          on = pub && (safe_attr(pub, :on) || safe_attr(pub, :from))
+          on = cover_date_text(on)
+          text = on ? "#{label} #{on}" : label
+          bands << %(<p><span class="coverpage-maturity" id="#{escape_html(stage)}">#{escape_html(text)}</span></p>)
+        end
+        return nil if bands.empty?
+
+        render_liquid("_element.html.liquid", "tag" => "div",
+                                                 "extra_attrs" => %( class="coverpage-stage-block"),
+                                                 "content" => bands.join)
+      end
+
+      def cover_doctype_label(bibdata)
+        dt = cover_doctype_value(bibdata)
+        return nil unless dt
+
+        pretty = cover_date_text(dt) || dt.to_s
+        pretty = pretty.split('-').map(&:capitalize).join(' ')
+        prefix = cover_publisher_prefix(bibdata)
+        prefix ? "#{prefix} #{pretty}" : pretty
+      end
+
+      def cover_doctype_id(bibdata)
+        cover_date_text(cover_doctype_value(bibdata))&.downcase
+      end
+
+      # doctype lives either on the bibdata or its flavor extension.
+      def cover_doctype_value(bibdata)
+        Array(safe_attr(bibdata, :doctype)).first ||
+          Array(safe_attr(safe_attr(bibdata, :ext), :doctype)).first
+      end
+
+      # bibdata dates are Relaton value objects; pull the text out.
+      def cover_date_text(v)
+        return nil if v.nil?
+        return v if v.is_a?(String)
+        return Array(v.value).join.strip if v.respond_to?(:value)
+
+        # Relaton DateTime maps <on>YYYY-MM</on> to content.
+        return v.content if v.respond_to?(:content) && v.content.is_a?(String)
+        return v.text if v.respond_to?(:text) && v.text.is_a?(String)
+
+        nil
+      end
+
+      # The contributor graph is self-referential under lutaml-model;
+      # walking it for the publisher organization loops forever. The
+      # flavor theme already carries the publisher name.
+      def cover_publisher_prefix(_bibdata)
+        name = theme.respond_to?(:publisher_name) ? theme.publisher_name : nil
+        name.is_a?(String) && !name.empty? ? name : nil
       end
 
       # Document dates (issue/implementation/...) as a cover band.
       def cover_dates_html(bibdata)
         items = Array(safe_attr(bibdata, :date)).filter_map do |d|
-          type = safe_attr(d, :type)
-          on = safe_attr(d, :on) || safe_attr(d, :from)
+          type = cover_date_text(safe_attr(d, :type)) || safe_attr(d, :type)
+          on = cover_date_text(safe_attr(d, :on)) || cover_date_text(safe_attr(d, :from))
           next unless type && on
 
           %(<span class="coverpage-date date-#{escape_html(type)}">#{escape_html(type.capitalize)}: #{escape_html(on)}</span>)
