@@ -19,6 +19,7 @@ module Metanorma
       autoload :ReferenceElements,
                "metanorma/document/components/reference_elements"
       autoload :Sections, "metanorma/document/components/sections"
+      autoload :Semantic, "metanorma/document/components/semantic"
       autoload :Tables, "metanorma/document/components/tables"
       autoload :Inline, "metanorma/document/components/inline"
       autoload :TextElements, "metanorma/document/components/text_elements"

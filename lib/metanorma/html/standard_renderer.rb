@@ -3,6 +3,7 @@
 module Metanorma
   module Html
     class StandardRenderer < BaseRenderer
+        include Renderers::SemanticRenderer
       register_render "Metanorma::Standoc::Document::Root",
                       :render_standard_document
       register_render "Metanorma::Standoc::Document::Terms::Term", :render_term
@@ -73,6 +74,7 @@ module Metanorma
         end
 
         content_parts << (render(doc.indexsect) || "") if doc.indexsect
+        content_parts << (render_semantic_annexes(doc) || "")
         content_parts << (render_footnotes_section || "")
 
         cover + render_liquid("_main_content.html.liquid", {
