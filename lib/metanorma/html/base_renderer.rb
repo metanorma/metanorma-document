@@ -13,6 +13,8 @@ module Metanorma
       autoload :PubidRenderer, "metanorma/html/renderers/pubid_renderer"
       autoload :ElementOrderTraversal,
                "metanorma/html/renderers/element_order_traversal"
+      autoload :SemanticRenderer,
+               "metanorma/html/renderers/semantic_renderer"
     end
 
     class BaseRenderer
