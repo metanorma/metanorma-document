@@ -34,6 +34,23 @@ module Metanorma
           quote: :render_quote,
         }.freeze
 
+        # Admonitions carry the full block range (BSI commentary lists,
+        # NIST historical quotes with attributions).
+        ADMONITION_CHILDREN = {
+          paragraphs: :render_paragraph,
+          semx: :render_note_semx_content,
+          ul: :render_unordered_list,
+          ol: :render_ordered_list,
+          dl: :render_definition_list,
+          quote: :render_quote,
+          table: :render_table,
+          formula: :render_formula,
+        }.freeze
+
+        def render_admonition_children(model)
+          render_block_children(model, children: ADMONITION_CHILDREN)
+        end
+
         # Presentation notes whose body arrives wrapped in a semx slice.
         def render_note_semx_content(semx)
           coordinator.render_semx_content(semx)
@@ -465,12 +482,29 @@ module Metanorma
           content = content_parts.join
           attribution_html = if quote.attribution
                                coordinator.render_mixed_inline(quote.attribution)
+                             else
+                               quote_author_source_attribution(quote)
                              end
           render_liquid("_quote.html.liquid", {
                           "attrs" => attrs,
                           "content" => content,
                           "attribution" => attribution_html,
                         })
+        end
+
+        # Quotes carry the attribution as author + source children
+        # (native: "— {author}, {source}").
+        def quote_author_source_attribution(quote)
+          author = safe_attr(safe_attr(quote, :author), :text)
+          source = safe_attr(quote, :source)
+          source_text = if source
+                          rendered = coordinator.render_mixed_inline(source)
+                          rendered.to_s.gsub(/<[^>]+>/, "").strip
+                        end
+          parts = [author, source_text].compact.reject(&:empty?)
+          return nil if parts.empty?
+
+          "— #{parts.join(', ')}"
         end
 
         def render_admonition(admonition, **_opts)
