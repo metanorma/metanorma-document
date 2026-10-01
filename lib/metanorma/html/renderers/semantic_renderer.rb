@@ -179,6 +179,7 @@ module Metanorma
           when "table" then semantic_table(node)
           when "title" then nil # rendered with its section
           when "figure" then semantic_figure(node)
+          when "sourcecode" then semantic_sourcecode(node)
           when "quote" then semantic_quote(node)
           else
             if INLINE_TAGS.include?(name)
@@ -338,6 +339,53 @@ module Metanorma
                                  })
           end
           nil
+        end
+
+        # Source blocks: verbatim pre/code content.
+        def semantic_sourcecode(node)
+          text = semantic_text_content(node)
+          return nil if text.strip.empty?
+
+          lang = safe_attr(node, :lang) || safe_attr(node, :sem_language)
+          lang_attr = lang ? %( lang="#{escape_html(lang.to_s)}") : ""
+          render_liquid("_element.html.liquid", {
+                          "tag" => "figure",
+                          "extra_attrs" => element_attrs(
+                            id: safe_attr(node, :id), class: "semantic-sourcecode",
+                          ),
+                          "content" => %(<pre><code#{lang_attr}>#{escape_html(text)}</code></pre>),
+                        })
+        end
+
+        # Plain concatenated text of a node's mixed content, in
+        # document order (for verbatim blocks).
+        def semantic_text_content(node)
+          parts = []
+          each_semantic_child_pair(node) do |kind, value|
+            case kind
+            when :text then parts << value.to_s
+            when :element then parts << semantic_text_content(value)
+            end
+          end
+          parts.join
+        end
+
+        # element_order walk yielding [:text, string] and
+        # [:element, child] pairs in document order.
+        def each_semantic_child_pair(node)
+          return enum_for(:each_semantic_child_pair, node) unless block_given?
+
+          children = Array(node.children)
+          index = 0
+          Array(node.element_order).each do |el|
+            if el.text?
+              yield :text, el.text_content
+            else
+              child = children[index]
+              index += 1
+              yield :element, child if child
+            end
+          end
         end
 
         # A quote with its attribution (author, source) — the native
