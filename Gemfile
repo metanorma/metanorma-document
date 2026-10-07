@@ -46,7 +46,7 @@ gem "nokogiri"
 gem "leptris", "~> 1.9"
 # TEMPORARY pin: the json 3.0 to_json fix (lutaml-model#769) — flip to
 # the released version when it ships.
-gem "lutaml-model", github: "lutaml/lutaml-model", branch: "fix/767-json-register-kwarg"
+gem "lutaml-model", github: "lutaml/lutaml-model", branch: "main" # the 767/769 json fix landed; main also rides rubyzip 3.7 like relaton 3.x
 gem "moxml", "~> 0.5.30"
 # 0.2.6 (2026-09-08) carries the moxml-0.5 range (plurimath/omml#11)
 gem "omml", "~> 0.2.6"
