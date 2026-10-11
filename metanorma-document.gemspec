@@ -47,7 +47,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "pubid", "~> 2.0.0.pre.alpha"
   # relaton v3 monogem provides Relaton::Bib (require "relaton/bib");
   # the former standalone relaton-bib gem is consolidated into it.
-  spec.add_dependency "relaton", ">= 3.0.0.pre.alpha.1"
+  spec.add_dependency "relaton", "~> 3.0.0.pre.alpha"
   # Native object-model decomposition (Glossarist concepts, Relaton
   # bibdata, Plurimath formulas) is a model-layer capability.
   spec.add_dependency "glossarist", "~> 2.13"
