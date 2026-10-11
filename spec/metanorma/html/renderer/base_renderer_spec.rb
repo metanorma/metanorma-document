@@ -175,12 +175,15 @@ RSpec.describe Metanorma::Html::BaseRenderer do
   end
 
   describe "block-dispatch registrations for inline-ish fmt classes" do
-    it "gives fmt-xref-label no block dispatch (native parity: a section-level xref-label duplicates the heading number)" do
+    # a76aa67: fmt-xref-label renders through at block dispatch (block
+    # context needs the label text; section-level duplication is handled
+    # by the caller suppressing the heading number).
+    it "dispatches fmt-xref-label to render_block_inline_content at block dispatch" do
       method = renderer.lookup_dispatch(
         Metanorma::Document::Components::Inline::FmtXrefLabelElement,
         :render_registry,
       )
-      expect(method).to be_nil
+      expect(method).to eq(:render_block_inline_content)
     end
 
     it "skips fmt-title (the semantic title attribute renders instead)" do

@@ -201,8 +201,12 @@ RSpec.describe Metanorma::Html::Theme do
   describe "OGC theme overrides" do
     let(:theme) { described_class.load(:ogc) }
 
-    it "has clause-only preface_order" do
-      expect(theme.preface_order).to eq(%w[clause])
+    # 1f91b1c: the wrapped preface renders the named sections, not just
+    # clauses — the OGC theme lists the full preface sequence.
+    it "has the full wrapped-preface order" do
+      expect(theme.preface_order)
+        .to eq(%w[foreword introduction abstract clause acknowledgements
+                  executivesummary])
     end
 
     it "has preface_wrap enabled" do

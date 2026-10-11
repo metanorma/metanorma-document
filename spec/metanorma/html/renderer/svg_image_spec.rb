@@ -76,12 +76,16 @@ RSpec.describe "SVG image capture and rendering" do
       XML
     end
 
-    it "renders inline SVG as base64 data URI in img tag" do
+    # Native parity: embedded SVG inlines as markup (its text nodes are
+    # page text), not a base64 <img> data URI.
+    it "renders inline SVG as inline markup in the figure span" do
       image = Metanorma::Document::Components::IdElements::Image.from_xml(svg_xml)
       renderer = Metanorma::Html::BaseRenderer.new
       html = renderer.render_image(image)
-      expect(html).to include("data:image/svg+xml;base64,")
-      expect(html).to include("<img")
+      expect(html).to include("<span id=\"fig1\" class=\"figure-svg\">")
+      expect(html).to include("<svg xmlns=\"http://www.w3.org/2000/svg\"")
+      expect(html).to include("<rect")
+      expect(html).not_to include("data:image/svg+xml;base64,")
     end
 
     it "does not include file source when SVG is present" do
