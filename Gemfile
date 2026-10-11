@@ -19,7 +19,7 @@ gem "metanorma-iso", github: "metanorma/metanorma-iso", branch: "feat/model-vali
 gem "metanorma-itu", github: "metanorma/metanorma-itu", branch: "main"
 # mko >= 1.1.0 from rubygems carries Mko::Language
 gem "metanorma-mirror", "~> 1.0"
-gem "metanorma-mko"
+gem "metanorma-mko", github: "metanorma/metanorma-mko", branch: "main" # mko#9: rubyzip-3 zip! fix, unreleased
 gem "metanorma-ogc", github: "metanorma/metanorma-ogc", branch: "main"
 # TEMPORARY pin: svgmap/imagemap/columnbreak section wiring
 # (standoc#1251) for the renderer specs — flip to main on merge.
