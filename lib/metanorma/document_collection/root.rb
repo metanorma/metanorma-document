@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Metanorma
-  module Collection
+  module DocumentCollection
     # Root model for <metanorma-collection> XML.
     # Represents a collection of Metanorma documents bundled together,
     # with shared metadata, directives, and a manifest of entries.

@@ -101,7 +101,7 @@ RSpec.shared_examples "xml round-trip" do |flavor_dir:, doc_class: Metanorma::Is
 end
 
 RSpec.shared_examples "collection round-trip" do |flavor_dir:|
-  require "metanorma/collection"
+  require "metanorma/document_collection"
 
   collections = RoundtripHelper.discover_collections(flavor_dir: flavor_dir)
 
@@ -109,7 +109,7 @@ RSpec.shared_examples "collection round-trip" do |flavor_dir:|
     describe fixture[:name] do
       let(:data) do
         RoundtripHelper.fixture_data(fixture[:path],
-                                     Metanorma::Collection::Root)
+                                     Metanorma::DocumentCollection::Root)
       end
       let(:xml) { data[:xml] }
       let(:doc) { data[:doc] }
@@ -118,7 +118,7 @@ RSpec.shared_examples "collection round-trip" do |flavor_dir:|
       let(:roundtrip_noko) { data[:roundtrip_noko] }
 
       it "parses without error" do
-        expect(doc).to be_a(Metanorma::Collection::Root)
+        expect(doc).to be_a(Metanorma::DocumentCollection::Root)
       end
 
       it "produces valid XML" do

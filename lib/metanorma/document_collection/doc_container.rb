@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Metanorma
-  module Collection
+  module DocumentCollection
     # A container for an embedded document within a metanorma-collection.
     # Each doc-container holds one <metanorma> document identified by its id attribute.
     class DocContainer < Lutaml::Model::Serializable
