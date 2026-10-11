@@ -14,17 +14,21 @@ RSpec.describe Metanorma::Html::Component::FootnoteCollector do
 
   describe "#register" do
     it "returns sequential numbers" do
-      n1 = collector.register(mock_fn(id: "fn1", reference: "a"))
-      n2 = collector.register(mock_fn(id: "fn2", reference: "b"))
-      expect(n1).to eq(1)
-      expect(n2).to eq(2)
+      e1 = collector.register(mock_fn(id: "fn1", reference: "a"))
+      e2 = collector.register(mock_fn(id: "fn2", reference: "b"))
+      expect(e1.number).to eq(1)
+      expect(e2.number).to eq(2)
     end
 
-    it "deduplicates by reference" do
-      n1 = collector.register(mock_fn(id: "fn1", reference: "a"))
-      n2 = collector.register(mock_fn(id: "fn1-dup", reference: "a"))
-      expect(n1).to eq(1)
-      expect(n2).to eq(1)
+    # 1c7de2e: dedup is by target/fn id — several <fn> references with
+    # differing reference attrs may point at one definition; distinct ids
+    # are distinct definitions even when their references collide.
+    it "deduplicates by id and tolerates colliding references" do
+      e1 = collector.register(mock_fn(id: "fn1", reference: "a"))
+      e1b = collector.register(mock_fn(id: "fn1", reference: "a"))
+      e2 = collector.register(mock_fn(id: "fn1-dup", reference: "a"))
+      expect(e1b).to equal(e1)
+      expect(e2.number).to eq(2)
     end
   end
 
