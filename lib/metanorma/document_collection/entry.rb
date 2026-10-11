@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Metanorma
-  module Collection
+  module DocumentCollection
     # An entry in a metanorma-collection manifest.
     # Entries are recursive — a top-level entry can contain nested entries,
     # each representing a document in the collection.

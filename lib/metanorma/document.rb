@@ -47,7 +47,7 @@ module Metanorma
   end
 
   autoload :BasicDocument, "#{__dir__}/basic_document"
-  autoload :Collection, "metanorma/collection"
+  autoload :DocumentCollection, "metanorma/document_collection"
   autoload :Html, "metanorma/html"
   # Mko: the format lives in the metanorma-mko gem; Metanorma::Mko is
   # REOPENED by the model side (document/mko.rb) with the projection

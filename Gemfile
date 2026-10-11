@@ -46,7 +46,8 @@ gem "nokogiri"
 gem "leptris", "~> 1.9"
 # TEMPORARY pin: the json 3.0 to_json fix (lutaml-model#769) — flip to
 # the released version when it ships.
-gem "lutaml-model", github: "lutaml/lutaml-model", branch: "fix/767-json-register-kwarg"
+# fix/767-json-register-kwarg branch is stale (no 0.8.76+ revision); canonical release carries the fix
+gem "lutaml-model", "0.8.102"
 gem "moxml", "~> 0.5.30"
 # 0.2.6 (2026-09-08) carries the moxml-0.5 range (plurimath/omml#11)
 gem "omml", "~> 0.2.6"
@@ -61,3 +62,6 @@ gem "rubocop-rspec"
 gem "benchmark-ips"
 gem "concurrent-ruby", "~> 1.3"
 gem "simplecov", require: false
+# monogem lockstep pair (α3–α6 were yanked; α14 is the current pairing)
+gem "relaton", "3.0.0.pre.alpha.14"
+gem "relaton-cli", "3.0.0.pre.alpha.14"
