@@ -160,7 +160,7 @@ module Metanorma
               clauses.filter_map { |cl| coordinator.render(cl, level: 2) }.join
             else
               out = Array(safe_attr(preface, name.to_sym))
-                     .filter_map { |sec| coordinator.render(sec, level: 2) }.join
+                .filter_map { |sec| coordinator.render(sec, level: 2) }.join
               out.empty? ? nil : out
             end
           end.join

@@ -22,7 +22,7 @@ css_class: nil, annotations_html: nil)
 
           name_html = if renderer.safe_attr(sc, :fmt_name) || sc.name
                         renderer.render_inline_element(
-                          renderer.safe_attr(sc, :fmt_name) || sc.name
+                          renderer.safe_attr(sc, :fmt_name) || sc.name,
                         )
                       end
 

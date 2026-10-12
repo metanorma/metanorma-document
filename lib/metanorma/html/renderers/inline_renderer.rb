@@ -67,7 +67,7 @@ module Metanorma
           # refterm is semantic-only inside <concept>, but a related-term
           # semx renders it as escaped literal text (native parity).
           if node.is_a?(Metanorma::Document::Components::Inline::SemxElement)
-            skip_after = skip_after.reject { |k, _| k == "refterm" }
+            skip_after = skip_after.except("refterm")
           end
           skip = {}
           node.element_order.each_with_index do |el, i|
@@ -448,7 +448,7 @@ module Metanorma
             render_liquid("_link.html.liquid", {
                             "attrs" => attrs,
                             "content" => inner,
-                            })
+                          })
           else
             display_text = escape_html(target.to_s.delete_prefix("mailto:"))
             render_liquid("_link.html.liquid", {
@@ -466,8 +466,11 @@ module Metanorma
           # Cross-references carry no computed labels in this pipeline, so
           # unresolvable targets keep isodoc's literal "[id]" fallback,
           # emitted ahead of the link text like the native presentation.
-          text = content.empty? ? "[#{escape_html(target.to_s)}]"
-                                : "[#{escape_html(target.to_s)}] #{content}"
+          text = if content.empty?
+                   "[#{escape_html(target.to_s)}]"
+                 else
+                   "[#{escape_html(target.to_s)}] #{content}"
+                 end
           render_liquid("_link.html.liquid", {
                           "attrs" => attrs,
                           "content" => text,
@@ -530,6 +533,7 @@ module Metanorma
           end
           %i[ul ol table].each do |attr|
             next unless fn.respond_to?(attr)
+
             Array(fn.send(attr)).each do |block|
               popup_parts << (coordinator.render(block) || "")
             end
@@ -645,7 +649,7 @@ module Metanorma
           # own; fall through to the block registry so it renders instead
           # of being dropped.
           method = coordinator.lookup_dispatch(element.class, :inline_registry) ||
-                   coordinator.lookup_dispatch(element.class, :render_registry)
+            coordinator.lookup_dispatch(element.class, :render_registry)
           if method
             coordinator.public_send(method, element)
           elsif element.is_a?(Lutaml::Model::Serializable) && element.mixed?

@@ -121,7 +121,6 @@ module Metanorma
         end
       end
 
-
       def self.validate(argv)
         options = parse_validate_options(argv)
         checks = []
