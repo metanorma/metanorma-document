@@ -121,19 +121,7 @@ module Metanorma
             coordinator.table_fn_context = saved_ctx
           end
 
-          tfoot_html = nil
-          if table.tfoot || (table.note && !table.note.empty?) || table_fns.any?
-            tfoot_inner = render_table_section_rows(table.tfoot) if table.tfoot
-            notes_html = nil
-            if table.note && !table.note.empty?
-              notes_inner = table.note.filter_map { |n| render_note(n) }.join
-              notes_html = render_liquid("_element.html.liquid", "tag" => "tr", "extra_attrs" => "",
-                                                                 "content" => render_liquid("_element.html.liquid", "tag" => "td", "extra_attrs" => %( colspan="#{col_count}" class="table-notes"), "content" => notes_inner))
-            end
-            table_fn_html = table_footnotes_row(table_fns, col_count)
-            tfoot_html = render_liquid("_element.html.liquid", "tag" => "tfoot", "extra_attrs" => "",
-                                                               "content" => "#{tfoot_inner}#{notes_html}#{table_fn_html}")
-          end
+          tfoot_html = table_tfoot_html(table, table_fns, col_count)
 
           render_liquid("_table.html.liquid", {
                           "attrs" => attrs,
@@ -145,12 +133,31 @@ module Metanorma
                         })
         end
 
+        def table_tfoot_html(table, table_fns, col_count)
+          return nil unless table.tfoot || (table.note && !table.note.empty?) ||
+            table_fns.any?
+
+          tfoot_inner = render_table_section_rows(table.tfoot) if table.tfoot
+          notes_html = table_notes_row(table, col_count)
+          table_fn_html = table_footnotes_row(table_fns, col_count)
+          render_liquid("_element.html.liquid", "tag" => "tfoot", "extra_attrs" => "",
+                                                "content" => "#{tfoot_inner}#{notes_html}#{table_fn_html}")
+        end
+
+        def table_notes_row(table, col_count)
+          return nil unless table.note && !table.note.empty?
+
+          notes_inner = table.note.filter_map { |n| render_note(n) }.join
+          render_liquid("_element.html.liquid", "tag" => "tr", "extra_attrs" => "",
+                                                "content" => render_liquid("_element.html.liquid", "tag" => "td", "extra_attrs" => %( colspan="#{col_count}" class="table-notes"), "content" => notes_inner))
+        end
+
         # Native parity: <fn>s used inside a table render as visible
         # TableFootnote blocks in a spanning tfoot row.
         def table_footnotes_row(fns, col_count)
           items = fns.filter_map do |fn|
             label = coordinator.footnote_label_text(fn) ||
-                    safe_attr(fn, :reference)
+              safe_attr(fn, :reference)
             next unless label
 
             body = coordinator.fn_content_html(fn)
@@ -162,7 +169,7 @@ module Metanorma
 
           inner = %(<div class="TableFootnote">#{items.join}</div>)
           render_liquid("_element.html.liquid", "tag" => "tr", "extra_attrs" => "",
-                                                             "content" => render_liquid("_element.html.liquid", "tag" => "td", "extra_attrs" => %( colspan="#{col_count}" class="table-footnotes"), "content" => inner))
+                                                "content" => render_liquid("_element.html.liquid", "tag" => "td", "extra_attrs" => %( colspan="#{col_count}" class="table-footnotes"), "content" => inner))
         end
 
         def table_column_count(table)
@@ -333,7 +340,7 @@ module Metanorma
         # list items); emitted after the list body so they are not dropped.
         def attached_notes_html(list, html)
           note_parts = Array(safe_attr(list, :note))
-                       .filter_map { |note| coordinator.render(note) || "" }
+            .filter_map { |note| coordinator.render(note) || "" }
           return html if note_parts.empty?
 
           html + render_liquid("_element.html.liquid", {
@@ -452,34 +459,20 @@ module Metanorma
           render_liquid("_formula.html.liquid", { "block" => drop })
         end
 
+        QUOTE_CHILDREN = {
+          paragraphs: %i[self render_paragraph],
+          ul: %i[self render_unordered_list],
+          ol: %i[self render_ordered_list],
+          dl: %i[self render_definition_list],
+          table: %i[self render_table],
+          formula: %i[self render_formula],
+          note: %i[coordinator render_note],
+          bookmark: %i[coordinator render_bookmark],
+        }.freeze
+
         def render_quote(quote, **_opts)
           attrs = element_attrs(id: safe_attr(quote, :id), class: "quote")
-          content_parts = []
-          quote.paragraphs&.each do |para|
-            content_parts << (render_paragraph(para) || "")
-          end
-          quote.ul&.each do |ul|
-            content_parts << (render_unordered_list(ul) || "")
-          end
-          quote.ol&.each do |ol|
-            content_parts << (render_ordered_list(ol) || "")
-          end
-          quote.dl&.each do |dl|
-            content_parts << (render_definition_list(dl) || "")
-          end
-          quote.table&.each do |table|
-            content_parts << (render_table(table) || "")
-          end
-          quote.formula&.each do |formula|
-            content_parts << (render_formula(formula) || "")
-          end
-          quote.note&.each do |note|
-            content_parts << (coordinator.render_note(note) || "")
-          end
-          quote.bookmark&.each do |bookmark|
-            content_parts << (coordinator.render_bookmark(bookmark) || "")
-          end
-          content = content_parts.join
+          content = quote_children_html(quote)
           attribution_html = if quote.attribution
                                coordinator.render_mixed_inline(quote.attribution)
                              else
@@ -490,6 +483,16 @@ module Metanorma
                           "content" => content,
                           "attribution" => attribution_html,
                         })
+        end
+
+        def quote_children_html(quote)
+          QUOTE_CHILDREN.flat_map do |attr, (receiver, method)|
+            values = safe_attr(quote, attr)
+            next [] unless values
+
+            target = receiver == :coordinator ? coordinator : self
+            Array(values).map { |child| target.public_send(method, child) || "" }
+          end.join
         end
 
         # Quotes carry the attribution as author + source children

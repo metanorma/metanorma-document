@@ -3,7 +3,8 @@
 module Metanorma
   module Html
     class StandardRenderer < BaseRenderer
-        include Renderers::SemanticRenderer
+      include Renderers::SemanticRenderer
+
       register_render "Metanorma::Standoc::Document::Root",
                       :render_standard_document
       register_render "Metanorma::Standoc::Document::Terms::Term", :render_term
@@ -59,27 +60,29 @@ module Metanorma
         cover += render_boilerplate(doc) if doc.respond_to?(:boilerplate) &&
           doc.boilerplate
 
-        content_parts = []
-        content_parts << (render(doc.preface) || "") if doc.preface
-        content_parts << (render_doc_title(doc) || "")
-        content_parts << (render(doc.sections) || "") if doc.sections
-        doc.annex&.each { |annex| content_parts << (render(annex) || "") }
-        content_parts << (render(doc.bibliography) || "") if doc.bibliography
-        content_parts << (render(doc.colophon) || "") if doc.respond_to?(:colophon) &&
+        cover + render_liquid("_main_content.html.liquid",
+                              { "content" => main_sections_html(doc) })
+      end
+
+      def main_sections_html(doc)
+        parts = []
+        parts << (render(doc.preface) || "") if doc.preface
+        parts << (render_doc_title(doc) || "")
+        parts << (render(doc.sections) || "") if doc.sections
+        doc.annex&.each { |annex| parts << (render(annex) || "") }
+        parts << (render(doc.bibliography) || "") if doc.bibliography
+        parts << (render(doc.colophon) || "") if doc.respond_to?(:colophon) &&
           doc.colophon
 
         unless @index_term_collector.empty?
           index_component = Component::IndexSection.new(self)
-          content_parts << (index_component.render(@index_term_collector) || "")
+          parts << (index_component.render(@index_term_collector) || "")
         end
 
-        content_parts << (render(doc.indexsect) || "") if doc.indexsect
-        content_parts << (render_semantic_annexes(doc) || "")
-        content_parts << (render_footnotes_section || "")
-
-        cover + render_liquid("_main_content.html.liquid", {
-                                "content" => content_parts.join,
-                              })
+        parts << (render(doc.indexsect) || "") if doc.indexsect
+        parts << (render_semantic_annexes(doc) || "")
+        parts << (render_footnotes_section || "")
+        parts.join
       end
 
       def render_coverpage(doc)
@@ -104,8 +107,8 @@ module Metanorma
         return nil unless name
 
         render_liquid("_element.html.liquid", "tag" => "div",
-                                                 "extra_attrs" => %( class="coverpage-tc-name"),
-                                                 "content" => %(<span>#{escape_html(name)}</span>))
+                                              "extra_attrs" => %( class="coverpage-tc-name"),
+                                              "content" => %(<span>#{escape_html(name)}</span>))
       end
 
       # The native covers open with type and maturity bands ("IHO
@@ -169,8 +172,8 @@ module Metanorma
         return nil if bands.empty?
 
         render_liquid("_element.html.liquid", "tag" => "div",
-                                                 "extra_attrs" => %( class="coverpage-stage-block"),
-                                                 "content" => bands.join)
+                                              "extra_attrs" => %( class="coverpage-stage-block"),
+                                              "content" => bands.join)
       end
 
       def cover_doctype_label(bibdata)
@@ -178,7 +181,7 @@ module Metanorma
         return nil unless dt
 
         pretty = cover_date_text(dt) || dt.to_s
-        pretty = pretty.split('-').map(&:capitalize).join(' ')
+        pretty = pretty.split("-").map(&:capitalize).join(" ")
         prefix = cover_publisher_prefix(bibdata)
         prefix ? "#{prefix} #{pretty}" : pretty
       end
@@ -194,14 +197,14 @@ module Metanorma
       end
 
       # bibdata dates are Relaton value objects; pull the text out.
-      def cover_date_text(v)
-        return nil if v.nil?
-        return v if v.is_a?(String)
-        return Array(v.value).join.strip if v.respond_to?(:value)
+      def cover_date_text(value)
+        return nil if value.nil?
+        return value if value.is_a?(String)
+        return Array(value.value).join.strip if value.respond_to?(:value)
 
         # Relaton DateTime maps <on>YYYY-MM</on> to content.
-        return v.content if v.respond_to?(:content) && v.content.is_a?(String)
-        return v.text if v.respond_to?(:text) && v.text.is_a?(String)
+        return value.content if value.respond_to?(:content) && value.content.is_a?(String)
+        return value.text if value.respond_to?(:text) && value.text.is_a?(String)
 
         nil
       end
@@ -209,120 +212,14 @@ module Metanorma
       # Publisher abbreviation (preferred) or name from the bibdata
       # contributor graph, value-only extraction: to_s/inspect on lutaml
       # collections recurses into self-referential model graphs.
-      def cover_publisher_prefix(bibdata)
-        Array(safe_attr(bibdata, :contributor)).each do |c|
-          roles = Array(safe_attr(c, :role))
-          publisher = roles.any? do |r|
-            type = r.is_a?(String) ? r : cover_date_text(safe_attr(r, :type))
-            type == "publisher"
-          end
-          next unless publisher
-
-          org = safe_attr(c, :organization)
-          abbr = cover_date_text(safe_attr(org, :abbreviation))
-          return abbr if abbr && !abbr.empty?
-
-          name = cover_date_text(safe_attr(org, :name))
-          return name if name && !name.empty?
-        end
-        nil
-      end
 
       # The committee subdivision name renders as the cover tc-name
       # ("hssc"); value-only extraction — the contributor graph is
       # self-referential under to_s/inspect.
-      def cover_tc_name(bibdata)
-        if bibdata.respond_to?(:subdivision_text_for)
-          name = begin
-            bibdata.subdivision_text_for("committee", :name)
-          rescue StandardError
-            nil
-          end
-          return name if name.is_a?(String) && !name.empty?
-        end
-
-        Array(safe_attr(bibdata, :contributor)).each do |c|
-          roles = Array(safe_attr(c, :role))
-          author = roles.any? { |r| r.is_a?(String) ? r == "author" : safe_attr(r, :type) == "author" }
-          next unless author
-
-          org = safe_attr(c, :organization)
-          Array(safe_attr(org, :subdivision)).each do |sub|
-            name = safe_attr(sub, :name)
-            name = cover_date_text(name) unless name.is_a?(String)
-            return name if name && !name.empty?
-          end
-        end
-        nil
-      end
-
-      def cover_stage_html(bibdata)
-        bands = []
-        if (doctype = cover_doctype_label(bibdata))
-          bands << %(<span class="coverpage-stage" id="#{escape_html(cover_doctype_id(bibdata))}">#{escape_html(doctype)}</span>)
-        end
-        status = safe_attr(bibdata, :status)
-        # status.stage is an Array of mixed-content StageElement;
-        # extract the text value (stringifying can hit self-reference).
-        stage_el = Array(safe_attr(status, :stage)).first
-        stage = if stage_el.nil?
-                  nil
-                elsif stage_el.is_a?(String)
-                  stage_el
-                elsif stage_el.respond_to?(:value)
-                  Array(stage_el.value).join.strip
-                end
-        stage = nil if stage.respond_to?(:empty?) && stage.empty?
-        if stage
-          label = { "in-force" => "Published" }.fetch(stage, stage.capitalize)
-          pub = Array(safe_attr(bibdata, :date)).find do |d|
-            safe_attr(d, :type) == "published"
-          end
-          # The native maturity band reads <on> only; when absent it
-          # prints the literal placeholder XXX.
-          on = cover_date_text(pub && safe_attr(pub, :on))
-          text = on ? "#{label} #{on}" : "#{label} XXX"
-          bands << %(<p><span class="coverpage-maturity" id="#{escape_html(stage)}">#{escape_html(text)}</span></p>)
-        end
-        return nil if bands.empty?
-
-        render_liquid("_element.html.liquid", "tag" => "div",
-                                                 "extra_attrs" => %( class="coverpage-stage-block"),
-                                                 "content" => bands.join)
-      end
-
-      def cover_doctype_label(bibdata)
-        dt = cover_doctype_value(bibdata)
-        return nil unless dt
-
-        pretty = cover_date_text(dt) || dt.to_s
-        pretty = pretty.split('-').map(&:capitalize).join(' ')
-        prefix = cover_publisher_prefix(bibdata)
-        prefix ? "#{prefix} #{pretty}" : pretty
-      end
-
-      def cover_doctype_id(bibdata)
-        cover_date_text(cover_doctype_value(bibdata))&.downcase
-      end
 
       # doctype lives either on the bibdata or its flavor extension.
-      def cover_doctype_value(bibdata)
-        Array(safe_attr(bibdata, :doctype)).first ||
-          Array(safe_attr(safe_attr(bibdata, :ext), :doctype)).first
-      end
 
       # bibdata dates are Relaton value objects; pull the text out.
-      def cover_date_text(v)
-        return nil if v.nil?
-        return v if v.is_a?(String)
-        return Array(v.value).join.strip if v.respond_to?(:value)
-
-        # Relaton DateTime maps <on>YYYY-MM</on> to content.
-        return v.content if v.respond_to?(:content) && v.content.is_a?(String)
-        return v.text if v.respond_to?(:text) && v.text.is_a?(String)
-
-        nil
-      end
 
       # The contributor graph is self-referential under lutaml-model;
       # walking it for the publisher organization loops forever. The
@@ -344,8 +241,8 @@ module Metanorma
         return nil if items.empty?
 
         render_liquid("_element.html.liquid", "tag" => "div",
-                                                 "extra_attrs" => %( class="coverpage-dates"),
-                                                 "content" => items.join)
+                                              "extra_attrs" => %( class="coverpage-dates"),
+                                              "content" => items.join)
       end
 
       # The document <boilerplate> front-matter block (copyright,
@@ -458,42 +355,56 @@ module Metanorma
         label = req.respond_to?(:fmt_name) && req.fmt_name ? render(req.fmt_name) : reqt_label(req)
         parts << %(<div class="reqt"><p class="reqt-label">#{escape_html(label.to_s)}</p>)
 
-        # Presentation-layer formatted provision: the requirement's own
-        # rendered table — when present it carries the full content.
         if req.respond_to?(:fmt_provision) && req.fmt_provision
-          parts << (render(req.fmt_provision) || "")
-
-          # Nested requirements (tests inside conformance classes) are
-          # not part of the formatted table — render them after it.
-          %i[requirement recommendation permission].each do |attr|
-            next unless req.respond_to?(attr)
-            Array(req.send(attr)).each { |nested| parts << (render(nested) || "") }
-          end
-
-          parts << %(</div>)
-          return parts.join
+          parts << requirement_fmt_provision_html(req)
+        else
+          parts << requirement_component_rows(req)
+          parts << requirement_classification_row(req)
         end
 
-        REQ_COMPONENTS.each do |attr, row_label|
+        parts << %(</div>)
+        parts.join
+      end
+
+      # Presentation-layer formatted provision: the requirement's own
+      # rendered table — when present it carries the full content.
+      def requirement_fmt_provision_html(req)
+        provision = render(req.fmt_provision) || ""
+
+        # Nested requirements (tests inside conformance classes) are
+        # not part of the formatted table — render them after it.
+        nested = %i[requirement recommendation permission].flat_map do |attr|
+          next [] unless req.respond_to?(attr)
+
+          Array(req.send(attr)).map { |child| render(child) || "" }
+        end
+
+        "#{provision}#{nested.join}"
+      end
+
+      def requirement_component_rows(req)
+        REQ_COMPONENTS.filter_map do |attr, row_label|
           value = req.respond_to?(attr) ? req.send(attr) : nil
           next if value.nil? || (value.respond_to?(:empty?) && value.empty?)
 
           cells = Array(value).filter_map { |component| render_reqt_component(component) }.join
           next if cells.empty?
 
-          parts << %(<div class="reqt-row"><span class="reqt-key">#{row_label}:</span> #{cells}</div>)
-        end
+          %(<div class="reqt-row"><span class="reqt-key">#{row_label}:</span> #{cells}</div>)
+        end.join
+      end
 
-        if req.respond_to?(:classification) && req.classification&.any?
-          cls = req.classification.filter_map do |c|
-            next unless c.respond_to?(:value)
-            "#{c.respond_to?(:tag) ? c.tag : ''} #{c.value}".strip
-          end.reject(&:empty?).join("; ")
-          parts << %(<div class="reqt-row"><span class="reqt-key">Classification:</span> #{escape_html(cls)}</div>) unless cls.empty?
-        end
+      def requirement_classification_row(req)
+        return "" unless req.respond_to?(:classification) && req.classification&.any?
 
-        parts << %(</div>)
-        parts.join
+        cls = req.classification.filter_map do |c|
+          next unless c.respond_to?(:value)
+
+          "#{c.tag if c.respond_to?(:tag)} #{c.value}".strip
+        end.reject(&:empty?).join("; ")
+        return "" if cls.empty?
+
+        %(<div class="reqt-row"><span class="reqt-key">Classification:</span> #{escape_html(cls)}</div>)
       end
 
       # Requirement labels come from mn-requirements' i18n vocabulary
@@ -503,7 +414,7 @@ module Metanorma
         @reqt_labels ||= begin
           require "isodoc-i18n"
           gem_path = Gem.loaded_specs["mn-requirements"]&.full_gem_path
-            gem_path && require(File.join(gem_path, "lib/isodoc/i18n"))
+          gem_path && require(File.join(gem_path, "lib/isodoc/i18n"))
           i18n = IsoDoc::MnRequirementsI18n.new(document_language, nil)
           req = Hash(i18n.get["requirements"])
           # vocabulary nests under default: and modspec: — merge them
@@ -523,17 +434,21 @@ module Metanorma
       def reqt_label(req)
         type = req.respond_to?(:type) ? req.type.to_s : ""
         base = reqt_labels[type] ||
-               reqt_labels[req.class.name.split("::").last.to_s.delete_suffix("Model").downcase] ||
-               req.class.name.split("::").last.to_s.delete_suffix("Model").capitalize
+          reqt_labels[req.class.name.split("::").last.to_s.delete_suffix("Model").downcase] ||
+          req.class.name.split("::").last.to_s.delete_suffix("Model").capitalize
         ident = req.identifier.to_s if req.respond_to?(:identifier)
-        ident&.empty? ? base : "#{base} #{ident}"
+        ident && ident.empty? ? base : "#{base} #{ident}"
       end
 
       def render_reqt_component(component, **_opts)
         return "" if component.nil? || component.is_a?(String)
 
         component.class.attributes.each_key.filter_map do |attr|
-          value = component.send(attr) rescue next
+          value = begin
+            component.send(attr)
+          rescue StandardError
+            next
+          end
           if value.is_a?(Array)
             value.map { |v| v.is_a?(String) ? v : render(v) }.join
           elsif !value.nil? && !value.is_a?(String)
@@ -544,11 +459,17 @@ module Metanorma
 
       # fmt-xref-label: the cross-reference label text ("Requirement
       # A.14-1", "Clause 3") carried ahead of blocks in mixed content.
-      def render_fmt_xref_label(el, **_opts)
+      def render_fmt_xref_label(element, **_opts)
         parts = []
-        parts << Array(el.text).join if el.respond_to?(:text) && el.text
-        Array(el.semx).each { |s| parts << render(s) } if el.respond_to?(:semx)
-        Array(el.span).each { |s| parts << render(s) } if el.respond_to?(:span)
+        if element.respond_to?(:text) && element.text
+          parts << Array(element.text).join
+        end
+        if element.respond_to?(:semx)
+          Array(element.semx).each { |s| parts << render(s) }
+        end
+        if element.respond_to?(:span)
+          Array(element.span).each { |s| parts << render(s) }
+        end
         joined = parts.join
         joined.empty? ? "" : %(<span class="fmt-xref-label">#{joined}</span>)
       end
@@ -584,9 +505,8 @@ module Metanorma
       # render bare, the new content blocks render inside a single
       # Quote AmendNewcontent wrapper — matching native isodoc output.
       def render_amend_block(amend, **opts)
-        parts = []
-        Array(safe_attr(amend, :description)).each do |desc|
-          parts << render_amend_content(desc, **opts)
+        parts = Array(safe_attr(amend, :description)).map do |desc|
+          render_amend_content(desc, **opts)
         end
         new_contents = Array(safe_attr(amend, :new_content))
         if new_contents.any?
@@ -612,11 +532,11 @@ module Metanorma
         parts.join
       end
 
-      def render_amend_child(child, **opts)
+      def render_amend_child(child, **)
         if child.is_a?(Metanorma::Standoc::Document::Sections::ClauseSection)
-          render_amend_clause(child, **opts)
+          render_amend_clause(child, **)
         else
-          render(child, **opts)
+          render(child, **)
         end
       end
 
@@ -624,8 +544,8 @@ module Metanorma
       # number/obligation attributes rather than a formatted title:
       # native isodoc renders the Annex label, the obligation and the
       # title as one heading paragraph.
-      def render_amend_clause(clause, level: 1, **opts)
-        return render(clause, level: level, **opts) unless safe_attr(clause, :type) == "annex"
+      def render_amend_clause(clause, level: 1, **)
+        return render(clause, level: level, **) unless safe_attr(clause, :type) == "annex"
 
         heading = +""
         number = safe_attr(clause, :number)
@@ -903,7 +823,7 @@ module Metanorma
 
         candidates = Array(fmt_def.semx)
         candidates << fmt_def if fmt_def.is_a?(Lutaml::Model::Serializable) &&
-                                 !fmt_def.is_a?(Metanorma::Document::Components::Inline::SemxElement)
+          !fmt_def.is_a?(Metanorma::Document::Components::Inline::SemxElement)
         candidates.any? { |n| semx_tree_has_source?(n) }
       end
 
@@ -917,7 +837,7 @@ module Metanorma
 
         seen[node] = true
         return true if node.is_a?(Metanorma::Document::Components::Inline::SemxElement) &&
-                       node.element_attr.to_s == "source"
+          node.element_attr.to_s == "source"
 
         SEMX_SOURCE_SEARCH_ATTRS.each do |attr|
           next unless node.respond_to?(attr)
@@ -934,6 +854,7 @@ module Metanorma
         if fmt_pref.is_a?(String) && !fmt_pref.empty?
           return fmt_pref
         end
+
         if fmt_pref.is_a?(Array) && !fmt_pref.empty?
           fp = fmt_pref.first
           if fp.p && !fp.p.empty?

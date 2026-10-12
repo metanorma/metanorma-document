@@ -16,7 +16,7 @@ module Metanorma
             # Base bibdata carries plain Iso639Code entries (no
             # `current` marker); flavor bibdata models mark one current.
             lang = langs.find { |l| l.respond_to?(:current) && l.current == "true" } ||
-                   langs.first
+              langs.first
             lang.respond_to?(:value) ? (lang.value || lang.to_s) : lang.to_s
           else
             "en"

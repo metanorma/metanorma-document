@@ -21,6 +21,7 @@ module Metanorma
           latexmath mi mn mo mrow mfrac msub msup msubsup mfenced mtext
           mtd mtr mover munderover
         ].freeze
+        TOP_SECTIONS = %w[annex sections preface bibliography].freeze
 
         def render_semantic_annexes(doc)
           roots = semantic_roots(doc)
@@ -29,7 +30,7 @@ module Metanorma
           @semantic_main_ids = collect_main_tree_ids(doc)
           parts = roots.flat_map do |root|
             each_semantic_child(root).filter_map do |name, child|
-              next unless %w[annex sections preface bibliography].include?(name)
+              next unless TOP_SECTIONS.include?(name)
 
               render_uncovered(child, name, 1)
             end
@@ -125,7 +126,7 @@ module Metanorma
         end
 
         def semantic_source?(model)
-          model.class.name == "Metanorma::Standoc::Document::Metadata::MetanormaSemanticSource"
+          model.instance_of?(::Metanorma::Standoc::Document::Metadata::MetanormaSemanticSource)
         end
 
         def semantic_roots(doc)
@@ -214,7 +215,7 @@ module Metanorma
             next if text.strip.empty?
 
             return render_liquid("_heading.html.liquid", {
-                                   "tag" => "h#{[[level, 6].min, 1].max}",
+                                   "tag" => "h#{level.clamp(1, 6)}",
                                    "class_attr" => element_attrs(id: safe_attr(node, :id)),
                                    "content" => text,
                                  })
@@ -400,7 +401,7 @@ module Metanorma
           when "br" then "<br/>"
           when "xref", "link"
             href = safe_attr(node, :sem_target) || safe_attr(node, :href) ||
-                   safe_attr(node, :url)
+              safe_attr(node, :url)
             text = semantic_inline_content(node)
             text = "[#{escape_html(href.to_s)}]" if text.strip.empty?
             %(<a href="##{escape_html(href.to_s)}">#{text}</a>)

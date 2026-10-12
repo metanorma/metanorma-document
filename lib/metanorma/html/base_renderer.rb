@@ -502,6 +502,8 @@ module Metanorma
       # Grouped here so adding a new transparent wrapper is one entry,
       # not another register_inline_render line. Classes with a more
       # specific handler register themselves above.
+      FN_BLOCK_ATTRS = %i[ul ol table].freeze
+
       TRANSPARENT_INLINE_WRAPPERS = [
         Metanorma::Document::Components::Inline::FmtNameElement,
         Metanorma::Document::Components::Inline::FmtTitleElement,
@@ -600,6 +602,7 @@ module Metanorma
 
       def footnote_label_text(fn) = @inline_renderer.footnote_label_text(fn)
       def fn_content_html(fn) = @inline_renderer.fn_content_html(fn)
+
       def render_mixed_inline(node)
         @inline_renderer.render_mixed_inline(node)
       end
@@ -891,7 +894,7 @@ level = 1)
           # Footnotes may carry list/table block children (OIML R 7's
           # bibliography lives inside footnote 3) — the native aside
           # renders them, so the end-of-document entry must too.
-          %i[ul ol table].each do |attr|
+          FN_BLOCK_ATTRS.each do |attr|
             next unless entry.source_fn.respond_to?(attr)
 
             Array(entry.source_fn.public_send(attr)).each do |block|

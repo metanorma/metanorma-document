@@ -28,7 +28,7 @@ module Metanorma
             "display" => :display, "scope" => :scope, "role" => :sem_role,
             "label" => :label, "number" => :sem_number, "value" => :sem_value,
             "url" => :url, "href" => :href, "from" => :sem_from,
-            "prefix" => :prefix, "hidden" => :hidden, "obligation" => :obligation,
+            "prefix" => :prefix, "hidden" => :hidden, "obligation" => :obligation
           }.freeze
 
           XML_ATTRIBUTES.each_value { |attr| attribute attr, :string }
