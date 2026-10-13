@@ -54,6 +54,40 @@ RSpec.describe Metanorma::Document::Components::Tables do
       .to eq("(mV/V or counts)")
   end
 
+  # AsciiMath spells the plus-minus operator "pm"; display text carries
+  # the glyph (the OIML MPE tables state tolerances as stem:[pm 0.10 %]).
+  it "renders the AsciiMath uncertainty operator as the ± glyph" do
+    cell = described_class::TextTableCell.from_xml(
+      '<td><stem type="AsciiMath"><asciimath>pm 0.10 %</asciimath></stem></td>',
+    )
+
+    expect(Metanorma::Document::PlainText.call(cell)).to eq("± 0.10 %")
+  end
+
+  it "renders the minus-plus operator as ∓" do
+    cell = described_class::TextTableCell.from_xml(
+      '<td><stem type="AsciiMath"><asciimath>mp 2 mg</asciimath></stem></td>',
+    )
+
+    expect(Metanorma::Document::PlainText.call(cell)).to eq("∓ 2 mg")
+  end
+
+  it "maps the LaTeX \\pm spelling too" do
+    cell = described_class::TextTableCell.from_xml(
+      '<td><stem type="LatexMath"><latexmath>\pm 70 e</latexmath></stem></td>',
+    )
+
+    expect(Metanorma::Document::PlainText.call(cell)).to include("± 70")
+  end
+
+  it "keeps a pm that is part of a larger word" do
+    cell = described_class::TextTableCell.from_xml(
+      '<td><stem type="AsciiMath"><asciimath>rpm 5</asciimath></stem></td>',
+    )
+
+    expect(Metanorma::Document::PlainText.call(cell)).to eq("rpm 5")
+  end
+
   it "falls back to the MathML token walk for math-only stems" do
     cell = described_class::TextTableCell.from_xml(
       "<td><stem type=\"MathML\"><math><mi>v</mi></math></stem></td>",

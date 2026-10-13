@@ -35,6 +35,16 @@ module Metanorma
         UNITSML_MACRO =
           /"?unitsml\(([^()]*(?:\([^()]*\)[^()]*)*)\)"?/
 
+        # The source linear forms spell operators as words (AsciiMath
+        # "pm", LaTeX "\pm"); extracted display text carries the glyphs.
+        # AsciiMath reserves these tokens as operators, so a bare "pm"
+        # in an expression IS the operator; inside a larger word ("rpm")
+        # the token boundaries hold the mapping off.
+        MATH_OPERATOR_GLYPHS = {
+          asciimath: [[/\bpm\b/, "±"], [/\bmp\b/, "∓"]],
+          latexmath: [[/\\pm\b/, "±"], [/\\mp\b/, "∓"]],
+        }.freeze
+
         def extract_plain_text(node)
           return node.to_s if node.is_a?(String)
           return extract_text_value(node).to_s unless node.is_a?(Lutaml::Model::Serializable)
@@ -122,12 +132,18 @@ module Metanorma
             text = if form == :math
                      Array(value).map { |m| extract_plain_text(m) }.join(" ")
                    else
-                     extract_text_value(value)
+                     display_math_text(extract_text_value(value), form)
                    end
             text = normalize_math_text(text)
             return text unless text.empty?
           end
           populated ? "" : nil
+        end
+
+        def display_math_text(text, form)
+          MATH_OPERATOR_GLYPHS.fetch(form, []).reduce(text.to_s) do |acc, (pattern, glyph)|
+            acc.gsub(pattern, glyph)
+          end
         end
 
         # Duck-typed stem check: any model declaring both an asciimath

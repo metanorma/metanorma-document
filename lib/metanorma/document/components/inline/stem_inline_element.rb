@@ -14,6 +14,7 @@ module Metanorma
           attribute :stem_type, :string
           attribute :asciimath, AsciimathElement, collection: true
           attribute :math, SemanticMathElement, collection: true
+          attribute :latexmath, TextElements::LatexmathElement, collection: true
 
           xml do
             element "stem"
@@ -22,6 +23,7 @@ module Metanorma
             map_attribute "type", to: :stem_type
             map_element "asciimath", to: :asciimath
             map_element "math", to: :math
+            map_element "latexmath", to: :latexmath
           end
         end
       end
