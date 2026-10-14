@@ -18,7 +18,7 @@ module Metanorma
         # Subclass of admonition allowing different runs of admonitions to be labelled
         # and auto-numbered differently, even if they are of the same type.
         # Typically is a subclass of an admonition type.
-        attribute :class, :string
+        attribute :class_attr, :string
 
         # Location where the content of the admonition is accessible as an external document.
         attribute :uri, Metanorma::Document::Components::DataTypes::Uri
@@ -27,7 +27,7 @@ module Metanorma
           element "admonition"
           map_attribute "type", to: :type
           map_element "name", to: :name
-          map_attribute "class", to: :class
+          map_attribute "class", to: :class_attr
           map_element "uri", to: :uri
         end
       end
