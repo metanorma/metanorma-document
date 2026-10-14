@@ -22,8 +22,7 @@ gem "metanorma-mirror", "~> 1.0"
 gem "metanorma-mko", github: "metanorma/metanorma-mko", branch: "main" # mko#9 rubyzip-3 fix unreleased; 1.1.1 still uses Zip::File::CREATE
 gem "metanorma-ogc", github: "metanorma/metanorma-ogc", branch: "main"
 # TEMPORARY pin: svgmap/imagemap/columnbreak section wiring
-# (standoc#1251) for the renderer specs — flip to main on merge.
-gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "feat/svgmap-block-wiring"
+gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "main"
 gem "plurimath", "~> 0.11"
 gem "pubid", ">= 2.0.0.pre.alpha.9"
 
