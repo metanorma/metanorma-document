@@ -23,7 +23,7 @@ module Metanorma
 
         # The semantic category of the figure. This is to allow different classes of figure (e.g. _Plate_,
         # _Chart_, _Diagram_) to be auto-numbered and captioned differently.
-        attribute :class, :string
+        attribute :class_attr, :string
 
         # The image file to be included in the figure as its main content.
         attribute :image, Metanorma::BasicDocument::IdElements::Image
@@ -52,7 +52,7 @@ module Metanorma
           map_attribute "unnumbered", to: :unnumbered
           map_attribute "subsequence", to: :subsequence
           map_element "name", to: :name
-          map_attribute "class", to: :class
+          map_attribute "class", to: :class_attr
           map_element "image", to: :image
           map_element "video", to: :video
           map_element "audio", to: :audio
