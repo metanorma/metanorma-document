@@ -10,7 +10,7 @@ module Metanorma
           attribute :start, :string
           attribute :semx_id, :string
           attribute :displayorder, :integer
-          attribute :display, :string
+          attribute :display_style, :string
           attribute :display_directives, :string
           attribute :class_attr, :string
           attribute :group, :string
@@ -34,7 +34,7 @@ module Metanorma
             map_attribute "type", to: :type
             map_attribute "semx-id", to: :semx_id
             map_attribute "displayorder", to: :displayorder
-            map_attribute "display", to: :display
+            map_attribute "display", to: :display_style
             map_attribute "display-directives", to: :display_directives
             map_attribute "class", to: :class_attr, render_empty: true
             map_attribute "start", to: :start
