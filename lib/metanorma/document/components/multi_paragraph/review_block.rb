@@ -20,7 +20,7 @@ module Metanorma
           # Identifier for the end of the text to which the comment applies.
           attribute :applies_to, :string
 
-          attribute :display, :string
+          attribute :display_style, :string
 
           xml do
             element "review"
@@ -28,7 +28,7 @@ module Metanorma
             map_attribute "date", to: :date
             map_attribute "from", to: :applies_from
             map_attribute "to", to: :applies_to
-            map_attribute "display", to: :display
+            map_attribute "display", to: :display_style
           end
         end
       end

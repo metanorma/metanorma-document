@@ -25,7 +25,7 @@ module Metanorma
             "bibitemid" => :bibitemid, "type" => :type_attr,
             "language" => :sem_language, "script" => :sem_script,
             "format" => :format, "alt" => :alt, "style" => :sem_style,
-            "display" => :display, "scope" => :scope, "role" => :sem_role,
+            "display" => :display_style, "scope" => :scope, "role" => :sem_role,
             "label" => :label, "number" => :sem_number, "value" => :sem_value,
             "url" => :url, "href" => :href, "from" => :sem_from,
             "prefix" => :prefix, "hidden" => :hidden, "obligation" => :obligation
