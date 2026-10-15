@@ -444,12 +444,15 @@ module Metanorma
       # elements under bibdata extensions.
       def doctype_text(bib)
         dt = val_any(bib, :doctype)
-        dt = val(val(bib, :ext), :doctype) if dt.nil?
+        dt = val(val(bib, :ext), :doctype_element) if dt.nil?
         return nil if dt.nil?
 
         dt = Array(dt).first if dt.is_a?(Array)
         abbr = val(dt, :abbreviation)
         return abbr.to_s unless abbr.to_s.empty?
+
+        value = val(dt, :value)
+        return value.to_s unless value.to_s.empty?
 
         scalar(dt)
       end

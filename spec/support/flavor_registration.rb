@@ -56,7 +56,7 @@ module SpecFlavors
       result = en_title&.to_s
       return result if result && !result.empty?
 
-      if titles.is_a?(Metanorma::IsoDocument::Metadata::TitleCollection) && !titles.items.empty?
+      if titles.is_a?(Metanorma::Iso::Document::Metadata::TitleCollection) && !titles.items.empty?
         raw = titles.items.find do |t|
           t.language == "en"
         end || titles.items.first
@@ -114,12 +114,12 @@ module SpecFlavors
     end
 
     def extract_doctype(bibdata)
-      return nil unless bibdata.is_a?(Metanorma::IsoDocument::Metadata::IsoBibliographicItem)
+      return nil unless bibdata.is_a?(Metanorma::Iso::Document::Metadata::IsoBibliographicItem)
 
       ext = bibdata.ext
       return nil unless ext
 
-      doctypes = ext.doctype
+      doctypes = ext.doctype_element
       return nil unless doctypes && !doctypes.empty?
 
       en_dt = doctypes.find do |d|
@@ -187,7 +187,7 @@ module SpecFlavors
       if bibdata.titles
         en_title = bibdata.title_for("en")
         if en_title
-          title_text = if en_title.is_a?(Metanorma::IsoDocument::Metadata::AbstractTitle) && en_title.value
+          title_text = if en_title.is_a?(Metanorma::Iso::Document::Metadata::AbstractTitle) && en_title.value
                          en_title.value.to_s
                        else
                          en_title.to_s
