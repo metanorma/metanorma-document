@@ -24,7 +24,7 @@ gem "metanorma-ogc", github: "metanorma/metanorma-ogc", branch: "main"
 # TEMPORARY pin: svgmap/imagemap/columnbreak section wiring
 gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "main"
 gem "plurimath", "~> 0.11"
-gem "pubid", ">= 2.0.0.pre.alpha.9"
+gem "pubid", "~> 2.0.0.pre.alpha"
 
 # Dependency sources. Default (no env vars): released gems, exactly the
 # contract downstream users get — CI and local dev must test that.
@@ -61,5 +61,5 @@ gem "benchmark-ips"
 gem "concurrent-ruby", "~> 1.3"
 gem "simplecov", require: false
 # monogem lockstep pair (α3–α6 were yanked; α14 is the current pairing)
-gem "relaton", "3.0.0.pre.alpha.14"
-gem "relaton-cli", "3.0.0.pre.alpha.14", github: "metanorma/relaton-cli", branch: "main"
+gem "relaton", "~> 3.0.0.pre.alpha"
+gem "relaton-cli", "~> 3.0.0.pre.alpha"
