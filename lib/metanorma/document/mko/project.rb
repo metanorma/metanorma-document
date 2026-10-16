@@ -186,7 +186,32 @@ module Metanorma
       def collect_numbers(presentation)
         return unless presentation
 
-        each_top_section(presentation) { |s| number_tree(s, nil) }
+        each_top_section(presentation) do |s|
+          harvest_autonums(s)
+          number_tree(s, nil)
+        end
+      end
+
+      # The 0.4.x emitter no longer carries clause numbers in section
+      # fmt-titles — they ride the TOC's semx autonum fragments, each
+      # keyed by the source clause's id. Register them globally; the
+      # walk resolves each section's own anchor against the registry.
+      def harvest_autonums(model)
+        return unless serializable?(model)
+
+        if val(model, :element_attr) == "autonum"
+          src = val(model, :source)
+          text = Document::PlainText.call(model)
+          @numbers[src] = text if src && !text.empty?
+        end
+        model.class.attributes.each_value do |attr|
+          next if attr.name.nil?
+
+          raw = model.public_send(attr.name)
+          next if raw.nil?
+
+          Array(raw).each { |v| harvest_autonums(v) }
+        end
       end
 
       def each_top_section(model, &)
@@ -521,9 +546,13 @@ module Metanorma
 
       # The iso tree declares Term entries as :term (so a terms
       # section is recognizable by that declaration); the standoc tree
-      # maps them to :terms.
+      # maps them to :terms. The 0.4.x clause models declare :term
+      # too (clauses may embed term containers), so the declaration
+      # alone misclassifies every ISO clause as a terms section —
+      # require actual term entries.
       def terms_section?(obj)
-        serializable?(obj) && obj.class.attributes.key?(:term)
+        serializable?(obj) && obj.class.attributes.key?(:term) &&
+          !vals(obj, :term).empty?
       end
 
       def walk_child_section(section, type: "clause")
@@ -553,6 +582,7 @@ module Metanorma
         begin
           anchor = element_anchor(section)
           number = @numbers[anchor] || section_autonum(section)
+
           title = Document::PlainText.call(val(section, :title))
           unit = emit_unit(
             type: type, anchor: anchor, number: number, title: title,
