@@ -315,8 +315,17 @@ RSpec.describe Metanorma::Html::Theme do
 
   describe "flat file fallback" do
     it "still loads flat YAML themes" do
-      theme = described_class.load(:iso)
+      # :iso now ships a directory theme (the iso gem registers its
+      # themes dir), so the flat-fallback contract is exercised with a
+      # flat-only flavor in a stubbed THEMES_DIR
+      flat_dir = File.join(Dir.tmpdir, "metanorma_flat_theme_#{Process.pid}")
+      FileUtils.mkdir_p(flat_dir)
+      File.write(File.join(flat_dir, "flatflavor.yaml"),
+                 { "primary" => "#123456" }.to_yaml)
+      stub_const("Metanorma::Html::Theme::THEMES_DIR", flat_dir)
+      theme = described_class.load(:flatflavor)
       expect(theme).not_to be_nil
+      expect(theme.primary).to eq("#123456")
       expect(theme.theme_dir).to be_nil
     end
 
