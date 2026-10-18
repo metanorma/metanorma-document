@@ -46,7 +46,6 @@ gem "leptris", "~> 1.9"
 # the json 3.0 to_json fix (lutaml-model#769) ships in the released line
 # (GeneratorOptions filter, >= 0.8.103) — float on the 0.8 max
 gem "lutaml-model", "~> 0.8.106"
-gem "moxml", "~> 0.5.30"
 # 0.2.6 (2026-09-08) carries the moxml-0.5 range (plurimath/omml#11)
 gem "omml", "~> 0.2.6"
 gem "rake", "~> 13.0"
