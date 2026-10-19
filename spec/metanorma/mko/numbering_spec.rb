@@ -43,7 +43,7 @@ RSpec.describe Metanorma::Mko do
     bundle = described_class.export(
       self.class.fixture_model(semantic_xml, :sem),
       to: tmpdir,
-      presentation_xml: self.class.fixture_model(presentation_xml, :pres)
+      presentation_xml: self.class.fixture_model(presentation_xml, :pres),
     )
     File.readlines(File.join(bundle, "units.jsonl")).map { |l| JSON.parse(l) }
   end
