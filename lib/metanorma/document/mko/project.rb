@@ -191,9 +191,12 @@ module Metanorma
         # bare fragments that would otherwise shadow the composed
         # numbers of sections already walked — observed on R 60-1,
         # metanorma-document#93); the number_tree pass then recomposes
-        # and its writes win.
+        # and its writes win. The passes are sequential PHASES, not
+        # combinable loops — combining them re-opens the shadowing.
+        # rubocop:disable Style/CombinableLoops
         each_top_section(presentation) { |s| harvest_autonums(s) }
         each_top_section(presentation) { |s| number_tree(s, nil) }
+        # rubocop:enable Style/CombinableLoops
       end
 
       # The 0.4.x emitter no longer carries clause numbers in section
