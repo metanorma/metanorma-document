@@ -35,7 +35,10 @@ module Metanorma
           attribute :fmt_fn_body, "Metanorma::Document::Components::Inline::FmtFnBodyElement"
 
           xml do
-            element "dd"
+            # Order-aware dd: the IETF transformer rebuilds children in
+            # source order (p, dl, p interleave), which requires the
+            # parse to capture element_order for this model.
+            root "dd", ordered: true
             map_attribute "id", to: :id
             map_attribute "anchor", to: :anchor
             map_attribute "semx-id", to: :semx_id
