@@ -186,10 +186,14 @@ module Metanorma
       def collect_numbers(presentation)
         return unless presentation
 
-        each_top_section(presentation) do |s|
-          harvest_autonums(s)
-          number_tree(s, nil)
-        end
+        # Two passes, deliberately: the harvest gathers EVERY semx
+        # autonum fragment (the preface's TOC processed last carries
+        # bare fragments that would otherwise shadow the composed
+        # numbers of sections already walked — observed on R 60-1,
+        # metanorma-document#93); the number_tree pass then recomposes
+        # and its writes win.
+        each_top_section(presentation) { |s| harvest_autonums(s) }
+        each_top_section(presentation) { |s| number_tree(s, nil) }
       end
 
       # The 0.4.x emitter no longer carries clause numbers in section
@@ -249,6 +253,7 @@ module Metanorma
         vals(section, :subsections).each { |s| number_tree(s, section) }
         vals(section, :clause).each { |s| number_tree(s, section) }
         vals(section, :terms).each do |tsec|
+          register_number(tsec, section)
           term_entries(tsec).each { |t| register_number(t, tsec) }
           nested_terms_sections(tsec).each { |nested| number_tree(nested, section) }
         end
@@ -259,7 +264,23 @@ module Metanorma
         return unless anchor
 
         autonum = section_autonum(element)
-        @numbers[anchor] = autonum if autonum && !autonum.empty?
+        return unless autonum && !autonum.empty?
+
+        @numbers[anchor] = compose_autonum(parent, autonum)
+      end
+
+      # The 0.4.x TOC renders BARE fragments for iso-tree terms sections
+      # ("7" where the clause tree says "3.7" — metanorma-document#93):
+      # the harvest keyed them by source id and nothing composed parent
+      # chains, so terms-section units cited the bare fragment (or fell
+      # back to their parent's anchor) and every term under them cited
+      # it too. A bare fragment composes under its registered parent; a
+      # composed autonum ("3.7", "A.1") already carries its chain.
+      def compose_autonum(parent, autonum)
+        return autonum if autonum.include?(".")
+
+        pnum = parent && @numbers[element_anchor(parent)]
+        pnum && !pnum.empty? ? "#{pnum}.#{autonum}" : autonum
       end
 
       def section_autonum(section)
