@@ -62,8 +62,10 @@ module RoundtripSamples
   # ("no_model"), never a load-time NameError.
   def resolve_flavor_model(repo_name)
     name = FLAVOR_MODEL_MAP[repo_name]
-    return nil if name.nil?
+    name && safe_const(name)
+  end
 
+  def safe_const(name)
     Object.const_get(name)
   rescue NameError
     nil
@@ -263,20 +265,20 @@ module RoundtripSamples
 
   # Maps root element names to model classes for auto-detection
   ROOT_MODEL_MAP = {
-    "iso-standard"       => -> { Metanorma::IsoDocument::Root },
-    "iec-standard"       => -> { Metanorma::IecDocument::Root },
-    "ieee-standard"      => -> { Metanorma::IeeeDocument::Root },
-    "ogc-standard"       => -> { Metanorma::OgcDocument::Root },
-    "itu-standard"       => -> { Metanorma::ItuDocument::Root },
-    "bipm-standard"      => -> { Metanorma::BipmDocument::Root },
-    "nist-standard"      => -> { Metanorma::IsoDocument::Root },
-    "iho-standard"       => -> { Metanorma::IhoDocument::Root },
-    "rsd-standard"       => -> { Metanorma::RiboseDocument::Root },
-    "ietf-standard"      => -> { Metanorma::IetfDocument::Root },
-    "cc-standard"        => -> { Metanorma::CcDocument::Root },
-    "metanorma"          => -> { Metanorma::IsoDocument::Root },
-    "metanorma-collection" => -> { Metanorma::Collection::Root },
-    "m3d-standard"        => -> { Metanorma::IsoDocument::Root },
+    "iso-standard"       => "Metanorma::Iso::Document::Root",
+    "iec-standard"       => "Metanorma::Iec::Document::Root",
+    "ieee-standard"      => "Metanorma::Ieee::Document::Root",
+    "ogc-standard"       => "Metanorma::Ogc::Document::Root",
+    "itu-standard"       => "Metanorma::Itu::Document::Root",
+    "bipm-standard"      => "Metanorma::Bipm::Document::Root",
+    "nist-standard"      => "Metanorma::Iso::Document::Root",
+    "iho-standard"       => "Metanorma::Iho::Document::Root",
+    "rsd-standard"       => "Metanorma::Ribose::Document::Root",
+    "ietf-standard"      => "Metanorma::Ietf::Document::Root",
+    "cc-standard"        => "Metanorma::Cc::Document::Root",
+    "metanorma"          => "Metanorma::Iso::Document::Root",
+    "metanorma-collection" => "Metanorma::Collection::Root",
+    "m3d-standard"        => "Metanorma::Iso::Document::Root",
   }.freeze
 
   def resolve_model(xml, repo_name)
@@ -287,7 +289,7 @@ module RoundtripSamples
 
     # Auto-detect from XML root element or metanorma/@flavor
     if xml.include?("<metanorma-collection")
-      return Metanorma::Collection::Root
+      return safe_const("Metanorma::Collection::Root")
     end
 
     root_name = extract_root_name(xml)
@@ -300,10 +302,8 @@ module RoundtripSamples
     end
 
     # Fallback: map root element name
-    factory = ROOT_MODEL_MAP[root_name]
-    return factory.call if factory
-
-    nil
+    name = ROOT_MODEL_MAP[root_name]
+    name && safe_const(name)
   end
 
   def extract_root_name(xml)
