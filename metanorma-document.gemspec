@@ -42,12 +42,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency "metanorma-core"
   spec.add_dependency "mml", "~> 2.4"
   spec.add_dependency "mn-requirements", ">= 0.2.1" # requirement labels & ModSpec semantics
-  # pubid has no stable 2.x release yet (latest: 2.0.0.pre.alpha.x);
-  # relax this pin once pubid 2.0.0 ships.
-  spec.add_dependency "pubid", "~> 2.0.0.pre.alpha"
+  spec.add_dependency "pubid", "~> 2.0"
   # relaton v3 monogem provides Relaton::Bib (require "relaton/bib");
   # the former standalone relaton-bib gem is consolidated into it.
-  spec.add_dependency "relaton", "~> 3.0.0.pre.alpha"
+  spec.add_dependency "relaton", "~> 3.0"
   # Native object-model decomposition (Glossarist concepts, Relaton
   # bibdata, Plurimath formulas) is a model-layer capability.
   spec.add_dependency "glossarist", "~> 2.13"
