@@ -18,6 +18,7 @@ module Metanorma
     autoload :Concerns, "metanorma/html/concerns"
     autoload :Generator, "metanorma/html/generator"
     autoload :RendererDelegation, "metanorma/html/renderer_delegation"
+    autoload :Renderers, "metanorma/html/renderers"
     autoload :Theme, "metanorma/html/theme"
     autoload :AssetPipeline, "metanorma/html/asset_pipeline"
     autoload :Component, "metanorma/html/component"
