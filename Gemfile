@@ -17,9 +17,7 @@ gem "metanorma-core", "~> 0.2.5.pre.alpha" # published flavor/taste table (metan
 gem "metanorma-iec", github: "metanorma/metanorma-iec", branch: "main"
 gem "metanorma-iso", github: "metanorma/metanorma-iso", branch: "main"
 gem "metanorma-itu", github: "metanorma/metanorma-itu", branch: "main"
-# mko >= 1.1.0 from rubygems carries Mko::Language
 gem "metanorma-mirror", "~> 1.0", github: "metanorma/metanorma-mirror", branch: "main"
-gem "metanorma-mko", github: "metanorma/metanorma-mko", branch: "main" # mko#9 rubyzip-3 fix unreleased; 1.1.1 still uses Zip::File::CREATE
 gem "metanorma-ogc", github: "metanorma/metanorma-ogc", branch: "main"
 # TEMPORARY pin: svgmap/imagemap/columnbreak section wiring
 gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "main"
