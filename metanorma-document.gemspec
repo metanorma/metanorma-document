@@ -49,5 +49,5 @@ Gem::Specification.new do |spec|
   # Native object-model decomposition (Glossarist concepts, Relaton
   # bibdata, Plurimath formulas) is a model-layer capability.
   spec.add_dependency "glossarist", "~> 2.13"
-  spec.add_dependency "plurimath", "~> 0.11"
+  spec.add_dependency "plurimath", "~> 0.11.14"
 end
