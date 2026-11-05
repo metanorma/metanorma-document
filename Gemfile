@@ -13,7 +13,7 @@ gemspec
 #     not main; flip once that stack lands on main
 # gem "glossarist", "~> 2.13"
 gem "isodoc", github: "metanorma/isodoc", branch: "main"
-gem "metanorma-core", "~> 0.2.5.pre.alpha" # published flavor/taste table (metanorma-core#18)
+gem "metanorma-core", "~> 0.2.7" # published flavor/taste table (metanorma-core#18)
 gem "metanorma-iec", github: "metanorma/metanorma-iec", branch: "main"
 gem "metanorma-iso", github: "metanorma/metanorma-iso", branch: "main"
 gem "metanorma-itu", github: "metanorma/metanorma-itu", branch: "main"
@@ -22,7 +22,7 @@ gem "metanorma-ogc", github: "metanorma/metanorma-ogc", branch: "main"
 # TEMPORARY pin: svgmap/imagemap/columnbreak section wiring
 gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "main"
 gem "plurimath", "~> 0.11"
-gem "pubid", "~> 2.0.0.pre.alpha"
+gem "pubid", "~> 2.0"
 
 # Dependency sources. Default (no env vars): released gems, exactly the
 # contract downstream users get — CI and local dev must test that.
@@ -59,5 +59,5 @@ gem "benchmark-ips"
 gem "concurrent-ruby", "~> 1.3"
 gem "simplecov", require: false
 # monogem lockstep pair (α3–α6 were yanked; α14 is the current pairing)
-gem "relaton", "~> 3.0.0.pre.alpha"
-gem "relaton-cli", "~> 3.0.0.pre.alpha"
+gem "relaton", "~> 3.0"
+gem "relaton-cli", "~> 3.0"
