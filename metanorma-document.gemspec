@@ -38,7 +38,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Uncomment to register a new dependency of your gem
-  spec.add_dependency "lutaml-model", "~> 0.8.0"
+  spec.add_dependency "lutaml-model", "~> 0.8.164"
   spec.add_dependency "metanorma-core"
   spec.add_dependency "mml", "~> 2.4"
   spec.add_dependency "mn-requirements", ">= 0.2.1" # requirement labels & ModSpec semantics
