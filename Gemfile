@@ -60,4 +60,3 @@ gem "concurrent-ruby", "~> 1.3"
 gem "simplecov", require: false
 # monogem lockstep pair (α3–α6 were yanked; α14 is the current pairing)
 gem "relaton", "~> 3.0"
-gem "relaton-cli", "~> 3.0"
