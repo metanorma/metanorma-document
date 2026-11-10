@@ -38,6 +38,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Uncomment to register a new dependency of your gem
+  # Bundled gem required directly by lib code: base64 in html/renderers/block_renderer.rb (metanorma/metanorma#669)
+  spec.add_dependency "base64"
   spec.add_dependency "lutaml-model", "~> 0.8.164"
   spec.add_dependency "metanorma-core"
   spec.add_dependency "mml", "~> 2.4"
