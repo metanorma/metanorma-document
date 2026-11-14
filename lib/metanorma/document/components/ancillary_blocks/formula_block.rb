@@ -37,6 +37,10 @@ module Metanorma
           # Key definitions for formula variables
           attribute :key, KeyElement
 
+          # Footnote references attached to the formula.
+          attribute :fn, Metanorma::Document::Components::Inline::FnElement,
+                    collection: true
+
           # Presentation-specific elements
           attribute :fmt_stem, Metanorma::Document::Components::Inline::FmtStemElement
           attribute :fmt_name, Metanorma::Document::Components::Inline::FmtNameElement
@@ -74,6 +78,7 @@ module Metanorma
             map_element "dl", to: :dl
             map_element "name", to: :name
             map_element "key", to: :key
+            map_element "fn", to: :fn
             map_element "fmt-stem", to: :fmt_stem
             map_element "fmt-name", to: :fmt_name
             map_element "fmt-xref-label", to: :fmt_xref_label
