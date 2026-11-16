@@ -3,6 +3,7 @@
 require "liquid"
 require "nokogiri"
 require "cgi"
+require "metanorma/html/template_resolver"
 
 module Metanorma
   module Html
@@ -230,13 +231,27 @@ module Metanorma
       TEMPLATE_CACHE = {} # rubocop:disable Style/MutableConstant
       TEMPLATE_CACHE_MUTEX = Mutex.new
 
+      # Flavor renderers supply gem-owned Liquid directories, most-specific
+      # first. A taste can prepend its directory to super without registration
+      # or changing the theme. Organization theme templates retain priority.
+      def template_directories
+        []
+      end
+
       def render_liquid(template_name, assigns)
-        template_path = theme.resolve_template(template_name)
+        resolver = TemplateResolver.new(
+          [theme.theme_templates_dir, *template_directories, TEMPLATES_ROOT],
+        )
+        template_path = resolver.resolve(template_name)
         template = TEMPLATE_CACHE_MUTEX.synchronize do
           TEMPLATE_CACHE[template_path] ||= Liquid::Template.parse(File.read(template_path))
         end
         assigns = assigns.transform_keys(&:to_s) if assigns.is_a?(Hash)
-        template.render(assigns)
+        context = Liquid::Context.build(
+          environments: assigns,
+          registers: { file_system: resolver },
+        )
+        template.render(context)
       end
 
       def assemble_document(body)

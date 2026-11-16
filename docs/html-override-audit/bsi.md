@@ -12,7 +12,7 @@ The categories below classify whole source files. Styling inside an (a) file sti
 
 | Source template | Class | Destination / reason |
 | --- | --- | --- |
-| [lib/isodoc/bsi/html/html_bsi_intro.html](https://github.com/metanorma/metanorma-bsi/blob/c267be75f959a253bc82d4b02c13db1bff4a9673/lib/isodoc/bsi/html/html_bsi_intro.html) | (a) | _toc.html.liquid for navigation layout; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves. |
+| [lib/isodoc/bsi/html/html_bsi_intro.html](https://github.com/metanorma/metanorma-bsi/blob/c267be75f959a253bc82d4b02c13db1bff4a9673/lib/isodoc/bsi/html/html_bsi_intro.html) | (a) | document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves. |
 | [lib/isodoc/bsi/html/html_bsi_titlepage.html](https://github.com/metanorma/metanorma-bsi/blob/c267be75f959a253bc82d4b02c13db1bff4a9673/lib/isodoc/bsi/html/html_bsi_titlepage.html) | (a) | _cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement. |
 
 See [hook contract](../flavor-template-hooks.md) and [measurement method](README.md). Field references and source hashes are retained in [inventory.json](inventory.json).

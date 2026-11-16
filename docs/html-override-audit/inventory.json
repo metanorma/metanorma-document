@@ -13,7 +13,7 @@
         "path": "lib/isodoc/bipm/html/html_bipm_intro.html",
         "sha256": "870653b413e8c27ef80e40a892176c6cf06c30943008643e012e566bffed536b",
         "category": "a",
-        "mapping": "_toc.html.liquid for navigation layout; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
         "fields": []
       },
       {
@@ -77,7 +77,7 @@
         "path": "lib/isodoc/bsi/html/html_bsi_intro.html",
         "sha256": "4f5ee75eebee77abd771f2da988960dc38935d0e41651cf06c5698da39300e6f",
         "category": "a",
-        "mapping": "_toc.html.liquid for navigation layout; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
         "fields": []
       },
       {
@@ -134,7 +134,7 @@
         "path": "lib/isodoc/cc/html/html_cc_intro.html",
         "sha256": "870653b413e8c27ef80e40a892176c6cf06c30943008643e012e566bffed536b",
         "category": "a",
-        "mapping": "_toc.html.liquid for navigation layout; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
         "fields": []
       },
       {
@@ -208,7 +208,7 @@
         "path": "lib/isodoc/csa/html/html_csa_intro.html",
         "sha256": "870653b413e8c27ef80e40a892176c6cf06c30943008643e012e566bffed536b",
         "category": "a",
-        "mapping": "_toc.html.liquid for navigation layout; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
         "fields": []
       },
       {
@@ -411,7 +411,7 @@
         "path": "lib/isodoc/gb/html/html_gb_intro.html",
         "sha256": "a6344a6841935116696469a2f36d9917708e84ede125595763727b37231c4cf3",
         "category": "a",
-        "mapping": "_toc.html.liquid for navigation layout; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
         "fields": []
       },
       {
@@ -524,7 +524,7 @@
         "path": "lib/isodoc/generic/html/html_generic_intro.html",
         "sha256": "1b13721f771fcf043eeedd77ce3f1a05ccddc1373cdac34ed473eb9bab280d5b",
         "category": "a",
-        "mapping": "_toc.html.liquid for navigation layout; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
         "fields": []
       },
       {
@@ -613,7 +613,7 @@
         "path": "lib/isodoc/iec/html/html_iec_intro.html",
         "sha256": "4f5ee75eebee77abd771f2da988960dc38935d0e41651cf06c5698da39300e6f",
         "category": "a",
-        "mapping": "_toc.html.liquid for navigation layout; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
         "fields": []
       },
       {
@@ -714,7 +714,7 @@
         "path": "lib/isodoc/ieee/html/html_ieee_intro.html",
         "sha256": "02eabf0ae4e19e5cd77aa2720151eefed0fc0efd075dc338f75ea5d3757c318b",
         "category": "a",
-        "mapping": "_toc.html.liquid for navigation layout; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
         "fields": []
       },
       {
@@ -864,7 +864,7 @@
         "path": "lib/isodoc/iho/html/html_iho_intro.html",
         "sha256": "870653b413e8c27ef80e40a892176c6cf06c30943008643e012e566bffed536b",
         "category": "a",
-        "mapping": "_toc.html.liquid for navigation layout; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
         "fields": []
       },
       {
@@ -959,7 +959,7 @@
         "path": "lib/isodoc/iso/html/html_iso_intro.html",
         "sha256": "4f5ee75eebee77abd771f2da988960dc38935d0e41651cf06c5698da39300e6f",
         "category": "a",
-        "mapping": "_toc.html.liquid for navigation layout; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
         "fields": []
       },
       {
@@ -1178,7 +1178,7 @@
         "path": "lib/isodoc/itu/html/html_itu_intro.html",
         "sha256": "ff0382eba6f8d1ced476c51a43fd827878ee36c886e2da24bbc3bd48f9f40fa1",
         "category": "a",
-        "mapping": "_toc.html.liquid for navigation layout; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
         "fields": []
       },
       {
@@ -1351,7 +1351,7 @@
         "path": "lib/isodoc/jis/html/html_jis_intro.html",
         "sha256": "94debd63ad9232898dffa13992fc765f4133a1236418d626aef092b17166d31c",
         "category": "a",
-        "mapping": "_toc.html.liquid for navigation layout; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
         "fields": []
       },
       {
@@ -1417,7 +1417,7 @@
         "path": "lib/isodoc/m3aawg/html/html_m3d_intro.html",
         "sha256": "1c144dd4170d6d76e7c1fe9e181e28ebd7a0f2c604fe7d9f5a83f5bacd5bd0ab",
         "category": "a",
-        "mapping": "_toc.html.liquid for navigation layout; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
         "fields": [
           "doctitle",
           "edition",
@@ -1507,7 +1507,7 @@
         "path": "lib/isodoc/mpfa/html/html_rsd_intro.html",
         "sha256": "1b13721f771fcf043eeedd77ce3f1a05ccddc1373cdac34ed473eb9bab280d5b",
         "category": "a",
-        "mapping": "_toc.html.liquid for navigation layout; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
         "fields": []
       },
       {
@@ -1602,7 +1602,7 @@
         "path": "lib/isodoc/nist/html/html_nist_intro.html",
         "sha256": "7443c57ff50b7c6abfdcebf3311e98d30d3a5a183a145ef8f9b93e7263b84e5b",
         "category": "a",
-        "mapping": "_toc.html.liquid for navigation layout; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
         "fields": [
           "docidentifier",
           "doctitle",
@@ -1776,7 +1776,7 @@
         "path": "lib/isodoc/ogc/html/html_ogc_intro.html",
         "sha256": "f6a0aca1da4dddfe53dd98372cc943da1394755d3c398af591dd6e7f88060543",
         "category": "a",
-        "mapping": "_toc.html.liquid for navigation layout; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
         "fields": []
       },
       {
@@ -1927,7 +1927,7 @@
         "path": "lib/isodoc/ribose/html/html_rsd_intro.html",
         "sha256": "870653b413e8c27ef80e40a892176c6cf06c30943008643e012e566bffed536b",
         "category": "a",
-        "mapping": "_toc.html.liquid for navigation layout; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
         "fields": []
       },
       {
@@ -2010,7 +2010,7 @@
         "path": "lib/isodoc/un/html/html_unece_intro.html",
         "sha256": "0171ec953b0c54c14bb377cc53340856b3bbbbb98579d0327fdbd79330c9db9f",
         "category": "a",
-        "mapping": "_toc.html.liquid for navigation layout; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
         "fields": []
       },
       {
@@ -2277,7 +2277,7 @@
         "path": "data/csa/html_csa_intro.html",
         "sha256": "870653b413e8c27ef80e40a892176c6cf06c30943008643e012e566bffed536b",
         "category": "a",
-        "mapping": "_toc.html.liquid for navigation layout; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
         "fields": []
       },
       {
