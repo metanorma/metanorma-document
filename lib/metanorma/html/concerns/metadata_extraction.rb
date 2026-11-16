@@ -47,14 +47,17 @@ module Metanorma
 
           # Flavor bibdata shapes diverge (e.g. IETF carries no ISO-ish
           # doc_identifier): no id rather than a method error.
-          identifiers = safe_attr(bibdata, :doc_identifier)
+          identifiers = safe_attr(bibdata, :doc_identifier) ||
+            safe_attr(bibdata, :docidentifier)
           return nil unless identifiers && !identifiers.empty?
 
           first_id = identifiers.first
           text = if first_id.is_a?(String)
                    first_id
                  elsif first_id.is_a?(Lutaml::Model::Serializable)
-                   Array(first_id.value).join
+                   value = safe_attr(first_id, :value) ||
+                     safe_attr(first_id, :content) || safe_attr(first_id, :id)
+                   Array(value).join
                  else
                    first_id.to_s
                  end

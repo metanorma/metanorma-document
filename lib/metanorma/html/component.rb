@@ -3,6 +3,7 @@
 module Metanorma
   module Html
     module Component
+      autoload :FrontMatter, "metanorma/html/component/front_matter"
       autoload :Base, "metanorma/html/component/base"
       autoload :IndexTermCollector,
                "metanorma/html/component/index_term_collector"

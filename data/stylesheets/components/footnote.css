@@ -99,3 +99,6 @@ a.footnote-backref {
   overflow-y: auto;
   max-height: calc(40vh - 2.5em);
 }
+
+/* Delimit consecutive references without rewriting rendered HTML. */
+.fn-marker + .fn-marker::before { content: ", "; }

@@ -22,6 +22,7 @@ module Metanorma
         :xml_path,
         :output,
         :flavor,
+        :headless,
         keyword_init: true,
       )
 
@@ -248,7 +249,7 @@ module Metanorma
       end
 
       def self.parse_to_html_options(argv)
-        options = ToHtmlOptions.new(output: nil, flavor: nil)
+        options = ToHtmlOptions.new(output: nil, flavor: nil, headless: false)
 
         parser = OptionParser.new do |opts|
           opts.banner = "Usage: metanorma-document to-html <xml_path> [options]"
@@ -256,6 +257,10 @@ module Metanorma
           opts.on("-o", "--output PATH",
                   "Output HTML path (default: stdout)") do |path|
             options.output = path
+          end
+
+          opts.on("--headless", "Emit the body layout inside a div without a head") do
+            options.headless = true
           end
 
           opts.on("-f", "--flavor FLAVOR",
@@ -281,7 +286,7 @@ module Metanorma
         step = Mirror::Output::Pipeline::Steps::ParseXml.new
         flavor = options.flavor || step.infer_flavor(options.xml_path)
         doc = step.flavor_class(flavor).from_xml(File.read(options.xml_path))
-        write_output(Html::Generator.generate(doc), options.output)
+        write_output(Html::Generator.generate(doc, headless: options.headless), options.output)
       end
 
       def self.usage

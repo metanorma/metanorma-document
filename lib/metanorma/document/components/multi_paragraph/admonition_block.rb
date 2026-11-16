@@ -59,7 +59,10 @@ module Metanorma
             map "admonition_type", to: :type
           end
 
+          attribute :coverpage, :boolean
+
           xml do
+            map_attribute "coverpage", to: :coverpage
             element "admonition"
             map_attribute "id", to: :id
             map_attribute "type", to: :type

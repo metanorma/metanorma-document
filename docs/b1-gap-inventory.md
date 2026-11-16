@@ -72,3 +72,35 @@ Taste revision: 36b7e017ed780dc62002a1cbbc17a7b9e8a12b99. Flavor HTML implementa
 3. Add config-driven cover/titlepage/intro slots with typed front-matter data. Document replacement for legacy destination IDs and template metadata; exercise template overrides with real models.
 
 Every missing row must be implemented or have an explicit documented replacement. Outstanding model ownership or per-flavor parity gaps must remain visible; no retirement or dispatch flip is authorized by this work.
+
+## Implementation closure
+
+The baseline rows above remain the pre-change inventory. The replacements are
+specified in [HTML capability replacements](html-capability-replacements.md).
+
+| Baseline gap | Implemented capability / documented replacement | Verification |
+|---|---|---|
+| Headless variant | Generator `headless: true`, CLI `--headless`, conditional document Liquid wrapper | `headless_spec.rb` (passed in targeted runs) |
+| Footnote references | Unique occurrence IDs, backlinks for every occurrence, independently scoped table targets, CSS adjacent-reference delimiter | `html_postprocessing_spec.rb`, collector regression specs (passed in targeted runs) |
+| Form controls | Typed shared label/select/option/textarea mappings; attribute-preserving input and real form wrapper | `html_postprocessing_spec.rb` (passed in targeted runs) |
+| Standoc direct form children | Before parsing, wrap direct controls/labels in a paragraph; upstream direct-child schema remains unchanged | Paragraph-in-form replacement spec (passed in targeted runs) |
+| Cover/titlepage/intro | Theme-selected independent slots; root renderer adopts `render_front_matter` | `front_matter_spec.rb` (passed in targeted runs) |
+| Authority destinations | Whole boilerplate placement or lazy typed statement fields with `boilerplate_placement: template` | `front_matter_spec.rb` (passed in targeted runs) |
+| Cover notes | Typed `coverpage` on notes/admonitions/paragraphs, routed to a configured template slot without model mutation | `front_matter_spec.rb` (passed in targeted runs) |
+
+No per-flavor parity gate has run. Flavor root renderers that override the
+shared implementation must adopt the front-matter hook in their owner repos;
+the theme and override ports remain B2/B3. Other coverpage-bearing element
+types require their owner models to retain the marker before routing can work.
+
+Additional source check: isodoc `function/blocks_example_note.rb` explicitly
+forwards the `coverpage` marker for notes and admonitions. Both model types
+are covered by the routing spec. Full extraction: local evidence/b1-cover-markers.txt.
+
+Verification: final capability run passed 18 examples; corrected theme run
+passed 111 examples. The broader targeted run passed all other 218 examples,
+with its old 68-attribute assertion superseded by the corrected theme run.
+The local verification summary records 220 distinct examples covered across
+scoped runs, with no remaining failures. No full suite or per-flavor visual
+parity gate ran. Reference source worktrees remained clean in the recorded
+35-worktree status check.
