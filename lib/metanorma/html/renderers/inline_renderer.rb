@@ -306,17 +306,17 @@ module Metanorma
             attributes = form_attributes(option, %i[value disabled selected])
             attributes[:selected] = true if el.value && option.value == el.value
             render_liquid("_element.html.liquid", "tag" => "option",
-                          "extra_attrs" => element_attrs(**attributes),
-                          "content" => escape_html(option.content))
+                                                  "extra_attrs" => element_attrs(**attributes),
+                                                  "content" => escape_html(option.content))
           end.join
           render_liquid("_element.html.liquid", "tag" => "select",
-                        "extra_attrs" => attrs, "content" => content)
+                                                "extra_attrs" => attrs, "content" => content)
         end
 
         def render_textarea(el)
           render_liquid("_element.html.liquid", "tag" => "textarea",
-                        "extra_attrs" => element_attrs(**form_attributes(el, %i[id name rows cols])),
-                        "content" => escape_html(el.value))
+                                                "extra_attrs" => element_attrs(**form_attributes(el, %i[id name rows cols])),
+                                                "content" => escape_html(el.value))
         end
 
         def render_label(el)
@@ -324,8 +324,8 @@ module Metanorma
             child.is_a?(String) ? escape_html(child) : render_inline_element(child)
           end.join
           render_liquid("_element.html.liquid", "tag" => "label",
-                        "extra_attrs" => element_attrs(for: safe_attr(el, :for_attr)),
-                        "content" => content)
+                                                "extra_attrs" => element_attrs(for: safe_attr(el, :for_attr)),
+                                                "content" => content)
         end
 
         def form_attributes(el, names)

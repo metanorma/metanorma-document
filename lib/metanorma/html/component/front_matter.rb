@@ -8,6 +8,7 @@ module Metanorma
       class FrontMatter
         SLOTS = %w[cover titlepage intro].freeze
         PLACEMENTS = (SLOTS + %w[after_cover template]).freeze
+        UNSLOTTED_PLACEMENTS = %w[cover after_cover template].freeze
 
         def initialize(renderer, document)
           @renderer = renderer
@@ -42,8 +43,9 @@ module Metanorma
           if theme.boilerplate_placement == "template" && !@renderer.front_matter_enabled?
             raise ArgumentError, "Template boilerplate placement requires a front matter template"
           end
+
           [theme.boilerplate_placement, theme.cover_notes_slot].uniq.each do |slot|
-            next if %w[cover after_cover template].include?(slot)
+            next if UNSLOTTED_PLACEMENTS.include?(slot)
             next if template_for(slot) && !template_for(slot).empty?
             # Notes need a destination only when routing is enabled.
             next if slot == theme.cover_notes_slot && !@renderer.front_matter_enabled?
@@ -62,9 +64,9 @@ module Metanorma
           template = template_for(slot)
           if template && !template.empty?
             @renderer.render_liquid(template, assigns.merge(
-              "cover_notes_html" => slot_notes,
-              "boilerplate_html" => slot_boilerplate,
-            ))
+                                                "cover_notes_html" => slot_notes,
+                                                "boilerplate_html" => slot_boilerplate,
+                                              ))
           elsif slot == "cover"
             (@renderer.render_coverpage(@document) || "") + slot_notes + slot_boilerplate
           else
@@ -78,15 +80,15 @@ module Metanorma
 
         def coverpage_nodes
           result = []
-          visit(@document, {}, result)
+          visit(@document, {}.compare_by_identity, result)
           result
         end
 
         def visit(node, seen, result)
           return unless node.is_a?(Lutaml::Model::Serializable)
-          return if seen[node.object_id]
+          return if seen[node]
 
-          seen[node.object_id] = true
+          seen[node] = true
           if @renderer.safe_attr(node, :coverpage)
             result << node
           elsif node.mixed?
