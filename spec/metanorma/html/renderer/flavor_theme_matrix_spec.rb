@@ -34,7 +34,9 @@ RSpec.describe "HTML flavor/taste theme matrix" do
     expect(actual).to eq(manifest.fetch("baseline_themes"))
     manifest.fetch("baseline_sha256").each do |name, digest|
       path = File.join(Metanorma::Html::Theme::THEMES_DIR, "#{name}.yaml")
-      expect(Digest::SHA256.file(path).hexdigest).to eq(digest)
+      # Windows checkouts may convert line endings; hash the LF form.
+      content = File.binread(path).gsub("\r\n", "\n")
+      expect(Digest::SHA256.hexdigest(content)).to eq(digest)
     end
   end
 
