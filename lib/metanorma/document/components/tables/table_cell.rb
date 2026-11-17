@@ -62,6 +62,11 @@ module Metanorma
             mapping.map_element "label", to: :label
             mapping.map_element "fmt-annotation-start", to: :fmt_annotation_start
             mapping.map_element "fmt-annotation-end", to: :fmt_annotation_end
+            mapping.map_element "identifier", to: :identifier
+            mapping.map_element "fmt-identifier", to: :fmt_identifier
+            mapping.map_element "requirement", to: :requirement
+            mapping.map_element "recommendation", to: :recommendation
+            mapping.map_element "permission", to: :permission
           end
         end
 
@@ -132,6 +137,16 @@ module Metanorma
                     Metanorma::Document::Components::ReferenceElements::SourceElement,
                     collection: true
 
+          # Nested provision models (requirement trees inside cells).
+          attribute :requirement, "Metanorma::Document::Components::Blocks::RequirementModel",
+                    collection: true
+          attribute :recommendation,
+                    "Metanorma::Document::Components::Blocks::RecommendationModel",
+                    collection: true
+          attribute :permission,
+                    "Metanorma::Document::Components::Blocks::PermissionModel",
+                    collection: true
+
           # Nested tables (table inside td/th). String-typed: breaks the
           # TableCell ⇄ TableBlock autoload cycle (cell → nested table →
           # rows → cells).
@@ -159,6 +174,14 @@ module Metanorma
           attribute :label, "Metanorma::Document::Elements::Label", collection: true
           attribute :input, Metanorma::Document::Elements::Input,
                     collection: true
+          attribute :date, Metanorma::Document::Components::Inline::DateElement,
+                    collection: true
+          attribute :fmt_date,
+                    Metanorma::Document::Components::Inline::FmtDateElement, collection: true
+          attribute :identifier,
+                    Metanorma::Document::Components::Inline::IdentifierElement, collection: true
+          attribute :fmt_identifier,
+                    Metanorma::Document::Components::Inline::FmtIdentifierElement, collection: true
           attribute :fmt_annotation_start,
                     Metanorma::Document::Components::Inline::FmtAnnotationStartElement, collection: true
           attribute :fmt_annotation_end,

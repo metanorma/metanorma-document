@@ -15,6 +15,8 @@ module Metanorma
         autoload :RequirementBase, "#{__dir__}/blocks/requirement_base"
         autoload :RequirementClassification,
                  "#{__dir__}/blocks/requirement_classification"
+        autoload :RequirementComponent,
+                 "#{__dir__}/blocks/requirement_component"
         autoload :RequirementDescription,
                  "#{__dir__}/blocks/requirement_description"
         autoload :RequirementInherit, "#{__dir__}/blocks/requirement_inherit"

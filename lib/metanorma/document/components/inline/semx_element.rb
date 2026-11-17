@@ -86,6 +86,12 @@ module Metanorma
                     collection: true
           attribute :sourcecode_child, "Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock",
                     collection: true
+          attribute :example_child,
+                    "Metanorma::Document::Components::AncillaryBlocks::ExampleBlock",
+                    collection: true
+          attribute :note_child,
+                    "Metanorma::Document::Components::Blocks::NoteBlock",
+                    collection: true
 
           xml do
             element "semx"
@@ -142,6 +148,8 @@ module Metanorma
             map_element "figure", to: :figure_child
             map_element "formula", to: :formula_child
             map_element "sourcecode", to: :sourcecode_child
+            map_element "example", to: :example_child
+            map_element "note", to: :note_child
           end
         end
       end

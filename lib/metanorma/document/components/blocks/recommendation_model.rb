@@ -22,6 +22,7 @@ module Metanorma
             map_element "verification", to: :verification
             map_element "import", to: :import
             map_element "inherit", to: :inherit
+            map_element "component", to: :component
             map_element "fmt-name", to: :fmt_name
             map_element "fmt-xref-label", to: :fmt_xref_label
             map_element "fmt-provision", to: :fmt_provision

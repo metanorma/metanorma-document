@@ -35,6 +35,9 @@ module Metanorma
           attribute :example,
                     Metanorma::Document::Components::AncillaryBlocks::ExampleBlock,
                     collection: true
+          attribute :component,
+                    "Metanorma::Document::Components::Blocks::RequirementComponent",
+                    collection: true
         end
       end
     end

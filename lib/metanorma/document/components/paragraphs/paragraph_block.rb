@@ -61,6 +61,11 @@ module Metanorma
                     collection: true
           attribute :note, Metanorma::Document::Components::Blocks::NoteBlock,
                     collection: true
+          # MN nests trailing examples inside the last <p>; string-typed
+          # to avoid the eager ParagraphBlock⇄ExampleBlock load cycle.
+          attribute :example,
+                    "Metanorma::Document::Components::AncillaryBlocks::ExampleBlock",
+                    collection: true
           attribute :semx, Metanorma::Document::Components::Inline::SemxElement,
                     collection: true
           attribute :tab, Metanorma::Document::Components::Inline::TabElement,
@@ -94,6 +99,10 @@ module Metanorma
                     collection: true
           attribute :fmt_date, Metanorma::Document::Components::Inline::FmtDateElement,
                     collection: true
+          attribute :identifier, Metanorma::Document::Components::Inline::IdentifierElement,
+                    collection: true
+          attribute :fmt_identifier,
+                    Metanorma::Document::Components::Inline::FmtIdentifierElement, collection: true
           attribute :erefstack, Metanorma::Document::Components::Inline::ErefStack,
                     collection: true
 
@@ -144,6 +153,7 @@ module Metanorma
             map_element "concept", to: :concept
             map_element "fn", to: :fn
             map_element "note", to: :note
+            map_element "example", to: :example
             map_element "fmt-annotation-end", to: :fmt_annotation_end
             map_element "fmt-annotation-start", to: :fmt_annotation_start
             map_element "semx", to: :semx
@@ -164,6 +174,8 @@ module Metanorma
             map_element "passthrough", to: :passthrough
             map_element "date", to: :date
             map_element "fmt-date", to: :fmt_date
+            map_element "identifier", to: :identifier
+            map_element "fmt-identifier", to: :fmt_identifier
             map_element "erefstack", to: :erefstack
           end
 
