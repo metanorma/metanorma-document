@@ -81,6 +81,8 @@ module Metanorma
                  "metanorma/document/components/inline/fmt_admitted_element"
         autoload :FmtIdentifierElement,
                  "metanorma/document/components/inline/fmt_identifier_element"
+        autoload :IdentifierElement,
+                 "metanorma/document/components/inline/identifier_element"
         autoload :BiblioTagElement,
                  "metanorma/document/components/inline/biblio_tag_element"
         autoload :LocalizedStringElement,
