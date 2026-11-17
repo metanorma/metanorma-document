@@ -82,11 +82,11 @@ module Metanorma
           copyright-statement executivesummary expression
           feedback-statement field-of-application floating-title foreword form
           gender graphical-symbol grammar grammar-value indexsect introduction
-          isAdjective isAdverb isNoun isParticiple isPreposition isVerb label
+          isAdjective isAdverb isNoun isParticiple isPreposition isVerb
           legal-statement letter-symbol license-statement metanorma-extension
-          newcontent non-verbal-representation option preface pronunciation
-          related sections select source-highlighter-css term
-          termdocsource termexample terms textarea toc usage-info
+          newcontent non-verbal-representation preface pronunciation
+          related sections source-highlighter-css term
+          termdocsource termexample terms toc usage-info
           fmt-deprecates fmt-related
         ],
         relaton: %w[altsource],

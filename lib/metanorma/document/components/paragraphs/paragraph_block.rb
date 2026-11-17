@@ -83,6 +83,9 @@ module Metanorma
                     collection: true
           attribute :del, "Metanorma::Document::Elements::Del",
                     collection: true
+          attribute :select, "Metanorma::Document::Elements::Select", collection: true
+          attribute :textarea, "Metanorma::Document::Elements::Textarea", collection: true
+          attribute :label, "Metanorma::Document::Elements::Label", collection: true
           attribute :input, Metanorma::Document::Elements::Input,
                     collection: true
           attribute :passthrough, Metanorma::Document::Components::Blocks::Passthrough,
@@ -104,7 +107,10 @@ module Metanorma
             map "content", to: :json_content
           end
 
+          attribute :coverpage, :boolean
+
           xml do
+            map_attribute "coverpage", to: :coverpage
             element "p"
             mixed_content
             map_attribute "id", to: :id
@@ -152,6 +158,9 @@ module Metanorma
             map_element "add", to: :add
             map_element "del", to: :del
             map_element "input", to: :input
+            map_element "select", to: :select
+            map_element "textarea", to: :textarea
+            map_element "label", to: :label
             map_element "passthrough", to: :passthrough
             map_element "date", to: :date
             map_element "fmt-date", to: :fmt_date

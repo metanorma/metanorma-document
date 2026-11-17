@@ -61,6 +61,8 @@ module Metanorma
         end
 
         def render_paragraph(p, label: nil, label_class: nil, **_opts)
+          return nil if coordinator.skip_coverpage_node?(p)
+
           attrs = element_attrs(id: safe_attr(p, :id),
                                 style: coordinator.alignment_style(safe_attr(p,
                                                                              :alignment)))
@@ -87,6 +89,8 @@ module Metanorma
         end
 
         def render_table(table, **_opts)
+          return nil if coordinator.skip_coverpage_node?(table)
+
           attrs = element_attrs(id: safe_attr(table, :id), class: "table-block")
           table_id = safe_attr(table, :id)
           name_el = safe_attr(table, :fmt_name) || safe_attr(table, :name)
@@ -108,7 +112,8 @@ module Metanorma
           # then lift into a visible tfoot block like the native render.
           table_fns = []
           saved_ctx = coordinator.table_fn_context
-          coordinator.table_fn_context = { fns: table_fns }
+          scope = coordinator.next_table_footnote_scope
+          coordinator.table_fn_context = { fns: table_fns, scope: scope }
           begin
             thead_html = if table.thead
                            render_table_section(table.thead, "thead")
@@ -121,7 +126,7 @@ module Metanorma
             coordinator.table_fn_context = saved_ctx
           end
 
-          tfoot_html = table_tfoot_html(table, table_fns, col_count)
+          tfoot_html = table_tfoot_html(table, table_fns, col_count, scope)
 
           render_liquid("_table.html.liquid", {
                           "attrs" => attrs,
@@ -133,13 +138,13 @@ module Metanorma
                         })
         end
 
-        def table_tfoot_html(table, table_fns, col_count)
+        def table_tfoot_html(table, table_fns, col_count, scope = nil)
           return nil unless table.tfoot || (table.note && !table.note.empty?) ||
             table_fns.any?
 
           tfoot_inner = render_table_section_rows(table.tfoot) if table.tfoot
           notes_html = table_notes_row(table, col_count)
-          table_fn_html = table_footnotes_row(table_fns, col_count)
+          table_fn_html = table_footnotes_row(table_fns, col_count, scope)
           render_liquid("_element.html.liquid", "tag" => "tfoot", "extra_attrs" => "",
                                                 "content" => "#{tfoot_inner}#{notes_html}#{table_fn_html}")
         end
@@ -154,8 +159,8 @@ module Metanorma
 
         # Native parity: <fn>s used inside a table render as visible
         # TableFootnote blocks in a spanning tfoot row.
-        def table_footnotes_row(fns, col_count)
-          items = fns.filter_map do |fn|
+        def table_footnotes_row(fns, col_count, scope)
+          items = fns.each_with_index.filter_map do |fn, index|
             label = coordinator.footnote_label_text(fn) ||
               safe_attr(fn, :reference)
             next unless label
@@ -163,7 +168,10 @@ module Metanorma
             body = coordinator.fn_content_html(fn)
             next if body.to_s.empty?
 
-            %(<p class="TableFootnote"><span><span class="TableFootnoteRef">#{escape_html(label.to_s)}</span>&#xA0; </span>#{body}</p>)
+            render_liquid("_table_footnote.html.liquid",
+                          "target_id" => "#{scope}-footnote-#{index + 1}",
+                          "reference_id" => "#{scope}-fnref-#{index + 1}",
+                          "label" => label.to_s, "content" => body)
           end
           return nil if items.empty?
 
@@ -232,6 +240,8 @@ module Metanorma
         end
 
         def render_unordered_list(ul, **_opts)
+          return nil if coordinator.skip_coverpage_node?(ul)
+
           labeled = ul.listitem&.any? { |li| list_label(li) } || false
           attrs = element_attrs(id: safe_attr(ul, :id),
                                 class: labeled ? "mn-labeled-list" : nil)
@@ -258,6 +268,8 @@ module Metanorma
         end
 
         def render_ordered_list(ol, **_opts)
+          return nil if coordinator.skip_coverpage_node?(ol)
+
           labeled = ol.listitem&.any? { |li| list_label(li) } || false
           attrs = element_attrs(id: safe_attr(ol, :id),
                                 class: labeled ? "mn-labeled-list" : nil,
@@ -322,6 +334,8 @@ module Metanorma
         end
 
         def render_definition_list(dl, **_opts)
+          return nil if coordinator.skip_coverpage_node?(dl)
+
           attrs = element_attrs(id: safe_attr(dl, :id))
           terms = dl.dt&.each_with_index&.map do |dt, i|
             dt_html = coordinator.render_mixed_inline(dt)
@@ -353,6 +367,8 @@ module Metanorma
         end
 
         def render_figure(figure, **_opts)
+          return nil if coordinator.skip_coverpage_node?(figure)
+
           drop = Drops::FigureDrop.from_model(figure,
                                               renderer: coordinator.renderer_context)
           render_liquid("_figure.html.liquid", { "block" => drop })
@@ -426,34 +442,45 @@ module Metanorma
         end
 
         def render_note(note, **_opts)
+          return nil if coordinator.skip_coverpage_node?(note)
+
           drop = Drops::NoteDrop.from_model(note,
                                             renderer: coordinator.renderer_context)
           render_liquid("_note.html.liquid", { "block" => drop })
         end
 
         def render_example(example, **_opts)
+          return nil if coordinator.skip_coverpage_node?(example)
+
           drop = Drops::ExampleDrop.from_model(example,
                                                renderer: coordinator.renderer_context)
           render_liquid("_example.html.liquid", { "block" => drop })
         end
 
         def render_form(form, **_opts)
-          attrs = element_attrs(id: safe_attr(form, :id), class: "form")
+          return nil if coordinator.skip_coverpage_node?(form)
+
+          attrs = element_attrs(id: form.id, name: form.name,
+                                class: form.class_attr, action: form.action)
           content = coordinator.render_ordered_content(form)
           render_liquid("_element.html.liquid", {
-                          "tag" => "div",
+                          "tag" => "form",
                           "extra_attrs" => attrs,
                           "content" => content,
                         })
         end
 
         def render_sourcecode(sc, **_opts)
+          return nil if coordinator.skip_coverpage_node?(sc)
+
           drop = Drops::SourcecodeDrop.from_model(sc,
                                                   renderer: coordinator.renderer_context)
           render_liquid("_sourcecode.html.liquid", { "block" => drop })
         end
 
         def render_formula(formula, **_opts)
+          return nil if coordinator.skip_coverpage_node?(formula)
+
           drop = Drops::FormulaDrop.from_model(formula,
                                                renderer: coordinator.renderer_context)
           render_liquid("_formula.html.liquid", { "block" => drop })
@@ -471,6 +498,8 @@ module Metanorma
         }.freeze
 
         def render_quote(quote, **_opts)
+          return nil if coordinator.skip_coverpage_node?(quote)
+
           attrs = element_attrs(id: safe_attr(quote, :id), class: "quote")
           content = quote_children_html(quote)
           attribution_html = if quote.attribution
@@ -511,6 +540,8 @@ module Metanorma
         end
 
         def render_admonition(admonition, **_opts)
+          return nil if coordinator.skip_coverpage_node?(admonition)
+
           drop = Drops::AdmonitionDrop.from_model(admonition,
                                                   renderer: coordinator.renderer_context)
           render_liquid("_admonition.html.liquid", { "block" => drop })

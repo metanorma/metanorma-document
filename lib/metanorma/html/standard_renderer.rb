@@ -56,9 +56,7 @@ module Metanorma
                       :render_toc
 
       def render_standard_document(doc, **_opts)
-        cover = render_coverpage(doc)
-        cover += render_boilerplate(doc) if doc.respond_to?(:boilerplate) &&
-          doc.boilerplate
+        cover = render_front_matter(doc)
 
         cover + render_liquid("_main_content.html.liquid",
                               { "content" => main_sections_html(doc) })
@@ -83,6 +81,26 @@ module Metanorma
         parts << (render_semantic_annexes(doc) || "")
         parts << (render_footnotes_section || "")
         parts.join
+      end
+
+      # Flavor renderers call this hook instead of assembling legacy
+      # cover/boilerplate fragments themselves.
+      def render_front_matter(doc)
+        Component::FrontMatter.new(self, doc).render
+      end
+
+      def front_matter_assigns(doc)
+        bibdata = doc.bibdata
+        {
+          "bibdata" => bibdata,
+          "title" => bibdata ? extract_display_title(bibdata) : nil,
+          "doc_id" => extract_primary_doc_id,
+          "language" => language,
+          "publisher_name" => theme.publisher_name,
+          "stage_html" => bibdata ? cover_stage_html(bibdata) : nil,
+          "tc_html" => bibdata ? cover_tc_html(bibdata) : nil,
+          "dates_html" => bibdata ? cover_dates_html(bibdata) : nil,
+        }
       end
 
       def render_coverpage(doc)

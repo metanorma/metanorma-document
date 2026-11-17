@@ -101,13 +101,7 @@ module Metanorma
               :pubid_renderer
 
       def initialize
-        @toc_entries = []
-        @figure_entries = []
-        @table_entries = []
-        @index_term_collector = Component::IndexTermCollector.new
-        @footnote_collector = Component::FootnoteCollector.new
-        @current_section_id = nil
-        @current_section_number = nil
+        reset_document_collections
 
         @inline_renderer = Renderers::InlineRenderer.new(self)
         @block_renderer = Renderers::BlockRenderer.new(self)
@@ -149,21 +143,44 @@ module Metanorma
 
       attr_writer :document, :theme
 
-      def generate_full_document(document, theme: nil, **)
+      def generate_full_document(document, theme: nil, headless: false, **)
         Metanorma::Html.seed_flavors!
         @document = document
         @theme_override = theme
+        @theme = nil
+        reset_document_collections
         validate_presentation_xml!
 
         body = render(@document) || ""
 
-        assemble_document(body)
+        assemble_document(body, headless: headless)
+      end
+
+      def reset_document_collections
+        @toc_entries = []
+        @figure_entries = []
+        @table_entries = []
+        @index_term_collector = Component::IndexTermCollector.new
+        @footnote_collector = Component::FootnoteCollector.new
+        @front_matter_routing = false
+        @table_footnote_sequence = 0
+        @current_section_id = nil
+        @current_section_number = nil
+      end
+
+      def next_table_footnote_scope
+        @table_footnote_sequence = (@table_footnote_sequence || 0) + 1
+        "table-#{@table_footnote_sequence}"
       end
 
       # Renders only the document body content (no html/head/styles
       # assembly) — for embedding classic-rendered content into a host page.
-      def generate_body(document, **)
+      def generate_body(document, theme: nil, **)
+        Metanorma::Html.seed_flavors!
         @document = document
+        @theme_override = theme
+        @theme = nil
+        reset_document_collections
         validate_presentation_xml!
         render(@document) || ""
       end
@@ -254,12 +271,13 @@ module Metanorma
         template.render(context)
       end
 
-      def assemble_document(body)
+      def assemble_document(body, headless: false)
         toc_html = build_toc_html(@toc_entries)
         header = build_header
         footer = build_footer
 
         render_liquid("document.html.liquid", {
+                        "headless" => headless,
                         "lang" => language,
                         "title" => html_title,
                         "font_url" => flavor_font_url,
@@ -362,6 +380,8 @@ module Metanorma
       # --- Dispatch ---
 
       def render(node, **)
+        return nil if skip_coverpage_node?(node)
+
         return escape_html(node) if node.is_a?(String)
 
         method = lookup_dispatch(node.class, :render_registry)
@@ -493,6 +513,20 @@ module Metanorma
                              :render_refterm
       register_inline_render Metanorma::Document::Components::Inline::FmtPreferredElement,
                              :render_fmt_preferred_inline
+      register_inline_render "Metanorma::Document::Elements::Input", :render_input
+      register_render "Metanorma::Document::Elements::Input", :render_input
+      register_inline_render "Metanorma::Document::Elements::Select", :render_select
+      register_inline_render "Metanorma::Standoc::Document::Elements::Select", :render_select
+      register_render "Metanorma::Document::Elements::Select", :render_select
+      register_render "Metanorma::Standoc::Document::Elements::Select", :render_select
+      register_inline_render "Metanorma::Document::Elements::Label", :render_label
+      register_inline_render "Metanorma::Standoc::Document::Elements::Label", :render_label
+      register_render "Metanorma::Document::Elements::Label", :render_label
+      register_render "Metanorma::Standoc::Document::Elements::Label", :render_label
+      register_inline_render "Metanorma::Document::Elements::Textarea", :render_textarea
+      register_inline_render "Metanorma::Standoc::Document::Elements::Textarea", :render_textarea
+      register_render "Metanorma::Document::Elements::Textarea", :render_textarea
+      register_render "Metanorma::Standoc::Document::Elements::Textarea", :render_textarea
       register_inline_render "Metanorma::Standoc::Document::Elements::Input",
                              :render_input
       register_inline_render Metanorma::Document::Components::Inline::EnumCommaElement,
@@ -644,6 +678,10 @@ module Metanorma
       def render_fmt_xref(el) = @inline_renderer.render_fmt_xref(el)
       def render_comma(*) = @inline_renderer.render_comma
       def render_input(el) = @inline_renderer.render_input(el)
+      def render_select(el) = @inline_renderer.render_select(el)
+      def render_textarea(el) = @inline_renderer.render_textarea(el)
+      def render_label(el) = @inline_renderer.render_label(el)
+
       def render_math(el) = @inline_renderer.render_math(el)
       def render_asciimath(el) = @inline_renderer.render_asciimath(el)
       def render_index(el) = @inline_renderer.render_index(el)
@@ -894,6 +932,26 @@ level = 1)
 
       def escape_html(text)
         CGI.escapeHTML(text.to_s)
+      end
+
+      def skip_coverpage_node?(node)
+        @front_matter_routing && !@rendering_coverpage && safe_attr(node, :coverpage)
+      end
+
+      def activate_front_matter_routing
+        @front_matter_routing = front_matter_enabled?
+      end
+
+      def front_matter_enabled?
+        [theme.cover_template, theme.titlepage_template, theme.intro_template].any? { |path| path && !path.empty? }
+      end
+
+      def render_coverpage_note(node)
+        previous = @rendering_coverpage
+        @rendering_coverpage = true
+        render(node) || ""
+      ensure
+        @rendering_coverpage = previous
       end
 
       def render_footnotes_section

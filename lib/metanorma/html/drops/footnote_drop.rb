@@ -9,6 +9,10 @@ module Metanorma
           @content_html = content_html
         end
 
+        def references
+          @entry.references
+        end
+
         def number
           @entry.number
         end

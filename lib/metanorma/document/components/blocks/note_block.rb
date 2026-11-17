@@ -60,7 +60,10 @@ module Metanorma
                     Metanorma::Document::Components::Inline::FmtXrefLabelElement, collection: true
           attribute :fmt_name, Metanorma::Document::Components::Inline::FmtNameElement
 
+          attribute :coverpage, :boolean
+
           xml do
+            map_attribute "coverpage", to: :coverpage
             element "note"
             map_attribute "type", to: :type_attr
             map_attribute "format", to: :format

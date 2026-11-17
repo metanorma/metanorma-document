@@ -108,6 +108,13 @@ module Metanorma
       attribute :doc_id_strip_prefix, :string
 
       # --- Section ordering ---
+      # Template paths resolve through the flavor theme directory first.
+      attribute :cover_template, :string
+      attribute :titlepage_template, :string
+      attribute :intro_template, :string
+      attribute :boilerplate_placement, :string, default: -> { "after_cover" }
+      attribute :cover_notes_slot, :string, default: -> { "cover" }
+
       attribute :preface_order, :string, collection: true, default: -> {
         %w[foreword introduction abstract clause acknowledgements executivesummary]
       }

@@ -3,6 +3,7 @@
 module Metanorma
   module Html
     module Drops
+      autoload :FrontMatterDrop, "metanorma/html/drops/front_matter_drop"
       autoload :FootnoteDrop, "metanorma/html/drops/footnote_drop"
       autoload :BlockElementDrop, "metanorma/html/drops/block_element_drop"
       autoload :NoteDrop, "metanorma/html/drops/note_drop"
