@@ -41,7 +41,7 @@ RSpec.describe "HTML postprocessing replacements" do
     XML
     html = renderer.render(form)
     expect(html).to include('<form id="survey" name="survey" class="application" action="/submit">')
-    expect(html).to include('name="answer"', 'value="Yes"', '</form>')
+    expect(html).to include('name="answer"', 'value="Yes"', "</form>")
   end
 
   it "preserves controls in table cells and nested inline spans" do
@@ -49,7 +49,7 @@ RSpec.describe "HTML postprocessing replacements" do
       <td><label for="s">Select</label><select id="s" value="a"><option value="a">A</option></select><span><textarea value="text"/></span></td>
     XML
     html = renderer.render_cell_content(cell)
-    expect(html).to include('<label for="s">Select</label>', '<option value="a" selected="true">A</option>', '<textarea>text</textarea>')
+    expect(html).to include('<label for="s">Select</label>', '<option value="a" selected="true">A</option>', "<textarea>text</textarea>")
   end
 
   it "gives repeated footnote references unique IDs and backlinks to each reference" do

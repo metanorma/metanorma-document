@@ -61,7 +61,7 @@ RSpec.describe "Configurable HTML front matter" do
   end
 
   it "provides statement destinations as lazy typed-model renders" do
-    with_theme("intro_template: intro.liquid\nboilerplate_placement: template\n", "intro.liquid" => '{{ front_matter.copyright_html }}') do |theme|
+    with_theme("intro_template: intro.liquid\nboilerplate_placement: template\n", "intro.liquid" => "{{ front_matter.copyright_html }}") do |theme|
       html = renderer.generate_full_document(document, theme: theme)
       expect(html.scan("Copyright holder").size).to eq(1)
     end

@@ -5,6 +5,7 @@ module Metanorma
     module Elements
       class Label < Lutaml::Model::Serializable
         include Metanorma::Document::Components::Inline::Vocabulary
+
         attribute :for_attr, :string
 
         xml do
