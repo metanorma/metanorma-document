@@ -23,6 +23,7 @@ module Metanorma
       autoload :Tables, "metanorma/document/components/tables"
       autoload :Inline, "metanorma/document/components/inline"
       autoload :TextElements, "metanorma/document/components/text_elements"
+      autoload :UpdateUnits, "metanorma/document/components/update_units"
     end
   end
 end

@@ -382,6 +382,80 @@ Metanorma::Document::NativeModels.pubid_identifiers(model)
 This is a model-layer capability available to any consumer; MKO below is
 one of them.
 
+== Update units and amendment records
+
+Some publications are amended one division at a time: a loose-leaf
+standard replaces a section while the part and the edition that contain
+it stay the same. Such a division is an update unit. It declares its unit
+name and identifier, and carries structured amendment records: sequence,
+edition, date, approval, announcing reference (for example a circular
+letter), a summary in each language, and the other units it affected.
+
+The records answer which units changed. The `add` and `del` change
+markup answers how the text changed.
+
+[source,xml]
+----
+<clause anchor="B-400">
+  <title>Section 400</title>
+  <update-unit unit="B-400">
+    <identifier>S-4 Part B, Section 400</identifier>
+    <validity><begins>2021-03-01</begins></validity>
+    <amendment-record sequence="1">
+      <edition>4.10.0</edition>
+      <date>2026-03-01</date>
+      <approval>HSSC-17</approval>
+      <reference>CL 12/2026</reference>
+      <summary language="en">New B-410 on light sectors</summary>
+      <summary language="fr">Nouveau B-410 sur les secteurs de feux</summary>
+      <affected-unit>B-410</affected-unit>
+    </amendment-record>
+  </update-unit>
+  ...
+</clause>
+----
+
+The records are usually kept as data next to the section source, in a
+YAML register keyed by unit anchor. Each entry is either the list of
+records, or a mapping with `identifier`, `last_updated`, `validity` and
+`records`:
+
+[source,yaml]
+----
+B-400:
+  identifier: S-4 Part B, Section 400
+  records:
+    - sequence: 1
+      edition: 4.10.0
+      date: 2026-03-01
+      approval: HSSC-17
+      reference: CL 12/2026
+      summary:
+        - language: en
+          content: New B-410 on light sectors
+      affected_units: [B-410]
+----
+
+`Metanorma::Document::UpdateUnits` reads the register, attaches it to the
+divisions it names, and derives the Record of Updates and change queries
+from the records:
+
+[source,ruby]
+----
+register = Metanorma::Document::UpdateUnits.load_register(File.read("updates.yaml"))
+unresolved = Metanorma::Document::UpdateUnits.attach(model, register)
+# => anchors that matched no division
+
+Metanorma::Document::UpdateUnits.units(model)
+# => [[division, UpdateUnit]] in document order
+
+Metanorma::Document::UpdateUnits.record_of_updates(unit, language: "fr")
+# => [Row(sequence:, edition:, date:, approval:, reference:, summary:, affected_units:)]
+
+Metanorma::Document::UpdateUnits.changed_since(model, "4.9.0")
+# => units amended after edition 4.9.0 (also accepts a Date or a sequence number)
+----
+
 == Machine serialization (MKO)
 
 *Metanorma Knowledge Objects* (MN 116) is the machine-first output
