@@ -28,15 +28,15 @@ RSpec.describe "Configurable HTML front matter" do
   it "orders independent cover, titlepage and intro slots before the document" do
     config = <<~YAML
       publisher_name: Example
-      cover_template: cover.liquid
-      titlepage_template: title.liquid
-      intro_template: intro.liquid
+      cover_template: cover.html.liquid
+      titlepage_template: title.html.liquid
+      intro_template: intro.html.liquid
       boilerplate_placement: intro
     YAML
     templates = {
-      "cover.liquid" => '<div id="bespoke-cover">{{ title | escape }}{{ cover_notes_html }}</div>',
-      "title.liquid" => '<div id="bespoke-title">{{ doc_id | escape }}</div>',
-      "intro.liquid" => '<div id="bespoke-intro">{{ boilerplate_html }}</div>',
+      "cover.html.liquid" => '<div id="bespoke-cover">{{ title | escape }}{{ cover_notes_html }}</div>',
+      "title.html.liquid" => '<div id="bespoke-title">{{ doc_id | escape }}</div>',
+      "intro.html.liquid" => '<div id="bespoke-intro">{{ boilerplate_html }}</div>',
     }
     with_theme(config, templates) do |theme|
       html = renderer.generate_full_document(document, theme: theme)
@@ -52,7 +52,7 @@ RSpec.describe "Configurable HTML front matter" do
   end
 
   it "uses shared cover rendering when only the intro is overridden" do
-    with_theme("intro_template: intro.liquid\n", "intro.liquid" => '<div id="intro">{{ publisher_name | escape }}</div>') do |theme|
+    with_theme("intro_template: intro.html.liquid\n", "intro.html.liquid" => '<div id="intro">{{ publisher_name | escape }}</div>') do |theme|
       html = renderer.generate_full_document(document, theme: theme)
       expect(html).to include('class="title-section"', 'id="intro"', "Copyright holder", "Cover note")
       expect(html.scan("Cover note").size).to eq(1)
@@ -61,7 +61,7 @@ RSpec.describe "Configurable HTML front matter" do
   end
 
   it "provides statement destinations as lazy typed-model renders" do
-    with_theme("intro_template: intro.liquid\nboilerplate_placement: template\n", "intro.liquid" => "{{ front_matter.copyright_html }}") do |theme|
+    with_theme("intro_template: intro.html.liquid\nboilerplate_placement: template\n", "intro.html.liquid" => "{{ front_matter.copyright_html }}") do |theme|
       html = renderer.generate_full_document(document, theme: theme)
       expect(html.scan("Copyright holder").size).to eq(1)
     end
@@ -76,7 +76,7 @@ RSpec.describe "Configurable HTML front matter" do
 
   it "preserves cover notes until a root renderer adopts the front matter hook" do
     note = Metanorma::Document::Components::Blocks::NoteBlock.from_xml('<note coverpage="true"><p>Keep this note</p></note>')
-    renderer.theme = Metanorma::Html::Theme.new(intro_template: "intro.liquid")
+    renderer.theme = Metanorma::Html::Theme.new(intro_template: "intro.html.liquid")
     expect(renderer.render(note)).to include("Keep this note")
   end
 
