@@ -1,0 +1,15 @@
+extends: generic
+publishers:
+- United Nations Economic Commission for Europe
+publisher_name: United Nations Economic Commission for Europe
+logos_light: {}
+logos_dark: {}
+primary: '#00ADEF'
+accent: '#00ADEF'
+gradient: 'linear-gradient(135deg, #00ADEF, #00ADEF)'
+header_background: '#00ADEF'
+cover_background: '#00ADEF'
+font_body: '"Source Sans Pro", sans-serif'
+font_sans: '"Source Sans Pro", sans-serif'
+font_mono: '"Source Code Pro", monospace'
+font_url: ''

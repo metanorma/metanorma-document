@@ -1,0 +1,7 @@
+<section class="title-section" aria-label="Cover">
+  <p class="cover-publisher">{{ publisher_name | escape }}</p>
+  {% if doc_id %}<p class="cover-doc-id">{{ doc_id | escape }}</p>{% endif %}
+  {% if title %}<h1 class="cover-title">{{ title | escape }}</h1>{% endif %}
+  {{ tc_html }}{{ stage_html }}{{ dates_html }}
+  {{ cover_notes_html }}{{ boilerplate_html }}
+</section>

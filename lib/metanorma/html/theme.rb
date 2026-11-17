@@ -1,11 +1,18 @@
 # frozen_string_literal: true
 
+require "yaml"
+
 module Metanorma
   module Html
     class Theme < Lutaml::Model::Serializable
       THEMES_DIR = File.join(File.dirname(__FILE__), "..", "..", "..", "data",
                              "themes")
       TEMPLATES_ROOT = File.join(File.dirname(__FILE__), "templates")
+      BOOLEAN_VALUES = [true, false].freeze
+
+      # Explicit composition: defaults belong to the selected parent, never to
+      # an unregistered flavor fallback. Child logo maps replace parent maps.
+      attribute :extends, :string
 
       # --- Primary palette ---
       attribute :primary, :string, default: -> { "#28388A" }
@@ -125,7 +132,7 @@ module Metanorma
       attribute :toc_filter_types, :string, collection: true, default: -> { [] }
 
       # --- Non-YAML state (set programmatically) ---
-      attr_accessor :theme_dir
+      attr_accessor :theme_dir, :inherited_theme_dirs
 
       # Additional theme directories registered by flavor gems (e.g.
       # metanorma-oiml). Searched before the built-in THEMES_DIR so a
@@ -145,36 +152,78 @@ module Metanorma
         end
       end
 
-      def self.load(flavor)
-        themes_dirs.each do |themes_dir|
-          dir_theme = File.join(themes_dir, flavor.to_s, "theme.yaml")
-          flat_theme = File.join(themes_dir, "#{flavor}.yaml")
-
-          return from_directory(dir_theme, flavor, themes_dir) if File.exist?(dir_theme)
-          return from_file(flat_theme) if File.exist?(flat_theme)
+      def self.load(flavor, chain: [])
+        name = flavor.to_s
+        unless /\A[a-z0-9][a-z0-9_-]*\z/.match?(name)
+          raise ArgumentError, "Invalid theme name: #{name.inspect}"
+        end
+        if chain.include?(name)
+          raise ArgumentError, "Theme inheritance cycle: #{(chain + [name]).join(' -> ')}"
         end
 
-        new
+        themes_dirs.each do |root|
+          directory = File.join(root, name, "theme.yaml")
+          flat = File.join(root, "#{name}.yaml")
+          path = [directory, flat].find { |candidate| File.file?(candidate) }
+          next unless path
+
+          dir = path == directory ? File.dirname(path) : nil
+          return from_config(path, dir, chain + [name])
+        end
+        raise ArgumentError, "Unknown HTML theme: #{name}"
       end
 
       def self.from_file(path)
-        from_yaml(File.read(path))
+        from_config(path, nil, [])
       end
 
       def self.from_directory(path, flavor, themes_dir = THEMES_DIR)
-        theme = from_yaml(File.read(path))
-        theme.theme_dir = File.join(themes_dir, flavor.to_s)
+        from_config(path, File.join(themes_dir, flavor.to_s), [flavor.to_s])
+      end
+
+      def self.from_theme_dir(dir)
+        from_config(File.join(dir, "theme.yaml"), dir, [])
+      end
+
+      def self.from_config(path, dir, chain)
+        config = YAML.safe_load_file(path, aliases: false)
+        validate_config!(config, path)
+        parent = load(config["extends"], chain: chain) if config["extends"]
+        # Only explicit child keys replace parent values, including empty maps
+        # and arrays. Deserializing the child first would inject its defaults.
+        inherited = parent ? YAML.safe_load(parent.to_yaml, aliases: false) : {}
+        theme = from_yaml(inherited.merge(config).to_yaml)
+        theme.theme_dir = dir
+        theme.inherited_theme_dirs = parent ? parent.resource_dirs : []
         theme
       end
 
-      # Load a theme from an external theme directory: `dir/theme.yaml`
-      # with optional `assets/`, `templates/` and `custom.css` resolved
-      # relative to `dir`. This is the entry point for organization-local
-      # themes living outside any gem.
-      def self.from_theme_dir(dir)
-        theme = from_yaml(File.read(File.join(dir, "theme.yaml")))
-        theme.theme_dir = dir
-        theme
+      def self.validate_config!(config, path)
+        raise ArgumentError, "Theme must be a mapping: #{path}" unless config.is_a?(Hash)
+
+        config.each do |key, value|
+          definition = attributes[key.to_sym] if key.is_a?(String)
+          raise ArgumentError, "Unknown theme key #{key.inspect}: #{path}" unless definition
+          next if value.nil?
+
+          valid = if definition.collection?
+                    value.is_a?(Array) && value.all?(String)
+                  elsif definition.type == Lutaml::Model::Type::Hash
+                    value.is_a?(Hash) && value.all? { |k, v| k.is_a?(String) && v.is_a?(String) }
+                  elsif definition.type == Lutaml::Model::Type::Boolean
+                    BOOLEAN_VALUES.include?(value)
+                  else
+                    value.is_a?(String)
+                  end
+          raise ArgumentError, "Invalid theme value for #{key}: #{path}" unless valid
+        end
+      end
+
+      # Theme resource APIs search the same composition chain as the data.
+      # The renderer currently takes a single theme_templates_dir; a child
+      # template directory therefore supplies its complete front-matter pair.
+      def resource_dirs
+        [theme_dir, *inherited_theme_dirs].compact.uniq
       end
 
       def logos
@@ -182,38 +231,36 @@ module Metanorma
       end
 
       def theme_templates_dir
-        return nil unless theme_dir
-
-        dir = File.join(theme_dir, "templates")
-        File.directory?(dir) ? dir : nil
+        resource_dirs.map { |dir| File.join(dir, "templates") }
+          .find { |dir| File.directory?(dir) }
       end
 
       def theme_assets_dir
-        return nil unless theme_dir
-
-        dir = File.join(theme_dir, "assets")
-        File.directory?(dir) ? dir : nil
+        resource_dirs.map { |dir| File.join(dir, "assets") }
+          .find { |dir| File.directory?(dir) }
       end
 
       def theme_css_path
-        return nil unless theme_dir
-
-        path = File.join(theme_dir, "custom.css")
-        File.exist?(path) ? path : nil
+        resource_path("custom.css")
       end
 
       def resolve_template(template_name)
-        if theme_templates_dir
-          flavor_path = File.join(theme_templates_dir, template_name)
-          return flavor_path if File.exist?(flavor_path)
-        end
-        File.join(TEMPLATES_ROOT, template_name)
+        resource_path("templates", template_name) ||
+          File.join(TEMPLATES_ROOT, template_name)
       end
 
       def resolve_asset(filename)
-        if theme_assets_dir
-          flavor_path = File.join(theme_assets_dir, filename)
-          return flavor_path if File.exist?(flavor_path)
+        resource_path("assets", filename)
+      end
+
+      def resource_path(*parts)
+        resource_dirs.each do |dir|
+          root = File.expand_path(dir)
+          path = File.expand_path(File.join(root, *parts))
+          unless path.start_with?("#{root}/")
+            raise ArgumentError, "Theme resource escapes its directory: #{parts.join('/')}"
+          end
+          return path if File.file?(path)
         end
         nil
       end

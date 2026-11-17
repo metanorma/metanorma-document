@@ -1,0 +1,15 @@
+extends: generic
+publishers:
+- Vita Green
+publisher_name: Vita Green
+logos_light: {}
+logos_dark: {}
+primary: '#007864'
+accent: '#007864'
+gradient: 'linear-gradient(135deg, #007864, #007864)'
+header_background: '#007864'
+cover_background: '#007864'
+font_body: '"Source Sans Pro", sans-serif'
+font_sans: '"Source Sans Pro", sans-serif'
+font_mono: '"Source Code Pro", monospace'
+font_url: ''

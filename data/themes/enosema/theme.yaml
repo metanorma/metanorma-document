@@ -1,0 +1,11 @@
+extends: iso
+publishers:
+- EFS
+publisher_name: Enosema Foundation
+logos_light:
+  EFS: logo.svg
+logos_dark: {}
+accent: '#007724'
+cover_template: cover.html.liquid
+intro_template: intro.html.liquid
+boilerplate_placement: intro

@@ -1,0 +1,156 @@
+# frozen_string_literal: true
+
+require "spec_helper"
+require "yaml"
+require "digest"
+require "tmpdir"
+require "fileutils"
+
+module HtmlThemeMatrix
+  FIXTURES = File.expand_path("../../../fixtures/html-theme-matrix", __dir__)
+  MANIFEST = YAML.safe_load_file(File.join(FIXTURES, "manifest.yaml")).freeze
+  ROWS = MANIFEST.fetch("rows").freeze
+  RENDER_ROWS = ROWS.select { |_, row| row.key?("theme") }.freeze
+  SLOTS = %i[cover_template titlepage_template intro_template].freeze
+  STATEMENTS = %w[copyright licence legal feedback].freeze
+end
+
+RSpec.describe "HTML flavor/taste theme matrix" do
+  let(:fixtures) { HtmlThemeMatrix::FIXTURES }
+  let(:manifest) { HtmlThemeMatrix::MANIFEST }
+  let(:rows) { HtmlThemeMatrix::ROWS }
+
+  let(:document) do
+    Metanorma::Standoc::Document::Root.from_xml(
+      File.read(File.join(fixtures, "document.xml")),
+    )
+  end
+
+  it "classifies every loaded registry entry and every preserved baseline theme" do
+    names = Metanorma::Core::Flavors.table.filter_map(&:name).map(&:to_s)
+    expect(names - rows.keys).to eq([])
+    actual = Dir[File.join(Metanorma::Html::Theme::THEMES_DIR, "*.yaml")]
+      .map { |path| File.basename(path, ".yaml") }.sort
+    expect(actual).to eq(manifest.fetch("baseline_themes"))
+    manifest.fetch("baseline_sha256").each do |name, digest|
+      path = File.join(Metanorma::Html::Theme::THEMES_DIR, "#{name}.yaml")
+      expect(Digest::SHA256.file(path).hexdigest).to eq(digest)
+    end
+  end
+
+  it "covers every measured model registration and taste, including aliases" do
+    registrations = manifest.fetch("source_inventory").values
+      .flat_map { |source| source.fetch("model_registrations") }
+    expect(registrations - rows.keys).to eq([])
+    expect(manifest.fetch("taste_inventory").keys.sort)
+      .to eq(rows.select { |_, row| row["kind"] == "taste" }.keys.sort)
+    Metanorma::Registry::DEFAULT_ALIASES.each do |name, target|
+      expect(rows.fetch(name.to_s).fetch("target")).to eq(target.to_s)
+    end
+    expect(rows.fetch("csd")).to include("target" => "cc")
+    expect(rows.fetch("plateau")).to include("kind" => "flavor")
+    expect(rows.fetch("vsd")).to include("kind" => "flavor")
+    expect(rows.fetch("mko")).to include("kind" => "infrastructure")
+    expect(rows.fetch("snap")).to include("kind" => "infrastructure")
+    expect(rows.fetch("en")).to include("kind" => "unknown")
+    expect(rows.fetch("mlit")).to include("kind" => "unknown")
+  end
+
+  it "requires newly added theme files to have a classified matrix row" do
+    names = Dir[File.join(Metanorma::Html::Theme::THEMES_DIR, "*", "theme.yaml")]
+      .map { |path| File.basename(File.dirname(path)) }
+    expect(names - rows.keys).to eq([])
+  end
+
+  HtmlThemeMatrix::RENDER_ROWS.each do |name, row|
+    context name do
+      let(:theme) { Metanorma::Html::Theme.load(name) }
+
+      it "loads typed config and resolves declared templates and assets" do
+        expect(theme.publisher_name).not_to be_nil
+        HtmlThemeMatrix::SLOTS.each do |slot|
+          template = theme.public_send(slot)
+          expect(File.file?(theme.resolve_template(template))).to be(true) if template
+        end
+        (theme.logos_light.values + theme.logos_dark.values).each do |asset|
+          local = theme.resolve_asset(asset)
+          shared = File.join(Metanorma::Html::BaseRenderer::LOGO_DIR, asset)
+          expect(File.file?(local || shared)).to be(true), "#{name}: missing #{asset}"
+        end
+        expect(row.fetch("gates")).not_to be_empty
+        expect(row.fetch("status")).to eq("parity_pending")
+      end
+
+      it "renders the real shared model with its selected composition" do
+        # This tests Theme + the B1 hook, not a substitute flavor-owned root.
+        renderer = Metanorma::Html::StandardRenderer.new
+        html = renderer.generate_full_document(document, theme: theme)
+        expect(html).to include("Theme matrix", "A &amp; B", "MATRIX 1:2026", "Matrix body content.")
+        HtmlThemeMatrix::STATEMENTS.each do |statement|
+          expect(html.scan("Matrix #{statement} statement.").size).to eq(1)
+        end
+        expect(html.scan("Matrix cover note.").size).to eq(1)
+        expect(html).to include(theme.to_css_root)
+        expect(html).to include(row["publisher"]) if row["kind"] == "taste"
+        if ENV["HTML_THEME_MATRIX_OUTPUT"]
+          FileUtils.mkdir_p(ENV.fetch("HTML_THEME_MATRIX_OUTPUT"))
+          File.write(File.join(ENV.fetch("HTML_THEME_MATRIX_OUTPUT"), "#{name}.html"), html)
+        end
+      end
+    end
+  end
+
+  describe "strict composition" do
+    def with_configs(configs)
+      Dir.mktmpdir("theme-composition") do |dir|
+        configs.each do |name, config|
+          path = File.join(dir, "#{name}.yaml")
+          File.write(path, config.to_yaml)
+        end
+        stub_const("Metanorma::Html::Theme::THEMES_DIR", dir)
+        yield dir
+      end
+    end
+
+    it "merges explicit values without injecting child defaults or parent logos" do
+      with_configs("parent" => { "primary" => "#112233", "logos_light" => { "Parent" => "logo.svg" } },
+                   "child" => { "extends" => "parent", "accent" => "#445566", "logos_light" => {} }) do
+        theme = Metanorma::Html::Theme.load(:child)
+        expect(theme.primary).to eq("#112233")
+        expect(theme.accent).to eq("#445566")
+        expect(theme.logos_light).to eq({})
+      end
+    end
+
+    it "resolves inherited assets and templates with child precedence" do
+      with_configs("parent" => {}, "child" => { "extends" => "parent" }) do |dir|
+        %w[parent child].each do |name|
+          FileUtils.mkdir_p(File.join(dir, name, "templates"))
+          File.write(File.join(dir, name, "theme.yaml"),
+                     (name == "parent" ? {} : { "extends" => "parent" }).to_yaml)
+        end
+        File.write(File.join(dir, "parent", "templates", "parent.liquid"), "parent")
+        File.write(File.join(dir, "child", "templates", "child.liquid"), "child")
+        theme = Metanorma::Html::Theme.load(:child)
+        expect(File.read(theme.resolve_template("parent.liquid"))).to eq("parent")
+        expect(File.read(theme.resolve_template("child.liquid"))).to eq("child")
+        expect { theme.resolve_template("../../../escape") }.to raise_error(ArgumentError)
+      end
+    end
+
+    it "rejects unknown themes, missing parents, cycles, keys and wrong YAML types" do
+      configs = {
+        "missing" => { "extends" => "not-installed" },
+        "a" => { "extends" => "b" }, "b" => { "extends" => "a" },
+        "typo" => { "publiser_name" => "Lost branding" },
+        "wrong" => { "publishers" => "Not a collection" },
+        "boolean" => { "preface_wrap" => "false" }
+      }
+      with_configs(configs) do
+        %w[unknown missing a typo wrong boolean ../iso].each do |name|
+          expect { Metanorma::Html::Theme.load(name) }.to raise_error(ArgumentError)
+        end
+      end
+    end
+  end
+end

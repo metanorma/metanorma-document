@@ -1,0 +1,15 @@
+extends: generic
+publishers:
+- M3AAWG
+publisher_name: M3AAWG
+logos_light: {}
+logos_dark: {}
+primary: '#69C5DC'
+accent: '#69C5DC'
+gradient: 'linear-gradient(135deg, #69C5DC, #69C5DC)'
+header_background: '#69C5DC'
+cover_background: '#69C5DC'
+font_body: '"Source Sans Pro", sans-serif'
+font_sans: '"Source Sans Pro", sans-serif'
+font_mono: '"Source Code Pro", monospace'
+font_url: ''

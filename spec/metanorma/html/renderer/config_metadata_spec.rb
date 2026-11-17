@@ -5,7 +5,7 @@ require "support/flavor_registration"
 
 RSpec.describe "Config-driven flavor metadata" do
   let(:xml_path) do
-    File.expand_path("../../../fixtures/iso/is/document-en.presentation.xml",
+    File.expand_path("../../../fixtures/html-theme-matrix/iso.xml",
                      __dir__)
   end
   let(:xml) { File.read(xml_path) }

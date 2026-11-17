@@ -1,0 +1,15 @@
+extends: generic
+publishers:
+- National Institute of Standards and Technology
+publisher_name: National Institute of Standards and Technology
+logos_light: {}
+logos_dark: {}
+primary: '#006494'
+accent: '#006494'
+gradient: 'linear-gradient(135deg, #006494, #006494)'
+header_background: '#006494'
+cover_background: '#006494'
+font_body: '"Source Sans Pro", sans-serif'
+font_sans: '"Source Sans Pro", sans-serif'
+font_mono: '"Source Code Pro", monospace'
+font_url: ''

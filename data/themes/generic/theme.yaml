@@ -1,0 +1,17 @@
+publishers:
+- Generic
+publisher_name: Generic
+logos_light: {}
+logos_dark: {}
+primary: '#1661AD'
+accent: '#1661AD'
+gradient: 'linear-gradient(135deg, #1661AD, #1661AD)'
+header_background: '#1661AD'
+cover_background: '#1661AD'
+font_body: '"Source Sans Pro", sans-serif'
+font_sans: '"Source Sans Pro", sans-serif'
+font_mono: '"Source Code Pro", monospace'
+font_url: ''
+cover_template: cover.html.liquid
+intro_template: intro.html.liquid
+boilerplate_placement: intro

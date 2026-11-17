@@ -1,0 +1,18 @@
+extends: iso
+publishers:
+- BSI
+publisher_name: BSI
+logos_light: {}
+logos_dark: {}
+primary: '#e60000'
+accent: '#e60000'
+gradient: 'linear-gradient(135deg, #e60000, #e60000)'
+header_background: '#e60000'
+cover_background: '#e60000'
+font_body: '"Overpass", sans-serif'
+font_sans: '"Overpass", sans-serif'
+font_mono: '"Source Code Pro", monospace'
+font_url: ''
+cover_template: cover.html.liquid
+intro_template: intro.html.liquid
+boilerplate_placement: intro

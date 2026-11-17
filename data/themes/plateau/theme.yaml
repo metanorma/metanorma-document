@@ -1,0 +1,6 @@
+extends: jis
+publishers:
+- PLATEAU
+publisher_name: PLATEAU
+logos_light: {}
+logos_dark: {}
