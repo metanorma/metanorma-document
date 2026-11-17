@@ -1,0 +1,2470 @@
+[
+  {
+    "flavor": "bipm",
+    "commit": "38d804b7ab7755acda4cb7b22f2c34057df9d4af",
+    "count": 2,
+    "categories": {
+      "a": 2,
+      "b": 0,
+      "c": 0
+    },
+    "files": [
+      {
+        "path": "lib/isodoc/bipm/html/html_bipm_intro.html",
+        "sha256": "870653b413e8c27ef80e40a892176c6cf06c30943008643e012e566bffed536b",
+        "category": "a",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/bipm/html/html_bipm_titlepage.html",
+        "sha256": "7244185d0a4291878d9e587bd04070854a1ea4eebfe69bea94d1bda4d75e1ffd",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "annexid",
+          "annexid_alt",
+          "annexsubtitle",
+          "annextitle",
+          "appendixid",
+          "appendixid_alt",
+          "appendixsubtitle",
+          "appendixtitle",
+          "authors_affiliations",
+          "committee",
+          "docnumber",
+          "docsubtitle",
+          "doctitle",
+          "doctype",
+          "doctype_display",
+          "docyear",
+          "draftinfo",
+          "item",
+          "labels",
+          "logo",
+          "logo_committee",
+          "metadata_extensions",
+          "org_abbrev",
+          "partid",
+          "partid_alt",
+          "partsubtitle",
+          "parttitle",
+          "provenancesubtitle",
+          "provenancetitle",
+          "revdate",
+          "si_aspect",
+          "stage",
+          "stage_display",
+          "subpartsubtitle",
+          "subparttitle",
+          "version"
+        ]
+      }
+    ],
+    "tastes": []
+  },
+  {
+    "flavor": "bsi",
+    "commit": "c267be75f959a253bc82d4b02c13db1bff4a9673",
+    "count": 2,
+    "categories": {
+      "a": 2,
+      "b": 0,
+      "c": 0
+    },
+    "files": [
+      {
+        "path": "lib/isodoc/bsi/html/html_bsi_intro.html",
+        "sha256": "4f5ee75eebee77abd771f2da988960dc38935d0e41651cf06c5698da39300e6f",
+        "category": "a",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/bsi/html/html_bsi_titlepage.html",
+        "sha256": "14dd3e27aa639fd4035e304fe4dd5b143c27cde5f798c78e0c214507003b9bd9",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "au",
+          "author",
+          "docnumber",
+          "docsubtitleintro",
+          "docsubtitlemain",
+          "docsubtitlepart",
+          "docsubtitlepartlabel",
+          "doctitleintro",
+          "doctitlemain",
+          "doctitlepart",
+          "doctitlepartlabel",
+          "draftinfo",
+          "editorialgroup",
+          "img",
+          "revdate",
+          "secretariat",
+          "stageabbr",
+          "tc_docnumber"
+        ]
+      }
+    ],
+    "tastes": []
+  },
+  {
+    "flavor": "cc",
+    "commit": "23eb5bfe21b9f5c5fb1cc8b58d364d5432244dae",
+    "count": 5,
+    "categories": {
+      "a": 2,
+      "b": 0,
+      "c": 3
+    },
+    "files": [
+      {
+        "path": "lib/isodoc/cc/html/header.html",
+        "sha256": "d59ca68c6422472a5a97745edabc2a995a15c1a7b6a04c0bff4b1df32aa49146",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "docnumber",
+          "docyear",
+          "filename"
+        ]
+      },
+      {
+        "path": "lib/isodoc/cc/html/html_cc_intro.html",
+        "sha256": "870653b413e8c27ef80e40a892176c6cf06c30943008643e012e566bffed536b",
+        "category": "a",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/cc/html/html_cc_titlepage.html",
+        "sha256": "8d1bc5a7d718076702ae1727ccaab4081db019c201b47ab70895ab02b6daf8e6",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "affiliation",
+          "author",
+          "docnumber",
+          "docsubtitle",
+          "doctitle",
+          "doctype",
+          "docyear",
+          "stage",
+          "tag",
+          "tc"
+        ]
+      },
+      {
+        "path": "lib/isodoc/cc/html/word_cc_intro.html",
+        "sha256": "87ad0121fa91e7265751cd828016f8aff828fc92257d505415ad34fcd1795a9c",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/cc/html/word_cc_titlepage.html",
+        "sha256": "c773b42abd9db024fc09f09a1e1f3fd7a9e3f1e7d112c6034fbc48fc9f588ab4",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "affiliation",
+          "docnumber",
+          "docsubtitle",
+          "doctitle",
+          "doctype",
+          "draftinfo",
+          "revdate",
+          "stage",
+          "tag",
+          "tc"
+        ]
+      }
+    ],
+    "tastes": []
+  },
+  {
+    "flavor": "csa",
+    "commit": "0c9a34d37cb9047a6c446ff4b94f9c025f0da075",
+    "count": 5,
+    "categories": {
+      "a": 2,
+      "b": 0,
+      "c": 3
+    },
+    "files": [
+      {
+        "path": "lib/isodoc/csa/html/header.html",
+        "sha256": "ab5718ec16d11f3045be5d09abcbcafba63191402e510d32d32716b567898f2a",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "docnumber",
+          "docyear",
+          "filename"
+        ]
+      },
+      {
+        "path": "lib/isodoc/csa/html/html_csa_intro.html",
+        "sha256": "870653b413e8c27ef80e40a892176c6cf06c30943008643e012e566bffed536b",
+        "category": "a",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/csa/html/html_csa_titlepage.html",
+        "sha256": "c07404089dc2cdadccf1c803ab48fdad99bd306ed73f892ea56d44baa54f3a49",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "affiliation",
+          "author",
+          "docnumber",
+          "docsubtitle",
+          "doctitle",
+          "doctype",
+          "stage",
+          "tag",
+          "tc"
+        ]
+      },
+      {
+        "path": "lib/isodoc/csa/html/word_csa_intro.html",
+        "sha256": "e10327a0bd1a67854aad4bd6c45387ea2efbe220a792c481c473fa6c5c4a9369",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/csa/html/word_csa_titlepage.html",
+        "sha256": "cb3f0e3081bb8726b43293a10a68a0557193fd826c6be3f61f5fbef95a85f0f7",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "affiliation",
+          "docnumber",
+          "docsubtitle",
+          "doctitle",
+          "doctype",
+          "draftinfo",
+          "stage",
+          "tag",
+          "tc"
+        ]
+      }
+    ],
+    "tastes": []
+  },
+  {
+    "flavor": "gb",
+    "commit": "d67597aa36da3ffc7a520e3fd351f15f41911d08",
+    "count": 13,
+    "categories": {
+      "a": 3,
+      "b": 0,
+      "c": 10
+    },
+    "files": [
+      {
+        "path": "lib/gbdoc/html/header.html",
+        "sha256": "ecd4dc5a986e574cfdc9d85988200ac7faccade14c5deb5d1c812e25fe9b6a05",
+        "category": "c",
+        "mapping": "Pre-IsoDoc GB converter tree; counted separately, not a second override for the current IsoDoc::Gb converter. Retain as historical reference.",
+        "fields": [
+          "docidentifier",
+          "docyear"
+        ]
+      },
+      {
+        "path": "lib/gbdoc/html/html_gb_intro.html",
+        "sha256": "dffc84a8a83a225b35071e53d691d24ebb21820be983990696ba08b33bde9198",
+        "category": "c",
+        "mapping": "Pre-IsoDoc GB converter tree; counted separately, not a second override for the current IsoDoc::Gb converter. Retain as historical reference.",
+        "fields": [
+          "table_of_contents"
+        ]
+      },
+      {
+        "path": "lib/gbdoc/html/html_gb_titlepage.html",
+        "sha256": "807c88f19aa4ad7e25b73dd180576c0ae80a1428baf6cc081d037d36b3f860d1",
+        "category": "c",
+        "mapping": "Pre-IsoDoc GB converter tree; counted separately, not a second override for the current IsoDoc::Gb converter. Retain as historical reference.",
+        "fields": [
+          "activateddate",
+          "docidentifier",
+          "docmaintitleen",
+          "docmaintitlezh",
+          "docpartitleen",
+          "docpartitlezh",
+          "docsubtitleen",
+          "docsubtitlezh",
+          "docyear",
+          "gbequivalence",
+          "isostandard",
+          "isostandardtitle",
+          "language",
+          "libraryid_ccs",
+          "libraryid_ics",
+          "obsoletes",
+          "publisheddate",
+          "revdate",
+          "stageabbr",
+          "standard_agency_formatted",
+          "standard_class",
+          "standard_logo"
+        ]
+      },
+      {
+        "path": "lib/gbdoc/html/scripts.html",
+        "sha256": "fef7edb5068e9bad6c5013fde97cb52bd8545a21a83d63113789620d089d2913",
+        "category": "c",
+        "mapping": "Pre-IsoDoc GB converter tree; counted separately, not a second override for the current IsoDoc::Gb converter. Retain as historical reference.",
+        "fields": []
+      },
+      {
+        "path": "lib/gbdoc/html/word_gb_intro.html",
+        "sha256": "1f72ff8792bd02732062e239d269fe524a38973b55fbeeaaa389bcbc7b2dacf9",
+        "category": "c",
+        "mapping": "Pre-IsoDoc GB converter tree; counted separately, not a second override for the current IsoDoc::Gb converter. Retain as historical reference.",
+        "fields": [
+          "table_of_contents"
+        ]
+      },
+      {
+        "path": "lib/gbdoc/html/word_gb_titlepage.html",
+        "sha256": "4d9f515dc3e4df7de60822c5bb715fa4771e9d8fa46ba4a430b728dec9f8b3ee",
+        "category": "c",
+        "mapping": "Pre-IsoDoc GB converter tree; counted separately, not a second override for the current IsoDoc::Gb converter. Retain as historical reference.",
+        "fields": [
+          "completion_date",
+          "docidentifier",
+          "docmaintitleen",
+          "docmaintitlezh",
+          "docparttitleen",
+          "docparttitlezh",
+          "docsubtitleen",
+          "docsubtitlezh",
+          "gbequivalence",
+          "isostandard",
+          "isostandardtitle",
+          "labelled_implementeddate",
+          "labelled_publisheddate",
+          "libraryid_ccs",
+          "libraryid_ics",
+          "obsoletes",
+          "partly_supercedes_lbl",
+          "patent_request",
+          "revdate",
+          "stageabbr",
+          "standard_agency_formatted",
+          "standard_class",
+          "standard_logo",
+          "supercedes_lbl"
+        ]
+      },
+      {
+        "path": "lib/isodoc/gb/html/header.html",
+        "sha256": "dda8052e8bfc67fa26e3d335186a18d9f52615c8c6a05214f6c785396284c1cb",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "docidentifier",
+          "docyear"
+        ]
+      },
+      {
+        "path": "lib/isodoc/gb/html/html_compliant_gb_titlepage.html",
+        "sha256": "11bdd609f48bd7d26c1f994e79558112f9be92a5a2057b15b33cf714f3b0568f",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "completion_date",
+          "docidentifier",
+          "docmaintitleen",
+          "docmaintitlezh",
+          "docparttitleen",
+          "docparttitlezh",
+          "docsubtitleen",
+          "docsubtitlezh",
+          "doctype",
+          "draftinfo",
+          "gbequivalence",
+          "isostandard",
+          "isostandardtitle",
+          "labelled_implementeddate",
+          "labelled_publisheddate",
+          "language",
+          "libraryid_ccs",
+          "libraryid_ics",
+          "obsoletes",
+          "partly_supercedes_lbl",
+          "revdate",
+          "stageabbr",
+          "standard_agency_formatted",
+          "standard_class",
+          "standard_logo",
+          "status",
+          "supercedes_lbl"
+        ]
+      },
+      {
+        "path": "lib/isodoc/gb/html/html_gb_intro.html",
+        "sha256": "a6344a6841935116696469a2f36d9917708e84ede125595763727b37231c4cf3",
+        "category": "a",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/gb/html/html_gb_titlepage.html",
+        "sha256": "514c05b85e75b62a4b1220c4c4cc6a6cadd15339acbfca342c8e0dca890fc3ae",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "completion_date",
+          "docidentifier",
+          "docmaintitleen",
+          "docmaintitlezh",
+          "docpartitleen",
+          "docpartitlezh",
+          "docsubtitleen",
+          "docsubtitlezh",
+          "draftinfo",
+          "gbequivalence",
+          "isostandard",
+          "isostandardtitle",
+          "labelled_implementeddate",
+          "labelled_publisheddate",
+          "language",
+          "libraryid_ccs",
+          "libraryid_ics",
+          "obsoletes",
+          "partly_supercedes_lbl",
+          "revdate",
+          "stageabbr",
+          "standard_agency_formatted",
+          "standard_class",
+          "standard_logo",
+          "supercedes_lbl"
+        ]
+      },
+      {
+        "path": "lib/isodoc/gb/html/scripts.html",
+        "sha256": "19c16c8da357babe4d2d7d52689cc65a875d3a5f568b10781ada95653a9e4398",
+        "category": "c",
+        "mapping": "Legacy DOM/TOC/sidebar JavaScript; cannot copy into the model-driven renderer. Reconcile behavior with frontend assets and B1 postprocessing; do not execute this file through Liquid.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/gb/html/word_gb_intro.html",
+        "sha256": "1f72ff8792bd02732062e239d269fe524a38973b55fbeeaaa389bcbc7b2dacf9",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "table_of_contents"
+        ]
+      },
+      {
+        "path": "lib/isodoc/gb/html/word_gb_titlepage.html",
+        "sha256": "fe29720b05e097b27f973a324158f497e18d683e4eb9d1f8c60921f4efc8417a",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "completion_date",
+          "docidentifier",
+          "docmaintitleen",
+          "docmaintitlezh",
+          "docparttitleen",
+          "docparttitlezh",
+          "docsubtitleen",
+          "docsubtitlezh",
+          "gbequivalence",
+          "isostandard",
+          "isostandardtitle",
+          "labelled_implementeddate",
+          "labelled_publisheddate",
+          "libraryid_ccs",
+          "libraryid_ics",
+          "obsoletes",
+          "partly_supercedes_lbl",
+          "revdate",
+          "stageabbr",
+          "standard_agency_formatted",
+          "standard_class",
+          "standard_logo",
+          "supercedes_lbl"
+        ]
+      }
+    ],
+    "tastes": []
+  },
+  {
+    "flavor": "generic",
+    "commit": "cb41786ff4feb4b730a1154a6ff82f2171dbe064",
+    "count": 6,
+    "categories": {
+      "a": 2,
+      "b": 0,
+      "c": 4
+    },
+    "files": [
+      {
+        "path": "lib/isodoc/generic/html/header.html",
+        "sha256": "2ac5cf44a6bff65ec0be4f4d91b7fb51043dd67d6bc575416536c203f9c20469",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "agency",
+          "docnumber",
+          "docyear",
+          "filename",
+          "publisher"
+        ]
+      },
+      {
+        "path": "lib/isodoc/generic/html/html_generic_intro.html",
+        "sha256": "1b13721f771fcf043eeedd77ce3f1a05ccddc1373cdac34ed473eb9bab280d5b",
+        "category": "a",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/generic/html/html_generic_titlepage.html",
+        "sha256": "5019e4df0c727117252009024519f77a2763ccd6b53387f3cb99e60962693cbb",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "agency",
+          "docnumber",
+          "docsubtitle",
+          "doctitle",
+          "doctype",
+          "docyear",
+          "draftinfo",
+          "publisher",
+          "revdate",
+          "security",
+          "stage",
+          "tc"
+        ]
+      },
+      {
+        "path": "lib/isodoc/generic/html/scripts.html",
+        "sha256": "dac04672b4f478e8dd69b3741a3e197a4c0cb072f03cb9d7c1dc68decca583a5",
+        "category": "c",
+        "mapping": "Legacy DOM/TOC/sidebar JavaScript; cannot copy into the model-driven renderer. Reconcile behavior with frontend assets and B1 postprocessing; do not execute this file through Liquid.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/generic/html/word_generic_intro.html",
+        "sha256": "0652557e1e49624de1700f79b253865915076d2582c68ea93cd3a6d8704815ad",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "agency",
+          "docyear"
+        ]
+      },
+      {
+        "path": "lib/isodoc/generic/html/word_generic_titlepage.html",
+        "sha256": "8666d6873b5344db1e5ce1b12547a38b35c35a72789f744da62719e1e5791eae",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "agency",
+          "docnumber",
+          "docsubtitle",
+          "doctitle",
+          "doctype",
+          "docyear",
+          "draftinfo",
+          "publisher",
+          "revdate",
+          "security",
+          "stage",
+          "tc"
+        ]
+      }
+    ],
+    "tastes": []
+  },
+  {
+    "flavor": "iec",
+    "commit": "74e017c884f2b6b1811b4dbf8dc055be82176eb2",
+    "count": 6,
+    "categories": {
+      "a": 2,
+      "b": 0,
+      "c": 4
+    },
+    "files": [
+      {
+        "path": "lib/isodoc/iec/html/header.html",
+        "sha256": "5591864aee0569aca7f705b69747a989b82d44653bd24be8fc601a001f0af3f0",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "agency",
+          "docnumber",
+          "docyear",
+          "filename"
+        ]
+      },
+      {
+        "path": "lib/isodoc/iec/html/html_iec_intro.html",
+        "sha256": "4f5ee75eebee77abd771f2da988960dc38935d0e41651cf06c5698da39300e6f",
+        "category": "a",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/iec/html/html_iec_titlepage.html",
+        "sha256": "609dea1d0effd756eb978fb525db2e1ea3abcbac618ef32aa1c3796cfb13f715",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "docnumber",
+          "docsubtitleintro",
+          "docsubtitlemain",
+          "docsubtitlepart",
+          "docsubtitlepartlabel",
+          "doctitleintro",
+          "doctitlemain",
+          "doctitlepart",
+          "doctitlepartlabel",
+          "draftinfo",
+          "editorialgroup",
+          "revdate",
+          "secretariat",
+          "stageabbr",
+          "tc_docnumber"
+        ]
+      },
+      {
+        "path": "lib/isodoc/iec/html/scripts.html",
+        "sha256": "1ba5c0b2b21710a4697035224a54b1e67128f30694f814bce4a26c746b251d1e",
+        "category": "c",
+        "mapping": "Legacy DOM/TOC/sidebar JavaScript; cannot copy into the model-driven renderer. Reconcile behavior with frontend assets and B1 postprocessing; do not execute this file through Liquid.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/iec/html/word_iec_intro.html",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/iec/html/word_iec_titlepage.html",
+        "sha256": "75a11da44c802486bc6f65640aa48a730f0f684c5c07a42ba3cd1735eb3fb070",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": []
+      }
+    ],
+    "tastes": []
+  },
+  {
+    "flavor": "ieee",
+    "commit": "b92dd9d16f723f8b9b4abb68ee67b9edc6ac3037",
+    "count": 12,
+    "categories": {
+      "a": 2,
+      "b": 0,
+      "c": 10
+    },
+    "files": [
+      {
+        "path": "lib/isodoc/ieee/html/header.html",
+        "sha256": "7991a83486485db8b7a5bfab003fc007b8f14f4183ae707377f2ef10283c1098",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "docnumeric",
+          "docyear",
+          "draft",
+          "draft_month",
+          "draft_year",
+          "filename",
+          "full_doctitle"
+        ]
+      },
+      {
+        "path": "lib/isodoc/ieee/html/header_amd.html",
+        "sha256": "45cf5e83ce537750924db2d7e7a7edd293ff4751d0f03574fcf243edf26b4823",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "docnumeric",
+          "draft",
+          "draft_month",
+          "draft_year"
+        ]
+      },
+      {
+        "path": "lib/isodoc/ieee/html/header_wp.html",
+        "sha256": "36d2e27c671337a3ce17b83db86ddb2000e4616d682aa869d4a5d0d3086cc9d1",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "docyear",
+          "filename"
+        ]
+      },
+      {
+        "path": "lib/isodoc/ieee/html/html_ieee_intro.html",
+        "sha256": "02eabf0ae4e19e5cd77aa2720151eefed0fc0efd075dc338f75ea5d3757c318b",
+        "category": "a",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/ieee/html/html_ieee_titlepage.html",
+        "sha256": "be8a8533ba8db1b91e9c37bd425f4d01a1bd7bb933caa6afa1605875cedefa59",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "amd",
+          "corr",
+          "coverpage_statement",
+          "docnumeric",
+          "docyear",
+          "draft",
+          "feedback_endeddate",
+          "full_doctitle",
+          "i",
+          "ics",
+          "ieee_sasb_approveddate",
+          "issueddate",
+          "keywords",
+          "obsoleteddate",
+          "provenance_doctitle",
+          "society",
+          "technical_committee"
+        ]
+      },
+      {
+        "path": "lib/isodoc/ieee/html/scripts.html",
+        "sha256": "3753de600e298a1d5eceb4f5805fdbc6cae3c33482d84b53931e35be74b4be1b",
+        "category": "c",
+        "mapping": "Legacy DOM/TOC/sidebar JavaScript; cannot copy into the model-driven renderer. Reconcile behavior with frontend assets and B1 postprocessing; do not execute this file through Liquid.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/ieee/html/word_ieee_colophon_wp.html",
+        "sha256": "d6e136901fe94b12155634c763265e615592baa5343e5e830a14d0b03cb69f20",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/ieee/html/word_ieee_intro.html",
+        "sha256": "bb974337343b3af434127ef4f46ba986bb8584c41049cb650df6676bbefc249e",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "keywords"
+        ]
+      },
+      {
+        "path": "lib/isodoc/ieee/html/word_ieee_intro_wp.html",
+        "sha256": "31c517e2f757aa4368f8d5f2268d86d0a33152074043e1f543dbdc60ac11a4fd",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/ieee/html/word_ieee_titlepage.html",
+        "sha256": "6c0455fc7bec6231a2564234cb721f1d2e7b9ed6db5b4414ff484b335d1c2854",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "amd",
+          "corr",
+          "coverpage_statement",
+          "docnumeric",
+          "docyear",
+          "draft",
+          "feedback_endeddate",
+          "full_doctitle",
+          "ieee_sasb_approveddate",
+          "issueddate",
+          "obsoleteddate",
+          "society",
+          "technical_committee"
+        ]
+      },
+      {
+        "path": "lib/isodoc/ieee/html/word_ieee_titlepage_icr.html",
+        "sha256": "95c3a121b778c306c2c536ac6732371e1108047c5805a90292ec3f53fba23a0f",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "au",
+          "doctitle",
+          "name",
+          "program",
+          "wp_image001_emz",
+          "wp_image003_emz",
+          "wp_image007_emz",
+          "wp_image008_emz"
+        ]
+      },
+      {
+        "path": "lib/isodoc/ieee/html/word_ieee_titlepage_wp.html",
+        "sha256": "37cdc9744a98f6535beeaa9df8efc52592f07c1d36012551cfc80e0337bacf7a",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "au",
+          "doctitle",
+          "name",
+          "program",
+          "wp_image001_emz",
+          "wp_image003_emz",
+          "wp_image008_emz"
+        ]
+      }
+    ],
+    "tastes": []
+  },
+  {
+    "flavor": "ietf",
+    "commit": "36964bd89f22e818547b292e02173831ff6ead2a",
+    "count": 0,
+    "categories": {
+      "a": 0,
+      "b": 0,
+      "c": 0
+    },
+    "files": [],
+    "tastes": []
+  },
+  {
+    "flavor": "iho",
+    "commit": "a1657ab9d50057419229566f5740e000e8e8852b",
+    "count": 5,
+    "categories": {
+      "a": 2,
+      "b": 0,
+      "c": 3
+    },
+    "files": [
+      {
+        "path": "lib/isodoc/iho/html/header.html",
+        "sha256": "2600d3fec56196fc436cb4198f6f7715ce3be31f481b59aa2c43b72f15abbd2a",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "docnumber",
+          "docyear",
+          "filename"
+        ]
+      },
+      {
+        "path": "lib/isodoc/iho/html/html_iho_intro.html",
+        "sha256": "870653b413e8c27ef80e40a892176c6cf06c30943008643e012e566bffed536b",
+        "category": "a",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/iho/html/html_iho_titlepage.html",
+        "sha256": "f5975ded895d9767a7f3dcc506b584d65c554ec235a022711096c613af5fe3c5",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "docnumber",
+          "docsubtitle",
+          "doctitle",
+          "doctype",
+          "docyear",
+          "draftinfo",
+          "edition",
+          "logo",
+          "logo1",
+          "publisheddate",
+          "revdate",
+          "stage",
+          "tc"
+        ]
+      },
+      {
+        "path": "lib/isodoc/iho/html/word_iho_intro.html",
+        "sha256": "2a40ba7939983907d365ca0fe3fe47a8b8b7d0f6b76371cad7baea11ff9b0f18",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/iho/html/word_iho_titlepage.html",
+        "sha256": "863d31a471ba045b8179e624a13ae03c1cb2eca6f45596daeb9ddf954e9e6d70",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "copublisher_logos",
+          "docnumber",
+          "doctitle",
+          "edition",
+          "logo_desc_emf",
+          "logo_mark_emf",
+          "logo_sign_emf"
+        ]
+      }
+    ],
+    "tastes": []
+  },
+  {
+    "flavor": "iso",
+    "commit": "c11202c7656b8367d3047505bfb5f8157151a228",
+    "count": 9,
+    "categories": {
+      "a": 2,
+      "b": 0,
+      "c": 7
+    },
+    "files": [
+      {
+        "path": "lib/isodoc/iso/html/header-dis.html",
+        "sha256": "b4378f319d32893642dace657a728776a8c204e9e5ce213499c635ff7b83e03b",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "agency",
+          "docnumber_reference",
+          "docyear",
+          "draftinfo",
+          "filename",
+          "ics",
+          "keywords",
+          "labels"
+        ]
+      },
+      {
+        "path": "lib/isodoc/iso/html/header.html",
+        "sha256": "0c072bf151c828bd4498c00a2f9074ffe0dc39ce3704ec3fd295aae19c85a578",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "agency",
+          "docnumber_reference",
+          "docyear",
+          "draftinfo",
+          "filename",
+          "ics",
+          "keywords",
+          "labels"
+        ]
+      },
+      {
+        "path": "lib/isodoc/iso/html/html_iso_intro.html",
+        "sha256": "4f5ee75eebee77abd771f2da988960dc38935d0e41651cf06c5698da39300e6f",
+        "category": "a",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/iso/html/html_iso_titlepage.html",
+        "sha256": "9d0836be0d5725261f024e05c9c0fc01ce073091d92a1ac59e3e130a36931c83",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "correcteddate",
+          "docnumber_undated",
+          "docsubtitleadd",
+          "docsubtitleaddlabel",
+          "docsubtitleamd",
+          "docsubtitleamdlabel",
+          "docsubtitlecomplementary",
+          "docsubtitlecorrlabel",
+          "docsubtitleintro",
+          "docsubtitlemain",
+          "docsubtitlepart",
+          "docsubtitlepartlabel",
+          "doctitleadd",
+          "doctitleaddlabel",
+          "doctitleamd",
+          "doctitleamdlabel",
+          "doctitlecomplementary",
+          "doctitlecorrlabel",
+          "doctitleext",
+          "doctitleextlabel",
+          "doctitleintro",
+          "doctitlemain",
+          "doctitlepart",
+          "doctitlepartlabel",
+          "doctitlesup",
+          "doctitlesuplabel",
+          "draftinfo",
+          "edition_display",
+          "editorialgroup",
+          "ics",
+          "keywords",
+          "labels",
+          "num",
+          "revdate",
+          "secretariat",
+          "stageabbr"
+        ]
+      },
+      {
+        "path": "lib/isodoc/iso/html/word_iso_intro-dis.html",
+        "sha256": "df5f57bd6eee00ac26cb197cb93d3e3325a7ab9116fc051ce9b24eb0a61bca8d",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/iso/html/word_iso_intro.html",
+        "sha256": "1d151db61908573ceeb0b474526e142f429744bb4f8765fb0d32cf39aecfebfa",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/iso/html/word_iso_titlepage-dis.html",
+        "sha256": "613e50715297058ceb8dfae518e581ca01ac2349d389420529ebf235a02bab6d",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "approvalgroup",
+          "correcteddate",
+          "doc_date",
+          "docnumber_undated",
+          "docsubtitleadd",
+          "docsubtitleaddlabel",
+          "docsubtitleamd",
+          "docsubtitleamdlabel",
+          "docsubtitlecomplementary",
+          "docsubtitlecorrlabel",
+          "docsubtitleintro",
+          "docsubtitlemain",
+          "docsubtitlepart",
+          "docsubtitlepartlabel",
+          "doctitleadd",
+          "doctitleaddlabel",
+          "doctitleamd",
+          "doctitleamdlabel",
+          "doctitlecomplementary",
+          "doctitlecorrlabel",
+          "doctitleext",
+          "doctitleextlabel",
+          "doctitleintro",
+          "doctitlemain",
+          "doctitlepart",
+          "doctitlepartlabel",
+          "doctitlesup",
+          "doctitlesuplabel",
+          "draftinfo",
+          "labels",
+          "num",
+          "secretariat"
+        ]
+      },
+      {
+        "path": "lib/isodoc/iso/html/word_iso_titlepage-prf.html",
+        "sha256": "6946412f7624ff31acdc53d2f7371a1710dd958449c99a5777072266cd21831f",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "correcteddate",
+          "doc_date",
+          "docnumber_reference",
+          "docsubtitleadd",
+          "docsubtitleaddlabel",
+          "docsubtitleamd",
+          "docsubtitleamdlabel",
+          "docsubtitlecomplementary",
+          "docsubtitlecorrlabel",
+          "docsubtitleintro",
+          "docsubtitlemain",
+          "docsubtitlepart",
+          "docsubtitlepartlabel",
+          "doctitleadd",
+          "doctitleaddlabel",
+          "doctitleamd",
+          "doctitleamdlabel",
+          "doctitlecomplementary",
+          "doctitlecorrlabel",
+          "doctitleext",
+          "doctitleextlabel",
+          "doctitleintro",
+          "doctitlemain",
+          "doctitlepart",
+          "doctitlepartlabel",
+          "doctitlesup",
+          "doctitlesuplabel",
+          "editorialgroup",
+          "labels",
+          "secretariat"
+        ]
+      },
+      {
+        "path": "lib/isodoc/iso/html/word_iso_titlepage.html",
+        "sha256": "c55d535d8ab9d36bb7764254c6470783157ecb5625841ec96e3e04fca66bb8f6",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "correcteddate",
+          "docnumber_undated",
+          "docsubtitleadd",
+          "docsubtitleaddlabel",
+          "docsubtitleamd",
+          "docsubtitleamdlabel",
+          "docsubtitlecomplementary",
+          "docsubtitlecorrlabel",
+          "docsubtitleintro",
+          "docsubtitlemain",
+          "docsubtitlepart",
+          "docsubtitlepartlabel",
+          "doctitleadd",
+          "doctitleaddlabel",
+          "doctitleamd",
+          "doctitleamdlabel",
+          "doctitlecomplementary",
+          "doctitlecorrlabel",
+          "doctitleext",
+          "doctitleextlabel",
+          "doctitleintro",
+          "doctitlemain",
+          "doctitlepart",
+          "doctitlepartlabel",
+          "doctitlesup",
+          "doctitlesuplabel",
+          "draftinfo",
+          "edition_display",
+          "editorialgroup",
+          "labels",
+          "num",
+          "revdate",
+          "secretariat",
+          "stageabbr"
+        ]
+      }
+    ],
+    "tastes": []
+  },
+  {
+    "flavor": "itu",
+    "commit": "1c5bf3515d813be7de60e7d8178c7a3648552f63",
+    "count": 7,
+    "categories": {
+      "a": 2,
+      "b": 0,
+      "c": 5
+    },
+    "files": [
+      {
+        "path": "lib/isodoc/itu/html/header.html",
+        "sha256": "54e1730546e806e580303afddf829fc03e42f7ee25c9a043bda9a3b37aa62fc5",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "amendmentid",
+          "corrigendumid",
+          "docnumber",
+          "docnumber_lang",
+          "docnumeric",
+          "doctype_abbreviated",
+          "doctype_display",
+          "document_provisional",
+          "document_td",
+          "filename",
+          "labels",
+          "meeting_acronym",
+          "pubdate_monthyear"
+        ]
+      },
+      {
+        "path": "lib/isodoc/itu/html/html_itu_intro.html",
+        "sha256": "ff0382eba6f8d1ced476c51a43fd827878ee36c886e2da24bbc3bd48f9f40fa1",
+        "category": "a",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/itu/html/html_itu_titlepage.html",
+        "sha256": "f0968c9eb508effba0cc59efd284568464b8a43aa4725c788a7b4a9a97afc133",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "addresses",
+          "affiliations",
+          "amendmentid",
+          "amendmenttitle",
+          "annexid",
+          "annextitle",
+          "author",
+          "bureau",
+          "collectiontitle",
+          "corrigendumid",
+          "corrigendumtitle",
+          "docnumber_provisional",
+          "docnumber_td",
+          "docnumeric",
+          "docsubtitle",
+          "doctitle",
+          "doctype",
+          "doctype_display",
+          "draftinfo",
+          "edition",
+          "emails",
+          "faxes",
+          "group",
+          "intended_type",
+          "keywords",
+          "labels",
+          "logo_html",
+          "meeting",
+          "meeting_date",
+          "meeting_place",
+          "phones",
+          "positiontitle",
+          "pubdate_monthyear",
+          "recommendationnumber",
+          "sector",
+          "series",
+          "series1",
+          "series2",
+          "source",
+          "stage",
+          "subgroup",
+          "workgroup"
+        ]
+      },
+      {
+        "path": "lib/isodoc/itu/html/scripts.html",
+        "sha256": "3753de600e298a1d5eceb4f5805fdbc6cae3c33482d84b53931e35be74b4be1b",
+        "category": "c",
+        "mapping": "Legacy DOM/TOC/sidebar JavaScript; cannot copy into the model-driven renderer. Reconcile behavior with frontend assets and B1 postprocessing; do not execute this file through Liquid.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/itu/html/word_itu_intro.html",
+        "sha256": "83060882dd6581ce84d8bfcc81a1ce90612cefbebdf5d05910325c8755fd5178",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "amendmentid",
+          "amendmenttitle",
+          "annexid",
+          "annextitle",
+          "corrigendumid",
+          "corrigendumtitle",
+          "docnumber",
+          "docnumber_iso",
+          "doctitle",
+          "doctype_display",
+          "labels"
+        ]
+      },
+      {
+        "path": "lib/isodoc/itu/html/word_itu_titlepage.html",
+        "sha256": "2a6f2da87cf5dd9447a615ed6676ccbcd86d2a3372e2ced3389ea523ea3f0dfe",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "addresses",
+          "affiliations",
+          "amendmentid",
+          "amendmenttitle",
+          "annexid",
+          "annextitle",
+          "author",
+          "bureau",
+          "corrigendumid",
+          "corrigendumtitle",
+          "docnumber_provisional",
+          "docnumber_td",
+          "docnumeric",
+          "doctitle",
+          "doctype_display",
+          "emails",
+          "faxes",
+          "group",
+          "intended_type",
+          "labels",
+          "logo_comb",
+          "logo_word",
+          "meeting",
+          "meeting_date",
+          "meeting_place",
+          "phones",
+          "positiontitle",
+          "pubdate_monthyear",
+          "recommendationnumber",
+          "revdate",
+          "sector",
+          "series",
+          "series1",
+          "series2",
+          "source",
+          "subgroup",
+          "workgroup"
+        ]
+      },
+      {
+        "path": "lib/isodoc/itu/html/word_itu_titlepage_sp.html",
+        "sha256": "f8c07347d5ef61277888e34f94636ab95ead788cea42c1f79786e5fd54eab3b2",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "docnumber_provisional",
+          "docnumber_td",
+          "docnumeric",
+          "docsubtitle",
+          "doctitle",
+          "labels",
+          "lang",
+          "logo_sp",
+          "placedate_year",
+          "positiontitle",
+          "pubdate_ddMMMyyyy"
+        ]
+      }
+    ],
+    "tastes": []
+  },
+  {
+    "flavor": "jis",
+    "commit": "d678bf45d98281cc269a0d1338ca32563252d723",
+    "count": 3,
+    "categories": {
+      "a": 2,
+      "b": 0,
+      "c": 1
+    },
+    "files": [
+      {
+        "path": "lib/isodoc/jis/html/header.html",
+        "sha256": "99f51fa35ce5137be727bc5d8dc08fd072dc1b30392bdd6b4516e80b2b3695d2",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "docnumber",
+          "docnumber_undated",
+          "docyear",
+          "filename",
+          "labels"
+        ]
+      },
+      {
+        "path": "lib/isodoc/jis/html/html_jis_intro.html",
+        "sha256": "94debd63ad9232898dffa13992fc765f4133a1236418d626aef092b17166d31c",
+        "category": "a",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/jis/html/html_jis_titlepage.html",
+        "sha256": "4659cc996dbab801b09d4761f6dd497550596af3c1e83e31ec5f02d920d1cfce",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "docnumber_undated",
+          "docsubtitleamd",
+          "docsubtitleamdlabel",
+          "docsubtitlecorrlabel",
+          "docsubtitleintro",
+          "docsubtitlemain",
+          "docsubtitlepart",
+          "docsubtitlepartlabel",
+          "doctitleamd",
+          "doctitleamdlabel",
+          "doctitlecorrlabel",
+          "doctitleintro",
+          "doctitlemain",
+          "doctitlepart",
+          "doctitlepartlabel",
+          "draftinfo",
+          "edition_display",
+          "editorialgroup",
+          "ics",
+          "keywords",
+          "labels",
+          "num",
+          "revdate",
+          "secretariat",
+          "stageabbr"
+        ]
+      }
+    ],
+    "tastes": []
+  },
+  {
+    "flavor": "m3aawg",
+    "commit": "141bcc472288d97e3115c310240606b48fbbf519",
+    "count": 6,
+    "categories": {
+      "a": 2,
+      "b": 0,
+      "c": 4
+    },
+    "files": [
+      {
+        "path": "lib/isodoc/m3aawg/html/header.html",
+        "sha256": "b1b9600cc83e3038c543028b1aaed4ef8c5e0528027c34cc5af891f101b2778a",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "docnumber",
+          "doctitle",
+          "docyear",
+          "edition",
+          "logo_word"
+        ]
+      },
+      {
+        "path": "lib/isodoc/m3aawg/html/html_m3d_intro.html",
+        "sha256": "1c144dd4170d6d76e7c1fe9e181e28ebd7a0f2c604fe7d9f5a83f5bacd5bd0ab",
+        "category": "a",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "fields": [
+          "doctitle",
+          "edition",
+          "revdate_monthyear"
+        ]
+      },
+      {
+        "path": "lib/isodoc/m3aawg/html/html_m3d_titlepage.html",
+        "sha256": "05e50a27cf1bc65075793fea85c0b939b8b1858699d495918e6faebae5d723c1",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "docnumber",
+          "docsubtitle",
+          "doctitle",
+          "doctype",
+          "draft",
+          "edition",
+          "logo_html",
+          "revdate_monthyear",
+          "stage",
+          "tc",
+          "url"
+        ]
+      },
+      {
+        "path": "lib/isodoc/m3aawg/html/scripts.html",
+        "sha256": "3753de600e298a1d5eceb4f5805fdbc6cae3c33482d84b53931e35be74b4be1b",
+        "category": "c",
+        "mapping": "Legacy DOM/TOC/sidebar JavaScript; cannot copy into the model-driven renderer. Reconcile behavior with frontend assets and B1 postprocessing; do not execute this file through Liquid.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/m3aawg/html/word_m3d_intro.html",
+        "sha256": "0abbc10804a843db1cc75d5273341c8b6fd088c020d0d2e3ef28251be2a0e9b8",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "doctitle",
+          "edition",
+          "revdate_monthyear",
+          "url"
+        ]
+      },
+      {
+        "path": "lib/isodoc/m3aawg/html/word_m3d_titlepage.html",
+        "sha256": "f917df8064f3e50a99af1102a93d633668dd3639278f0d18bfcfc7e063196826",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "agency",
+          "docnumber",
+          "docsubtitle",
+          "doctitle",
+          "draftinfo",
+          "editorialgroup",
+          "secretariat",
+          "stage",
+          "url"
+        ]
+      }
+    ],
+    "tastes": []
+  },
+  {
+    "flavor": "mpfa",
+    "commit": "85f11a566c9c00c62dbb58409cb53ca4329dc74f",
+    "count": 6,
+    "categories": {
+      "a": 2,
+      "b": 0,
+      "c": 4
+    },
+    "files": [
+      {
+        "path": "lib/isodoc/mpfa/html/header.html",
+        "sha256": "1187de60f9ee27b4c019fc720016ffaf4e46557bf98d671a7313ccf74002e30d",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "docnumber",
+          "docyear",
+          "filename"
+        ]
+      },
+      {
+        "path": "lib/isodoc/mpfa/html/html_rsd_intro.html",
+        "sha256": "1b13721f771fcf043eeedd77ce3f1a05ccddc1373cdac34ed473eb9bab280d5b",
+        "category": "a",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/mpfa/html/html_rsd_titlepage.html",
+        "sha256": "b737869f12ea95f0f98b169e3af26b022bbd2a73fe10f14555dbe1c0982f78fd",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "docnumber",
+          "docsubtitle",
+          "doctitle",
+          "doctype",
+          "docyear",
+          "draftinfo",
+          "edition",
+          "publisher",
+          "revdate_monthyear",
+          "stage"
+        ]
+      },
+      {
+        "path": "lib/isodoc/mpfa/html/scripts.html",
+        "sha256": "92f01f77c73cefabcc9175292e789238ebf085a4a33907c1c1a9531eb18e0cd8",
+        "category": "c",
+        "mapping": "Legacy DOM/TOC/sidebar JavaScript; cannot copy into the model-driven renderer. Reconcile behavior with frontend assets and B1 postprocessing; do not execute this file through Liquid.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/mpfa/html/word_rsd_intro.html",
+        "sha256": "4ebed60be7eeea2e49680c66aa879dd2b450f3b4f089be89d686ddfe5b672c4e",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/mpfa/html/word_rsd_titlepage.html",
+        "sha256": "5b4ad3df71368d52012d8c76ed3e84013f99cd4a27ce0b3e44c054e8464d8dac",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "docnumber",
+          "doctitle",
+          "doctype",
+          "docyear",
+          "drafinfo",
+          "draftinfo",
+          "edition",
+          "logo",
+          "revdate_monthyear"
+        ]
+      }
+    ],
+    "tastes": []
+  },
+  {
+    "flavor": "nist",
+    "commit": "40029199d3cf17b32d541de28bb14868335eee03",
+    "count": 9,
+    "categories": {
+      "a": 2,
+      "b": 0,
+      "c": 7
+    },
+    "files": [
+      {
+        "path": "lib/isodoc/nist/html/header.html",
+        "sha256": "8173a58a3cfa05daacfc05c2a9569e6d9927b343cae861521f2e17f32c1bdebc",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "docidentifier",
+          "docsubtitle_short",
+          "doctitle_short",
+          "draft_prefix",
+          "filename"
+        ]
+      },
+      {
+        "path": "lib/isodoc/nist/html/header_cswp.html",
+        "sha256": "0d0f91f1bb45bc57b2df821115e122211cbf38629b3a07b48cd56345b694755e",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "docsubtitle_short",
+          "doctitle_short",
+          "filename",
+          "issueddate_MMMddyyyy",
+          "series"
+        ]
+      },
+      {
+        "path": "lib/isodoc/nist/html/html_nist_intro.html",
+        "sha256": "7443c57ff50b7c6abfdcebf3311e98d30d3a5a183a145ef8f9b93e7263b84e5b",
+        "category": "a",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "fields": [
+          "docidentifier",
+          "doctitle",
+          "doi",
+          "url"
+        ]
+      },
+      {
+        "path": "lib/isodoc/nist/html/html_nist_titlepage.html",
+        "sha256": "a284a99ffead46f77282834b56b56813fabc3a1756dc99aef0675a759c07c3d3",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "abandoneddate_MMMddyyyy",
+          "additional_note",
+          "affiliation",
+          "author",
+          "circulateddate_MMMddyyyy",
+          "confirmeddate_MMMddyyyy",
+          "docclasstitle",
+          "docidentifier_long",
+          "docparttitle",
+          "docsubtitle",
+          "doctitle",
+          "doi",
+          "draft_prefix",
+          "draftinfo",
+          "issueddate_MMMddyyyy",
+          "issueddate_monthyear",
+          "labels",
+          "logo_commerce",
+          "obsoleteddate_MMMddyyyy",
+          "series",
+          "seriesabbr",
+          "status",
+          "supersededdate_MMMddyyyy",
+          "superseding_docidentifier_long",
+          "superseding_doi",
+          "superseding_issued_date_monthyear",
+          "superseding_subtitle",
+          "superseding_title",
+          "superseding_updated_date_MMMddyyyy",
+          "superseding_uri",
+          "updateddate_MMMddyyyy"
+        ]
+      },
+      {
+        "path": "lib/isodoc/nist/html/scripts.html",
+        "sha256": "3753de600e298a1d5eceb4f5805fdbc6cae3c33482d84b53931e35be74b4be1b",
+        "category": "c",
+        "mapping": "Legacy DOM/TOC/sidebar JavaScript; cannot copy into the model-driven renderer. Reconcile behavior with frontend assets and B1 postprocessing; do not execute this file through Liquid.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/nist/html/word_nist_intro.html",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/nist/html/word_nist_intro_cswp.html",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/nist/html/word_nist_titlepage.html",
+        "sha256": "870ec33c4bc6ad984460de637d1908b96bc29724eab600f34b90bd092e5d4556",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "abandoneddate_MMMddyyyy",
+          "additional_note",
+          "affiliation",
+          "author",
+          "circulateddate_MMMddyyyy",
+          "circulateddate_monthyear",
+          "confirmeddate",
+          "confirmeddate_mmddyyyy",
+          "docclasstitle",
+          "docidentifier_long",
+          "docparttitle",
+          "docsubtitle",
+          "doctitle",
+          "doi",
+          "draft_prefix",
+          "draftinfo",
+          "issueddate_MMMddyyyy",
+          "issueddate_monthyear",
+          "iteration_code",
+          "iteration_ordinal",
+          "labels",
+          "logo_commerce_word",
+          "logo_nist",
+          "nist_subdiv",
+          "obsoleteddate_MMMddyyyy",
+          "revdate_MMMddyyyy",
+          "status",
+          "supersededdate_MMMddyyyy",
+          "superseding_authors",
+          "superseding_circulated_date_monthyear",
+          "superseding_docidentifier_long",
+          "superseding_doi",
+          "superseding_issued_date",
+          "superseding_issued_date_monthyear",
+          "superseding_iteration_code",
+          "superseding_iteration_ordinal",
+          "superseding_status",
+          "superseding_subtitle",
+          "superseding_title",
+          "superseding_updated_date_MMMddyyyy",
+          "superseding_updated_date_monthyear",
+          "superseding_uri",
+          "updateddate_mmddyyyy",
+          "uri",
+          "withdrawal_announcement_link",
+          "withdrawal_note"
+        ]
+      },
+      {
+        "path": "lib/isodoc/nist/html/word_nist_titlepage_cswp.html",
+        "sha256": "5163fc4bfdd52de36636cbc0d2d66f898bc23c8655543d27421c30bce9d3f42f",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "affiliation",
+          "author",
+          "docsubtitle",
+          "doctitle",
+          "doi",
+          "issueddate_MMMddyyyy",
+          "logo_cswp"
+        ]
+      }
+    ],
+    "tastes": []
+  },
+  {
+    "flavor": "ogc",
+    "commit": "92a9133e34b38cb1dca6217795170a4137263298",
+    "count": 9,
+    "categories": {
+      "a": 2,
+      "b": 0,
+      "c": 7
+    },
+    "files": [
+      {
+        "path": "lib/isodoc/ogc/html/header.html",
+        "sha256": "5f11422d79215818b58b84353c47e7561c3a989e434c65371cfecf75c5eb59b1",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "docnumber",
+          "docyear",
+          "filename"
+        ]
+      },
+      {
+        "path": "lib/isodoc/ogc/html/header_wp.html",
+        "sha256": "fda21518ef485582b640ebf61612ec0a283568e12bf652da6d46694937fd25f6",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "filename"
+        ]
+      },
+      {
+        "path": "lib/isodoc/ogc/html/html_ogc_intro.html",
+        "sha256": "f6a0aca1da4dddfe53dd98372cc943da1394755d3c398af591dd6e7f88060543",
+        "category": "a",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/ogc/html/html_ogc_titlepage.html",
+        "sha256": "5415f003d0aa43e1ab22d9f2b348dab986f599c4aad7797487c6e17c04b574e7",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "contributor",
+          "doc",
+          "doclanguage",
+          "docnumber",
+          "docsubtitle",
+          "docsubtype",
+          "doctitle",
+          "doctype",
+          "doi.content",
+          "edition",
+          "editor",
+          "externalid",
+          "issueddate",
+          "logo_html",
+          "pdf",
+          "previousuri",
+          "publisheddate",
+          "receiveddate",
+          "stage",
+          "stage_display",
+          "tc",
+          "url",
+          "xml"
+        ]
+      },
+      {
+        "path": "lib/isodoc/ogc/html/scripts.html",
+        "sha256": "b6c2eb14e3b379fe4a23450053410548e166a9ffdf0ad2ab2dcba61940e06b9d",
+        "category": "c",
+        "mapping": "Legacy DOM/TOC/sidebar JavaScript; cannot copy into the model-driven renderer. Reconcile behavior with frontend assets and B1 postprocessing; do not execute this file through Liquid.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/ogc/html/word_ogc_intro.html",
+        "sha256": "78655fea7cf7cab8d5e4aa1b1f076f6edd4775a3675daf76a3f0aede91df5ea4",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/ogc/html/word_ogc_intro_wp.html",
+        "sha256": "45be9754b35d2a6f87f92ef548d7d54ba65a54846a3933904253ffa6f1e9f1f5",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/ogc/html/word_ogc_titlepage.html",
+        "sha256": "eeac6841875555cabf269780c6febbdfbe8c57dfb841cfbf9f8c95a923ac1024",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "contributors",
+          "doclanguage",
+          "docnumber",
+          "docsubstatus",
+          "doctitle",
+          "doctype",
+          "edition",
+          "editors",
+          "externalid",
+          "issueddate",
+          "publisheddate",
+          "receiveddate",
+          "stage_display",
+          "url"
+        ]
+      },
+      {
+        "path": "lib/isodoc/ogc/html/word_ogc_titlepage_wp.html",
+        "sha256": "a6cd34c1f9c41cd326d854ba88438f31cc4861e076a3b1f68cb892fde5104f09",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "contributors",
+          "docnumber",
+          "doctitle",
+          "doctype",
+          "edition",
+          "editors",
+          "externalid",
+          "issueddate",
+          "logo_word",
+          "publisheddate",
+          "receiveddate",
+          "url"
+        ]
+      }
+    ],
+    "tastes": []
+  },
+  {
+    "flavor": "oiml",
+    "commit": "2a073f3c6de00af6cfa53b0796d7b149f77ff00b",
+    "count": 0,
+    "categories": {
+      "a": 0,
+      "b": 0,
+      "c": 0
+    },
+    "files": [],
+    "tastes": []
+  },
+  {
+    "flavor": "plateau",
+    "commit": "60d02099e5e8f5c9d2a4529f0153965bb9bcf41f",
+    "count": 0,
+    "categories": {
+      "a": 0,
+      "b": 0,
+      "c": 0
+    },
+    "files": [],
+    "tastes": []
+  },
+  {
+    "flavor": "ribose",
+    "commit": "dc142f99acf24e84ad801ff6413267885d81c5de",
+    "count": 5,
+    "categories": {
+      "a": 2,
+      "b": 0,
+      "c": 3
+    },
+    "files": [
+      {
+        "path": "lib/isodoc/ribose/html/header.html",
+        "sha256": "bae8a11e42afc4e45c7e8c7d2d7124f2a9edf7b2fb6c7260f77040ba43d6be1a",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "agency",
+          "docnumber",
+          "docyear",
+          "filename",
+          "publisher"
+        ]
+      },
+      {
+        "path": "lib/isodoc/ribose/html/html_rsd_intro.html",
+        "sha256": "870653b413e8c27ef80e40a892176c6cf06c30943008643e012e566bffed536b",
+        "category": "a",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/ribose/html/html_rsd_titlepage.html",
+        "sha256": "d6e5240ae1d762683555bd928540e18430be6dd13eae820256e1139c613e6395",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "agency",
+          "docnumber",
+          "docsubtitle",
+          "doctitle",
+          "doctype",
+          "docyear",
+          "draftinfo",
+          "metadata_extensions",
+          "publisheddate",
+          "publisher",
+          "revdate",
+          "stage",
+          "tc"
+        ]
+      },
+      {
+        "path": "lib/isodoc/ribose/html/word_rsd_intro.html",
+        "sha256": "02213a8081b57db6d44fd4145ff104f6e83f1b327f5be4f2c0eaa0cb356b9dfa",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/ribose/html/word_rsd_titlepage.html",
+        "sha256": "c36d64dfd8f2ffbc4d2cb01cb641b916a234bde347551de7c13e4bfdb4194034",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "agency",
+          "author",
+          "docnumber",
+          "docsubtitle",
+          "doctitle",
+          "doctype",
+          "docyear",
+          "draft",
+          "draftinfo",
+          "logo",
+          "metadata_extensions",
+          "publisheddate",
+          "revdate",
+          "revdate_MMMddyyyy",
+          "stage",
+          "tc"
+        ]
+      }
+    ],
+    "tastes": []
+  },
+  {
+    "flavor": "un",
+    "commit": "345ba67319ae0ce0ca80f01f9d3f5fa67bc8f40e",
+    "count": 8,
+    "categories": {
+      "a": 3,
+      "b": 0,
+      "c": 5
+    },
+    "files": [
+      {
+        "path": "lib/isodoc/un/html/header.html",
+        "sha256": "c86db69ebb827cca11f99495ed6bc3ea9faf46466004913632cc417e67e7f726",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "filename",
+          "formatted_docnumber",
+          "session_id"
+        ]
+      },
+      {
+        "path": "lib/isodoc/un/html/html_unece_intro.html",
+        "sha256": "0171ec953b0c54c14bb377cc53340856b3bbbbb98579d0327fdbd79330c9db9f",
+        "category": "a",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/un/html/html_unece_plenary_titlepage.html",
+        "sha256": "b476a10490e2ab61257172c819d92a90f2eeb1180a85545a007a2a8c9cfc020f",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "doclanguage",
+          "docnumber",
+          "docsubtitle",
+          "doctitle",
+          "doctype",
+          "docyear",
+          "fn_refs",
+          "item",
+          "item_footnote",
+          "revdate",
+          "session_date",
+          "session_itemname",
+          "session_itemnumber",
+          "session_number",
+          "session_subitemname",
+          "stage",
+          "submissionlanguage",
+          "tc"
+        ]
+      },
+      {
+        "path": "lib/isodoc/un/html/html_unece_titlepage.html",
+        "sha256": "36918d51f8710b6a782df4f91aafe1ae5afe3d5673aff6cdc486fc424cfb254f",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "doclanguage",
+          "docsubtitle",
+          "doctitle",
+          "doctype",
+          "docyear",
+          "draftinfo",
+          "fn_refs",
+          "formatted_docnumber",
+          "item",
+          "revdate",
+          "stage",
+          "submissionlanguage",
+          "tc"
+        ]
+      },
+      {
+        "path": "lib/isodoc/un/html/scripts.html",
+        "sha256": "2d326ee69b1b4210dea803f6fd851460ad357bbdd289b772d174521839bab476",
+        "category": "c",
+        "mapping": "Legacy DOM/TOC/sidebar JavaScript; cannot copy into the model-driven renderer. Reconcile behavior with frontend assets and B1 postprocessing; do not execute this file through Liquid.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/un/html/word_unece_intro.html",
+        "sha256": "156c8fc8d4aae47fc73c7334adc76656bc0ec7e39d316b1144a704119b52b864",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": []
+      },
+      {
+        "path": "lib/isodoc/un/html/word_unece_plenary_titlepage.html",
+        "sha256": "d5697d64efc6d4ccdad47d4f9c818da8fbe8e6689539c05de25cd74d2f1a80f9",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "distribution",
+          "doclanguage",
+          "docnumber",
+          "docsubtitle",
+          "doctitle",
+          "fn_refs",
+          "item",
+          "logo",
+          "revdate",
+          "session_collaborator",
+          "session_date",
+          "session_id",
+          "session_id_head",
+          "session_id_tail",
+          "session_itemname",
+          "session_itemnumber",
+          "session_number",
+          "session_subitemname",
+          "submissionlanguage",
+          "tc"
+        ]
+      },
+      {
+        "path": "lib/isodoc/un/html/word_unece_titlepage.html",
+        "sha256": "30492ca2797a4e5ca98374ef5d488c1ffefb672577d10a46218440d5ed116f55",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "doclanguage",
+          "docnumber",
+          "docsubtitle",
+          "doctitle",
+          "doctype",
+          "docyear",
+          "draftinfo",
+          "fn_refs",
+          "item",
+          "submissionlanguage",
+          "tc"
+        ]
+      }
+    ],
+    "tastes": []
+  },
+  {
+    "flavor": "icc",
+    "commit": null,
+    "count": 0,
+    "categories": {
+      "a": 0,
+      "b": 0,
+      "c": 0
+    },
+    "files": [],
+    "tastes": []
+  },
+  {
+    "flavor": "pdfa",
+    "commit": "ebe3dea6c5cae61e8f81b3a8aeda3c3e5993ff5e",
+    "count": 0,
+    "categories": {
+      "a": 0,
+      "b": 0,
+      "c": 0
+    },
+    "files": [],
+    "tastes": []
+  },
+  {
+    "flavor": "mbxif",
+    "commit": "75b4c68df188664c1f148ee53e5715a70a1f2b1f",
+    "count": 0,
+    "categories": {
+      "a": 0,
+      "b": 0,
+      "c": 0
+    },
+    "files": [],
+    "tastes": []
+  },
+  {
+    "flavor": "swf",
+    "commit": "361526792dadd47695d3874f716fae485be536a1",
+    "count": 0,
+    "categories": {
+      "a": 0,
+      "b": 0,
+      "c": 0
+    },
+    "files": [],
+    "tastes": []
+  },
+  {
+    "flavor": "mko",
+    "commit": "bf0f89deb6b23b63309a51187d23b20cc050723d",
+    "count": 0,
+    "categories": {
+      "a": 0,
+      "b": 0,
+      "c": 0
+    },
+    "files": [],
+    "tastes": []
+  },
+  {
+    "flavor": "snap",
+    "commit": "987903f0ac6258ea4d1016e38c9b28a628802e5d",
+    "count": 0,
+    "categories": {
+      "a": 0,
+      "b": 0,
+      "c": 0
+    },
+    "files": [],
+    "tastes": []
+  },
+  {
+    "flavor": "standoc",
+    "commit": "a381a598ed689aaa3d343be54f5fa59a4c8d4dd2",
+    "count": 2,
+    "categories": {
+      "a": 1,
+      "b": 0,
+      "c": 1
+    },
+    "files": [
+      {
+        "path": "lib/isodoc/html/html_titlepage.html",
+        "sha256": "06d66d76f4b76b6b2c30abd872096cd545b8ae147aaec01a209647825b69fdc6",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "annexid",
+          "annexid_alt",
+          "annexsubtitle",
+          "annextitle",
+          "appendixid",
+          "appendixid_alt",
+          "appendixsubtitle",
+          "appendixtitle",
+          "authors_affiliations",
+          "docnumber",
+          "docsubtitle",
+          "doctitle",
+          "doctype",
+          "doctype_display",
+          "docyear",
+          "draftinfo",
+          "item",
+          "org_abbrev",
+          "partid",
+          "partid_alt",
+          "partsubtitle",
+          "parttitle",
+          "provenancesubtitle",
+          "provenancetitle",
+          "stage",
+          "stage_display",
+          "subpartsubtitle",
+          "subparttitle"
+        ]
+      },
+      {
+        "path": "lib/isodoc/html/scripts.html",
+        "sha256": "b94f60c70c869ff53304f4209a00e617ee58949672a4b26e2cd98b3f541fb0ac",
+        "category": "c",
+        "mapping": "Legacy DOM/TOC/sidebar JavaScript; cannot copy into the model-driven renderer. Reconcile behavior with frontend assets and B1 postprocessing; do not execute this file through Liquid.",
+        "fields": []
+      }
+    ],
+    "tastes": []
+  },
+  {
+    "flavor": "taste",
+    "commit": "36b7e017ed780dc62002a1cbbc17a7b9e8a12b99",
+    "count": 8,
+    "categories": {
+      "a": 5,
+      "b": 0,
+      "c": 3
+    },
+    "files": [
+      {
+        "path": "data/csa/header.html",
+        "sha256": "ab5718ec16d11f3045be5d09abcbcafba63191402e510d32d32716b567898f2a",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "docnumber",
+          "docyear",
+          "filename"
+        ]
+      },
+      {
+        "path": "data/csa/html_csa_intro.html",
+        "sha256": "870653b413e8c27ef80e40a892176c6cf06c30943008643e012e566bffed536b",
+        "category": "a",
+        "mapping": "document.html.liquid for the intro/navigation container; _toc.html.liquid for TOC entries only; explicit flavor intro partial for extra metadata. Boilerplate destination IDs require B1 placement/typed content, not DOM moves.",
+        "fields": []
+      },
+      {
+        "path": "data/csa/html_csa_titlepage.html",
+        "sha256": "c07404089dc2cdadccf1c803ab48fdad99bd306ed73f892ea56d44baa54f3a49",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "affiliation",
+          "author",
+          "docnumber",
+          "docsubtitle",
+          "doctitle",
+          "doctype",
+          "stage",
+          "tag",
+          "tc"
+        ]
+      },
+      {
+        "path": "data/csa/word_csa_intro.html",
+        "sha256": "e10327a0bd1a67854aad4bd6c45387ea2efbe220a792c481c473fa6c5c4a9369",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": []
+      },
+      {
+        "path": "data/csa/word_csa_titlepage.html",
+        "sha256": "cb3f0e3081bb8726b43293a10a68a0557193fd826c6be3f61f5fbef95a85f0f7",
+        "category": "c",
+        "mapping": "Word-only cover/intro/colophon or Office header (mso/page fields); not an HTML page header. Outside the HTML port.",
+        "fields": [
+          "affiliation",
+          "docnumber",
+          "docsubtitle",
+          "doctitle",
+          "doctype",
+          "draftinfo",
+          "stage",
+          "tag",
+          "tc"
+        ]
+      },
+      {
+        "path": "data/iala/html_iala_titlepage.html",
+        "sha256": "9e1260c059301eace1205010185663cd168c117a3dcad185ab5c7f3793ec1afd",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "docnumber",
+          "doctitle",
+          "doctype",
+          "docyear",
+          "draftinfo",
+          "edition",
+          "publisheddate",
+          "stage",
+          "tc"
+        ]
+      },
+      {
+        "path": "data/icc/htmlcoverpage.html",
+        "sha256": "1c8a1503cc9b7c63f25691e38f47cf1dacda5215dde91a8b4b21b7b972338de8",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "copublisher_logos",
+          "docnumber",
+          "doctitle",
+          "doctype_display"
+        ]
+      },
+      {
+        "path": "data/pdfa/htmlcoverpage.html",
+        "sha256": "40bbcdfbe91fa489c429fba4bdc0c4a66762de624ea3c0a27b1e56226465e920",
+        "category": "a",
+        "mapping": "_cover.html.liquid at the StandardRenderer cover call; a flavor-owned renderer may select its own named partial. Adapt metadata to typed model/Drop assigns; B1 owns placement.",
+        "fields": [
+          "bibdata",
+          "bibdata.docidentifier",
+          "bibdata.edition",
+          "bibdata.ext",
+          "bibdata.ext.coverpage_image.image",
+          "bibdata.ext.coverpage_image.image.src",
+          "bibdata.ext.innercoverpage",
+          "bibdata.id",
+          "bibdata.status",
+          "bibdata.status.stage.abbreviation",
+          "bibdata.version",
+          "c.organization.logo",
+          "c.organization.name",
+          "copublisher_logos",
+          "docnumber",
+          "docnumeric",
+          "doctitle",
+          "doctype",
+          "doctype_abbr",
+          "doctype_display",
+          "docyear",
+          "draft",
+          "edition",
+          "edition_display",
+          "stage",
+          "stage_display",
+          "stageabbr"
+        ]
+      }
+    ],
+    "tastes": [
+      {
+        "path": "data/csa/config.yaml",
+        "name": "csa",
+        "parent_kind": "flavor",
+        "parent": "generic"
+      },
+      {
+        "path": "data/dsa/config.yaml",
+        "name": "dsa",
+        "parent_kind": "flavor",
+        "parent": "iso"
+      },
+      {
+        "path": "data/elf/config.yaml",
+        "name": "elf",
+        "parent_kind": "flavor",
+        "parent": "iso"
+      },
+      {
+        "path": "data/enosema/config.yaml",
+        "name": "enosema",
+        "parent_kind": "flavor",
+        "parent": "iso"
+      },
+      {
+        "path": "data/iala/config.yaml",
+        "name": "iala",
+        "parent_kind": "flavor",
+        "parent": "iho"
+      },
+      {
+        "path": "data/icc/config.yaml",
+        "name": "icc",
+        "parent_kind": "flavor",
+        "parent": "iso"
+      },
+      {
+        "path": "data/jcgm/config.yaml",
+        "name": "jcgm",
+        "parent_kind": "flavor",
+        "parent": "iso"
+      },
+      {
+        "path": "data/mbxif/config.yaml",
+        "name": "mbxif",
+        "parent_kind": "flavor",
+        "parent": "ribose"
+      },
+      {
+        "path": "data/oiml-cs/config.yaml",
+        "name": "oiml-cs",
+        "parent_kind": "taste",
+        "parent": "oiml"
+      },
+      {
+        "path": "data/oiml/config.yaml",
+        "name": "oiml",
+        "parent_kind": "flavor",
+        "parent": "iso"
+      },
+      {
+        "path": "data/pdfa/config.yaml",
+        "name": "pdfa",
+        "parent_kind": "flavor",
+        "parent": "ribose"
+      },
+      {
+        "path": "data/swf/config.yaml",
+        "name": "swf",
+        "parent_kind": "flavor",
+        "parent": "ribose"
+      },
+      {
+        "path": "data/wmo/config.yaml",
+        "name": "wmo",
+        "parent_kind": "flavor",
+        "parent": "iho"
+      }
+    ]
+  }
+]
