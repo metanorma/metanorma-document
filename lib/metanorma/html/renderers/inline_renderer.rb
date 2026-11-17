@@ -295,15 +295,41 @@ module Metanorma
           ", "
         end
 
-        # Form inputs render as disabled HTML inputs — this is a document
-        # rendering, not an interactive form.
         def render_input(el)
-          attrs = element_attrs(
-            type: safe_attr(el, :type) || "text",
-            disabled: "disabled",
-            checked: safe_attr(el, :checked) ? "checked" : nil,
-          )
-          "<input#{attrs}>"
+          attrs = element_attrs(**form_attributes(el, %i[id name type value disabled readonly checked maxlength minlength]))
+          render_liquid("_input.html.liquid", "attrs" => attrs)
+        end
+
+        def render_select(el)
+          attrs = element_attrs(**form_attributes(el, %i[id name size disabled multiple]))
+          content = Array(el.option).map do |option|
+            attributes = form_attributes(option, %i[value disabled selected])
+            attributes[:selected] = true if el.value && option.value == el.value
+            render_liquid("_element.html.liquid", "tag" => "option",
+                          "extra_attrs" => element_attrs(**attributes),
+                          "content" => escape_html(option.content))
+          end.join
+          render_liquid("_element.html.liquid", "tag" => "select",
+                        "extra_attrs" => attrs, "content" => content)
+        end
+
+        def render_textarea(el)
+          render_liquid("_element.html.liquid", "tag" => "textarea",
+                        "extra_attrs" => element_attrs(**form_attributes(el, %i[id name rows cols])),
+                        "content" => escape_html(el.value))
+        end
+
+        def render_label(el)
+          content = el.each_mixed_content.map do |child|
+            child.is_a?(String) ? escape_html(child) : render_inline_element(child)
+          end.join
+          render_liquid("_element.html.liquid", "tag" => "label",
+                        "extra_attrs" => element_attrs(for: safe_attr(el, :for_attr)),
+                        "content" => content)
+        end
+
+        def form_attributes(el, names)
+          names.to_h { |name| [name, safe_attr(el, name)] }
         end
 
         def render_math(el)
@@ -497,10 +523,9 @@ module Metanorma
             # tfoot block (TableFootnote), not an endnote popup.
             ctx[:fns] << fn
             assigns = {
-              "attrs" => element_attrs(
-                id: safe_attr(fn, :id) || "table-fn-#{ctx[:fns].size}",
-                class: "fn-marker",
-              ),
+              "attrs" => element_attrs(class: "fn-marker"),
+              "reference_id" => "#{ctx[:scope]}-fnref-#{ctx[:fns].size}",
+              "target_id" => "#{ctx[:scope]}-footnote-#{ctx[:fns].size}",
               "number" => ctx[:fns].size,
               "label" => escape_html(label.to_s),
               "popup_html" => nil,
@@ -517,7 +542,9 @@ module Metanorma
           popup_html = fn_content_html(fn)
 
           assigns = {
-            "attrs" => element_attrs(id: fn_id, class: "fn-marker"),
+            "attrs" => element_attrs(id: entry.references.size == 1 ? fn_id : nil, class: "fn-marker"),
+            "reference_id" => entry.references.last,
+            "target_id" => "footnote-#{entry.number}",
             "number" => entry.number,
             "label" => escape_html(label.to_s),
             "popup_html" => popup_html.strip.empty? ? nil : popup_html,

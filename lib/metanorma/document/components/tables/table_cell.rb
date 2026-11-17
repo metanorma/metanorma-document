@@ -57,6 +57,9 @@ module Metanorma
             mapping.map_element "span", to: :span
             mapping.map_element "bookmark", to: :bookmark
             mapping.map_element "input", to: :input
+            mapping.map_element "select", to: :select
+            mapping.map_element "textarea", to: :textarea
+            mapping.map_element "label", to: :label
             mapping.map_element "fmt-annotation-start", to: :fmt_annotation_start
             mapping.map_element "fmt-annotation-end", to: :fmt_annotation_end
           end
@@ -151,6 +154,9 @@ module Metanorma
                     collection: true
           attribute :bookmark, Metanorma::Document::Components::IdElements::Bookmark,
                     collection: true
+          attribute :select, "Metanorma::Document::Elements::Select", collection: true
+          attribute :textarea, "Metanorma::Document::Elements::Textarea", collection: true
+          attribute :label, "Metanorma::Document::Elements::Label", collection: true
           attribute :input, Metanorma::Document::Elements::Input,
                     collection: true
           attribute :fmt_annotation_start,

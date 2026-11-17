@@ -1,3 +1,4 @@
+{% if headless %}<div lang="{{ lang }}">{% else %}
 <!DOCTYPE html>
 <html lang="{{ lang }}">
 <head>
@@ -12,6 +13,7 @@
   </style>
 </head>
 <body lang="{{ lang }}">
+{% endif %}
 <a href="#doc-content" class="skip-nav">Skip to content</a>
 {{ header }}
 <div class="reading-progress" id="reading-progress"></div>
@@ -40,5 +42,5 @@
   <div class="fn-annotation-body" id="fn-annotation-content"></div>
 </div>
 {{ scripts }}
-</body>
-</html>
+{% if headless %}</div>{% else %}</body>
+</html>{% endif %}

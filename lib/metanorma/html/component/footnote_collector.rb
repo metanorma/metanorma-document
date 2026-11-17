@@ -21,6 +21,7 @@ module Metanorma
           key = fn.respond_to?(:target) && fn.target && !fn.target.empty? ? fn.target : fn_id
 
           if (seen = @entries_by_key[key])
+            seen.references << "fnref-#{seen.number}-#{seen.references.size + 1}"
             seen.fmt_label ||= label_text
             return seen
           end
@@ -32,6 +33,7 @@ module Metanorma
             content: fn.p,
             fmt_label: label_text,
             source_fn: fn,
+            references: ["fnref-#{@footnotes.size + 1}"],
           )
           @footnotes << entry
           @entries_by_key[key] = entry
@@ -52,7 +54,7 @@ module Metanorma
       end
 
       FootnoteEntry = Struct.new(:id, :number, :reference, :content, :fmt_label,
-                                 :source_fn, keyword_init: true)
+                                 :source_fn, :references, keyword_init: true)
     end
   end
 end

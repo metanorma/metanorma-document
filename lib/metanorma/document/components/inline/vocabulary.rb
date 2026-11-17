@@ -107,6 +107,9 @@ module Metanorma
                              collection: true
               base.attribute :del, "Metanorma::Document::Elements::Del",
                              collection: true
+              base.attribute :select, "Metanorma::Document::Elements::Select", collection: true
+              base.attribute :textarea, "Metanorma::Document::Elements::Textarea", collection: true
+              base.attribute :label, "Metanorma::Document::Elements::Label", collection: true
               base.attribute :input,
                              Metanorma::Document::Elements::Input,
                              collection: true
@@ -195,6 +198,9 @@ module Metanorma
               "add" => :add,
               "del" => :del,
               "input" => :input,
+              "select" => :select,
+              "textarea" => :textarea,
+              "label" => :label,
               "passthrough" => :passthrough,
               "date" => :date,
               "fmt-date" => :fmt_date,
