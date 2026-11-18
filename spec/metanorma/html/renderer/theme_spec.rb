@@ -44,9 +44,9 @@ RSpec.describe Metanorma::Html::Theme do
 
   describe ".load" do
     context "with unknown flavor" do
-      it "returns default theme" do
-        t = described_class.load(:nonexistent)
-        expect(t.primary).to eq("#28388A")
+      it "rejects an unknown theme" do
+        expect { described_class.load(:nonexistent) }
+          .to raise_error(ArgumentError, /Unknown HTML theme/)
       end
     end
 
@@ -239,7 +239,7 @@ RSpec.describe Metanorma::Html::Theme do
         "accent" => "#00ff00",
         "publishers" => ["TEST"],
         "publisher_name" => "TestPub",
-        "logos" => { "TEST" => "test-logo.svg" },
+        "logos_light" => { "TEST" => "test-logo.svg" },
         "preface_order" => ["introduction", "clause"],
         "preface_wrap" => true,
       }.to_yaml)
@@ -329,10 +329,9 @@ RSpec.describe Metanorma::Html::Theme do
       expect(theme.theme_dir).to be_nil
     end
 
-    it "returns default theme for unknown flavor" do
-      theme = described_class.load(:nonexistent)
-      expect(theme.primary).to eq("#28388A")
-      expect(theme.theme_dir).to be_nil
+    it "rejects an unknown flavor" do
+      expect { described_class.load(:nonexistent) }
+        .to raise_error(ArgumentError, /Unknown HTML theme/)
     end
   end
 
@@ -358,8 +357,8 @@ RSpec.describe Metanorma::Html::Theme do
       expect(described_class.ancestors).to include(Lutaml::Model::Serializable)
     end
 
-    it "has 73 typed attributes" do
-      expect(described_class.attributes.size).to eq(73)
+    it "has 74 typed attributes" do
+      expect(described_class.attributes.size).to eq(74)
     end
 
     it "has boolean type for preface_wrap" do

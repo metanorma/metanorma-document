@@ -1,0 +1,11 @@
+extends: iso
+publishers:
+- ELF
+publisher_name: EXPRESS Language Foundation
+logos_light:
+  ELF: logo.svg
+logos_dark: {}
+accent: '#3f65a2'
+cover_template: cover.html.liquid
+intro_template: intro.html.liquid
+boilerplate_placement: intro

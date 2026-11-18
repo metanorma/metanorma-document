@@ -1,0 +1,13 @@
+extends: iso
+publishers:
+- DSA
+publisher_name: Digital Standards Alliance
+logos_light:
+  DSA: logo.svg
+logos_dark: {}
+font_body: '''Source Sans Pro'', ''Helvetica Neue'', Helvetica, sans-serif'
+font_sans: '''Source Sans Pro'', ''Helvetica Neue'', Helvetica, sans-serif'
+accent: '#005893'
+cover_template: cover.html.liquid
+intro_template: intro.html.liquid
+boilerplate_placement: intro

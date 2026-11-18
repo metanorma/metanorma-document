@@ -6,7 +6,7 @@ require "tmpdir"
 
 RSpec.describe "Theme override via Generator.generate" do
   let(:xml_path) do
-    File.expand_path("../../../fixtures/iso/is/document-en.presentation.xml",
+    File.expand_path("../../../fixtures/html-theme-matrix/iso.xml",
                      __dir__)
   end
   let(:doc) { Metanorma::Iso::Document::Root.from_xml(File.read(xml_path)) }

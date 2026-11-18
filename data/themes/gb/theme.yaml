@@ -1,0 +1,15 @@
+extends: generic
+publishers:
+- 中华人民共和国国家标准
+publisher_name: 中华人民共和国国家标准
+logos_light: {}
+logos_dark: {}
+primary: '#000000'
+accent: '#000000'
+gradient: 'linear-gradient(135deg, #000000, #000000)'
+header_background: '#000000'
+cover_background: '#000000'
+font_body: '"Source Han Sans SC", "Noto Sans CJK SC", sans-serif'
+font_sans: '"Source Han Sans SC", "Noto Sans CJK SC", sans-serif'
+font_mono: '"Source Code Pro", monospace'
+font_url: ''

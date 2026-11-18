@@ -1,0 +1,10 @@
+extends: iso
+publishers:
+- OIML
+publisher_name: International Organization of Legal Metrology
+logos_light:
+  OIML: oiml-logo_icon-light.svg
+logos_dark: {}
+cover_template: cover.html.liquid
+intro_template: intro.html.liquid
+boilerplate_placement: intro

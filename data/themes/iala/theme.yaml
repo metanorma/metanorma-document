@@ -1,0 +1,14 @@
+extends: iho
+publishers:
+- IALA
+publisher_name: International Organization for Marine Aids to Navigation
+logos_light:
+  IALA: iala-logo.svg
+logos_dark: {}
+font_body: Carlito, Calibri, Arial, sans-serif
+font_sans: Carlito, Calibri, Arial, sans-serif
+font_mono: '"Source Code Pro", monospace'
+accent: '#00558C'
+cover_template: cover.html.liquid
+intro_template: intro.html.liquid
+boilerplate_placement: intro

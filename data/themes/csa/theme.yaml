@@ -1,0 +1,13 @@
+extends: generic
+publishers:
+- CSA
+publisher_name: Cloud Security Alliance
+logos_light:
+  CSA: logo.svg
+logos_dark: {}
+font_body: Lato,"Source Sans Pro",sans-serif
+font_sans: Lato,"Source Sans Pro",sans-serif
+font_mono: '"Source Code Pro",monospace'
+cover_template: cover.html.liquid
+intro_template: intro.html.liquid
+boilerplate_placement: intro

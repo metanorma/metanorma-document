@@ -1,0 +1,1351 @@
+schema: 1
+baseline_themes:
+- bipm
+- cc
+- icc
+- iec
+- ieee
+- ietf
+- iho
+- iso
+- itu
+- ogc
+- pdfa
+- ribose
+source_inventory:
+  metanorma-bipm:
+    revision: 38d804b7ab7755acda4cb7b22f2c34057df9d4af
+    model_registrations:
+    - bipm
+  metanorma-bsi:
+    revision: c267be75f959a253bc82d4b02c13db1bff4a9673
+    model_registrations:
+    - bsi
+  metanorma-cc:
+    revision: 23eb5bfe21b9f5c5fb1cc8b58d364d5432244dae
+    model_registrations:
+    - cc
+  metanorma-core:
+    revision: 4dadba56074f2e1c5cac29b2a28db87aa263cdcb
+    model_registrations: []
+  metanorma-csa:
+    revision: 0c9a34d37cb9047a6c446ff4b94f9c025f0da075
+    model_registrations: []
+  metanorma-csd:
+    revision: 23eb5bfe21b9f5c5fb1cc8b58d364d5432244dae
+    model_registrations:
+    - cc
+  metanorma-en:
+    revision: null
+    model_registrations: []
+  metanorma-gb:
+    revision: d67597aa36da3ffc7a520e3fd351f15f41911d08
+    model_registrations:
+    - gb
+  metanorma-generic:
+    revision: cb41786ff4feb4b730a1154a6ff82f2171dbe064
+    model_registrations:
+    - generic
+  metanorma-icc:
+    revision: null
+    model_registrations: []
+  metanorma-iec:
+    revision: 74e017c884f2b6b1811b4dbf8dc055be82176eb2
+    model_registrations:
+    - iec
+  metanorma-ieee:
+    revision: b92dd9d16f723f8b9b4abb68ee67b9edc6ac3037
+    model_registrations:
+    - ieee
+  metanorma-ietf:
+    revision: 36964bd89f22e818547b292e02173831ff6ead2a
+    model_registrations:
+    - ietf
+  metanorma-iho:
+    revision: a1657ab9d50057419229566f5740e000e8e8852b
+    model_registrations:
+    - iho
+  metanorma-iso:
+    revision: c11202c7656b8367d3047505bfb5f8157151a228
+    model_registrations:
+    - iso
+  metanorma-itu:
+    revision: 1c5bf3515d813be7de60e7d8178c7a3648552f63
+    model_registrations:
+    - itu
+  metanorma-jis:
+    revision: d678bf45d98281cc269a0d1338ca32563252d723
+    model_registrations:
+    - jis
+  metanorma-m3aawg:
+    revision: 141bcc472288d97e3115c310240606b48fbbf519
+    model_registrations:
+    - m3d
+  metanorma-mbxif:
+    revision: 75b4c68df188664c1f148ee53e5715a70a1f2b1f
+    model_registrations: []
+  metanorma-mko:
+    revision: bf0f89deb6b23b63309a51187d23b20cc050723d
+    model_registrations: []
+  metanorma-mlit:
+    revision: null
+    model_registrations: []
+  metanorma-mpfa:
+    revision: 85f11a566c9c00c62dbb58409cb53ca4329dc74f
+    model_registrations: []
+  metanorma-nist:
+    revision: 40029199d3cf17b32d541de28bb14868335eee03
+    model_registrations:
+    - nist
+  metanorma-ogc:
+    revision: 92a9133e34b38cb1dca6217795170a4137263298
+    model_registrations:
+    - ogc
+  metanorma-oiml:
+    revision: 2a073f3c6de00af6cfa53b0796d7b149f77ff00b
+    model_registrations: []
+  metanorma-pdfa:
+    revision: ebe3dea6c5cae61e8f81b3a8aeda3c3e5993ff5e
+    model_registrations: []
+  metanorma-plateau:
+    revision: 60d02099e5e8f5c9d2a4529f0153965bb9bcf41f
+    model_registrations: []
+  metanorma-ribose:
+    revision: dc142f99acf24e84ad801ff6413267885d81c5de
+    model_registrations: []
+  metanorma-snap:
+    revision: 987903f0ac6258ea4d1016e38c9b28a628802e5d
+    model_registrations: []
+  metanorma-standoc:
+    revision: a381a598ed689aaa3d343be54f5fa59a4c8d4dd2
+    model_registrations:
+    - standoc
+  metanorma-swf:
+    revision: 361526792dadd47695d3874f716fae485be536a1
+    model_registrations: []
+  metanorma-taste:
+    revision: 36b7e017ed780dc62002a1cbbc17a7b9e8a12b99
+    model_registrations: []
+  metanorma-un:
+    revision: 345ba67319ae0ce0ca80f01f9d3f5fa67bc8f40e
+    model_registrations: []
+  metanorma-vsd:
+    revision: 6df5f2ae8deb4005ee5962e585b6b1bf0f650d4d
+    model_registrations: []
+taste_inventory:
+  csa:
+    base: generic
+    publisher: Cloud Security Alliance
+    abbreviation: CSA
+    source: data/csa/config.yaml
+  dsa:
+    base: iso
+    publisher: Digital Standards Alliance
+    abbreviation: DSA
+    source: data/dsa/config.yaml
+  elf:
+    base: iso
+    publisher: EXPRESS Language Foundation
+    abbreviation: ELF
+    source: data/elf/config.yaml
+  enosema:
+    base: iso
+    publisher: Enosema Foundation
+    abbreviation: EFS
+    source: data/enosema/config.yaml
+  iala:
+    base: iho
+    publisher: International Organization for Marine Aids to Navigation
+    abbreviation: IALA
+    source: data/iala/config.yaml
+  icc:
+    base: iso
+    publisher: International Color Consortium
+    abbreviation: ICC
+    source: data/icc/config.yaml
+  jcgm:
+    base: iso
+    publisher: Joint Committee for Guides in Metrology
+    abbreviation: JCGM
+    source: data/jcgm/config.yaml
+  mbxif:
+    base: ribose
+    publisher: MBx Interoperability Forum
+    abbreviation: MBx-IF
+    source: data/mbxif/config.yaml
+  oiml:
+    base: iso
+    publisher: International Organization of Legal Metrology
+    abbreviation: OIML
+    source: data/oiml/config.yaml
+  oiml-cs:
+    base: oiml
+    publisher: OIML Certification System
+    abbreviation: OIML-CS
+    source: data/oiml-cs/config.yaml
+  pdfa:
+    base: ribose
+    publisher: PDF Association
+    abbreviation: PDF Association
+    source: data/pdfa/config.yaml
+  swf:
+    base: ribose
+    publisher: Spatial Web Foundation
+    abbreviation: SWF
+    source: data/swf/config.yaml
+  wmo:
+    base: iho
+    publisher: World Meteorological Organization
+    abbreviation: WMO
+    source: data/wmo/config.yaml
+rows:
+  bipm:
+    kind: flavor
+    theme: bipm
+    status: parity_pending
+    gates:
+    - flavor model/renderer adoption
+    - legacy comparison
+    - browser review
+  bsi:
+    kind: flavor
+    theme: bsi
+    status: parity_pending
+    gates:
+    - flavor model/renderer adoption
+    - legacy comparison
+    - browser review
+  cc:
+    kind: flavor
+    theme: cc
+    status: parity_pending
+    gates:
+    - flavor model/renderer adoption
+    - legacy comparison
+    - browser review
+  gb:
+    kind: flavor
+    theme: gb
+    status: parity_pending
+    gates:
+    - flavor model/renderer adoption
+    - legacy comparison
+    - browser review
+  generic:
+    kind: flavor
+    theme: generic
+    status: parity_pending
+    gates:
+    - flavor model/renderer adoption
+    - legacy comparison
+    - browser review
+  iec:
+    kind: flavor
+    theme: iec
+    status: parity_pending
+    gates:
+    - flavor model/renderer adoption
+    - legacy comparison
+    - browser review
+  ieee:
+    kind: flavor
+    theme: ieee
+    status: parity_pending
+    gates:
+    - flavor model/renderer adoption
+    - legacy comparison
+    - browser review
+  ietf:
+    kind: flavor
+    theme: ietf
+    status: parity_pending
+    gates:
+    - flavor model/renderer adoption
+    - legacy comparison
+    - browser review
+  iho:
+    kind: flavor
+    theme: iho
+    status: parity_pending
+    gates:
+    - flavor model/renderer adoption
+    - legacy comparison
+    - browser review
+  iso:
+    kind: flavor
+    theme: iso
+    status: parity_pending
+    gates:
+    - flavor model/renderer adoption
+    - legacy comparison
+    - browser review
+  itu:
+    kind: flavor
+    theme: itu
+    status: parity_pending
+    gates:
+    - flavor model/renderer adoption
+    - legacy comparison
+    - browser review
+  jis:
+    kind: flavor
+    theme: jis
+    status: parity_pending
+    gates:
+    - flavor model/renderer adoption
+    - legacy comparison
+    - browser review
+  m3aawg:
+    kind: flavor
+    theme: m3aawg
+    status: parity_pending
+    gates:
+    - flavor model/renderer adoption
+    - legacy comparison
+    - browser review
+  mpfa:
+    kind: flavor
+    theme: mpfa
+    status: parity_pending
+    gates:
+    - flavor model/renderer adoption
+    - legacy comparison
+    - browser review
+  nist:
+    kind: flavor
+    theme: nist
+    status: parity_pending
+    gates:
+    - flavor model/renderer adoption
+    - legacy comparison
+    - browser review
+  ogc:
+    kind: flavor
+    theme: ogc
+    status: parity_pending
+    gates:
+    - flavor model/renderer adoption
+    - legacy comparison
+    - browser review
+  plateau:
+    kind: flavor
+    theme: plateau
+    status: parity_pending
+    gates:
+    - flavor model/renderer adoption
+    - legacy comparison
+    - browser review
+  ribose:
+    kind: flavor
+    theme: ribose
+    status: parity_pending
+    gates:
+    - flavor model/renderer adoption
+    - legacy comparison
+    - browser review
+  un:
+    kind: flavor
+    theme: un
+    status: parity_pending
+    gates:
+    - flavor model/renderer adoption
+    - legacy comparison
+    - browser review
+  vsd:
+    kind: flavor
+    theme: vsd
+    status: parity_pending
+    gates:
+    - flavor model/renderer adoption
+    - legacy comparison
+    - browser review
+    source_resolution: metanorma-vsd source registers VG processor; vg is an explicit
+      theme alias.
+  csa:
+    kind: taste
+    theme: csa
+    base: generic
+    publisher: Cloud Security Alliance
+    status: parity_pending
+    gates:
+    - base renderer taste selection/adoption
+    - legacy comparison
+    - browser review
+  dsa:
+    kind: taste
+    theme: dsa
+    base: iso
+    publisher: Digital Standards Alliance
+    status: parity_pending
+    gates:
+    - base renderer taste selection/adoption
+    - legacy comparison
+    - browser review
+  elf:
+    kind: taste
+    theme: elf
+    base: iso
+    publisher: EXPRESS Language Foundation
+    status: parity_pending
+    gates:
+    - base renderer taste selection/adoption
+    - legacy comparison
+    - browser review
+  enosema:
+    kind: taste
+    theme: enosema
+    base: iso
+    publisher: Enosema Foundation
+    status: parity_pending
+    gates:
+    - base renderer taste selection/adoption
+    - legacy comparison
+    - browser review
+  iala:
+    kind: taste
+    theme: iala
+    base: iho
+    publisher: International Organization for Marine Aids to Navigation
+    status: parity_pending
+    gates:
+    - base renderer taste selection/adoption
+    - legacy comparison
+    - browser review
+  icc:
+    kind: taste
+    theme: icc
+    base: iso
+    publisher: International Color Consortium
+    status: parity_pending
+    gates:
+    - base renderer taste selection/adoption
+    - legacy comparison
+    - browser review
+    source_resolution: Active metanorma-taste config supplies ICC; empty standalone
+      clone is not used as retirement evidence.
+  jcgm:
+    kind: taste
+    theme: jcgm
+    base: iso
+    publisher: Joint Committee for Guides in Metrology
+    status: parity_pending
+    gates:
+    - base renderer taste selection/adoption
+    - legacy comparison
+    - browser review
+  mbxif:
+    kind: taste
+    theme: mbxif
+    base: ribose
+    publisher: MBx Interoperability Forum
+    status: parity_pending
+    gates:
+    - base renderer taste selection/adoption
+    - legacy comparison
+    - browser review
+  oiml:
+    kind: taste
+    theme: oiml
+    base: iso
+    publisher: International Organization of Legal Metrology
+    status: parity_pending
+    gates:
+    - base renderer taste selection/adoption
+    - legacy comparison
+    - browser review
+  oiml-cs:
+    kind: taste
+    theme: oiml-cs
+    base: oiml
+    publisher: OIML Certification System
+    status: parity_pending
+    gates:
+    - base renderer taste selection/adoption
+    - legacy comparison
+    - browser review
+  pdfa:
+    kind: taste
+    theme: pdfa
+    base: ribose
+    publisher: PDF Association
+    status: parity_pending
+    gates:
+    - base renderer taste selection/adoption
+    - legacy comparison
+    - browser review
+  swf:
+    kind: taste
+    theme: swf
+    base: ribose
+    publisher: Spatial Web Foundation
+    status: parity_pending
+    gates:
+    - base renderer taste selection/adoption
+    - legacy comparison
+    - browser review
+  wmo:
+    kind: taste
+    theme: wmo
+    base: iho
+    publisher: World Meteorological Organization
+    status: parity_pending
+    gates:
+    - base renderer taste selection/adoption
+    - legacy comparison
+    - browser review
+  csd:
+    kind: alias
+    theme: csd
+    target: cc
+    status: parity_pending
+    gates:
+    - canonical flavor parity
+  m3d:
+    kind: alias
+    theme: m3d
+    target: m3aawg
+    status: parity_pending
+    gates:
+    - canonical flavor parity
+  mpfd:
+    kind: alias
+    theme: mpfd
+    target: mpfa
+    status: parity_pending
+    gates:
+    - canonical flavor parity
+  csand:
+    kind: alias
+    theme: csand
+    target: csa
+    status: parity_pending
+    gates:
+    - canonical flavor parity
+  vg:
+    kind: alias
+    theme: vg
+    target: vsd
+    status: parity_pending
+    gates:
+    - canonical flavor parity
+  mko:
+    kind: infrastructure
+    reason: Knowledge Objects serialization; no HTML processor
+  snap:
+    kind: infrastructure
+    reason: Distribution packaging; no HTML processor
+  document:
+    kind: infrastructure
+    reason: Abstract base document renderer
+  standoc:
+    kind: infrastructure
+    reason: Shared standard model/renderer, not publisher branding
+  core:
+    kind: infrastructure
+    reason: Registry infrastructure
+  taste:
+    kind: infrastructure
+    reason: Taste discovery infrastructure
+  en:
+    kind: unknown
+    reason: No source HEAD available; not treated as retired
+  mlit:
+    kind: unknown
+    reason: No source HEAD available; not treated as retired
+limits:
+- Shared StandardRenderer fixtures prove configuration rendering only; they do not
+  prove flavor-owned model/renderer adoption.
+- Legacy bespoke templates need typed assigns beyond B1 and remain pending; no complete
+  parity claim.
+- UN plenary and GB alternative cover selection remain pending owner contracts.
+- B3 render_liquid takes one theme_templates_dir. Partial child-directory template
+  overrides need the renderer to consume inherited directories; shipped front-matter
+  directories contain complete pairs.
+baseline_sha256:
+  bipm: 22f3ad9d26f1a880743cc72d83cd3219aa84f77000ce0fa5db0e7f3ae5d5cb3c
+  cc: 49cf0878b057398af5dd045f5227a6649869f2fd251044bc5a933ce16c7564ba
+  icc: 8674d659c48d7708da11d050c3a9a08b5d8dbeb2e6de94f870fb03c66632b27e
+  iec: 4e3c6db21843239a24845df370376a562ba057860c29eb40cdfe02133d012d22
+  ieee: 80223f68b88a413e8b4eeb2fe58f2b209cfd26c34ddd193445a0d40232593699
+  ietf: ca8fa134c6cd0fa96ade09a679482c7810384e550f4f4cc47421d49fbd68034a
+  iho: b8050c521ab736f8c236790e32b3c8a09d4f948aaab73bc1fcbdb64638099e31
+  iso: e7e9bdbc78bd64fc4832328332bcfd18125c7249258f9ef8cafa1ae013432231
+  itu: 56a348b005f914def61db10b4aead55df61107585eb13c087bb1cef7c5a30578
+  ogc: 28d55a63ee448628f2f25da8a6935588053dab6b0f2a34f0e43c12e3f0bd8cb9
+  pdfa: 31e3e4f1f0d72521fa2f1fab348d1eaaad8356c4a4a9eb7019f74215fd841fe5
+  ribose: 6f8219ce02f95b75aee5cf269ab03319acc8d959a33ae0d021656d53ba778dc5
+legacy_template_gates:
+- source: metanorma-bipm/lib/isodoc/bipm/html/html_bipm_intro.html
+  sha256: 870653b413e8c27ef80e40a892176c6cf06c30943008643e012e566bffed536b
+  legacy_assigns: []
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-bipm/lib/isodoc/bipm/html/html_bipm_titlepage.html
+  sha256: 7244185d0a4291878d9e587bd04070854a1ea4eebfe69bea94d1bda4d75e1ffd
+  legacy_assigns:
+  - annexid
+  - annexid_alt
+  - annexsubtitle
+  - annextitle
+  - appendixid
+  - appendixid_alt
+  - appendixsubtitle
+  - appendixtitle
+  - authors_affiliations
+  - committee
+  - docnumber
+  - docsubtitle
+  - doctitle
+  - doctype
+  - doctype_display
+  - docyear
+  - draftinfo
+  - item
+  - labels
+  - logo
+  - logo_committee
+  - metadata_extensions
+  - org_abbrev
+  - partid
+  - partid_alt
+  - partsubtitle
+  - parttitle
+  - provenancesubtitle
+  - provenancetitle
+  - revdate
+  - si_aspect
+  - stage
+  - stage_display
+  - subpartsubtitle
+  - subparttitle
+  - version
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-bsi/lib/isodoc/bsi/html/html_bsi_intro.html
+  sha256: 4f5ee75eebee77abd771f2da988960dc38935d0e41651cf06c5698da39300e6f
+  legacy_assigns: []
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-bsi/lib/isodoc/bsi/html/html_bsi_titlepage.html
+  sha256: 14dd3e27aa639fd4035e304fe4dd5b143c27cde5f798c78e0c214507003b9bd9
+  legacy_assigns:
+  - au
+  - author
+  - docnumber
+  - docsubtitleintro
+  - docsubtitlemain
+  - docsubtitlepart
+  - docsubtitlepartlabel
+  - doctitleintro
+  - doctitlemain
+  - doctitlepart
+  - doctitlepartlabel
+  - draftinfo
+  - editorialgroup
+  - img
+  - revdate
+  - secretariat
+  - stageabbr
+  - tc_docnumber
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-cc/lib/isodoc/cc/html/html_cc_intro.html
+  sha256: 870653b413e8c27ef80e40a892176c6cf06c30943008643e012e566bffed536b
+  legacy_assigns: []
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-cc/lib/isodoc/cc/html/html_cc_titlepage.html
+  sha256: 8d1bc5a7d718076702ae1727ccaab4081db019c201b47ab70895ab02b6daf8e6
+  legacy_assigns:
+  - affiliation
+  - author
+  - docnumber
+  - docsubtitle
+  - doctitle
+  - doctype
+  - docyear
+  - stage
+  - tag
+  - tc
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-csa/lib/isodoc/csa/html/html_csa_intro.html
+  sha256: 870653b413e8c27ef80e40a892176c6cf06c30943008643e012e566bffed536b
+  legacy_assigns: []
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-csa/lib/isodoc/csa/html/html_csa_titlepage.html
+  sha256: c07404089dc2cdadccf1c803ab48fdad99bd306ed73f892ea56d44baa54f3a49
+  legacy_assigns:
+  - affiliation
+  - author
+  - docnumber
+  - docsubtitle
+  - doctitle
+  - doctype
+  - stage
+  - tag
+  - tc
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-gb/lib/isodoc/gb/html/html_compliant_gb_titlepage.html
+  sha256: 11bdd609f48bd7d26c1f994e79558112f9be92a5a2057b15b33cf714f3b0568f
+  legacy_assigns:
+  - completion_date
+  - docidentifier
+  - docmaintitleen
+  - docmaintitlezh
+  - docparttitleen
+  - docparttitlezh
+  - docsubtitleen
+  - docsubtitlezh
+  - doctype
+  - draftinfo
+  - gbequivalence
+  - isostandard
+  - isostandardtitle
+  - labelled_implementeddate
+  - labelled_publisheddate
+  - language
+  - libraryid_ccs
+  - libraryid_ics
+  - obsoletes
+  - partly_supercedes_lbl
+  - revdate
+  - stageabbr
+  - standard_agency_formatted
+  - standard_class
+  - standard_logo
+  - status
+  - supercedes_lbl
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-gb/lib/isodoc/gb/html/html_gb_intro.html
+  sha256: a6344a6841935116696469a2f36d9917708e84ede125595763727b37231c4cf3
+  legacy_assigns: []
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-gb/lib/isodoc/gb/html/html_gb_titlepage.html
+  sha256: 514c05b85e75b62a4b1220c4c4cc6a6cadd15339acbfca342c8e0dca890fc3ae
+  legacy_assigns:
+  - completion_date
+  - docidentifier
+  - docmaintitleen
+  - docmaintitlezh
+  - docpartitleen
+  - docpartitlezh
+  - docsubtitleen
+  - docsubtitlezh
+  - draftinfo
+  - gbequivalence
+  - isostandard
+  - isostandardtitle
+  - labelled_implementeddate
+  - labelled_publisheddate
+  - language
+  - libraryid_ccs
+  - libraryid_ics
+  - obsoletes
+  - partly_supercedes_lbl
+  - revdate
+  - stageabbr
+  - standard_agency_formatted
+  - standard_class
+  - standard_logo
+  - supercedes_lbl
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-generic/lib/isodoc/generic/html/html_generic_intro.html
+  sha256: 1b13721f771fcf043eeedd77ce3f1a05ccddc1373cdac34ed473eb9bab280d5b
+  legacy_assigns: []
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-generic/lib/isodoc/generic/html/html_generic_titlepage.html
+  sha256: 5019e4df0c727117252009024519f77a2763ccd6b53387f3cb99e60962693cbb
+  legacy_assigns:
+  - agency
+  - docnumber
+  - docsubtitle
+  - doctitle
+  - doctype
+  - docyear
+  - draftinfo
+  - publisher
+  - revdate
+  - security
+  - stage
+  - tc
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-iec/lib/isodoc/iec/html/html_iec_intro.html
+  sha256: 4f5ee75eebee77abd771f2da988960dc38935d0e41651cf06c5698da39300e6f
+  legacy_assigns: []
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-iec/lib/isodoc/iec/html/html_iec_titlepage.html
+  sha256: 609dea1d0effd756eb978fb525db2e1ea3abcbac618ef32aa1c3796cfb13f715
+  legacy_assigns:
+  - docnumber
+  - docsubtitleintro
+  - docsubtitlemain
+  - docsubtitlepart
+  - docsubtitlepartlabel
+  - doctitleintro
+  - doctitlemain
+  - doctitlepart
+  - doctitlepartlabel
+  - draftinfo
+  - editorialgroup
+  - revdate
+  - secretariat
+  - stageabbr
+  - tc_docnumber
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-ieee/lib/isodoc/ieee/html/html_ieee_intro.html
+  sha256: 02eabf0ae4e19e5cd77aa2720151eefed0fc0efd075dc338f75ea5d3757c318b
+  legacy_assigns: []
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-ieee/lib/isodoc/ieee/html/html_ieee_titlepage.html
+  sha256: be8a8533ba8db1b91e9c37bd425f4d01a1bd7bb933caa6afa1605875cedefa59
+  legacy_assigns:
+  - amd
+  - corr
+  - coverpage_statement
+  - docnumeric
+  - docyear
+  - draft
+  - feedback_endeddate
+  - full_doctitle
+  - i
+  - ics
+  - ieee_sasb_approveddate
+  - issueddate
+  - keywords
+  - obsoleteddate
+  - provenance_doctitle
+  - society
+  - technical_committee
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-iho/lib/isodoc/iho/html/html_iho_intro.html
+  sha256: 870653b413e8c27ef80e40a892176c6cf06c30943008643e012e566bffed536b
+  legacy_assigns: []
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-iho/lib/isodoc/iho/html/html_iho_titlepage.html
+  sha256: f5975ded895d9767a7f3dcc506b584d65c554ec235a022711096c613af5fe3c5
+  legacy_assigns:
+  - docnumber
+  - docsubtitle
+  - doctitle
+  - doctype
+  - docyear
+  - draftinfo
+  - edition
+  - logo
+  - logo1
+  - publisheddate
+  - revdate
+  - stage
+  - tc
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-iso/lib/isodoc/iso/html/html_iso_intro.html
+  sha256: 4f5ee75eebee77abd771f2da988960dc38935d0e41651cf06c5698da39300e6f
+  legacy_assigns: []
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-iso/lib/isodoc/iso/html/html_iso_titlepage.html
+  sha256: 9d0836be0d5725261f024e05c9c0fc01ce073091d92a1ac59e3e130a36931c83
+  legacy_assigns:
+  - correcteddate
+  - docnumber_undated
+  - docsubtitleadd
+  - docsubtitleaddlabel
+  - docsubtitleamd
+  - docsubtitleamdlabel
+  - docsubtitlecomplementary
+  - docsubtitlecorrlabel
+  - docsubtitleintro
+  - docsubtitlemain
+  - docsubtitlepart
+  - docsubtitlepartlabel
+  - doctitleadd
+  - doctitleaddlabel
+  - doctitleamd
+  - doctitleamdlabel
+  - doctitlecomplementary
+  - doctitlecorrlabel
+  - doctitleext
+  - doctitleextlabel
+  - doctitleintro
+  - doctitlemain
+  - doctitlepart
+  - doctitlepartlabel
+  - doctitlesup
+  - doctitlesuplabel
+  - draftinfo
+  - edition_display
+  - editorialgroup
+  - ics
+  - keywords
+  - labels
+  - num
+  - revdate
+  - secretariat
+  - stageabbr
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-itu/lib/isodoc/itu/html/html_itu_intro.html
+  sha256: ff0382eba6f8d1ced476c51a43fd827878ee36c886e2da24bbc3bd48f9f40fa1
+  legacy_assigns: []
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-itu/lib/isodoc/itu/html/html_itu_titlepage.html
+  sha256: f0968c9eb508effba0cc59efd284568464b8a43aa4725c788a7b4a9a97afc133
+  legacy_assigns:
+  - addresses
+  - affiliations
+  - amendmentid
+  - amendmenttitle
+  - annexid
+  - annextitle
+  - author
+  - bureau
+  - collectiontitle
+  - corrigendumid
+  - corrigendumtitle
+  - docnumber_provisional
+  - docnumber_td
+  - docnumeric
+  - docsubtitle
+  - doctitle
+  - doctype
+  - doctype_display
+  - draftinfo
+  - edition
+  - emails
+  - faxes
+  - group
+  - intended_type
+  - keywords
+  - labels
+  - logo_html
+  - meeting
+  - meeting_date
+  - meeting_place
+  - phones
+  - positiontitle
+  - pubdate_monthyear
+  - recommendationnumber
+  - sector
+  - series
+  - series1
+  - series2
+  - source
+  - stage
+  - subgroup
+  - workgroup
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-jis/lib/isodoc/jis/html/html_jis_intro.html
+  sha256: 94debd63ad9232898dffa13992fc765f4133a1236418d626aef092b17166d31c
+  legacy_assigns: []
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-jis/lib/isodoc/jis/html/html_jis_titlepage.html
+  sha256: 4659cc996dbab801b09d4761f6dd497550596af3c1e83e31ec5f02d920d1cfce
+  legacy_assigns:
+  - docnumber_undated
+  - docsubtitleamd
+  - docsubtitleamdlabel
+  - docsubtitlecorrlabel
+  - docsubtitleintro
+  - docsubtitlemain
+  - docsubtitlepart
+  - docsubtitlepartlabel
+  - doctitleamd
+  - doctitleamdlabel
+  - doctitlecorrlabel
+  - doctitleintro
+  - doctitlemain
+  - doctitlepart
+  - doctitlepartlabel
+  - draftinfo
+  - edition_display
+  - editorialgroup
+  - ics
+  - keywords
+  - labels
+  - num
+  - revdate
+  - secretariat
+  - stageabbr
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-m3aawg/lib/isodoc/m3aawg/html/html_m3d_intro.html
+  sha256: 1c144dd4170d6d76e7c1fe9e181e28ebd7a0f2c604fe7d9f5a83f5bacd5bd0ab
+  legacy_assigns:
+  - doctitle
+  - edition
+  - revdate_monthyear
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-m3aawg/lib/isodoc/m3aawg/html/html_m3d_titlepage.html
+  sha256: 05e50a27cf1bc65075793fea85c0b939b8b1858699d495918e6faebae5d723c1
+  legacy_assigns:
+  - docnumber
+  - docsubtitle
+  - doctitle
+  - doctype
+  - draft
+  - edition
+  - logo_html
+  - revdate_monthyear
+  - stage
+  - tc
+  - url
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-mpfa/lib/isodoc/mpfa/html/html_rsd_intro.html
+  sha256: 1b13721f771fcf043eeedd77ce3f1a05ccddc1373cdac34ed473eb9bab280d5b
+  legacy_assigns: []
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-mpfa/lib/isodoc/mpfa/html/html_rsd_titlepage.html
+  sha256: b737869f12ea95f0f98b169e3af26b022bbd2a73fe10f14555dbe1c0982f78fd
+  legacy_assigns:
+  - docnumber
+  - docsubtitle
+  - doctitle
+  - doctype
+  - docyear
+  - draftinfo
+  - edition
+  - publisher
+  - revdate_monthyear
+  - stage
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-nist/lib/isodoc/nist/html/html_nist_intro.html
+  sha256: 7443c57ff50b7c6abfdcebf3311e98d30d3a5a183a145ef8f9b93e7263b84e5b
+  legacy_assigns:
+  - docidentifier
+  - doctitle
+  - doi
+  - url
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-nist/lib/isodoc/nist/html/html_nist_titlepage.html
+  sha256: a284a99ffead46f77282834b56b56813fabc3a1756dc99aef0675a759c07c3d3
+  legacy_assigns:
+  - abandoneddate_MMMddyyyy
+  - additional_note
+  - affiliation
+  - author
+  - circulateddate_MMMddyyyy
+  - confirmeddate_MMMddyyyy
+  - docclasstitle
+  - docidentifier_long
+  - docparttitle
+  - docsubtitle
+  - doctitle
+  - doi
+  - draft_prefix
+  - draftinfo
+  - issueddate_MMMddyyyy
+  - issueddate_monthyear
+  - labels
+  - logo_commerce
+  - obsoleteddate_MMMddyyyy
+  - series
+  - seriesabbr
+  - status
+  - supersededdate_MMMddyyyy
+  - superseding_docidentifier_long
+  - superseding_doi
+  - superseding_issued_date_monthyear
+  - superseding_subtitle
+  - superseding_title
+  - superseding_updated_date_MMMddyyyy
+  - superseding_uri
+  - updateddate_MMMddyyyy
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-ogc/lib/isodoc/ogc/html/html_ogc_intro.html
+  sha256: f6a0aca1da4dddfe53dd98372cc943da1394755d3c398af591dd6e7f88060543
+  legacy_assigns: []
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-ogc/lib/isodoc/ogc/html/html_ogc_titlepage.html
+  sha256: 5415f003d0aa43e1ab22d9f2b348dab986f599c4aad7797487c6e17c04b574e7
+  legacy_assigns:
+  - contributor
+  - doc
+  - doclanguage
+  - docnumber
+  - docsubtitle
+  - docsubtype
+  - doctitle
+  - doctype
+  - doi
+  - edition
+  - editor
+  - externalid
+  - issueddate
+  - logo_html
+  - pdf
+  - previousuri
+  - publisheddate
+  - receiveddate
+  - stage
+  - stage_display
+  - tc
+  - url
+  - xml
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-ribose/lib/isodoc/ribose/html/html_rsd_intro.html
+  sha256: 870653b413e8c27ef80e40a892176c6cf06c30943008643e012e566bffed536b
+  legacy_assigns: []
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-ribose/lib/isodoc/ribose/html/html_rsd_titlepage.html
+  sha256: d6e5240ae1d762683555bd928540e18430be6dd13eae820256e1139c613e6395
+  legacy_assigns:
+  - agency
+  - docnumber
+  - docsubtitle
+  - doctitle
+  - doctype
+  - docyear
+  - draftinfo
+  - metadata_extensions
+  - publisheddate
+  - publisher
+  - revdate
+  - stage
+  - tc
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-standoc/lib/isodoc/html/html_titlepage.html
+  sha256: 06d66d76f4b76b6b2c30abd872096cd545b8ae147aaec01a209647825b69fdc6
+  legacy_assigns:
+  - annexid
+  - annexid_alt
+  - annexsubtitle
+  - annextitle
+  - appendixid
+  - appendixid_alt
+  - appendixsubtitle
+  - appendixtitle
+  - authors_affiliations
+  - docnumber
+  - docsubtitle
+  - doctitle
+  - doctype
+  - doctype_display
+  - docyear
+  - draftinfo
+  - item
+  - org_abbrev
+  - partid
+  - partid_alt
+  - partsubtitle
+  - parttitle
+  - provenancesubtitle
+  - provenancetitle
+  - stage
+  - stage_display
+  - subpartsubtitle
+  - subparttitle
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-un/lib/isodoc/un/html/html_unece_intro.html
+  sha256: 0171ec953b0c54c14bb377cc53340856b3bbbbb98579d0327fdbd79330c9db9f
+  legacy_assigns: []
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-un/lib/isodoc/un/html/html_unece_plenary_titlepage.html
+  sha256: b476a10490e2ab61257172c819d92a90f2eeb1180a85545a007a2a8c9cfc020f
+  legacy_assigns:
+  - doclanguage
+  - docnumber
+  - docsubtitle
+  - doctitle
+  - doctype
+  - docyear
+  - fn_refs
+  - item
+  - item_footnote
+  - revdate
+  - session_date
+  - session_itemname
+  - session_itemnumber
+  - session_number
+  - session_subitemname
+  - stage
+  - submissionlanguage
+  - tc
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-un/lib/isodoc/un/html/html_unece_titlepage.html
+  sha256: 36918d51f8710b6a782df4f91aafe1ae5afe3d5673aff6cdc486fc424cfb254f
+  legacy_assigns:
+  - doclanguage
+  - docsubtitle
+  - doctitle
+  - doctype
+  - docyear
+  - draftinfo
+  - fn_refs
+  - formatted_docnumber
+  - item
+  - revdate
+  - stage
+  - submissionlanguage
+  - tc
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-vsd/lib/isodoc/vg/html/html_vsd_intro.html
+  sha256: 1b13721f771fcf043eeedd77ce3f1a05ccddc1373cdac34ed473eb9bab280d5b
+  legacy_assigns: []
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-vsd/lib/isodoc/vg/html/html_vsd_titlepage.html
+  sha256: ce6dd0bfcd0d3c1b664366a0f6391356e989e2fd8946ebe257c9c0d5427dace9
+  legacy_assigns:
+  - docnumber
+  - docsubtitle
+  - doctitle
+  - doctype
+  - docyear
+  - draftinfo
+  - revdate
+  - security
+  - stage
+  - tc
+  status: pending
+  gate: Legacy layout/CSS adaptation and flavor typed assigns; B1 shared assigns alone
+    do not prove this port.
+- source: metanorma-taste/data/csa/html_csa_intro.html
+  sha256: 870653b413e8c27ef80e40a892176c6cf06c30943008643e012e566bffed536b
+  legacy_assigns: []
+  status: pending
+  gate: B3 category-(a) template port; typed assigns and source layout parity not
+    yet verified.
+- source: metanorma-taste/data/csa/html_csa_titlepage.html
+  sha256: c07404089dc2cdadccf1c803ab48fdad99bd306ed73f892ea56d44baa54f3a49
+  legacy_assigns:
+  - affiliation
+  - author
+  - docnumber
+  - docsubtitle
+  - doctitle
+  - doctype
+  - stage
+  - tag
+  - tc
+  status: pending
+  gate: B3 category-(a) template port; typed assigns and source layout parity not
+    yet verified.
+- source: metanorma-taste/data/iala/html_iala_titlepage.html
+  sha256: 9e1260c059301eace1205010185663cd168c117a3dcad185ab5c7f3793ec1afd
+  legacy_assigns:
+  - docnumber
+  - doctitle
+  - doctype
+  - docyear
+  - draftinfo
+  - edition
+  - publisheddate
+  - stage
+  - tc
+  status: pending
+  gate: B3 category-(a) template port; typed assigns and source layout parity not
+    yet verified.
+- source: metanorma-taste/data/icc/htmlcoverpage.html
+  sha256: 1c8a1503cc9b7c63f25691e38f47cf1dacda5215dde91a8b4b21b7b972338de8
+  legacy_assigns:
+  - copublisher_logos
+  - docnumber
+  - doctitle
+  - doctype_display
+  status: pending
+  gate: B3 category-(a) template port; typed assigns and source layout parity not
+    yet verified.
+- source: metanorma-taste/data/pdfa/htmlcoverpage.html
+  sha256: 40bbcdfbe91fa489c429fba4bdc0c4a66762de624ea3c0a27b1e56226465e920
+  legacy_assigns:
+  - bibdata
+  - bibdata.docidentifier
+  - bibdata.edition
+  - bibdata.ext
+  - bibdata.ext.coverpage_image.image
+  - bibdata.ext.coverpage_image.image.src
+  - bibdata.ext.innercoverpage
+  - bibdata.id
+  - bibdata.status
+  - bibdata.status.stage.abbreviation
+  - bibdata.version
+  - c.organization.logo
+  - c.organization.name
+  - copublisher_logos
+  - docnumber
+  - docnumeric
+  - doctitle
+  - doctype
+  - doctype_abbr
+  - doctype_display
+  - docyear
+  - draft
+  - edition
+  - edition_display
+  - stage
+  - stage_display
+  - stageabbr
+  status: pending
+  gate: B3 category-(a) template port; typed assigns and source layout parity not
+    yet verified.

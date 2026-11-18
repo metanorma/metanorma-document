@@ -1,0 +1,16 @@
+<metanorma xmlns="https://www.metanorma.org/ns/standoc" type="presentation" flavor="iso">
+  <bibdata>
+    <title language="en">Theme matrix — A &amp; B</title>
+    <docidentifier>ISO 1:2026</docidentifier>
+    <language>en</language>
+    <date type="published"><on>2026-01-01</on></date>
+  </bibdata>
+  <boilerplate>
+    <copyright-statement><p>Matrix copyright statement.</p></copyright-statement>
+    <license-statement><p>Matrix licence statement.</p></license-statement>
+    <legal-statement><p>Matrix legal statement.</p></legal-statement>
+    <feedback-statement><p>Matrix feedback statement.</p></feedback-statement>
+  </boilerplate>
+  <preface><foreword id="foreword"><title>Foreword</title><p>Matrix foreword.</p></foreword></preface>
+  <sections><clause id="scope"><title>Scope</title><p>Matrix body content.</p><note coverpage="true"><p>Matrix cover note.</p></note></clause></sections>
+</metanorma>
