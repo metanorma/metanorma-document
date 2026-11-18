@@ -28,6 +28,7 @@ module Metanorma
     autoload :PlainText, "metanorma/document/plain_text"
     autoload :Relaton, "metanorma/document/relaton"
     autoload :Root, "metanorma/document/root"
+    autoload :UpdateUnits, "metanorma/document/update_units"
     autoload :Version, "metanorma/document/version"
     autoload :VERSION, "metanorma/document/version"
     autoload :CLI, "metanorma/document/cli"

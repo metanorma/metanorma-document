@@ -19,6 +19,10 @@ module Metanorma
                     collection: true
           attribute :notes, Metanorma::Document::Components::Blocks::NoteBlock,
                     collection: true
+          # Set when the division is an update unit: amended on its own,
+          # independently of the publication that contains it.
+          attribute :update_unit,
+                    Metanorma::Document::Components::UpdateUnits::UpdateUnit
 
           xml do
             element "basic-section"
@@ -29,6 +33,7 @@ module Metanorma
             map_element "script", to: :script
             map_element "blocks", to: :blocks
             map_element "notes", to: :notes
+            map_element "update-unit", to: :update_unit
           end
         end
       end

@@ -2,6 +2,7 @@
 
 ### Added
 
+- Update units and amendment records on divisions (`Components::UpdateUnits`), with `Document::UpdateUnits` to load anchor-keyed YAML registers and derive Records of Updates and change sets
 - Full document model for all Metanorma XML flavors: ISO, IEC, IEEE, IETF, IHO, OIML, BIPM, ITU, OGC, CC, Ribose, and Standoc
 - Autoload-based lazy loading across all modules — replaces eager `require_relative` chains
 - Roundtrip test suite verifying XML parse → serialize fidelity for ISO, BIPM, CC, ITU, OGC, OIML, and collections
