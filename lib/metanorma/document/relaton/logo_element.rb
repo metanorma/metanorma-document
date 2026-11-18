@@ -13,7 +13,9 @@ module Metanorma
         attribute :content, :string
 
         xml do
-          element "logo"
+          # No element declaration: lutaml-model 0.8.175 forbids element
+          # mappings alongside map_all_content, and this class is only
+          # ever embedded (the parent mapping carries the tag name).
           map_attribute "type", to: :type
           map_all_content to: :content
         end
