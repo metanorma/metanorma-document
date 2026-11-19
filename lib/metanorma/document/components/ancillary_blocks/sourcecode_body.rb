@@ -10,9 +10,13 @@ module Metanorma
           attribute :content, :string
 
           xml do
-            # No element declaration: lutaml-model 0.8.175 forbids element
-            # mappings alongside map_all_content, and this class is only
-            # ever embedded (the parent mapping carries the tag name).
+            # Type-only (embedded) model: SourcecodeBlock carries the
+            # <body> tag through its own `map_element "body"` mapping.
+            # A root-level element declaration must NOT be added back:
+            # with an element declared, lutaml-model drops the raw
+            # map_all_content capture at the root (content comes out nil
+            # on every 0.8.x in the supported range), while the embedded
+            # path — the only one this class takes — round-trips it.
             map_all_content to: :content
           end
 

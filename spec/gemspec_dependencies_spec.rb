@@ -12,6 +12,29 @@ require "spec_helper"
 # to the standard library, or to interpolated (non-static) paths are
 # exempt.
 RSpec.describe "the gemspec declares every load-time require" do
+  subject(:undeclared_requires) do
+    requires = Hash.new { |h, k| h[k] = [] }
+    Dir[File.join(lib_dir, "**", "*.rb")].each do |file|
+      relative = file.delete_prefix("#{lib_dir}/")
+      File.readlines(file).each_with_index do |line, i|
+        match = line.match(/^\s*require\s+["']([^"']+)["']/) or next
+        path = match[1]
+        next if path.include?("#")
+        next if File.exist?(File.join(lib_dir, "#{path}.rb"))
+
+        segments = path.split("/")
+        candidates = (1..segments.size).map do |n|
+          segments.first(n).join("-")
+        end
+        next if candidates.any? { |c| declared_gems.include?(c) }
+        next if stdlib_gems.include?(path)
+
+        requires[path] << "#{relative}:#{i + 1}"
+      end
+    end
+    requires
+  end
+
   let(:gemspec_path) do
     File.join(__dir__, "..", "metanorma-document.gemspec")
   end
@@ -37,30 +60,9 @@ RSpec.describe "the gemspec declares every load-time require" do
     ]
   end
 
-  subject(:undeclared_requires) do
-    requires = Hash.new { |h, k| h[k] = [] }
-    Dir[File.join(lib_dir, "**", "*.rb")].sort.each do |file|
-      relative = file.delete_prefix("#{lib_dir}/")
-      File.readlines(file).each_with_index do |line, i|
-        match = line.match(/^\s*require\s+["']([^"']+)["']/) or next
-        path = match[1]
-        next if path.include?("#")
-        next if File.exist?(File.join(lib_dir, "#{path}.rb"))
-        segments = path.split("/")
-        candidates = (1..segments.size).map do |n|
-          segments.first(n).join("-")
-        end
-        next if candidates.any? { |c| declared_gems.include?(c) }
-        next if stdlib_gems.include?(path)
-        requires[path] << "#{relative}:#{i + 1}"
-      end
-    end
-    requires
-  end
-
   it "declares a runtime dependency for every gem lib code requires" do
     expect(undeclared_requires).to be_empty,
-      "lib code requires gems the gemspec does not declare: " \
-      "#{undeclared_requires.map { |k, v| "#{k} (#{v.join(', ')})" }.join('; ')}"
+                                   "lib code requires gems the gemspec does not declare: " \
+                                   "#{undeclared_requires.map { |k, v| "#{k} (#{v.join(', ')})" }.join('; ')}"
   end
 end
