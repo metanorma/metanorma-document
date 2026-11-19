@@ -379,6 +379,8 @@ module Metanorma
       # --- Dispatch ---
 
       def render(node, **)
+        previous = @rendering_boilerplate
+        @rendering_boilerplate = true if @document && node.equal?(safe_attr(@document, :boilerplate))
         return nil if skip_coverpage_node?(node)
 
         return escape_html(node) if node.is_a?(String)
@@ -390,6 +392,8 @@ module Metanorma
           "no renderer registered for #{node.class} — content skipped",
         )
         ""
+      ensure
+        @rendering_boilerplate = previous
       end
 
       # Emit a render warning once per distinct message. Warnings mark
@@ -612,12 +616,14 @@ module Metanorma
       end
 
       def resolve_dispatch(type_class, registry_method)
-        self.class.ancestors.each do |ancestor|
-          next unless ancestor.is_a?(Class) && (ancestor == BaseRenderer || ancestor < BaseRenderer)
+        type_class.ancestors.each do |node_type|
+          self.class.ancestors.each do |ancestor|
+            next unless ancestor.is_a?(Class) && (ancestor == BaseRenderer || ancestor < BaseRenderer)
 
-          registry = ancestor.public_send(registry_method)
-          method_name = registry[type_class]
-          return method_name if method_name
+            registry = ancestor.public_send(registry_method)
+            method_name = registry[node_type]
+            return method_name if method_name
+          end
         end
         nil
       end

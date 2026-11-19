@@ -7,6 +7,8 @@ module Metanorma
 
       register_render "Metanorma::Standoc::Document::Root",
                       :render_standard_document
+      register_render "Metanorma::Standoc::Document::RootAttributes",
+                      :render_standard_document
       register_render "Metanorma::Standoc::Document::Terms::Term", :render_term
       register_render "Metanorma::Standoc::Document::Terms::TermSource",
                       :render_term_source
@@ -66,7 +68,7 @@ module Metanorma
         parts = []
         parts << (render(doc.preface) || "") if doc.preface
         parts << (render_doc_title(doc) || "")
-        parts << (render(doc.sections) || "") if doc.sections
+        Array(doc.sections).each { |section| parts << (render(section) || "") }
         doc.annex&.each { |annex| parts << (render(annex) || "") }
         parts << (render(doc.bibliography) || "") if doc.bibliography
         parts << (render(doc.colophon) || "") if doc.respond_to?(:colophon) &&
@@ -267,6 +269,8 @@ module Metanorma
       # licence, legal and feedback statements): part of the native
       # cover matter, rendered right after the title cover.
       def render_boilerplate(doc)
+        previous = @rendering_boilerplate
+        @rendering_boilerplate = true
         boilerplate = doc.boilerplate
         parts = []
         %i[copyright_statement license_statement legal_statement
@@ -282,6 +286,8 @@ module Metanorma
                         ),
                         "content" => parts.join,
                       })
+      ensure
+        @rendering_boilerplate = previous
       end
 
       def render_doc_title(doc)

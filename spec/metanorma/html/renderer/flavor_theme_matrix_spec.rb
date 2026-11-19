@@ -5,6 +5,7 @@ require "yaml"
 require "digest"
 require "tmpdir"
 require "fileutils"
+require "open3"
 
 module HtmlThemeMatrix
   FIXTURES = File.expand_path("../../../fixtures/html-theme-matrix", __dir__)
@@ -24,6 +25,57 @@ RSpec.describe "HTML flavor/taste theme matrix" do
     Metanorma::Standoc::Document::Root.from_xml(
       File.read(File.join(fixtures, "document.xml")),
     )
+  end
+
+  it "renders body content from a real flavor root sharing root attributes" do
+    # Flavor register setup must not alter the other model fixtures' state.
+    script = <<~RUBY
+      require "metanorma/document"
+      require "metanorma/cc/document"
+      root = Metanorma::Cc::Document::Root.from_xml(File.read(ARGV.fetch(0)))
+      abort "Expected an independent flavor root" if root.is_a?(Metanorma::Standoc::Document::Root)
+      puts Metanorma::Html::Generator.generate(root, theme: Metanorma::Html::Theme.load(:cc))
+    RUBY
+    lib = File.expand_path("../../../../lib", __dir__)
+    html, error, status = Open3.capture3(RbConfig.ruby, "-I", lib, "-e", script,
+                                         File.join(fixtures, "document.xml"))
+    expect(status).to be_success, error
+    expect(Nokogiri::HTML(html).at_css(".main-section").text)
+      .to include("Matrix body content.")
+  end
+
+  it "renders typed titles as text in the header and page title" do
+    html = Metanorma::Html::Generator.generate(document)
+    page = Nokogiri::HTML(html)
+    expect(page.at_css("#header-doc-title").text).to eq("Theme matrix")
+    expect(page.at_css("head title").text).to eq("Theme matrix — A & B")
+  end
+
+  it "keeps the supported back-to-top control without the legacy duplicate" do
+    html = Metanorma::Html::Generator.generate(document)
+    page = Nokogiri::HTML(html)
+    expect(page.css("#back-to-top").size).to eq(1)
+    expect(page.css("#myBtn, [onclick*='topFunction']")).to be_empty
+  end
+
+  it "uses raw title collection values when grouped titles are unavailable" do
+    root = Metanorma::Iso::Document::Root.from_xml(
+      File.read(File.join(fixtures, "document.xml")),
+    )
+    allow(root.bibdata).to receive(:title_for).with("en").and_return(nil)
+    title = Metanorma::Html::StandardRenderer.new.extract_display_title(root.bibdata)
+    expect(title).to eq("Theme matrix — A & B")
+  end
+
+  it "keeps IEC boilerplate catalogue headings out of the sidebar TOC" do
+    xml = File.read(File.join(fixtures, "document.xml"))
+      .sub("<copyright-statement>", '<copyright-statement><clause id="catalogue"><title>IEC Catalogue</title><p>Catalogue content.</p></clause>')
+    root = Metanorma::Standoc::Document::Root.from_xml(xml)
+    html = Metanorma::Html::StandardRenderer.new.generate_full_document(root, theme: Metanorma::Html::Theme.load(:iec))
+    page = Nokogiri::HTML(html)
+    expect(page.at_css(".document-boilerplate").text).to include("IEC Catalogue")
+    expect(page.at_css(".toc-sidebar").text).not_to include("IEC Catalogue")
+    expect(page.at_css(".toc-sidebar").text).to include("Scope", "Foreword")
   end
 
   it "classifies every loaded registry entry and every preserved baseline theme" do

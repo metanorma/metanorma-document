@@ -6,6 +6,51 @@ require "metanorma/html/generator"
 RSpec.describe Metanorma::Html::BaseRenderer do
   let(:renderer) { described_class.new }
 
+  describe "dispatch fallback" do
+    let(:node_type) { Class.new }
+    let(:subtype) { Class.new(node_type) }
+    let(:renderer_type) { Class.new(described_class) }
+
+    it "uses a registration for the node's superclass" do
+      renderer_type.register_render(node_type, :render_parent)
+      expect(renderer_type.new.lookup_dispatch(subtype, :render_registry))
+        .to eq(:render_parent)
+    end
+
+    it "uses a registration for an included module" do
+      attributes = Module.new
+      node_type.include(attributes)
+      renderer_type.register_render(attributes, :render_shared)
+      expect(renderer_type.new.lookup_dispatch(node_type, :render_registry))
+        .to eq(:render_shared)
+    end
+
+    it "prefers an exact node registration to a renderer's generic fallback" do
+      renderer_type.register_render(subtype, :render_specific)
+      child_renderer = Class.new(renderer_type)
+      child_renderer.register_render(node_type, :render_parent)
+      expect(child_renderer.new.lookup_dispatch(subtype, :render_registry))
+        .to eq(:render_specific)
+    end
+  end
+
+  it "suppresses boilerplate TOC entries even for an overridden renderer" do
+    node_type = Class.new
+    node = node_type.new
+    renderer_type = Class.new(described_class) do
+      def render_boilerplate_heading(_node)
+        register_toc_entry(id: "catalogue", level: 1, text: "IEC Catalogue")
+        "Catalogue content"
+      end
+    end
+    renderer_type.register_render(node_type, :render_boilerplate_heading)
+    instance = renderer_type.new
+    instance.document = Struct.new(:boilerplate).new(node)
+    expect(instance.render(node)).to eq("Catalogue content")
+    instance.register_toc_entry(id: "scope", level: 1, text: "Scope")
+    expect(instance.toc_entries.map { |entry| entry[:text] }).to eq(["Scope"])
+  end
+
   describe "#escape_html" do
     it "escapes ampersands" do
       expect(renderer.escape_html("a&b")).to eq("a&amp;b")
