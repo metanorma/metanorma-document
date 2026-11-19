@@ -13,6 +13,7 @@ gemspec
 #     not main; flip once that stack lands on main
 # gem "glossarist", "~> 2.13"
 gem "isodoc", github: "metanorma/isodoc", branch: "main"
+gem "metanorma-cc"
 gem "metanorma-core", "~> 0.2.7" # published flavor/taste table (metanorma-core#18)
 gem "metanorma-iec", github: "metanorma/metanorma-iec", branch: "main"
 gem "metanorma-iso", github: "metanorma/metanorma-iso", branch: "main"

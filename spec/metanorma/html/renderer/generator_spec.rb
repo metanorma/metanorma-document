@@ -21,6 +21,14 @@ RSpec.describe Metanorma::Html::Generator do
       expect(described_class.renderer_for(doc)).to eq(Metanorma::Html::StandardRenderer)
     end
 
+    it "falls back to StandardRenderer for an unregistered flavor root" do
+      root_type = Class.new(Lutaml::Model::Serializable) do
+        include Metanorma::Standoc::Document::RootAttributes
+      end
+      expect(described_class.renderer_for(root_type.new))
+        .to eq(Metanorma::Html::StandardRenderer)
+    end
+
     it "returns OgcRenderer for OgcDocument::Root" do
       doc = Metanorma::Ogc::Document::Root.new
       expect(described_class.renderer_for(doc)).to eq(SpecFlavors::OgcRenderer)

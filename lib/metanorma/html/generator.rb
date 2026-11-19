@@ -17,7 +17,18 @@ module Metanorma
 
         def renderer_for(document, **)
           Metanorma::Core::Flavors.renderer_for(document, format: :html,
-                                                          **) || BaseRenderer
+                                                          **) || fallback_renderer(document)
+        end
+
+        private
+
+        def fallback_renderer(document)
+          if defined?(Metanorma::Standoc::Document::RootAttributes) &&
+              document.is_a?(Metanorma::Standoc::Document::RootAttributes)
+            StandardRenderer
+          else
+            BaseRenderer
+          end
         end
       end
     end

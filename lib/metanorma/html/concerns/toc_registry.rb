@@ -27,6 +27,8 @@ module Metanorma
         end
 
         def register_toc_entry(id:, level:, text:)
+          return if @rendering_boilerplate
+
           @toc_entries << { id: id, level: level, text: text }
         end
 

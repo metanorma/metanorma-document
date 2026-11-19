@@ -30,10 +30,16 @@ module Metanorma
         def extract_display_title(bibdata)
           return nil unless bibdata
 
-          title = bibdata.title_for("en") if bibdata.is_a?(Metanorma::Document::Components::BibData::BibData)
-          return title.to_s if title && !title.to_s.empty?
+          title = bibdata.title_for("en") if bibdata.respond_to?(:title_for)
+          text = if title.is_a?(Metanorma::Document::Relaton::TypedTitleString)
+                   extract_plain_text(title)
+                 elsif title
+                   title.to_s
+                 end
+          return text unless text.nil? || text.empty?
 
-          titles = safe_attr(bibdata, :title)
+          titles = safe_attr(bibdata, :title) || safe_attr(bibdata, :titles)
+          titles = safe_attr(titles, :items) || titles
           return nil unless titles && !titles.is_a?(String) && !titles.empty?
 
           en = titles.find { |t| safe_attr(t, :language) == "en" }
