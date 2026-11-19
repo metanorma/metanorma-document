@@ -2,7 +2,6 @@
 
 require "liquid"
 require "metanorma-core"
-require "nokogiri"
 
 module Metanorma
   module Html

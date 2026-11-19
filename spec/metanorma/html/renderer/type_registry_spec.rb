@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "nokogiri"
+
 require "spec_helper"
 require "metanorma/ogc/document"
 require "metanorma/html/generator"
