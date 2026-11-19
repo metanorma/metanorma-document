@@ -42,14 +42,14 @@ Gem::Specification.new do |spec|
   # base64 in html/renderers/block_renderer.rb (metanorma/metanorma#669),
   # metanorma/mirror in lib/metanorma/document.rb (metanorma-document#129).
   spec.add_dependency "base64"
-  spec.add_dependency "metanorma-mirror", "~> 1.0"
   spec.add_dependency "isodoc-i18n", "~> 1.5"
   spec.add_dependency "liquid", ">= 5.4"
-  spec.add_dependency "moxml", "~> 0.6"
   spec.add_dependency "lutaml-model", "~> 0.8.164"
   spec.add_dependency "metanorma-core"
+  spec.add_dependency "metanorma-mirror", "~> 1.0"
   spec.add_dependency "mml", "~> 2.4"
   spec.add_dependency "mn-requirements", ">= 0.2.1" # requirement labels & ModSpec semantics
+  spec.add_dependency "moxml", "~> 0.6"
   spec.add_dependency "pubid", "~> 2.0.3"
   # relaton v3 monogem provides Relaton::Bib (require "relaton/bib");
   # the former standalone relaton-bib gem is consolidated into it.
