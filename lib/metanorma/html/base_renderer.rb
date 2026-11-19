@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "liquid"
-require "nokogiri"
 require "cgi"
 require "metanorma/html/template_resolver"
 

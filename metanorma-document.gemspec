@@ -38,8 +38,14 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Uncomment to register a new dependency of your gem
-  # Bundled gem required directly by lib code: base64 in html/renderers/block_renderer.rb (metanorma/metanorma#669)
+  # Bundled gems required directly by lib code (gemspec-declares-requires spec):
+  # base64 in html/renderers/block_renderer.rb (metanorma/metanorma#669),
+  # metanorma/mirror in lib/metanorma/document.rb (metanorma-document#129).
   spec.add_dependency "base64"
+  spec.add_dependency "metanorma-mirror", "~> 1.0"
+  spec.add_dependency "isodoc-i18n", "~> 1.5"
+  spec.add_dependency "liquid", ">= 5.4"
+  spec.add_dependency "moxml", "~> 0.6"
   spec.add_dependency "lutaml-model", "~> 0.8.164"
   spec.add_dependency "metanorma-core"
   spec.add_dependency "mml", "~> 2.4"
@@ -52,4 +58,6 @@ Gem::Specification.new do |spec|
   # bibdata, Plurimath formulas) is a model-layer capability.
   spec.add_dependency "glossarist", "~> 2.14"
   spec.add_dependency "plurimath", "~> 0.11.14"
+  # Bundled gem required directly by lib code: metanorma/mirror in lib/metanorma/document.rb
+  spec.add_dependency "metanorma-mirror", "~> 1.0"
 end
