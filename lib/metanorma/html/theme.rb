@@ -220,8 +220,6 @@ module Metanorma
       end
 
       # Theme resource APIs search the same composition chain as the data.
-      # The renderer currently takes a single theme_templates_dir; a child
-      # template directory therefore supplies its complete front-matter pair.
       def resource_dirs
         [theme_dir, *inherited_theme_dirs].compact.uniq
       end
@@ -231,8 +229,12 @@ module Metanorma
       end
 
       def theme_templates_dir
+        theme_template_directories.first
+      end
+
+      def theme_template_directories
         resource_dirs.map { |dir| File.join(dir, "templates") }
-          .find { |dir| File.directory?(dir) }
+          .select { |dir| File.directory?(dir) }
       end
 
       def theme_assets_dir

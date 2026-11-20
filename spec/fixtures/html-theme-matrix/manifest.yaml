@@ -558,9 +558,6 @@ limits:
 - Legacy bespoke templates need typed assigns beyond B1 and remain pending; no complete
   parity claim.
 - UN plenary and GB alternative cover selection remain pending owner contracts.
-- B3 render_liquid takes one theme_templates_dir. Partial child-directory template
-  overrides need the renderer to consume inherited directories; shipped front-matter
-  directories contain complete pairs.
 baseline_sha256:
   bipm: 22f3ad9d26f1a880743cc72d83cd3219aa84f77000ce0fa5db0e7f3ae5d5cb3c
   cc: 49cf0878b057398af5dd045f5227a6649869f2fd251044bc5a933ce16c7564ba
