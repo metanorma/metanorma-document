@@ -256,7 +256,7 @@ module Metanorma
 
       def render_liquid(template_name, assigns)
         resolver = TemplateResolver.new(
-          [theme.theme_templates_dir, *template_directories, TEMPLATES_ROOT],
+          [*theme.theme_template_directories, *template_directories, TEMPLATES_ROOT],
         )
         template_path = resolver.resolve(template_name)
         template = TEMPLATE_CACHE_MUTEX.synchronize do

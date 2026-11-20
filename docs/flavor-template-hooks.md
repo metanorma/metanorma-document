@@ -25,7 +25,8 @@ sent through `render_liquid`, including flavor-owned names.
 
 For every entry template and nested Liquid `render` or `include`, search:
 
-1. The selected organization/theme's `templates/` directory, if present.
+1. The selected organization/theme's `templates/` directory, followed by its
+   `extends` ancestors from nearest parent to most distant parent, if present.
 2. The renderer's `template_directories`, in supplied order (taste before base).
 3. The shared `Metanorma::Html::TEMPLATES_ROOT` directory.
 
@@ -34,6 +35,12 @@ directory; a missing entry raises `Liquid::FileSystemError`. Invalid names,
 absolute paths, `..` traversal, and symlinks escaping a configured directory are
 rejected. Liquid's normal rendering behavior handles missing partial errors;
 this hook does not change error policy or enable strict variables globally.
+
+A taste can override a single entry or partial and inherit the remaining
+templates from its base theme. Parent theme templates take precedence over
+renderer-owned templates, and nested `render` and `include` calls use the same
+search order as entry templates. `Theme#theme_template_directories` exposes
+this ordered list; `theme_templates_dir` still returns its first directory.
 
 Entry names include the extension, for example `_paragraph.html.liquid`.
 Partial names omit underscore and suffix: `{% render 'branding' %}` reads
