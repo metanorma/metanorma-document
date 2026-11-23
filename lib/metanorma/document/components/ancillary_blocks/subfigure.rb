@@ -20,7 +20,10 @@ module Metanorma
           attribute :fmt_xref_label,
                     Metanorma::Document::Components::Inline::FmtXrefLabelElement, collection: true
 
+          attribute :hidden, :boolean
+
           xml do
+            map_attribute "hidden", to: :hidden
             element "figure"
             map_attribute "id", to: :id
             map_attribute "anchor", to: :anchor

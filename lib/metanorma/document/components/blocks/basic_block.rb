@@ -12,7 +12,10 @@ module Metanorma
 
           attribute :fmt_ladl_label_data, Metanorma::Document::Components::Inline::FmtLadlLabelData
 
+          attribute :hidden, :boolean
+
           xml do
+            map_attribute "hidden", to: :hidden
             map_element "fmt-ladl-label-data", to: :fmt_ladl_label_data
             element "basic-block"
             map_element "notes", to: :notes
