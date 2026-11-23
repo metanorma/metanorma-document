@@ -140,6 +140,7 @@ module Metanorma
         @renderer_context ||= RendererContext.new(self)
       end
 
+      attr_reader :document
       attr_writer :document, :theme
 
       def generate_full_document(document, theme: nil, headless: false, **)

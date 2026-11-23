@@ -489,18 +489,57 @@ module Metanorma
           attrs = element_attrs(href: "##{escape_html(target)}",
                                 id: safe_attr(xref, :id))
           content = render_mixed_inline(xref)
-          # Cross-references carry no computed labels in this pipeline, so
-          # unresolvable targets keep isodoc's literal "[id]" fallback,
-          # emitted ahead of the link text like the native presentation.
-          text = if content.empty?
-                   "[#{escape_html(target.to_s)}]"
+          if content.empty?
+            content = Array(safe_attr(xref, :text)).map { |text| escape_html(text.to_s) }.join
+          end
+          label = native_xref_label(target, local: safe_attr(xref, :format) == "local")
+          text = if !content.empty?
+                   label ? content : "[#{escape_html(target.to_s)}] #{content}"
+                 elsif label
+                   escape_html(label)
                  else
-                   "[#{escape_html(target.to_s)}] #{content}"
+                   "[#{escape_html(target.to_s)}]"
                  end
           render_liquid("_link.html.liquid", {
                           "attrs" => attrs,
                           "content" => text,
                         })
+        end
+
+        # Resolve only persisted Document-owned presentation metadata. Rendering
+        # never invokes a labelling processor or changes the document graph.
+        def native_xref_label(target, local: false)
+          root = coordinator.document
+          return nil unless root && target
+
+          pending, seen = [root], {}
+          until pending.empty?
+            node = pending.pop
+            next unless node.is_a?(Lutaml::Model::Serializable)
+            next if seen[node.object_id]
+            seen[node.object_id] = true
+            next if node.is_a?(Metanorma::Document::Components::Inline::RenderedDisplay)
+
+            attrs = node.class.attributes
+            if attrs.key?(:id) && node.id == target
+              data = attrs.key?(:fmt_ladl_label_data) && node.fmt_ladl_label_data
+              if !data && attrs.key?(:fmt_xref_label)
+                labels = Array(node.fmt_xref_label)
+                label = labels.find do |item|
+                  item.is_a?(Metanorma::Document::Components::Inline::FmtXrefLabelElement) &&
+                    item.fmt_ladl_label_data
+                end
+                data = label&.fmt_ladl_label_data
+              end
+              return nil unless data.is_a?(Metanorma::Document::Components::Inline::FmtLadlLabelData)
+              return local ? data.local : (data.global || data.local)
+            end
+            attrs.each_key do |key|
+              next if %i[bibdata bibliography].include?(key)
+              Array(node.public_send(key)).reverse_each { |child| pending << child }
+            end
+          end
+          nil
         end
 
         def render_eref(eref)
