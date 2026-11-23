@@ -35,7 +35,11 @@ RSpec.describe "Native presentation label data" do
     label = inline::FmtXrefLabelElement.from_xml(xml)
     reparsed = inline::FmtXrefLabelElement.from_xml(label.to_xml)
     expect(reparsed.fmt_ladl_label_data.global).to eq("Clause 2")
-    without_data = ->(source) { doc = Nokogiri::XML(source); doc.xpath("//fmt-ladl-label-data").remove; doc.root.children.map(&:to_xml) }
+    without_data = ->(source) {
+      doc = Nokogiri::XML(source)
+      doc.xpath("//fmt-ladl-label-data").remove
+      doc.root.children.map(&:to_xml)
+    }
     expect(without_data.call(label.to_xml)).to eq(without_data.call(xml))
   end
 

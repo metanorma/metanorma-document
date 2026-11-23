@@ -91,8 +91,8 @@ module Metanorma
         end
       end
 
-      attr_reader :inline_renderer, :block_renderer, :section_renderer,
-                  :pubid_renderer, :index_term_collector, :footnote_collector
+      attr_reader :inline_renderer, :block_renderer, :section_renderer, :pubid_renderer, :index_term_collector, :footnote_collector, :document
+
       # While a table renders: table-scoped <fn>s collect here and lift
       # into the table's visible footnotes row instead of endnote popups.
       attr_accessor :table_fn_context
@@ -140,7 +140,6 @@ module Metanorma
         @renderer_context ||= RendererContext.new(self)
       end
 
-      attr_reader :document
       attr_writer :theme
 
       def document=(document)

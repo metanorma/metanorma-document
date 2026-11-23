@@ -539,12 +539,15 @@ module Metanorma
           return @native_xref_index if @native_xref_index
 
           index = {}
-          pending, seen = [coordinator.document], {}
+          pending = [coordinator.document]
+          seen = {}.compare_by_identity
+          skipped_attributes = %i[bibdata bibliography]
           until pending.empty?
             node = pending.pop
             next unless node.is_a?(Lutaml::Model::Serializable)
-            next if seen[node.object_id]
-            seen[node.object_id] = true
+            next if seen[node]
+
+            seen[node] = true
             next if node.is_a?(Metanorma::Document::Components::Inline::RenderedDisplay)
 
             attrs = node.class.attributes
@@ -553,7 +556,8 @@ module Metanorma
               index[id] ||= node if id
             end
             attrs.each_key do |key|
-              next if %i[bibdata bibliography].include?(key)
+              next if skipped_attributes.include?(key)
+
               Array(node.public_send(key)).reverse_each { |child| pending << child }
             end
           end
