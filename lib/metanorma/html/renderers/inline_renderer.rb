@@ -506,13 +506,40 @@ module Metanorma
                         })
         end
 
-        # Resolve only persisted Document-owned presentation metadata. Rendering
+        def reset_native_xref_index
+          @native_xref_index = nil
+        end
+
+        # Read current metadata from indexed native node references. Rendering
         # never invokes a labelling processor or changes the document graph.
         def native_xref_label(target, local: false)
-          root = coordinator.document
-          return nil unless root && target
+          return nil unless coordinator.document && target
 
-          pending, seen = [root], {}
+          node = native_xref_index[target]
+          return nil unless node
+
+          attrs = node.class.attributes
+          data = attrs.key?(:fmt_ladl_label_data) && node.fmt_ladl_label_data
+          if !data && attrs.key?(:fmt_xref_label)
+            label = Array(node.fmt_xref_label).find do |item|
+              item.is_a?(Metanorma::Document::Components::Inline::FmtXrefLabelElement) &&
+                item.fmt_ladl_label_data
+            end
+            data = label&.fmt_ladl_label_data
+          end
+          return nil unless data.is_a?(Metanorma::Document::Components::Inline::FmtLadlLabelData)
+
+          local ? data.local : (data.global || data.local)
+        end
+
+        # Cache even an empty index: legacy unlabelled input must not trigger a
+        # new graph scan for every reference. BaseRenderer resets this per render.
+        # First-match identity and traversal order match the former direct lookup.
+        def native_xref_index
+          return @native_xref_index if @native_xref_index
+
+          index = {}
+          pending, seen = [coordinator.document], {}
           until pending.empty?
             node = pending.pop
             next unless node.is_a?(Lutaml::Model::Serializable)
@@ -521,25 +548,16 @@ module Metanorma
             next if node.is_a?(Metanorma::Document::Components::Inline::RenderedDisplay)
 
             attrs = node.class.attributes
-            if attrs.key?(:id) && node.id == target
-              data = attrs.key?(:fmt_ladl_label_data) && node.fmt_ladl_label_data
-              if !data && attrs.key?(:fmt_xref_label)
-                labels = Array(node.fmt_xref_label)
-                label = labels.find do |item|
-                  item.is_a?(Metanorma::Document::Components::Inline::FmtXrefLabelElement) &&
-                    item.fmt_ladl_label_data
-                end
-                data = label&.fmt_ladl_label_data
-              end
-              return nil unless data.is_a?(Metanorma::Document::Components::Inline::FmtLadlLabelData)
-              return local ? data.local : (data.global || data.local)
+            if attrs.key?(:id)
+              id = node.id
+              index[id] ||= node if id
             end
             attrs.each_key do |key|
               next if %i[bibdata bibliography].include?(key)
               Array(node.public_send(key)).reverse_each { |child| pending << child }
             end
           end
-          nil
+          @native_xref_index = index
         end
 
         def render_eref(eref)

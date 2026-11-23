@@ -141,11 +141,16 @@ module Metanorma
       end
 
       attr_reader :document
-      attr_writer :document, :theme
+      attr_writer :theme
+
+      def document=(document)
+        @document = document
+        @inline_renderer&.reset_native_xref_index
+      end
 
       def generate_full_document(document, theme: nil, headless: false, **)
         Metanorma::Html.seed_flavors!
-        @document = document
+        self.document = document
         @theme_override = theme
         @theme = nil
         reset_document_collections
@@ -177,7 +182,7 @@ module Metanorma
       # assembly) — for embedding classic-rendered content into a host page.
       def generate_body(document, theme: nil, **)
         Metanorma::Html.seed_flavors!
-        @document = document
+        self.document = document
         @theme_override = theme
         @theme = nil
         reset_document_collections
