@@ -1,12 +1,12 @@
 PresentationProfile "base" {
   layer = "base"
-  settings = { date_format = "own" footnote_sup = true contributor_name_order = "given_family" section_order = "preface,scope,normref,terms,definitions,middle,annex,bibliography,indexsect,colophon" }
+  settings = { date_format = "own" footnote_sup = true contributor_name_order = "given_family" section_order = "preface,scope,normref,terms,definitions,middle,annex,bibliography,indexsect,colophon" bibdata_current = true address_precompose = true }
 }
 
 PresentationProfile "iso" {
   layer = "flavor"
   flavor = "iso"
-  settings = { footnote_close = ")" footnote_delim_scope = "body" section_order = "preface,scope,normref,main,annex,bibliography,indexsect,colophon" }
+  settings = { footnote_close = ")" footnote_delim_scope = "body" bibdata_labels = "document" i18n_class = "IsoDoc::Iso::I18n" section_order = "preface,scope,normref,main,annex,bibliography,indexsect,colophon" }
 }
 
 PresentationProfile "bsi" {
@@ -31,4 +31,10 @@ PresentationProfile "itu" {
   layer = "flavor"
   flavor = "itu"
   settings = { section_order = "boilerplate_clauses,preface,scope,normref,terms,definitions,middle,annex,bibliography,indexsect,colophon" }
+}
+
+PresentationProfile "document_language_dates" {
+  layer = "taste"
+  taste = "document_language_dates"
+  settings = { date_format = "%-d %B %Y" date_language = "document" }
 }
