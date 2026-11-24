@@ -29,6 +29,7 @@ require "nokogiri"
 require "optparse"
 require "fileutils"
 require "open3"
+require "tmpdir"
 
 module ContentParity
   FLAVORS = %w[bipm cc gb generic iec ieee ietf iho iso itu jis m3aawg ogc
@@ -164,25 +165,41 @@ module ContentParity
 
   # ---- rendering (needs flavor gems; loaded lazily) ------------------------
 
-  def class_name(flavor)
-    flavor.split("-").map(&:capitalize).join
+  # Flavors whose gem rejects the generic terms clause (gb 1.5.10 fails on
+  # any term with current standoc; nist wants its own term-clause markup).
+  # They get the sample without a terms clause.
+  NO_TERMS = %w[gb nist].freeze
+
+  # Constant names are not always Capitalized-by-dash (M3AAWG, UN).
+  def const_for(namespace, flavor)
+    want = flavor.delete("-").downcase
+    name = namespace.constants.find { |c| c.to_s.downcase == want }
+    raise NameError, "no #{namespace}::#{want} constant" unless name
+
+    namespace.const_get(name)
   end
 
   def presentation_xml(flavor, adoc_path)
     require "asciidoctor"
     require "metanorma-#{flavor}"
-    Dir.chdir(File.dirname(adoc_path)) do
-      xml = Asciidoctor.convert(File.read(adoc_path), backend: flavor.to_sym,
-                                                      safe: :safe,
-                                                      header_footer: true)
-      ::IsoDoc.const_get(class_name(flavor))::PresentationXMLConvert
-        .new({}).convert("sample", xml, true)
+    # Asciidoctor writes error dumps next to the source: work in a copy.
+    Dir.mktmpdir("content-parity") do |tmp|
+      FileUtils.cp_r(Dir[File.join(File.dirname(adoc_path), "*")], tmp)
+      Dir.chdir(tmp) { convert_adoc(flavor, adoc_path) }
     end
+  end
+
+  def convert_adoc(flavor, adoc_path)
+    xml = Asciidoctor.convert(File.read(adoc_path), backend: flavor.to_sym,
+                                                    safe: :safe,
+                                                    header_footer: true)
+    const_for(::IsoDoc, flavor)::PresentationXMLConvert
+      .new({}).convert("sample", xml, true)
   end
 
   def legacy_html(flavor, pres_xml)
     require "metanorma-#{flavor}"
-    ::IsoDoc.const_get(class_name(flavor))::HtmlConvert
+    const_for(::IsoDoc, flavor)::HtmlConvert
       .new({}).convert("sample", pres_xml, true)
   end
 
@@ -190,7 +207,7 @@ module ContentParity
     require "metanorma/document"
     require "metanorma/html"
     require "metanorma-#{flavor}"
-    root = ::Metanorma.const_get(class_name(flavor))::Document::Root
+    root = const_for(::Metanorma, flavor)::Document::Root
     ::Metanorma::Html::Generator.generate(root.from_xml(pres_xml))
   end
 
@@ -210,7 +227,15 @@ module ContentParity
   end
 
   def cases_for(flavor)
-    cases = Dir[File.join(FIXTURE_DIR, "*.adoc")].map do |f|
+    files = Dir[File.join(FIXTURE_DIR, "*.adoc")].select do |f|
+      base = File.basename(f, ".adoc")
+      if NO_TERMS.include?(flavor)
+        base.end_with?("-noterms") || base == "deflist"
+      else
+        !base.end_with?("-noterms")
+      end
+    end
+    cases = files.map do |f|
       [File.basename(f, ".adoc"), { adoc: f }]
     end
     repo = File.expand_path("..", __dir__)
