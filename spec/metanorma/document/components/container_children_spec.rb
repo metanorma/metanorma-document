@@ -16,7 +16,7 @@ RSpec.describe "container children mappings" do
   end
 
   it "maps sourcecode inside notes" do
-    xml = '<note><p>n</p><sourcecode>sc</sourcecode></note>'
+    xml = "<note><p>n</p><sourcecode>sc</sourcecode></note>"
 
     nb = Metanorma::Document::Components::Blocks::NoteBlock.from_xml(xml)
 
