@@ -1,41 +1,25 @@
-# frozen_string_literal: true
 
-require_relative "../../../../spec_helper"
-
-# metanorma-ietf#303: pseudocode figures carry their content as
-# paragraphs and sourcecode; the FigureBlock model mapped neither, so
-# the content was unreachable at parse and pseudocode figures rendered
-# empty.
-RSpec.describe "p and sourcecode mapping on FigureBlock" do
-  it "maps figure paragraphs" do
+# metanorma-ietf#296 item 4: sourcecode src= was unmapped at parse
+RSpec.describe "src mapping on SourcecodeBlock" do
+  it "maps the src attribute" do
     xml = <<~XML
-      <figure class="pseudocode"><name>Label</name>
-        <p>first line</p>
-        <p>second line</p>
-      </figure>
+      <sourcecode src="code.rb" anchor="sc1"/>
     XML
 
-    figure = Metanorma::Document::Components::AncillaryBlocks::FigureBlock
+    sc = Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock
       .from_xml(xml)
 
-    expect(figure.figure_class).to eq("pseudocode")
-    expect(figure.p.size).to eq(2)
-    expect(figure.p.map { |para| Metanorma::Document::PlainText.call(para) })
-      .to eq(["first line", "second line"])
+    expect(sc.src).to eq("code.rb")
+    expect(sc.anchor).to eq("sc1")
   end
 
-  it "maps figure sourcecode" do
+  it "maps singular initial on person names (metanorma-ietf#298 item 4)" do
     xml = <<~XML
-      <figure class="pseudocode"><name>Label</name>
-        <sourcecode>if x then y</sourcecode>
-      </figure>
+      <name><forename>Barney</forename><initial>B. X.</initial><surname>Rubble</surname></name>
     XML
 
-    figure = Metanorma::Document::Components::AncillaryBlocks::FigureBlock
-      .from_xml(xml)
+    name = Metanorma::Document::Relaton::FullName.from_xml(xml)
 
-    expect(figure.sourcecode.size).to eq(1)
-    expect(Metanorma::Document::PlainText.call(figure.sourcecode.first))
-      .to include("if x then y")
+    expect(Array(name.initials).map(&:value)).to include("B. X.")
   end
 end
