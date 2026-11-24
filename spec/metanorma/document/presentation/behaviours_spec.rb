@@ -75,6 +75,10 @@ RSpec.describe Metanorma::Document::Presentation::Behaviours do
       expect(profile_for.settings).to eq("date_format" => "own", "footnote_sup" => true,
                                          "contributor_name_order" => "given_family",
                                          "bibdata_current" => true, "address_precompose" => true,
+                                         "term_labels" => true, "term_label_delim" => ".", "term_label_name" => true,
+                                         "term_designations" => true, "term_definitions" => true,
+                                         "term_annotations" => true, "term_sources" => true,
+                                         "term_source_locality" => true,
                                          "section_order" => "preface,scope,normref,terms,definitions,middle,annex,bibliography,indexsect,colophon")
     end
   end
