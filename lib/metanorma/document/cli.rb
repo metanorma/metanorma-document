@@ -299,9 +299,14 @@ module Metanorma
         return flavor unless flavor
 
         require "metanorma-core"
-        entry = Metanorma::Core::Flavors.find(flavor)
-        entry = Metanorma::Core::Flavors.find(entry.base_flavor) while entry&.base_flavor
-        entry&.name&.to_s || flavor
+        begin
+          # Taste entries live in metanorma-taste; without it the table
+          # has no taste rows and taste2flavor cannot resolve.
+          require "metanorma-taste"
+        rescue LoadError
+          nil
+        end
+        Metanorma::Core::FlavorLoader.taste2flavor(flavor).to_s
       rescue LoadError, NameError
         flavor
       end
