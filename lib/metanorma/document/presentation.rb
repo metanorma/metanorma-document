@@ -7,6 +7,10 @@ module Metanorma
     module Presentation
       autoload :Engine, "metanorma/document/presentation/engine"
       autoload :Profile, "metanorma/document/presentation/profile"
+      autoload :ProfileError, "metanorma/document/presentation/profile_error"
+      autoload :ProfileLoader, "metanorma/document/presentation/profile_loader"
+      autoload :LayeredProfile, "metanorma/document/presentation/layered_profile"
+      autoload :LabelData, "metanorma/document/presentation/label_data"
     end
   end
 end
