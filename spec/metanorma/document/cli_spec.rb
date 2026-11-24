@@ -95,7 +95,7 @@ RSpec.describe Metanorma::Document::CLI do
       # every loaded entry, so taste fixtures must not survive this block.
       require "metanorma-core"
       flavors = Metanorma::Core::Flavors.table
-                                      .instance_variable_get(:@flavors)
+        .instance_variable_get(:@flavors)
       flavors.reject! { |f| f.name.to_s.start_with?("taste-spec-canonical") }
     end
 
@@ -104,11 +104,11 @@ RSpec.describe Metanorma::Document::CLI do
       base = "taste-spec-canonical-base"
       taste = "taste-spec-canonical"
       Metanorma::Core::Flavors.register(
-        Metanorma::Core::Flavor.new(name: base, gem: "metanorma-standoc")
+        Metanorma::Core::Flavor.new(name: base, gem: "metanorma-standoc"),
       )
       Metanorma::Core::Flavors.register(
         Metanorma::Core::Flavor.new(name: taste, base_flavor: base.to_sym,
-                                    gem: "metanorma-taste")
+                                    gem: "metanorma-taste"),
       )
       expect(described_class.canonical_flavor(taste)).to eq(base)
     end
