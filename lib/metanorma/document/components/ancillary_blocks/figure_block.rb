@@ -60,6 +60,13 @@ module Metanorma
           # Key definitions for figure
           attribute :key, KeyElement
 
+          # Bibliographic source citations for the figure content
+          # (metanorma-ietf#296 item 3); @source remains the attribute
+          # spelling on the element itself.
+          attribute :sources,
+                    Metanorma::Document::Components::ReferenceElements::SourceElement,
+                    collection: true
+
           # Optional footnotes specific to the figure.
           attribute :footnotes, Metanorma::Document::Components::Inline::FnElement,
                     collection: true
@@ -116,6 +123,7 @@ module Metanorma
             map_element "key", to: :key
             map_element "fn", to: :footnotes
             map_element "note", to: :note
+            map_element "source", to: :sources
             map_element "fmt-figure", to: :fmt_figure
             map_element "fmt-name", to: :fmt_name
             map_element "fmt-xref-label", to: :fmt_xref_label
