@@ -4,6 +4,18 @@ source:
   method: flavor override = method of the same name defined in a flavor's lib/isodoc/**/*.rb
     file whose name matches presentation|xref|sections|terms or which references PresentationXMLConvert;
     name-match heuristic, not a semantic diff
+  flavor_status:
+    note: checked 2026-11-24 against metanorma-cli v1.18.7 and the 1.20 scope rules
+    public: [bipm, cc, gb, generic, iec, ieee, ietf, iho, iso, itu, jis, m3aawg, ogc, oiml, plateau, ribose, un]
+    private_active: [nist, bsi]
+    taste: [csa, icc, mbxif, oiml, pdfa, swf]
+    deprecated_dropped: [vsd]
+    unconfirmed_skip: [csd]
+    not_in_scope_list: [core, en, mko, mlit, mpfa, snap, standoc, taste]
+    oiml: public flavor; its taste (oiml-cs) shares the name and is handled as a taste layer
+    nist_bsi: private flavors, kept in the catalog and tagged private
+    csd: unconfirmed; its deltas stay listed for reference but are not a target
+    vsd: deprecated and archived; removed from the scan list
   flavors_scanned:
   - bipm
   - bsi
@@ -38,7 +50,6 @@ source:
   - swf
   - taste
   - un
-  - vsd
 files:
 - file: annex.rb
   lines: 101

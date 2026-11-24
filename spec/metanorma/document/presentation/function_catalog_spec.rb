@@ -25,4 +25,14 @@ RSpec.describe "presentation function catalog" do
     catalog["files"].each { |f| expect(f["flavor_overrides"]).to be_a(Hash) }
     expect(catalog["files"].sum { |f| f["flavor_overrides"].size }).to be > 0
   end
+
+  it "follows the 1.20 flavor scope: vsd dropped, csd unconfirmed, oiml/nist/bsi kept" do
+    scanned = catalog["source"]["flavors_scanned"]
+    status = catalog["source"]["flavor_status"]
+    expect(scanned).not_to include("vsd")
+    expect(scanned).to include("oiml", "nist", "bsi")
+    expect(status["unconfirmed_skip"]).to eq(["csd"])
+    expect(status["private_active"]).to eq(%w[nist bsi])
+    expect(catalog["files"].flat_map { |f| f["flavor_overrides"].keys }).not_to include("vsd")
+  end
 end
