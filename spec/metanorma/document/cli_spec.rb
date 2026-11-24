@@ -90,6 +90,15 @@ RSpec.describe Metanorma::Document::CLI do
   end
 
   describe ".canonical_flavor" do
+    after do
+      # The registry is process-global: the theme-matrix spec classifies
+      # every loaded entry, so taste fixtures must not survive this block.
+      require "metanorma-core"
+      flavors = Metanorma::Core::Flavors.table
+                                      .instance_variable_get(:@flavors)
+      flavors.reject! { |f| f.name.to_s.start_with?("taste-spec-canonical") }
+    end
+
     it "maps a taste to its base flavor's model owner" do
       require "metanorma-core"
       base = "taste-spec-canonical-base"

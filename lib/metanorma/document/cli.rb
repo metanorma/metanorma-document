@@ -302,7 +302,7 @@ module Metanorma
         begin
           # Taste entries live in metanorma-taste; without it the table
           # has no taste rows and taste2flavor cannot resolve.
-          require "metanorma-taste"
+          require "metanorma-taste" # soft-require: LoadError-guarded optional
         rescue LoadError
           nil
         end
