@@ -1024,7 +1024,7 @@ module Metanorma
                                })
         example.ul&.each { |ul| parts << (render_unordered_list(ul) || "") }
         example.ol&.each { |ol| parts << (render_ordered_list(ol) || "") }
-        example.dl&.then { |dl| parts << (render_definition_list(dl) || "") }
+        Array(example.dl).each { |dl| parts << (render_definition_list(dl) || "") }
         render_liquid("_element.html.liquid", {
                         "tag" => "div",
                         "extra_attrs" => attrs,
