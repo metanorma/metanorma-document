@@ -4,13 +4,16 @@ require "spec_helper"
 require "json"
 require "open3"
 require "tmpdir"
-require "isodoc/iso/html_convert"
-require "isodoc/iec/html_convert"
-require "isodoc/iec/presentation_xml_convert"
 
 RSpec.describe "Bundled ISO and IEC HTML body visual parity" do
   before do
     skip "Set HTML_THEME_PARITY=1 after installing frontend Puppeteer/Chromium" unless ENV["HTML_THEME_PARITY"] == "1"
+
+    # Loaded here, not at file load, so the flavour converters never alter
+    # global state for the other (always-run) HTML specs.
+    require "isodoc/iso/html_convert"
+    require "isodoc/iec/html_convert"
+    require "isodoc/iec/presentation_xml_convert"
   end
   let(:fixture) { File.expand_path("../../../fixtures/html-theme-parity/document.xml", __dir__) }
   let(:browser_script) { File.expand_path("../../../support/html_theme_parity.mjs", __dir__) }
