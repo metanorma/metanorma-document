@@ -11,6 +11,8 @@ module Metanorma
       autoload :ProfileLoader, "metanorma/document/presentation/profile_loader"
       autoload :LayeredProfile, "metanorma/document/presentation/layered_profile"
       autoload :LabelData, "metanorma/document/presentation/label_data"
+      autoload :Walk, "metanorma/document/presentation/walk"
+      autoload :Behaviours, "metanorma/document/presentation/behaviours"
     end
   end
 end

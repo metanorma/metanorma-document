@@ -1,0 +1,28 @@
+PresentationProfile "base" {
+  layer = "base"
+  settings = { date_format = "own" footnote_sup = true contributor_name_order = "given_family" }
+}
+
+PresentationProfile "iso" {
+  layer = "flavor"
+  flavor = "iso"
+  settings = { footnote_close = ")" footnote_delim_scope = "body" }
+}
+
+PresentationProfile "bsi" {
+  layer = "flavor"
+  flavor = "bsi"
+  settings = { footnote_close = ")" }
+}
+
+PresentationProfile "bipm" {
+  layer = "flavor"
+  flavor = "bipm"
+  settings = { footnote_open = "(" footnote_close = ")" }
+}
+
+PresentationProfile "example_dates" {
+  layer = "taste"
+  taste = "example_dates"
+  settings = { date_format = "%-d %B %Y" contributor_name_order = "family_given" }
+}
