@@ -148,8 +148,18 @@ module ContentParity
 
   # ---- rendering (needs flavor gems; loaded lazily) ------------------------
 
-  def class_name(flavor)
-    flavor.split("-").map(&:capitalize).join
+  # Flavors whose gem rejects the generic terms clause (gb 1.5.10 fails on
+  # any term with current standoc; nist wants its own term-clause markup).
+  # They get the sample without a terms clause.
+  NO_TERMS = %w[gb nist].freeze
+
+  # Constant names are not always Capitalized-by-dash (M3AAWG, UN).
+  def const_for(namespace, flavor)
+    want = flavor.delete("-").downcase
+    name = namespace.constants.find { |c| c.to_s.downcase == want }
+    raise NameError, "no #{namespace}::#{want} constant" unless name
+
+    namespace.const_get(name)
   end
 
   def presentation_xml(flavor, adoc_path)
@@ -159,14 +169,14 @@ module ContentParity
       xml = Asciidoctor.convert(File.read(adoc_path), backend: flavor.to_sym,
                                                       safe: :safe,
                                                       header_footer: true)
-      ::IsoDoc.const_get(class_name(flavor))::PresentationXMLConvert
+      const_for(::IsoDoc, flavor)::PresentationXMLConvert
         .new({}).convert("sample", xml, true)
     end
   end
 
   def legacy_html(flavor, pres_xml)
     require "metanorma-#{flavor}"
-    ::IsoDoc.const_get(class_name(flavor))::HtmlConvert
+    const_for(::IsoDoc, flavor)::HtmlConvert
       .new({}).convert("sample", pres_xml, true)
   end
 
@@ -174,7 +184,7 @@ module ContentParity
     require "metanorma/document"
     require "metanorma/html"
     require "metanorma-#{flavor}"
-    root = ::Metanorma.const_get(class_name(flavor))::Document::Root
+    root = const_for(::Metanorma, flavor)::Document::Root
     ::Metanorma::Html::Generator.generate(root.from_xml(pres_xml))
   end
 
