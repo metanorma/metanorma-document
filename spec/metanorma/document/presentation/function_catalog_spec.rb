@@ -32,6 +32,8 @@ RSpec.describe "presentation function catalog" do
     expect(scanned).not_to include("vsd")
     expect(scanned).to include("oiml", "nist", "bsi")
     expect(status["unconfirmed_skip"]).to eq(["csd"])
+    expect(scanned).to include("mpfa", "csa")
+    expect(status["assigned_umbrella"].keys).to eq(%w[mpfa csa])
     expect(status["private_active"]).to eq(%w[nist bsi])
     expect(catalog["files"].flat_map { |f| f["flavor_overrides"].keys }).not_to include("vsd")
   end

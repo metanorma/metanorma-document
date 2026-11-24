@@ -11,9 +11,11 @@ source:
     taste: [csa, icc, mbxif, oiml, pdfa, swf]
     deprecated_dropped: [vsd]
     unconfirmed_skip: [csd]
-    not_in_scope_list: [core, en, mko, mlit, mpfa, snap, standoc, taste]
+    assigned_umbrella: {mpfa: metanorma-mpfa#95, csa: metanorma-csa#368}
+    not_in_scope_list: [core, en, mko, mlit, snap, standoc, taste]
     oiml: public flavor; its taste (oiml-cs) shares the name and is handled as a taste layer
     nist_bsi: private flavors, kept in the catalog and tagged private
+    mpfa_csa: in scope because Ronald assigned their 1.20 umbrellas (csa is also a taste)
     csd: unconfirmed; its deltas stay listed for reference but are not a target
     vsd: deprecated and archived; removed from the scan list
   flavors_scanned:
