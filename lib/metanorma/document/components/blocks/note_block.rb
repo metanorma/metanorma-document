@@ -27,6 +27,10 @@ module Metanorma
                     "Metanorma::Document::Components::MultiParagraph::QuoteBlock",
                     collection: true
 
+          attribute :sourcecode,
+                    "Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock",
+                    collection: true
+
           # Presentation XML wraps the note body in a semx slice
           # (<note><semx element="note"><p>…</p></semx></note>).
           attribute :semx, "Metanorma::Document::Components::Inline::SemxElement",
@@ -79,6 +83,7 @@ module Metanorma
             map_element "ul", to: :ul
             map_element "ol", to: :ol
             map_element "quote", to: :quote
+            map_element "sourcecode", to: :sourcecode
             map_element "semx", to: :semx
             map_element "fmt-xref-label", to: :fmt_xref_label
             map_element "fmt-name", to: :fmt_name

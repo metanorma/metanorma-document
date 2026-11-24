@@ -39,6 +39,17 @@ module Metanorma
           attribute :unnumbered, :boolean
 
           # Paragraphs within the admonition.
+          attribute :ul,
+                    "Metanorma::Document::Components::Lists::UnorderedList",
+                    collection: true
+
+          attribute :ol,
+                    "Metanorma::Document::Components::Lists::OrderedList",
+                    collection: true
+
+          attribute :dl,
+                    "Metanorma::Document::Components::Lists::DefinitionList"
+
           attribute :paragraphs,
                     Metanorma::Document::Components::Paragraphs::ParagraphBlock,
                     collection: true
@@ -72,6 +83,9 @@ module Metanorma
             map_attribute "unnumbered", to: :unnumbered
             map_element "uri", to: :uri
             map_element "p", to: :paragraphs
+            map_element "ul", to: :ul
+            map_element "ol", to: :ol
+            map_element "dl", to: :dl
             map_element "fmt-name", to: :fmt_name
           end
         end
