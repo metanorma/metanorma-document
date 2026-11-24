@@ -52,4 +52,26 @@ RSpec.describe ContentParity do
                                      "error" => "boom" }])
     expect(md).to include("| f | c | new-failed | boom")
   end
+
+  it "matches paragraph text split by an inline footnote popup" do
+    legacy_html = "<body><p>Text.<sup>1</sup> More text.</p></body>"
+    new_html = '<body><p>Text.<span class="fn-marker"><sup>1</sup>' \
+               '<span class="fn-popup">Note body</span></span> More ' \
+               "text.</p></body>"
+    expect(described_class.compare(legacy_html, new_html)["missing_blocks"])
+      .to eq([])
+  end
+
+  it "still requires footnote body text to be present" do
+    legacy_html = "<body><p>Footnote body text</p></body>"
+    result = described_class.compare(legacy_html, "<body></body>")
+    expect(result["missing_blocks"].size).to eq(1)
+  end
+
+  it "counts terms by dfn and ignores bibliography layout tables" do
+    legacy_html = '<body><p class="TermNum"></p><p><dfn>t</dfn></p>' \
+                  '<table class="biblio"><tr><td>[1]</td></tr></table></body>'
+    r = described_class.compare(legacy_html, "<body><p><dfn>t</dfn></p></body>")
+    expect(r["lost_kinds"]).to eq([])
+  end
 end

@@ -48,7 +48,7 @@ module ContentParity
   # css selector for the legacy side and for the new side.
   KINDS = {
     "headings" => { both: "h1, h2, h3, h4, h5, h6" },
-    "tables" => { both: "table" },
+    "tables" => { both: "table:not(.biblio)" },
     "figures" => { both: "figure, img" },
     "formulas" => { both: "math" },
     "bullet/ordered lists" => { both: "ul, ol" },
@@ -58,9 +58,11 @@ module ContentParity
     "quotes" => { legacy: "blockquote, .Quote", new: "blockquote, .quote" },
     "notes" => { legacy: ".Note", new: ".note-block" },
     "examples" => { both: ".example" },
-    "terms" => { both: ".TermNum" },
+    # Legacy emits an empty p.TermNum per term; counting those measured the
+    # anchor, not the term. The term itself is the dfn in both outputs.
+    "terms" => { both: "dfn" },
     "footnote refs" => { legacy: ".FootnoteRef", new: ".fn-link" },
-    "footnote bodies" => { legacy: ".footnote", new: ".footnote" },
+    "footnote bodies" => { legacy: ".footnote", new: ".footnote, .fn-popup" },
     "bibliography entries" => { legacy: ".NormRef, .Biblio",
                                 new: ".biblio-entry" },
     "cross-references" => { both: "a[href^='#']" },
@@ -98,6 +100,20 @@ module ContentParity
     end
   end
 
+  # The new output places each footnote body in a popup right after its
+  # marker, which splits the paragraph text. Compare the paragraph text
+  # without the popups and the popup texts as separate text, so footnote
+  # content still has to be present but cannot break a paragraph match.
+  def flat_text_with_popups(body)
+    copy = body.dup
+    popups = copy.css(".fn-popup").map do |popup|
+      text = popup.text
+      popup.remove
+      text
+    end
+    ([copy.text] + popups).join(" ")
+  end
+
   def count_kind(body, selector)
     return 0 unless selector
 
@@ -118,7 +134,7 @@ module ContentParity
   def compare(legacy_html, new_html)
     lbody = content_body(legacy_html)
     nbody = content_body(new_html)
-    new_flat = normalize(nbody.text)
+    new_flat = normalize(flat_text_with_popups(nbody))
     new_norm_blocks = text_blocks(nbody).map { |b| normalize(b["text"]) }
 
     lblocks = text_blocks(lbody)
