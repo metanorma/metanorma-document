@@ -20,9 +20,8 @@ RSpec.describe "p and sourcecode mapping on FigureBlock" do
 
     expect(figure.figure_class).to eq("pseudocode")
     expect(figure.p.size).to eq(2)
-    expect(figure.p.map(&:content).map(&:join)).to eq(
-      ["first line", "second line"],
-    )
+    expect(figure.p.map { |para| Metanorma::Document::PlainText.call(para) })
+      .to eq(["first line", "second line"])
   end
 
   it "maps figure sourcecode" do
@@ -36,6 +35,7 @@ RSpec.describe "p and sourcecode mapping on FigureBlock" do
       .from_xml(xml)
 
     expect(figure.sourcecode.size).to eq(1)
-    expect(figure.sourcecode.first.content.join).to include("if x then y")
+    expect(Metanorma::Document::PlainText.call(figure.sourcecode.first))
+      .to include("if x then y")
   end
 end
