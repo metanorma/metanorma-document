@@ -316,13 +316,14 @@ module Metanorma
       def build_publisher_logos
         publishers = flavor_publishers(extract_primary_doc_id)
         logo_map = publisher_logo_map
-        return "" if publishers.empty? && logo_map.empty?
+        header_map = theme.header_logos || {}
+        return "" if publishers.empty? && logo_map.empty? && header_map.empty?
 
         dark_logo_map = theme.logos_dark
-        display_pubs = publishers.empty? ? logo_map.keys : publishers
+        display_pubs = publishers.empty? ? (logo_map.keys | header_map.keys) : publishers
 
         display_pubs.filter_map do |pub|
-          filename = logo_map[pub]
+          filename = header_map[pub] || logo_map[pub]
           next unless filename
 
           svg = load_logo_svg(filename, height: 26)
