@@ -8,6 +8,7 @@ module Metanorma
         # Contains mixed content with inline elements.
         class UnderlineElement < Lutaml::Model::Serializable
           include Inline::Vocabulary
+
           attribute :text, :string, collection: true
           attribute :ruby, "Metanorma::Document::Components::TextElements::RubyElement",
                     collection: true

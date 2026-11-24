@@ -22,7 +22,7 @@ RSpec.describe "inline vocabulary on NameWithIdElement" do
   end
 
   it "keeps plain names working" do
-    xml = '<name>Figure 1</name>'
+    xml = "<name>Figure 1</name>"
 
     name = Metanorma::Document::Components::Inline::NameWithIdElement
       .from_xml(xml)
