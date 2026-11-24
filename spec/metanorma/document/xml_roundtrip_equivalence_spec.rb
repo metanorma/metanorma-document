@@ -2,41 +2,71 @@
 
 require "spec_helper"
 
-# Slice 1 of metanorma#690 (L5 round-trip): strict XML -> Document model
-# -> XML equivalence (element order and text preserved, insignificant
-# whitespace normalised) over the semantic fixtures. Complements the
-# structural id/count checks in spec/support/shared_roundtrip_examples.rb.
-RSpec.describe "Metanorma XML <-> Document model round-trip" do
-  fixtures_dir = File.expand_path("../../fixtures", __dir__)
+# Fixture catalogue for the round-trip gate (metanorma#690).
+module XmlRoundtripFixtures
+  DIR = File.expand_path("../../fixtures", __dir__)
 
-  roots = {
+  ROOTS = {
     "iso" => Metanorma::IsoDocument::Root,
     "itu" => Metanorma::ItuDocument::Root,
     "ogc" => Metanorma::OgcDocument::Root,
     "standoc" => Metanorma::Standoc::Document::Root,
-  }
+  }.freeze
 
-  # Known model losses still to be closed in later slices. They stay
-  # visible: each is `pending`, so the example fails once it is fixed.
-  known_loss_by_name = {
-    "iso/is/document-nested-terms.xml" => "1 semantic difference",
-    "ogc/19-004/document.xml" => "11 semantic differences (22s run)",
-  }
+  # Known model losses still to be closed. They stay visible: each is
+  # `pending`, so the example fails once it is fixed.
+  KNOWN_LOSS = {
+    "ogc/19-004/document.xml" =>
+      "5 differences, all in metanorma-standoc models: " \
+      "Terms::TermDefinition and Terms::VerbalExpression lack the id " \
+      "attribute; Sections::TermsSection lacks <definitions>",
+  }.freeze
 
-  cases = Dir[File.join(fixtures_dir, "{#{roots.keys.join(',')}}/**/*.xml")]
-    .reject { |p| p.end_with?(".presentation.xml") }
-    .sort.map do |path|
-      name = path.delete_prefix("#{fixtures_dir}/")
-      [name, path, roots.fetch(name.split("/").first),
-       known_loss_by_name[name]]
-    end
+  def self.name_of(path)
+    path.delete_prefix("#{DIR}/")
+  end
 
-  cases.each do |name, path, root_class, known_loss|
-    it "round-trips #{name} without loss" do
-      pending(known_loss) if known_loss
+  def self.root_for(path)
+    ROOTS.fetch(name_of(path).split("/").first)
+  end
+
+  def self.paths
+    Dir[File.join(DIR, "{#{ROOTS.keys.join(',')}}/**/*.xml")]
+      .partition { |p| p.end_with?(".presentation.xml") }.reverse
+  end
+end
+
+# Strict XML -> Document model -> XML equivalence (element order and text
+# preserved, insignificant whitespace normalised). Complements the
+# structural id/count checks in spec/support/shared_roundtrip_examples.rb.
+RSpec.describe "Metanorma XML <-> Document model round-trip" do
+  semantic, presentation = XmlRoundtripFixtures.paths
+
+  semantic.each do |path|
+    it "round-trips #{XmlRoundtripFixtures.name_of(path)} without loss" do
+      known = XmlRoundtripFixtures::KNOWN_LOSS[XmlRoundtripFixtures.name_of(path)]
+      pending(known) if known
       xml = File.read(path)
+      root = XmlRoundtripFixtures.root_for(path)
 
-      expect(root_class.from_xml(xml).to_xml).to be_xml_equivalent_to(xml)
+      expect(root.from_xml(xml).to_xml).to be_xml_equivalent_to(xml)
+    end
+  end
+
+  # Slice 2 of metanorma#690: presentation XML (fmt-* twins). Measured
+  # against the current models, every presentation fixture still loses
+  # content (about 3 minutes in total, so these are skipped, not run):
+  #   - <semx> directly under <clause> in sections (ISO clauses)
+  #   - <amend>/<newcontent> children: note, figure (image, key/dl/dd), clause
+  #   - the metanorma-standoc term gaps named above (ids, <definitions>)
+  # Remove the skip once the models are fixed; the fixture then runs.
+  presentation.each do |path|
+    it "round-trips presentation #{XmlRoundtripFixtures.name_of(path)} without loss" do
+      skip "presentation XML model losses (see comment above)"
+      xml = File.read(path)
+      root = XmlRoundtripFixtures.root_for(path)
+
+      expect(root.from_xml(xml).to_xml).to be_xml_equivalent_to(xml)
     end
   end
 end
