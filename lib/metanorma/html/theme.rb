@@ -109,6 +109,10 @@ module Metanorma
       attribute :publisher_name, :string
       attribute :logos_light, :hash, default: -> { {} }
       attribute :logos_dark, :hash, default: -> { {} }
+      # Compact publisher marks for the fixed-height header bar; the
+      # full lockups in logos_light stay on the cover. Falls back to
+      # logos_light per publisher when unset.
+      attribute :header_logos, :hash, default: -> { {} }
       attribute :doctype_labels, :hash, default: -> { {} }
 
       # --- Document identifier formatting ---
