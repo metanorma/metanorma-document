@@ -727,9 +727,17 @@ module Metanorma
         @block_renderer.render_ordered_list(ol, **)
       end
 
+      # collection-tolerant: dl attributes are declared collection:
+      # true on the models (ExampleBlock, NoteBlock), so the parse
+      # hands an Array through; lutaml-model 0.8.177 stopped hiding
+      # that from callers
       def render_definition_list(dl,
 **)
-        @block_renderer.render_definition_list(dl, **)
+        lists = dl.is_a?(Array) ? dl : [dl]
+        html = lists.compact.filter_map do |l|
+          @block_renderer.render_definition_list(l, **)
+        end.join
+        html.empty? ? nil : html
       end
 
       def render_svgmap(svgmap,
