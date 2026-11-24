@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "../../../spec_helper"
+require_relative "../../../../spec_helper"
 
 # metanorma-ietf#303: pseudocode figures carry their content as
 # paragraphs and sourcecode; the FigureBlock model mapped neither, so
