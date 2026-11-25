@@ -13,3 +13,21 @@ font_body: '"Source Sans Pro", sans-serif'
 font_sans: '"Source Sans Pro", sans-serif'
 font_mono: '"Source Code Pro", monospace'
 font_url: ''
+# Palette taken from the UN/UNECE HTML stylesheet in metanorma-un
+# (lib/isodoc/un/html/htmlstyle.scss variables): $un-blue #00ADEF,
+# $un-classic-blue #5B92E5, $un-toc #1661AD, $un-note #FFF495,
+# $un-admonition-back #FFCCCC / -color #47430C, $un-label #4D4D4D.
+primary_dark: '#1661AD'
+primary_light: '#E1EEF1'
+accent_deep: '#1661AD'
+accent_light: '#E1EEF1'
+gradient: 'linear-gradient(85deg, #00ADEF, #5B92E5)'
+cover_background: 'linear-gradient(85deg, #00ADEF, #5B92E5)'
+note_border: '#00ADEF'
+note_bg: '#FFF495'
+note_color: '#47430C'
+example_border: '#00ADEF'
+example_bg: '#E1EEF1'
+example_color: '#424242'
+admonition_border: '#FFCCCC'
+admonition_color: '#47430C'

@@ -13,3 +13,17 @@ font_body: '"Source Sans Pro", sans-serif'
 font_sans: '"Source Sans Pro", sans-serif'
 font_mono: '"Source Code Pro", monospace'
 font_url: ''
+# Palette taken from the Vita Green HTML stylesheet in metanorma-vsd
+# (lib/isodoc/vg/html/htmlstyle.scss): green #007864, olive #6C734A,
+# link #485094, note #FFF495 with text #47430C, example tint #E1EEF1.
+accent: '#6C734A'
+gradient: 'linear-gradient(200deg, #007864, #6C734A)'
+cover_background: 'linear-gradient(200deg, #007864, #6C734A)'
+note_border: '#007864'
+note_bg: '#FFF495'
+note_color: '#47430C'
+example_border: '#6C734A'
+example_bg: '#E1EEF1'
+example_color: '#424242'
+admonition_border: '#6C734A'
+admonition_color: '#47430C'

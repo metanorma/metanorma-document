@@ -13,3 +13,19 @@ font_body: '"Source Sans Pro", sans-serif'
 font_sans: '"Source Sans Pro", sans-serif'
 font_mono: '"Source Code Pro", monospace'
 font_url: ''
+# Palette taken from M3AAWG's own HTML stylesheet in metanorma-m3aawg
+# (lib/isodoc/m3aawg/html/htmlstyle.scss): brand blue #69C5DC, orange
+# #EE9C4F, light grey #F5F6F6, example tint #E1EEF1, note text #5B5E5F and
+# link/anchor #485094. Values marked "derived" are not in that source.
+primary_light: '#E1EEF1'
+accent_light: '#E1EEF1'
+warm: '#EE9C4F'
+warm_light: '#FDF1E4' # derived: light tint of #EE9C4F
+note_border: '#69C5DC'
+note_bg: '#F5F6F6'
+note_color: '#5B5E5F'
+example_border: '#69C5DC'
+example_bg: '#E1EEF1'
+example_color: '#424242'
+admonition_border: '#69C5DC'
+admonition_color: '#5B5E5F'
