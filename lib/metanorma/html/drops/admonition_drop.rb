@@ -13,7 +13,10 @@ module Metanorma
           new(
             id: id,
             type: type,
-            label_html: renderer.escape_html(type.capitalize),
+            label_html: renderer.escape_html(
+              renderer.fmt_name_text(admonition)&.sub(/\s*[—–-]\z/, "") ||
+                type.capitalize,
+            ),
             content_html: content_html,
             css_class: "admonition #{type}",
           )
