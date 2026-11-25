@@ -13,7 +13,7 @@ RSpec.describe Metanorma::Html::XmlHighlighter do
 
   it "wraps tag names, attribute names and values" do
     html = described_class.highlight(
-      %(<SeaIce gml:id="ID1">), lang: "xml",
+      %(<SeaIce gml:id="ID1">), lang: "xml"
     )
     expect(html).to include(%(<span class="nt">SeaIce</span>))
     expect(html).to include(%(<span class="na">gml:id</span>))
@@ -23,7 +23,7 @@ RSpec.describe Metanorma::Html::XmlHighlighter do
 
   it "escapes content outside tags" do
     html = described_class.highlight(
-      "<snowDepth>10</snowDepth>", lang: "xml",
+      "<snowDepth>10</snowDepth>", lang: "xml"
     )
     expect(html).to include(%(<span class="nt">snowDepth</span>))
     expect(html).not_to include("<snowDepth")
