@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metanorma xmlns="https://www.metanorma.org/ns/standoc" type="semantic" version="3.5.30" schema-version="v2.3.0" flavor="iso">
+<bibdata type="standard">
+<title language="en" type="main">Content parity sample</title>
+
+<title language="en" type="title-main">Content parity sample</title>
+<docidentifier type="ISO" primary="true">ISO 1000:2026</docidentifier><docidentifier type="iso-reference">ISO 1000:2026(E)</docidentifier><docidentifier type="URN">urn:iso:std:iso:1000:en</docidentifier><docidentifier type="iso-undated">ISO 1000</docidentifier><docidentifier type="iso-with-lang">ISO 1000:2026(en)</docidentifier><docnumber>1000</docnumber><contributor><role type="author"/><organization>
+<name>International Organization for Standardization</name>
+<abbreviation>ISO</abbreviation></organization></contributor><contributor><role type="author"/><person>
+<name><completename>Jane Author</completename></name>
+<affiliation><organization>
+<name>Sample Org</name>
+</organization></affiliation></person></contributor><contributor><role type="authorizer"><description>Agency</description></role><organization>
+<name>International Organization for Standardization</name>
+<abbreviation>ISO</abbreviation></organization></contributor><contributor><role type="publisher"/><organization>
+<name>International Organization for Standardization</name>
+<abbreviation>ISO</abbreviation></organization></contributor><language>en</language><script>Latn</script><status><stage abbreviation="IS">60</stage><substage>60</substage></status><copyright><from>2026</from><owner><organization>
+<name>International Organization for Standardization</name>
+<abbreviation>ISO</abbreviation></organization></owner></copyright><ext><doctype>standard</doctype><flavor>iso</flavor><structuredidentifier><project-number>ISO 1000</project-number></structuredidentifier><stagename abbreviation="IS">International Standard</stagename></ext></bibdata><metanorma-extension><semantic-metadata><stage-published>true</stage-published></semantic-metadata>
+<presentation-metadata><document-scheme>2024</document-scheme><toc-heading-levels>2</toc-heading-levels><html-toc-heading-levels>2</html-toc-heading-levels><doc-toc-heading-levels>3</doc-toc-heading-levels><pdf-toc-heading-levels>3</pdf-toc-heading-levels></presentation-metadata></metanorma-extension>
+<boilerplate><copyright-statement>
+
+<clause id="_3b0e6c15-db19-55ef-fce3-25e4fd645987" anchor="boilerplate-copyright-default" inline-header="false" obligation="normative">
+<title id="_129fe8d3-7b32-3da5-a270-59bb0ef8173e">COPYRIGHT PROTECTED DOCUMENT</title>
+<p id="_eec80c0b-5174-1b28-5406-965a2278541b" anchor="boilerplate-year">© <span class="std_publisher">ISO </span><span class="date">2026</span></p>
+
+<p id="_dcd0efd0-9c2b-bcfd-6dcd-ce36b8143916" anchor="boilerplate-message">All rights reserved. Unless otherwise specified, or required in the context of its implementation, no part of this publication may be reproduced or utilized otherwise in any form or by any means, electronic or mechanical, including photocopying, or posting on the internet or an intranet, without prior written permission. Permission can be requested from either ISO at the address below or ISO’s member body in the country of the requester.</p>
+
+<p id="_71c22afa-6b94-ad85-9f54-347ef903ebd8" anchor="boilerplate-address" align="left">ISO copyright office<br/> CP 401 • Ch. de Blandonnet 8<br/> CH-1214 Vernier, Geneva<br/> Phone: +41 22 749 01 11<br/> Email:  <link target="mailto:copyright@iso.org"/><br/> Website:  <link target="https://www.iso.org/">www.iso.org</link></p>
+
+<p id="_93a0bcfe-1edb-b952-e8f5-db8ed91f8e23" anchor="boilerplate-place">Published in Switzerland</p>
+</clause>
+</copyright-statement>
+</boilerplate><preface><foreword id="_67c3c202-d36d-58a1-07c2-7f6e7aacf9d5" obligation="informative">
+<title id="_41c9fad3-d4c1-eecc-4fad-f91704acc026">Foreword</title>
+<p id="_6ac28667-9274-1309-f635-58e889d015be">Foreword paragraph with a footnote.<fn id="_2e284e81-abb1-f10f-c78b-98e1c17675df" reference="1"><p id="_c8cd41ac-8d64-c11d-cb9f-748d94cdb7ba">Foreword footnote text.</p>
+</fn><note id="_a30ed575-38c0-6a09-9283-cec8c45b884f"><p id="_ff4cc492-3df7-a8a2-333c-db0a3901d601">A foreword note.</p>
+</note></p>
+
+
+</foreword><introduction id="_e58241e9-ce27-fb43-40f2-20795dc9b626" obligation="informative">
+<title id="_2b2e98d1-114a-3da4-8556-01ae0a724280">Introduction</title>
+<p id="_4ec35ec7-ab32-35d0-3614-48b25d9f4840">Introduction paragraph.</p>
+</introduction></preface><sections>
+
+<clause id="_dec9649d-8252-d9fa-12a9-84b988b36745" type="scope" inline-header="false" obligation="normative">
+<title id="_f70b6ff6-6131-0e24-81e1-850dbe94b63d">Scope</title>
+<p id="_5e564a0a-8bff-7d04-4122-341ec22dc332">This document specifies the parity sample. See <xref target="clause1"/>, <xref target="tbl1"/>, <xref target="fig1"/> and <eref type="inline" bibitemid="ref1" citeas="ISO 1234"/>.</p>
+</clause>
+
+
+
+<terms id="_e9fe5727-9ea3-da9f-e276-2b6d020bd0af" obligation="normative">
+<title id="_dfb2eab2-f980-6365-3c47-81d0eb272962">Terms and definitions</title><p id="_dcc01114-4d03-3550-1347-4ba901bda94c">For the purposes of this document, the following terms and definitions apply.</p><p id="_1df4aedb-297d-0c69-967f-f6a60db009d2">ISO and IEC maintain terminology databases for use in standardization at the following addresses:</p>
+
+<ul id="_e6ddc246-88cc-2222-8452-b939a5cefa0e"><li><p id="_93880b15-0e52-9141-f887-d290dce89ffd">ISO Online browsing platform: available at <link target="https://www.iso.org/obp"/></p>
+</li>
+<li><p id="_8a7ecb99-412c-1138-ae9d-76c4ac7b7d43">IEC Electropedia: available at <link target="https://www.electropedia.org"/></p>
+</li>
+</ul>
+<term id="_4ebe5b3a-0255-21e9-fd37-119235bb5fc9" anchor="term-sample-term"><preferred><expression>
+<name>sample term</name>
+</expression>
+</preferred><admitted><expression>
+<name>other term</name>
+</expression>
+</admitted>
+
+
+
+<definition id="_6e0dd48a-1a36-a45b-02f7-39eec2dab867"><verbal-definition id="_6841525c-46d1-d10a-a443-701e068a2ca1"><p id="_f4b6773a-c12b-7feb-28cb-7d75ed6e35f9">Definition of the sample term.</p></verbal-definition></definition>
+
+
+
+
+ <termnote id="_a369a71d-1c7e-513f-240f-93d88c5b3849"><p id="_4d8ae220-f870-6961-72e3-328a6fe69470">A term note.</p>
+</termnote><termexample id="_5d4b2a2f-8d69-0946-a844-b8fd8e7297ff"><p id="_1e87a2d1-38ea-a0e4-6fde-298eb647b6e5">A term example.</p>
+</termexample></term>
+</terms>
+
+<clause id="_5fe317a1-a08a-a138-aff8-a29fa4522a01" inline-header="false" obligation="normative">
+<title id="_d27d3da4-593d-df63-d1db-8e105ec9e952">Requirements</title>
+<clause id="_c0366dd6-ce53-91cd-5886-427f3e8d0d64" anchor="clause1" inline-header="false" obligation="normative">
+<title id="_029149a4-0c13-be9f-1328-b03333f1b099">First subclause</title>
+<p id="_5d5d7ab2-b202-9269-5f4d-ff73dc4c9ded">Paragraph with <em>emphasis</em>, <strong>strong</strong>, <tt>mono</tt>, a link <link target="http://example.com">example link</link> and a formula <stem block="false" type="MathML"><math xmlns="http://www.w3.org/1998/Math/MathML">
+  <mstyle displaystyle="false">
+    <msup>
+      <mi>x</mi>
+      <mn>2</mn>
+    </msup>
+    <mo>+</mo>
+    <msup>
+      <mi>y</mi>
+      <mn>2</mn>
+    </msup>
+    <mo>=</mo>
+    <msup>
+      <mi>z</mi>
+      <mn>2</mn>
+    </msup>
+  </mstyle>
+</math><asciimath>x^2 + y^2 = z^2</asciimath></stem>.</p>
+
+<table id="_d73d3d2d-3540-1bc1-e202-028800c1d391" anchor="tbl1">
+<name id="_37992069-7111-b471-048c-c92806eff48a">Sample table</name>
+<thead><tr id="_83f4b229-b0f5-2f96-4de5-87078c6ccecf"><th id="_d8e15606-657c-9069-ea71-6636cf86855d" valign="top" align="left">Head A</th>
+<th id="_905837db-d533-1a8e-50c8-4523e02a52c4" valign="top" align="left">Head B</th>
+</tr></thead>
+<tbody><tr id="_ce52ddb8-143d-2d7c-8099-a6acf91e62de"><td id="_bd28272a-6cc4-fb5d-37c5-73590f08a88c" valign="top" align="left">Cell A1</td>
+<td id="_0ddc9144-e0fb-6a77-00e7-4a7e05fb5659" valign="top" align="left">Cell B1</td>
+</tr><tr id="_d462fd12-f206-c79e-2c5c-34e500e5d002"><td id="_abe3f107-e8a0-f5e3-717a-4403e52c48c3" valign="top" align="left">Cell A2</td>
+<td id="_588f1846-9733-6251-8c42-c7de36cf50ef" valign="top" align="left">Cell B2</td>
+</tr></tbody>
+</table>
+
+<example id="_43b90bd5-8128-2c5b-bcda-93e7c5f7cbdd" anchor="fig1">
+<name id="_9993fb16-4315-24bd-bd99-a12c158ea311">Sample figure</name>
+<p id="_2d9bbdf7-9358-7677-d0fe-d95116759978">Figure body text</p>
+</example>
+
+<figure id="_968ac932-435d-3fe5-c994-72002ac96703" anchor="fig2">
+<name id="_7b93c5bb-02a0-e26b-7375-204f64a30e05">Sample image figure</name>
+<image id="_92d8756a-1f90-b6db-1e6b-4a41bad40a0a" src="spec/fixtures/content-parity/dot.png" mimetype="image/png" height="auto" width="auto" filename="spec/fixtures/content-parity/dot.png"/></figure>
+
+<sourcecode id="_3e76eeda-75b4-f15c-a295-2ff3b4406377" lang="ruby"><body>puts "code block"</body></sourcecode>
+
+
+<ul id="_113a70fc-1ff9-b795-4fc5-efc8ee3619cb"><li><p id="_aceb35c4-b2db-0176-0bb1-8936829cbc30">bullet one</p>
+</li>
+<li><p id="_c4178fcd-64de-0684-4451-7378ff4b0531">bullet two</p>
+<ol id="_589c9a6f-924e-39b3-cc5d-7be7e5c2868e"><li><p id="_daf789e4-7b21-9513-e021-34cefe9f6fac">ordered one</p>
+</li>
+<li><p id="_725a00b5-2e1f-ae0d-8d34-1bb99d9bdae8">ordered two</p>
+<dl id="_38fe7a50-e2d4-7f12-eda7-72f310e8e2d8"><dt>Term</dt>
+<dd id="_63cb67a4-63c8-bb54-25e0-16a80c11e8d2"><p id="_d677c17e-0a33-a274-362d-c4eac89681d2">Definition list description</p>
+</dd>
+</dl>
+</li>
+</ol>
+</li>
+</ul>
+
+<example id="_aa8e2306-43dd-2e34-2c5f-69fe7beb525d"><p id="_329573c2-1a98-3626-5fc5-269121c2320c">An example block.</p>
+</example>
+
+<quote id="_372cfa21-8849-be01-e8e0-72b8640a5886"><p id="_018497bd-92d5-693f-e656-63d68a704ce3">A block quotation.</p>
+</quote>
+
+<example id="_d32d10c8-ba2b-6477-584f-2b91890020b2"><p id="_2f30dca8-58a9-a935-c828-84dbefbf500b">Nested note text</p>
+</example>
+</clause>
+</clause>
+
+
+
+
+</sections><annex id="_80b9ff96-d555-41ce-78f8-204eb479bed9" inline-header="false" obligation="normative">
+<title id="_53343c3b-cfdc-ffed-0166-4c58694093da">Annex title</title>
+<p id="_db661bbf-b9b8-68a6-d001-685dac8c5b02">Annex paragraph.</p>
+</annex><bibliography><references id="_b185f955-2d4a-7f26-7a9b-bd0ded9cb4cd" normative="true" obligation="informative">
+<title id="_270c5ee6-077e-f285-ff95-287984a30140">Normative references</title><p id="_49996d2b-65c1-916b-9bbf-42b933aa0025">The following documents are referred to in the text in such a way that some or all of their content constitutes requirements of this document. For dated references, only the edition cited applies. For undated references, the latest edition of the referenced document (including any amendments) applies.</p>
+<bibitem id="_d8c3c231-9d44-e027-c477-ddcf4e28db28" type="standard" schema-version="v1.5.6" anchor="ref1">
+  <fetched>2026-11-24</fetched>
+  
+<title language="en" script="Latn" type="title-main">Split pins</title>
+
+  
+<title language="en" script="Latn" type="main">Split pins</title>
+
+  
+<title language="fr" script="Latn" type="title-main">Goupilles fendues</title>
+
+  
+<title language="fr" script="Latn" type="main">Goupilles fendues</title>
+
+  <uri type="src">https://www.iso.org/standard/20000.html</uri>
+  <uri type="obp">https://www.iso.org/obp/ui/en/#!iso:std:20000:en</uri>
+  <uri type="rss">https://www.iso.org/contents/data/standard/02/00/20000.detail.rss</uri>
+  <docidentifier type="ISO" primary="true">ISO 1234</docidentifier>
+  <docidentifier type="iso-reference">ISO 1234(E)</docidentifier>
+  <docidentifier type="URN">urn:iso:std:iso:1234:stage-90.93</docidentifier>
+  <docnumber>1234</docnumber>
+  <contributor>
+    <role type="publisher"/>
+    <organization>
+      
+<name>International Organization for Standardization</name>
+
+      <abbreviation>ISO</abbreviation>
+      <uri>www.iso.org</uri>
+    </organization>
+  </contributor>
+  <contributor>
+    <role type="author">
+      <description>committee</description>
+    </role>
+    <organization>
+      
+<name>International Organization for Standardization</name>
+
+      <subdivision type="technical-committee" subtype="TC">
+        
+<name>Fasteners</name>
+
+        <identifier>ISO/TC 2</identifier>
+      </subdivision>
+      <abbreviation>ISO</abbreviation>
+    </organization>
+  </contributor>
+  <edition>2</edition>
+  <language>en</language>
+  <language>fr</language>
+  <script>Latn</script>
+  <status>
+    <stage>90</stage>
+    <substage>93</substage>
+  </status>
+  <copyright>
+    <from>1997</from>
+    <owner>
+      <organization>
+        
+<name>ISO</name>
+
+      </organization>
+    </owner>
+  </copyright>
+  <relation type="obsoletes">
+    <bibitem>
+      <formattedref>ISO 1234:1976</formattedref>
+      <docidentifier type="ISO" primary="true">ISO 1234:1976</docidentifier>
+      <date type="published">
+        <on>1976-04-01</on>
+      </date>
+    </bibitem>
+
+  </relation>
+  <relation type="instanceOf">
+    <bibitem type="standard">
+      
+<title language="en" script="Latn" type="title-main">Split pins</title>
+
+      
+<title language="en" script="Latn" type="main">Split pins</title>
+
+      
+<title language="fr" script="Latn" type="title-main">Goupilles fendues</title>
+
+      
+<title language="fr" script="Latn" type="main">Goupilles fendues</title>
+
+      <uri type="src">https://www.iso.org/standard/20000.html</uri>
+      <uri type="obp">https://www.iso.org/obp/ui/en/#!iso:std:20000:en</uri>
+      <uri type="rss">https://www.iso.org/contents/data/standard/02/00/20000.detail.rss</uri>
+      <docidentifier type="ISO" primary="true">ISO 1234:1997</docidentifier>
+      <docidentifier type="iso-undated">ISO 1234</docidentifier>
+      <docidentifier type="iso-reference">ISO 1234:1997(E)</docidentifier>
+      <docidentifier type="URN">urn:iso:std:iso:1234:stage-90.93</docidentifier>
+      <docnumber>1234</docnumber>
+      <date type="published">
+        <on>1997-10-30</on>
+      </date>
+      <contributor>
+        <role type="publisher"/>
+        <organization>
+          
+<name>International Organization for Standardization</name>
+
+          <abbreviation>ISO</abbreviation>
+          <uri>www.iso.org</uri>
+        </organization>
+      </contributor>
+      <contributor>
+        <role type="author">
+          <description>committee</description>
+        </role>
+        <organization>
+          
+<name>International Organization for Standardization</name>
+
+          <subdivision type="technical-committee" subtype="TC">
+            
+<name>Fasteners</name>
+
+            <identifier>ISO/TC 2</identifier>
+          </subdivision>
+          <abbreviation>ISO</abbreviation>
+        </organization>
+      </contributor>
+      <edition>2</edition>
+      <language>en</language>
+      <language>fr</language>
+      <script>Latn</script>
+      <status>
+        <stage>90</stage>
+        <substage>93</substage>
+      </status>
+      <copyright>
+        <from>1997</from>
+        <owner>
+          <organization>
+            
+<name>ISO</name>
+
+          </organization>
+        </owner>
+      </copyright>
+      <relation type="obsoletes">
+        <bibitem>
+          <formattedref>ISO 1234:1976</formattedref>
+          <docidentifier type="ISO" primary="true">ISO 1234:1976</docidentifier>
+          <date type="published">
+            <on>1976-04-01</on>
+          </date>
+        </bibitem>
+
+      </relation>
+      <place>
+        <city>Geneva</city>
+      </place>
+    </bibitem>
+
+  </relation>
+  <place>
+    <city>Geneva</city>
+  </place>
+</bibitem>
+</references><references id="_73ca3067-b11b-caa4-9b6b-92d7cc037104" normative="false" obligation="informative">
+<title id="_50ceb1e1-516f-2673-d73d-4f0c58b4d023">Bibliography</title><bibitem id="_27faa1cc-177c-4e0e-a618-3bcd8305af8a" type="standard" schema-version="v1.5.6" anchor="ref2">
+  <fetched>2026-11-24</fetched>
+  
+<title language="en" script="Latn" type="title-intro">Agricultural machinery</title>
+
+  
+<title language="en" script="Latn" type="title-main">Equipment for working the soil</title>
+
+  
+<title language="en" script="Latn" type="title-part">S-tines: main dimensions and clearance zones</title>
+
+  
+<title language="en" script="Latn" type="main">Agricultural machinery — Equipment for working the soil — S-tines: main dimensions and clearance zones</title>
+
+  
+<title language="fr" script="Latn" type="title-intro">Matériel agricole</title>
+
+  
+<title language="fr" script="Latn" type="title-main">Matériel de travail du sol</title>
+
+  
+<title language="fr" script="Latn" type="title-part">Dimensions principales des dents de type S et leurs zones de dégagement</title>
+
+  
+<title language="fr" script="Latn" type="main">Matériel agricole — Matériel de travail du sol — Dimensions principales des dents de type S et leurs zones de dégagement</title>
+
+  <uri type="src">https://www.iso.org/standard/11789.html</uri>
+  <uri type="obp">https://www.iso.org/obp/ui/en/#!iso:std:11789:en</uri>
+  <uri type="rss">https://www.iso.org/contents/data/standard/01/17/11789.detail.rss</uri>
+  <docidentifier type="ISO" primary="true">ISO 5678</docidentifier>
+  <docidentifier type="iso-reference">ISO 5678(E)</docidentifier>
+  <docidentifier type="URN">urn:iso:std:iso:5678:stage-90.93</docidentifier>
+  <docnumber>5678</docnumber>
+  <contributor>
+    <role type="publisher"/>
+    <organization>
+      
+<name>International Organization for Standardization</name>
+
+      <abbreviation>ISO</abbreviation>
+      <uri>www.iso.org</uri>
+    </organization>
+  </contributor>
+  <contributor>
+    <role type="author">
+      <description>committee</description>
+    </role>
+    <organization>
+      
+<name>International Organization for Standardization</name>
+
+      <subdivision type="technical-committee" subtype="TC">
+        
+<name>Tractors and machinery for agriculture and forestry</name>
+
+        <identifier>ISO/TC 23</identifier>
+      </subdivision>
+      <abbreviation>ISO</abbreviation>
+    </organization>
+  </contributor>
+  <edition>2</edition>
+  <language>en</language>
+  <language>fr</language>
+  <script>Latn</script>
+  <status>
+    <stage>90</stage>
+    <substage>93</substage>
+  </status>
+  <copyright>
+    <from>1993</from>
+    <owner>
+      <organization>
+        
+<name>ISO</name>
+
+      </organization>
+    </owner>
+  </copyright>
+  <relation type="obsoletes">
+    <bibitem>
+      <formattedref>ISO 5678:1979</formattedref>
+      <docidentifier type="ISO" primary="true">ISO 5678:1979</docidentifier>
+      <date type="published">
+        <on>1979-04-01</on>
+      </date>
+    </bibitem>
+
+  </relation>
+  <relation type="instanceOf">
+    <bibitem type="standard">
+      
+<title language="en" script="Latn" type="title-intro">Agricultural machinery</title>
+
+      
+<title language="en" script="Latn" type="title-main">Equipment for working the soil</title>
+
+      
+<title language="en" script="Latn" type="title-part">S-tines: main dimensions and clearance zones</title>
+
+      
+<title language="en" script="Latn" type="main">Agricultural machinery — Equipment for working the soil — S-tines: main dimensions and clearance zones</title>
+
+      
+<title language="fr" script="Latn" type="title-intro">Matériel agricole</title>
+
+      
+<title language="fr" script="Latn" type="title-main">Matériel de travail du sol</title>
+
+      
+<title language="fr" script="Latn" type="title-part">Dimensions principales des dents de type S et leurs zones de dégagement</title>
+
+      
+<title language="fr" script="Latn" type="main">Matériel agricole — Matériel de travail du sol — Dimensions principales des dents de type S et leurs zones de dégagement</title>
+
+      <uri type="src">https://www.iso.org/standard/11789.html</uri>
+      <uri type="obp">https://www.iso.org/obp/ui/en/#!iso:std:11789:en</uri>
+      <uri type="rss">https://www.iso.org/contents/data/standard/01/17/11789.detail.rss</uri>
+      <docidentifier type="ISO" primary="true">ISO 5678:1993</docidentifier>
+      <docidentifier type="iso-undated">ISO 5678</docidentifier>
+      <docidentifier type="iso-reference">ISO 5678:1993(E)</docidentifier>
+      <docidentifier type="URN">urn:iso:std:iso:5678:stage-90.93</docidentifier>
+      <docnumber>5678</docnumber>
+      <date type="published">
+        <on>1993-11-04</on>
+      </date>
+      <contributor>
+        <role type="publisher"/>
+        <organization>
+          
+<name>International Organization for Standardization</name>
+
+          <abbreviation>ISO</abbreviation>
+          <uri>www.iso.org</uri>
+        </organization>
+      </contributor>
+      <contributor>
+        <role type="author">
+          <description>committee</description>
+        </role>
+        <organization>
+          
+<name>International Organization for Standardization</name>
+
+          <subdivision type="technical-committee" subtype="TC">
+            
+<name>Tractors and machinery for agriculture and forestry</name>
+
+            <identifier>ISO/TC 23</identifier>
+          </subdivision>
+          <abbreviation>ISO</abbreviation>
+        </organization>
+      </contributor>
+      <edition>2</edition>
+      <language>en</language>
+      <language>fr</language>
+      <script>Latn</script>
+      <abstract language="en" script="Latn">Specifies the main dimensions and clearance zones for harrow and cultivator S-tines, type 0 to 3.</abstract>
+      <status>
+        <stage>90</stage>
+        <substage>93</substage>
+      </status>
+      <copyright>
+        <from>1993</from>
+        <owner>
+          <organization>
+            
+<name>ISO</name>
+
+          </organization>
+        </owner>
+      </copyright>
+      <relation type="obsoletes">
+        <bibitem>
+          <formattedref>ISO 5678:1979</formattedref>
+          <docidentifier type="ISO" primary="true">ISO 5678:1979</docidentifier>
+          <date type="published">
+            <on>1979-04-01</on>
+          </date>
+        </bibitem>
+
+      </relation>
+      <place>
+        <city>Geneva</city>
+      </place>
+    </bibitem>
+
+  </relation>
+  <place>
+    <city>Geneva</city>
+  </place>
+</bibitem>
+
+</references></bibliography>
+</metanorma>
