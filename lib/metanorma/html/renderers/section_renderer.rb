@@ -94,6 +94,12 @@ module Metanorma
           children.each do |node|
             next if node.is_a?(String)
             next if coordinator.is_title_element?(node, section)
+            # fmt-xref-label is the cross-reference label ("Clause 3",
+            # "1.1") — it belongs inside xrefs, never in the body; the
+            # heading already carries the number.
+            next if node.is_a?(
+              Metanorma::Document::Components::Inline::FmtXrefLabelElement,
+            )
 
             parts << (coordinator.render(node, level: level + 1) || "")
           end
