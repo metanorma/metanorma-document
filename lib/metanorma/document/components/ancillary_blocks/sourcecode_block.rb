@@ -11,6 +11,7 @@ module Metanorma
           attribute :anchor, :string
           attribute :subsequence, :string
           attribute :filename, :string
+          attribute :src, :string
           attribute :lang, :string
           attribute :markers, :string
           attribute :alt, :string
@@ -44,6 +45,7 @@ module Metanorma
             map_element "fmt-name", to: :fmt_name
             map_attribute "unnumbered", to: :unnumbered
             map_attribute "subsequence", to: :subsequence
+            map_attribute "src", to: :src
             map_attribute "filename", to: :filename
             map_attribute "lang", to: :lang
             map_attribute "markers", to: :markers

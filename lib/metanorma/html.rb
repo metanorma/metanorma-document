@@ -23,6 +23,7 @@ module Metanorma
     autoload :Component, "metanorma/html/component"
     autoload :Drops, "metanorma/html/drops"
     autoload :StandardRenderer, "metanorma/html/standard_renderer"
+    autoload :XmlHighlighter, "metanorma/html/xml_highlighter"
 
     # This module is a pure format adapter over the central flavor
     # registry (Metanorma.flavors). It contributes the HTML renderers

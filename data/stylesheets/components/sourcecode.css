@@ -1,5 +1,17 @@
 /* === Sourcecode — terminal aesthetic === */
 .sourcecode { margin: 1.4em 0; max-width: 100%; overflow: hidden; position: relative; }
+
+/* Code reads left-aligned; the blanket figure centering must not
+   reach the code. */
+figure.sourcecode { text-align: left; }
+figure.sourcecode pre { text-align: left; }
+
+/* Syntax tokens (XmlHighlighter emits nt / na / s / c) */
+.sourcecode pre .nt { color: #7ee787; }
+.sourcecode pre .na { color: #79c0ff; }
+.sourcecode pre .s { color: #a5d6ff; }
+.sourcecode pre .c { color: #8b949e; font-style: italic; }
+
 .sourcecode pre {
   background: #151528; color: #d4d4e8;
   border: 1px solid #2a2a48; border-radius: var(--radius-md);
