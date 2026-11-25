@@ -109,6 +109,10 @@ module Metanorma
       attribute :publisher_name, :string
       attribute :logos_light, :hash, default: -> { {} }
       attribute :logos_dark, :hash, default: -> { {} }
+      # Compact publisher marks for the fixed-height header bar; the
+      # full lockups in logos_light stay on the cover. Falls back to
+      # logos_light per publisher when unset.
+      attribute :header_logos, :hash, default: -> { {} }
       attribute :doctype_labels, :hash, default: -> { {} }
 
       # --- Document identifier formatting ---
@@ -220,8 +224,6 @@ module Metanorma
       end
 
       # Theme resource APIs search the same composition chain as the data.
-      # The renderer currently takes a single theme_templates_dir; a child
-      # template directory therefore supplies its complete front-matter pair.
       def resource_dirs
         [theme_dir, *inherited_theme_dirs].compact.uniq
       end
@@ -231,8 +233,12 @@ module Metanorma
       end
 
       def theme_templates_dir
+        theme_template_directories.first
+      end
+
+      def theme_template_directories
         resource_dirs.map { |dir| File.join(dir, "templates") }
-          .find { |dir| File.directory?(dir) }
+          .select { |dir| File.directory?(dir) }
       end
 
       def theme_assets_dir

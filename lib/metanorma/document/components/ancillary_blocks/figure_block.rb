@@ -48,12 +48,24 @@ module Metanorma
 
           # An optional definitions list defining any symbols used in the figure.
           attribute :dl, Metanorma::Document::Components::Lists::DefinitionList
+          attribute :p, Metanorma::Document::Components::Paragraphs::ParagraphBlock,
+                    collection: true
+          attribute :sourcecode,
+                    Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock,
+                    collection: true
 
           # Pre-formatted text content within the figure (e.g., ASCII art).
           attribute :pre, Metanorma::Document::Components::AncillaryBlocks::LiteralBlock
 
           # Key definitions for figure
           attribute :key, KeyElement
+
+          # Bibliographic source citations for the figure content
+          # (metanorma-ietf#296 item 3); @source remains the attribute
+          # spelling on the element itself.
+          attribute :sources,
+                    Metanorma::Document::Components::ReferenceElements::SourceElement,
+                    collection: true
 
           # Optional footnotes specific to the figure.
           attribute :footnotes, Metanorma::Document::Components::Inline::FnElement,
@@ -105,10 +117,13 @@ module Metanorma
             map_element "audio", to: :audio
             map_element "figure", to: :figure
             map_element "dl", to: :dl
+            map_element "p", to: :p
+            map_element "sourcecode", to: :sourcecode
             map_element "pre", to: :pre
             map_element "key", to: :key
             map_element "fn", to: :footnotes
             map_element "note", to: :note
+            map_element "source", to: :sources
             map_element "fmt-figure", to: :fmt_figure
             map_element "fmt-name", to: :fmt_name
             map_element "fmt-xref-label", to: :fmt_xref_label

@@ -33,6 +33,9 @@ module Metanorma
           map_element "prefix", to: :prefix
           map_element "forename", to: :forename
           map_element "initials", to: :initials
+          # the semantic vocabulary emits the singular <initial>;
+          # without it authored initials were unreachable at parse
+          map_element "initial", to: :initials
           map_element "surname", to: :surname
           map_element "addition", to: :addition
           map_element "completename", to: :completename

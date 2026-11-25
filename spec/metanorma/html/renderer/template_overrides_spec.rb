@@ -103,6 +103,40 @@ RSpec.describe "Flavor Liquid template hooks" do
     expect(renderer.render_paragraph(paragraph)).to eq("theme branding")
   end
 
+  it "inherits entry templates when a taste overrides only one partial" do
+    parent_dir = directory("parent/templates")
+    child_dir = directory("child/templates")
+    write_template(parent_dir, "_paragraph.html.liquid",
+                   "{% render 'branding' %}: {% render 'inherited' %}")
+    write_template(parent_dir, "_branding.html.liquid", "parent branding")
+    write_template(parent_dir, "_inherited.html.liquid", "parent content")
+    write_template(child_dir, "_branding.html.liquid", "taste branding")
+    write_template(flavor_dir, "_paragraph.html.liquid", "flavor fallback")
+    write_template(flavor_dir, "_inherited.html.liquid", "flavor content")
+    File.write(File.join(template_root, "parent/theme.yaml"), {}.to_yaml)
+    File.write(File.join(template_root, "child/theme.yaml"),
+               { "extends" => "parent" }.to_yaml)
+    stub_const("Metanorma::Html::Theme::THEMES_DIR", template_root)
+    renderer.theme = Metanorma::Html::Theme.load(:child)
+
+    expect(renderer.render_paragraph(paragraph))
+      .to eq("taste branding: parent content")
+  end
+
+  it "uses a child entry template with inherited include partials" do
+    parent_dir = directory("parent/templates")
+    child_dir = directory("child/templates")
+    write_template(child_dir, "_paragraph.html.liquid", "{% include 'branding' %}")
+    write_template(parent_dir, "_branding.html.liquid", "parent branding")
+    write_template(flavor_dir, "_branding.html.liquid", "flavor fallback")
+    theme = Metanorma::Html::Theme.new
+    theme.theme_dir = File.dirname(child_dir)
+    theme.inherited_theme_dirs = [File.dirname(parent_dir)]
+    renderer.theme = theme
+
+    expect(renderer.render_paragraph(paragraph)).to eq("parent branding")
+  end
+
   it "does not leak partials between renderers sharing a cached entry template" do
     shared_dir = directory("shared")
     other_dir = directory("other")

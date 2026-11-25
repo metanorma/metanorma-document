@@ -286,11 +286,33 @@ module Metanorma
         # a taste uses its base model while retaining its own HTML theme.
         step = Mirror::Output::Pipeline::Steps::ParseXml.new
         requested = options.flavor || step.infer_flavor(options.xml_path)
-        flavor = Core::FlavorLoader.taste2flavor(requested).to_s
+        flavor = canonical_flavor(requested).to_s
         doc = step.flavor_class(flavor).from_xml(File.read(options.xml_path))
         theme = Html::Theme.load(requested) if requested.to_s != flavor
         write_output(Html::Generator.generate(doc, theme: theme,
                                                    headless: options.headless), options.output)
+      end
+
+      # Tastes carry no model classes of their own: the mirror pipeline's
+      # dispatch requires metanorma/<flavor>/document, so a taste name
+      # ("wmo") silently falls back to the Standoc root and the flavor
+      # walk then misses the taste's renderer. Follow the base_flavor
+      # chain to the owning model ("wmo" -> "iho"); unknown names pass
+      # through untouched.
+      def self.canonical_flavor(flavor)
+        return flavor unless flavor
+
+        require "metanorma-core"
+        begin
+          # Taste entries live in metanorma-taste; without it the table
+          # has no taste rows and taste2flavor cannot resolve.
+          require "metanorma-taste" # soft-require: LoadError-guarded optional
+        rescue LoadError
+          nil
+        end
+        Metanorma::Core::FlavorLoader.taste2flavor(flavor).to_s
+      rescue LoadError, NameError
+        flavor
       end
 
       def self.usage

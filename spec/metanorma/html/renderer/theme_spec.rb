@@ -352,13 +352,38 @@ RSpec.describe Metanorma::Html::Theme do
     end
   end
 
+  describe "#theme_template_directories" do
+    it "keeps existing child and ancestor template directories in order" do
+      Dir.mktmpdir("theme-template-directories") do |dir|
+        %w[child parent grandparent].each do |name|
+          FileUtils.mkdir_p(File.join(dir, name, "templates"))
+        end
+        theme.theme_dir = File.join(dir, "child")
+        theme.inherited_theme_dirs = %w[missing parent grandparent].map do |name|
+          File.join(dir, name)
+        end
+        expected = %w[child parent grandparent].map do |name|
+          File.join(dir, name, "templates")
+        end
+
+        expect(theme.theme_template_directories).to eq(expected)
+        expect(theme.theme_templates_dir).to eq(expected.first)
+      end
+    end
+
+    it "returns an empty list without theme template directories" do
+      expect(theme.theme_template_directories).to eq([])
+      expect(theme.theme_templates_dir).to be_nil
+    end
+  end
+
   describe "lutaml-model schema" do
     it "is a Lutaml::Model::Serializable" do
       expect(described_class.ancestors).to include(Lutaml::Model::Serializable)
     end
 
-    it "has 74 typed attributes" do
-      expect(described_class.attributes.size).to eq(74)
+    it "has 75 typed attributes" do
+      expect(described_class.attributes.size).to eq(75)
     end
 
     it "has boolean type for preface_wrap" do

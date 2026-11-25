@@ -101,6 +101,57 @@ RSpec.describe Metanorma::Document::CLI do
         expect(File.read(out)).to include("<!DOCTYPE html>")
       end
     end
+
+    it "does not render the section xref label as body text" do
+      # The section's fmt-xref-label ("Clause 3", "1.1") belongs inside
+      # cross-references; the heading already carries the number, so a
+      # stray label right after a heading is a rendering defect.
+      Dir.mktmpdir do |dir|
+        out = File.join(dir, "out.html")
+        described_class.to_html(["-f", "iso", "-o", out, xml_path])
+        html = File.read(out)
+        expect(html).not_to match(%r{</h\d><span class="element-label">})
+        expect(html).not_to match(%r{</h\d>\d})
+      end
+    end
+  end
+
+  describe ".canonical_flavor" do
+    after do
+      # The registry is process-global: the theme-matrix spec classifies
+      # every loaded entry, so taste fixtures must not survive this block.
+      require "metanorma-core"
+      flavors = Metanorma::Core::Flavors.table
+        .instance_variable_get(:@flavors)
+      flavors.reject! { |f| f.name.to_s.start_with?("taste-spec-canonical") }
+    end
+
+    it "maps a taste to its base flavor's model owner" do
+      require "metanorma-core"
+      base = "taste-spec-canonical-base"
+      taste = "taste-spec-canonical"
+      Metanorma::Core::Flavors.register(
+        Metanorma::Core::Flavor.new(name: base, gem: "metanorma-standoc"),
+      )
+      Metanorma::Core::Flavors.register(
+        Metanorma::Core::Flavor.new(name: taste, base_flavor: base.to_sym,
+                                    gem: "metanorma-taste"),
+      )
+      expect(described_class.canonical_flavor(taste)).to eq(base)
+    end
+
+    it "passes unknown flavors through untouched" do
+      expect(described_class.canonical_flavor("nosuch-flavor"))
+        .to eq("nosuch-flavor")
+    end
+
+    it "returns the flavor itself for a registered flavor" do
+      expect(described_class.canonical_flavor("iso")).to eq("iso")
+    end
+
+    it "tolerates nil" do
+      expect(described_class.canonical_flavor(nil)).to be_nil
+    end
   end
 
   def capture_stdout
