@@ -100,4 +100,36 @@ RSpec.describe "HTML renderer content parity" do
       expect(page.css(".key-title").map(&:text)).to include(*names)
     end
   end
+
+  describe "equation numbers" do
+    it "keeps the number in the same block as its math" do
+      numbered = page.css(".formula").select { |f| f.at_css(".formula-number") }
+      expect(numbered).not_to be_empty
+      numbered.each do |formula|
+        main = formula.at_css("> .formula-main")
+        expect(main).not_to be_nil
+        expect(main.at_css("math")).not_to be_nil
+        expect(main.at_css("> .formula-number")).not_to be_nil
+      end
+    end
+
+    it "places the number directly after the math, before the where text" do
+      formula = page.css(".formula").find { |f| f.at_css(".formula-number") }
+      children = formula.element_children.map { |c| c["class"].to_s }
+      expect(children.first).to eq("formula-main")
+      expect(formula.at_css(".formula-main").text).to match(/\(\s*[A-Z]?\.?\d+\s*\)/)
+    end
+  end
+
+  describe "sourcecode callouts" do
+    it "renders a callout element as the literal <n> marker" do
+      body = Metanorma::Document::Components::AncillaryBlocks::SourcecodeBody
+        .new(content: 'a <callout target="x">1</callout> b &lt;c&gt;')
+      expect(body.decoded_content).to eq("a <1> b <c>")
+    end
+
+    it "never leaks raw callout markup into the page" do
+      expect(page.text).not_to include("<callout")
+    end
+  end
 end
