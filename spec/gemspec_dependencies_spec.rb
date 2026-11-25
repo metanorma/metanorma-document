@@ -10,7 +10,10 @@ require "spec_helper"
 # The gemspec is read as text — packaging is not loaded through the Gem
 # API inside specs. Requires that resolve to this gem's own lib files,
 # to the standard library, or to interpolated (non-static) paths are
-# exempt.
+# exempt. A require commented `# soft-require` is a LoadError-guarded
+# optional integration: absence must not break the gem, so it stays
+# undeclared (declaring it would drag the optional gem into every
+# consumer).
 RSpec.describe "the gemspec declares every load-time require" do
   subject(:undeclared_requires) do
     requires = Hash.new { |h, k| h[k] = [] }
@@ -20,6 +23,7 @@ RSpec.describe "the gemspec declares every load-time require" do
         match = line.match(/^\s*require\s+["']([^"']+)["']/) or next
         path = match[1]
         next if path.include?("#")
+        next if line.include?("soft-require")
         next if File.exist?(File.join(lib_dir, "#{path}.rb"))
 
         segments = path.split("/")

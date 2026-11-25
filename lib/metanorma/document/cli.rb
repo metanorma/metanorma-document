@@ -284,9 +284,31 @@ module Metanorma
         # Reuse the mirror pipeline's flavor inference/model dispatch so
         # to-html and to-mirror parse documents identically.
         step = Mirror::Output::Pipeline::Steps::ParseXml.new
-        flavor = options.flavor || step.infer_flavor(options.xml_path)
+        flavor = canonical_flavor(options.flavor || step.infer_flavor(options.xml_path))
         doc = step.flavor_class(flavor).from_xml(File.read(options.xml_path))
         write_output(Html::Generator.generate(doc, headless: options.headless), options.output)
+      end
+
+      # Tastes carry no model classes of their own: the mirror pipeline's
+      # dispatch requires metanorma/<flavor>/document, so a taste name
+      # ("wmo") silently falls back to the Standoc root and the flavor
+      # walk then misses the taste's renderer. Follow the base_flavor
+      # chain to the owning model ("wmo" -> "iho"); unknown names pass
+      # through untouched.
+      def self.canonical_flavor(flavor)
+        return flavor unless flavor
+
+        require "metanorma-core"
+        begin
+          # Taste entries live in metanorma-taste; without it the table
+          # has no taste rows and taste2flavor cannot resolve.
+          require "metanorma-taste" # soft-require: LoadError-guarded optional
+        rescue LoadError
+          nil
+        end
+        Metanorma::Core::FlavorLoader.taste2flavor(flavor).to_s
+      rescue LoadError, NameError
+        flavor
       end
 
       def self.usage

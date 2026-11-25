@@ -42,6 +42,9 @@ module Metanorma
           attribute :quote, Metanorma::Document::Components::MultiParagraph::QuoteBlock,
                     collection: true
 
+          attribute :notes, Metanorma::Document::Components::Blocks::NoteBlock,
+                    collection: true
+
           # Sourcecode blocks contributing to example content.
           attribute :sourcecode,
                     Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock, collection: true
@@ -103,6 +106,7 @@ module Metanorma
             map_attribute "subsequence", to: :subsequence
             map_element "formula", to: :formula
             map_element "list", to: :list
+            map_element "note", to: :notes
             map_element "ol", to: :ol
             map_element "ul", to: :ul
             map_element "quote", to: :quote

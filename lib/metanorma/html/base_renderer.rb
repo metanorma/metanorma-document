@@ -316,13 +316,14 @@ module Metanorma
       def build_publisher_logos
         publishers = flavor_publishers(extract_primary_doc_id)
         logo_map = publisher_logo_map
-        return "" if publishers.empty? && logo_map.empty?
+        header_map = theme.header_logos || {}
+        return "" if publishers.empty? && logo_map.empty? && header_map.empty?
 
         dark_logo_map = theme.logos_dark
-        display_pubs = publishers.empty? ? logo_map.keys : publishers
+        display_pubs = publishers.empty? ? (logo_map.keys | header_map.keys) : publishers
 
         display_pubs.filter_map do |pub|
-          filename = logo_map[pub]
+          filename = header_map[pub] || logo_map[pub]
           next unless filename
 
           svg = load_logo_svg(filename, height: 26)
@@ -727,9 +728,17 @@ module Metanorma
         @block_renderer.render_ordered_list(ol, **)
       end
 
+      # collection-tolerant: dl attributes are declared collection:
+      # true on the models (ExampleBlock, NoteBlock), so the parse
+      # hands an Array through; lutaml-model 0.8.177 stopped hiding
+      # that from callers
       def render_definition_list(dl,
 **)
-        @block_renderer.render_definition_list(dl, **)
+        lists = dl.is_a?(Array) ? dl : [dl]
+        html = lists.compact.filter_map do |l|
+          @block_renderer.render_definition_list(l, **)
+        end.join
+        html.empty? ? nil : html
       end
 
       def render_svgmap(svgmap,

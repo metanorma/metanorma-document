@@ -38,7 +38,7 @@ css_class: nil, annotations_html: nil)
             id: id,
             lang: lang,
             name_html: name_html,
-            code_html: renderer.escape_html(code_text),
+            code_html: XmlHighlighter.highlight(code_text, lang: lang),
             css_class: "sourcecode",
             annotations_html: annotations_key_html(sc, renderer),
           )

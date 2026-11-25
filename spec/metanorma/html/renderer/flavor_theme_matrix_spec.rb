@@ -207,4 +207,30 @@ RSpec.describe "HTML flavor/taste theme matrix" do
       end
     end
   end
+
+  describe "header_logos" do
+    it "renders the header brand with the theme's compact header emblem" do
+      Dir.mktmpdir do |dir|
+        %w[templates assets].each do |sub|
+          FileUtils.mkdir_p(File.join(dir, sub))
+        end
+        File.write(File.join(dir, "theme.yaml"), {
+          "publishers" => ["TEST"],
+          "logos_light" => { "TEST" => "test-lockup.svg" },
+          "header_logos" => { "TEST" => "test-emblem.svg" },
+        }.to_yaml)
+        File.write(File.join(dir, "assets", "test-lockup.svg"),
+                   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><circle r="4"/></svg>')
+        File.write(File.join(dir, "assets", "test-emblem.svg"),
+                   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><rect width="8" height="8"/></svg>')
+        theme = Metanorma::Html::Theme.from_theme_dir(dir)
+
+        html = Metanorma::Html::Generator.generate(document, theme: theme)
+        brand = Nokogiri::HTML(html).at_css(".header-brand .brand-logo")
+        expect(brand).not_to be_nil
+        expect(brand.at_css("svg rect")).not_to be_nil
+        expect(brand.at_css("svg circle")).to be_nil
+      end
+    end
+  end
 end

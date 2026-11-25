@@ -382,8 +382,8 @@ RSpec.describe Metanorma::Html::Theme do
       expect(described_class.ancestors).to include(Lutaml::Model::Serializable)
     end
 
-    it "has 74 typed attributes" do
-      expect(described_class.attributes.size).to eq(74)
+    it "has 75 typed attributes" do
+      expect(described_class.attributes.size).to eq(75)
     end
 
     it "has boolean type for preface_wrap" do
