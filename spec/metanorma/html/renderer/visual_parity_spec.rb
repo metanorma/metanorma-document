@@ -15,6 +15,7 @@ RSpec.describe "Bundled ISO and IEC HTML body visual parity" do
     require "isodoc/iec/html_convert"
     require "isodoc/iec/presentation_xml_convert"
   end
+
   let(:fixture) { File.expand_path("../../../fixtures/html-theme-parity/document.xml", __dir__) }
   let(:browser_script) { File.expand_path("../../../support/html_theme_parity.mjs", __dir__) }
   let(:properties) do
@@ -73,7 +74,7 @@ RSpec.describe "Bundled ISO and IEC HTML body visual parity" do
           File.write(File.join(output, "comparison.json"), JSON.pretty_generate(result))
         end
         expect(result.fetch("mismatches")).to be_empty,
-          result.fetch("mismatches").join("\n")
+                                              result.fetch("mismatches").join("\n")
       end
     end
   end
@@ -84,7 +85,7 @@ RSpec.describe "Bundled ISO and IEC HTML body visual parity" do
       theme = File.join(directory, "theme.html")
       html = '<!doctype html><html><body><p id="parity-paragraph">Original</p></body></html>'
       File.write(legacy, html)
-      File.write(theme, html.sub("Original", "Changed").sub('<p ', '<p style="font-size: 20px" '))
+      File.write(theme, html.sub("Original", "Changed").sub("<p ", '<p style="font-size: 20px" '))
       result = compare(directory, legacy, theme)
       differences = result.fetch("mismatches").join("\n")
       expect(differences).to include("paragraph.text:", "paragraph.font-size:")
