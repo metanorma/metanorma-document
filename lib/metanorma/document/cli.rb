@@ -3,6 +3,7 @@
 require "optparse"
 require "json"
 require "fileutils"
+require "metanorma-core"
 
 module Metanorma
   module Document
@@ -281,12 +282,15 @@ module Metanorma
 
       def self.execute_to_html(options)
         # Metanorma::Html is autoloaded from metanorma/document.
-        # Reuse the mirror pipeline's flavor inference/model dispatch so
-        # to-html and to-mirror parse documents identically.
+        # Resolve tastes before the mirror parser's class-name lookup:
+        # a taste uses its base model while retaining its own HTML theme.
         step = Mirror::Output::Pipeline::Steps::ParseXml.new
-        flavor = canonical_flavor(options.flavor || step.infer_flavor(options.xml_path))
+        requested = options.flavor || step.infer_flavor(options.xml_path)
+        flavor = canonical_flavor(requested).to_s
         doc = step.flavor_class(flavor).from_xml(File.read(options.xml_path))
-        write_output(Html::Generator.generate(doc, headless: options.headless), options.output)
+        theme = Html::Theme.load(requested) if requested.to_s != flavor
+        write_output(Html::Generator.generate(doc, theme: theme,
+                                                   headless: options.headless), options.output)
       end
 
       # Tastes carry no model classes of their own: the mirror pipeline's
