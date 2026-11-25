@@ -71,6 +71,20 @@ RSpec.describe Metanorma::Document::CLI do
         )
     end
 
+    %w[oiml oiml-cs].each do |taste|
+      it "renders #{taste} preface and terms through its base model" do
+        path = File.expand_path("../../fixtures/oiml/document.presentation.xml",
+                                __dir__)
+        html = capture_stdout { described_class.to_html(["-f", taste, path]) }
+        body = Nokogiri::HTML(html).at_css(".main-section").text
+
+        expect(body).to include("Contents", "OIML preface content.",
+                                "Terms and definitions", "sample term")
+        expect(html).to include(Metanorma::Html::Theme.load(taste).publisher_name)
+        expect(Metanorma::Core::Flavors.table.canonical(taste).name).to eq(:iso)
+      end
+    end
+
     it "renders standalone HTML to stdout" do
       stdout = capture_stdout do
         described_class.to_html(["-f", "iso", xml_path])
