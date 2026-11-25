@@ -87,6 +87,19 @@ RSpec.describe Metanorma::Document::CLI do
         expect(File.read(out)).to include("<!DOCTYPE html>")
       end
     end
+
+    it "does not render the section xref label as body text" do
+      # The section's fmt-xref-label ("Clause 3", "1.1") belongs inside
+      # cross-references; the heading already carries the number, so a
+      # stray label right after a heading is a rendering defect.
+      Dir.mktmpdir do |dir|
+        out = File.join(dir, "out.html")
+        described_class.to_html(["-f", "iso", "-o", out, xml_path])
+        html = File.read(out)
+        expect(html).not_to match(%r{</h\d><span class="element-label">})
+        expect(html).not_to match(%r{</h\d>\d})
+      end
+    end
   end
 
   describe ".canonical_flavor" do
