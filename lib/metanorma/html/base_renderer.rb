@@ -593,10 +593,11 @@ module Metanorma
                       :render_noop
       register_render Metanorma::Document::Components::Inline::VariantTitleElement,
                       :render_noop
-      # fmt-xref-label carries the cross-reference link label; render it
-      # through when it appears in block context.
+      # fmt-xref-label carries the text a cross-reference to its parent
+      # displays ("Clause 1", "Annex A"); it is link-target metadata, not
+      # body content, so it must not print after the heading.
       register_render Metanorma::Document::Components::Inline::FmtXrefLabelElement,
-                      :render_block_inline_content
+                      :render_noop
       # Annotation boundary markers fence an annotated region; they carry
       # no renderable content of their own at block dispatch.
       register_render Metanorma::Document::Components::Inline::FmtAnnotationStartElement,

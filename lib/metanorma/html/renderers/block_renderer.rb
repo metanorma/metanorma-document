@@ -334,6 +334,12 @@ module Metanorma
         end
 
         def render_definition_list(dl, **_opts)
+          # Collection-valued `dl` attributes (figure, example, dd, ...)
+          # arrive as Arrays; render each list in order.
+          if dl.is_a?(Array)
+            parts = dl.filter_map { |item| render_definition_list(item) }
+            return parts.empty? ? nil : parts.join
+          end
           return nil if coordinator.skip_coverpage_node?(dl)
 
           attrs = element_attrs(id: safe_attr(dl, :id))

@@ -521,12 +521,16 @@ module Metanorma
             # Table-scoped <fn>: the native render shows the reference
             # letter in the cell and lifts the definition into a visible
             # tfoot block (TableFootnote), not an endnote popup.
-            ctx[:fns] << fn
+            #
+            # Several <fn>s may share one definition (same `target`, e.g.
+            # the same footnote letter on many cells); they collapse to
+            # one tfoot entry. Repeat markers get a unique id suffix.
+            number, ref_suffix = table_fn_slot(ctx, fn, label)
             assigns = {
               "attrs" => element_attrs(class: "fn-marker"),
-              "reference_id" => "#{ctx[:scope]}-fnref-#{ctx[:fns].size}",
-              "target_id" => "#{ctx[:scope]}-footnote-#{ctx[:fns].size}",
-              "number" => ctx[:fns].size,
+              "reference_id" => "#{ctx[:scope]}-fnref-#{number}#{ref_suffix}",
+              "target_id" => "#{ctx[:scope]}-footnote-#{number}",
+              "number" => number,
               "label" => escape_html(label.to_s),
               "popup_html" => nil,
             }
@@ -550,6 +554,24 @@ module Metanorma
             "popup_html" => popup_html.strip.empty? ? nil : popup_html,
           }
           render_liquid("_fn_marker.html.liquid", assigns)
+        end
+
+        # Assign a table-scoped footnote its tfoot slot. Footnotes sharing a
+        # target reuse one slot; repeat markers get a unique id suffix.
+        def table_fn_slot(ctx, fn, label)
+          key = safe_attr(fn, :target) || label.to_s
+          ctx[:keys] ||= []
+          index = ctx[:keys].index(key)
+          if index.nil?
+            ctx[:fns] << fn
+            ctx[:keys] << key
+            index = ctx[:fns].size - 1
+          end
+          number = index + 1
+          ctx[:uses] ||= Hash.new(0)
+          repeat = ctx[:uses][number]
+          ctx[:uses][number] += 1
+          [number, repeat.zero? ? "" : "-#{repeat + 1}"]
         end
 
         # The rendered body of a footnote: its paragraphs plus any block
