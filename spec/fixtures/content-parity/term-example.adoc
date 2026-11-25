@@ -1,0 +1,16 @@
+= Term example sample
+:docnumber: 1001
+:copyright-year: 2026
+:language: en
+:title-main-en: Term example sample
+:no-pdf:
+:no-isobib:
+
+== Terms and definitions
+
+=== sample term
+
+Definition of the sample term.
+
+[example]
+A term example.

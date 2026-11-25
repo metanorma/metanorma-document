@@ -11,6 +11,7 @@ module Metanorma
           attribute :text, :string, collection: true
           attribute :span, SpanElement, collection: true
           attribute :semx, SemxElement, collection: true
+          attribute :em, EmRawElement, collection: true
 
           xml do
             element "fmt-name"
@@ -19,6 +20,7 @@ module Metanorma
             map_content to: :text
             map_element "span", to: :span
             map_element "semx", to: :semx
+            map_element "em", to: :em
           end
         end
       end

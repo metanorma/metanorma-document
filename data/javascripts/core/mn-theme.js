@@ -15,12 +15,10 @@
 
   function init() {
     var stored = R.getSetting(KEY);
-    var mode = stored && MODES.indexOf(stored) >= 0 ? stored : getSystemPreference();
-    apply(mode);
-  }
-
-  function getSystemPreference() {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    // Standards documents read like paper: light is the default regardless
+    // of the OS color scheme. Readers switch themes with the toggle, and a
+    // stored choice always wins.
+    apply(stored && MODES.indexOf(stored) >= 0 ? stored : 'light');
   }
 
   function nextMode() {
@@ -36,10 +34,6 @@
       R.setSetting(KEY, next);
     });
   }
-
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-    if (!R.getSetting(KEY)) apply(e.matches ? 'dark' : 'light');
-  });
 
   init();
 
