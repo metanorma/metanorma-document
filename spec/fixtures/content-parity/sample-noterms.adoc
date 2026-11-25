@@ -1,0 +1,85 @@
+= Content parity sample (no terms)
+:docnumber: 1000
+:copyright-year: 2026
+:language: en
+:title-main-en: Content parity sample
+:fullname: Jane Author
+:affiliation: Sample Org
+:no-pdf:
+:no-isobib:
+
+== Foreword
+
+Foreword paragraph with a footnote.footnote:[Foreword footnote text.]
+
+NOTE: A foreword note.
+
+== Introduction
+
+Introduction paragraph.
+
+== Scope
+
+This document specifies the parity sample. See <<clause1>>, <<tbl1>>, <<fig1>> and <<ref1>>.
+
+[bibliography]
+== Normative references
+
+* [[[ref1,ISO 1234]]], _Reference title one_
+
+== Requirements
+
+[[clause1]]
+=== First subclause
+
+Paragraph with _emphasis_, *strong*, `mono`, a link http://example.com[example link] and a formula stem:[x^2 + y^2 = z^2].
+
+[[tbl1]]
+.Sample table
+|===
+|Head A |Head B
+
+|Cell A1 |Cell B1
+|Cell A2 |Cell B2
+|===
+
+[[fig1]]
+.Sample figure
+====
+Figure body text
+====
+
+[[fig2]]
+.Sample image figure
+image::dot.png[]
+
+[source,ruby]
+----
+puts "code block"
+----
+
+* bullet one
+* bullet two
+
+. ordered one
+. ordered two
+
+[example]
+An example block.
+
+[quote]
+A block quotation.
+
+====
+Nested note text
+====
+
+[appendix]
+== Annex title
+
+Annex paragraph.
+
+[bibliography]
+== Bibliography
+
+* [[[ref2,ISO 5678]]], _Informative reference_
