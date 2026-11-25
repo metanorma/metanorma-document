@@ -13,3 +13,19 @@ font_body: '"Source Sans Pro", sans-serif'
 font_sans: '"Source Sans Pro", sans-serif'
 font_mono: '"Source Code Pro", monospace'
 font_url: ''
+# Palette taken from NIST's own HTML stylesheet in metanorma-nist
+# (lib/isodoc/nist/html/htmlstyle.scss, _coverpage.scss): NIST blue
+# #006494 for chrome, link/rule blue #2677EA, table stripe #F1F8FF, orange
+# #F36F36, note yellow #FFCA3A, example tint #E1EEF1 and text #141115.
+primary_light: '#F1F8FF'
+accent: '#2677EA'
+accent_light: '#F1F8FF'
+warm: '#F36F36'
+note_border: '#FFCA3A'
+note_bg: '#FFCA3A'
+note_color: '#141115'
+example_border: '#006494'
+example_bg: '#E1EEF1'
+example_color: '#141115'
+admonition_border: '#FFCCCC'
+admonition_color: '#47430C'
