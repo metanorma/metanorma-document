@@ -1,0 +1,16 @@
+= Definition list sample
+:docnumber: 1001
+:copyright-year: 2026
+:language: en
+:title-main-en: Definition list sample
+:no-pdf:
+:no-isobib:
+
+== Scope
+
+Scope text.
+
+== Requirements
+
+Key:: Definition list description
+Other key:: Second description
