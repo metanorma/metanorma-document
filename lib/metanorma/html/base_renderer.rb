@@ -295,15 +295,12 @@ module Metanorma
         doc_id = extract_primary_doc_id
         pub_logos = build_publisher_logos
         pub_name = flavor_publisher_name
-        display_id = if pub_name && doc_id && !doc_id.start_with?(pub_name)
-                       "#{pub_name} #{doc_id}"
-                     else
-                       doc_id
-                     end
+        doc_publisher = pub_name if pub_name && doc_id && !doc_id.start_with?(pub_name)
 
         render_liquid("_header.html.liquid", {
                         "publisher_logos" => pub_logos,
-                        "doc_id" => display_id,
+                        "doc_publisher" => doc_publisher,
+                        "doc_id" => doc_id,
                         "doc_title" => header_title_text,
                       })
       end
