@@ -988,7 +988,15 @@ module Metanorma
 
       def render_term_note(note)
         attrs = element_attrs(id: safe_attr(note, :id), class: "note-block")
-        label = extract_termnote_label(note)
+        label = fmt_name_label(note)
+        if label
+          # fmt-name already carries its own delimiter ("Note 1 to entry:",
+          # "NOTE—"); only a trailing colon needs a following space.
+          delim = label.end_with?(":") ? " " : ""
+        else
+          label = extract_termnote_label(note)
+          delim = ": "
+        end
         parts = []
         note_content_parts = []
         note.p&.each do |para|
@@ -997,11 +1005,12 @@ module Metanorma
         note_content = note_content_parts.join
         parts << render_liquid("_term_note.html.liquid", {
                                  "label" => escape_html(label),
+                                 "delim" => delim,
                                  "content" => note_content,
                                })
         note.ul&.each { |ul| parts << (render_unordered_list(ul) || "") }
         note.ol&.each { |ol| parts << (render_ordered_list(ol) || "") }
-        note.dl&.then { |dl| parts << (render_definition_list(dl) || "") }
+        Array(note.dl).each { |dl| parts << (render_definition_list(dl) || "") }
         render_liquid("_element.html.liquid", {
                         "tag" => "div",
                         "extra_attrs" => attrs,
@@ -1024,7 +1033,7 @@ module Metanorma
                                })
         example.ul&.each { |ul| parts << (render_unordered_list(ul) || "") }
         example.ol&.each { |ol| parts << (render_ordered_list(ol) || "") }
-        example.dl&.then { |dl| parts << (render_definition_list(dl) || "") }
+        Array(example.dl).each { |dl| parts << (render_definition_list(dl) || "") }
         render_liquid("_element.html.liquid", {
                         "tag" => "div",
                         "extra_attrs" => attrs,
@@ -1473,6 +1482,12 @@ module Metanorma
       # Semantic notes (e.g. inside amendment newcontent) carry their
       # number as the number attribute, with no fmt-name or autonum.
       def extract_block_label(block, default)
+        # The presentation XML's fmt-name is the full caption the legacy
+        # output prints ("EXAMPLE 1 — Title"); the semantic name is only
+        # the bare title.
+        fmt = fmt_name_label(block)
+        return fmt if fmt
+
         label = super
         return label unless label == default
 
@@ -1482,6 +1497,17 @@ module Metanorma
         else
           label
         end
+      end
+
+      def fmt_name_label(block)
+        fmt_name = safe_attr(block, :fmt_name)
+        return nil unless fmt_name
+
+        # render_mixed_inline keeps the spaces around the caption delimiter
+        # that extract_plain_text drops.
+        text = Nokogiri::HTML.fragment(render_mixed_inline(fmt_name).to_s)
+          .text.gsub(/[[:space:]]+/, " ").strip
+        text.empty? ? nil : text
       end
     end
   end
