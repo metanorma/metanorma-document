@@ -37,31 +37,33 @@ module Metanorma
         escape(text.to_s)
       end
 
-      # Index just past the construct opening at +lt+ ("</...>",
+      # Index just past the construct opening at +open_idx+ ("</...>",
       # "<?...?>", "<!--...-->", "<![CDATA[...]]>", "<...>"), quote-
       # aware so ">" inside attribute values does not end the tag.
       # Unterminated constructs run to end of input; nil past it.
-      def tag_end(text, lt)
-        rest = text[lt..].to_s
+      QUOTE_CHARS = ['"', "'"].freeze
+
+      def tag_end(text, open_idx)
+        rest = text[open_idx..].to_s
         if rest.start_with?("<!--")
-          idx = text.index("-->", lt + 4)
+          idx = text.index("-->", open_idx + 4)
           idx ? idx + 3 : text.length
         elsif rest.start_with?("<?")
-          idx = text.index("?>", lt + 2)
+          idx = text.index("?>", open_idx + 2)
           idx ? idx + 2 : text.length
         elsif rest.start_with?("<![CDATA[")
-          idx = text.index("]]>", lt + 9)
+          idx = text.index("]]>", open_idx + 9)
           idx ? idx + 3 : text.length
         else
           quote = nil
-          i = lt
+          i = open_idx
           while i < text.length
-            ch = text[i]
+            char = text[i]
             if quote
-              quote = nil if ch == quote
-            elsif ch == '"' || ch == "'"
-              quote = ch
-            elsif ch == ">"
+              quote = nil if char == quote
+            elsif QUOTE_CHARS.include?(char)
+              quote = char
+            elsif char == ">"
               return i + 1
             end
             i += 1
@@ -73,9 +75,7 @@ module Metanorma
       def highlight_tag(tag)
         inner = tag[1...-1].to_s
         body =
-          if inner.start_with?("!--")
-            span("c", inner)
-          elsif inner.start_with?("?") || inner.start_with?("!")
+          if inner.start_with?("!--", "?", "!")
             span("c", inner)
           else
             highlight_element(inner)
@@ -101,8 +101,11 @@ module Metanorma
 
       def highlight_attrs(rest)
         out = +""
+        # Atomic groups keep the name/`=` boundary linear: without them
+        # a long `-` run backtracks the greedy class against `=` for
+        # every position (CodeQL polynomial-redos).
         rest.scan(
-          /([\w:.-]+)(=)("[^"]*"|'[^']*')|([\w:.-]+)|(\s+)|(.)/m,
+          /((?>[\w:.-]+))(=)("[^"]*"|'[^']*')|((?>[\w:.-]+))|(\s+)|(.)/m,
         ) do |name, eq, value, bare, ws, other|
           if name
             out << span("na", name) << escape(eq)
