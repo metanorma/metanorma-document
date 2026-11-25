@@ -80,7 +80,7 @@ module Metanorma
 
             name = renderer.safe_attr(key, :name)
             if name
-              title = renderer.escape_html(renderer.safe_attr(name, :text).to_s.strip)
+              title = renderer.escape_html(Array(renderer.safe_attr(name, :text)).join.strip)
               parts << "<p class=\"key-title\"><b>#{title}</b></p>" unless title.empty?
             end
             if renderer.safe_attr(key, :dl)
