@@ -699,7 +699,14 @@ module Metanorma
           end
         else
           fmt_list.each do |element|
-            element.p&.each { |para| parts << (render_paragraph(para) || "") }
+            paragraphs = Array(element.p)
+            paragraphs.each { |para| parts << (render_paragraph(para) || "") }
+            next unless paragraphs.empty?
+
+            inline = Array(safe_attr(element, :semx)).map do |semx|
+              render_inline_element(semx) || ""
+            end.join
+            parts << "<p>#{inline}</p>" unless inline.empty?
           end
         end
         parts.join

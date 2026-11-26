@@ -12,12 +12,7 @@ load File.expand_path("../../script/content_parity.rb", __dir__)
 # KNOWN_LOSSES lists the text blocks that are currently absent from the new
 # output. The spec fails on any additional loss, so the list can only shrink.
 RSpec.describe "content parity, new HTML vs legacy isodoc" do
-  KNOWN_LOSSES = {
-    "cc" => ["3.1."],
-    "generic" => ["3.1."],
-    "itu" => ["Recommendation ITU-T 1000", "3.1. sample term:"],
-    "ogc" => ["other term ALTERNATIVE"],
-  }.freeze
+  KNOWN_LOSSES = {}.freeze
 
   # Flavor gems share global state (isodoc classes, i18n), so as in the
   # script's own --all mode each flavor is rendered in a fresh process.
