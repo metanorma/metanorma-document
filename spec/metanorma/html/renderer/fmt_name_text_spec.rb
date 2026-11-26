@@ -11,10 +11,10 @@ RSpec.describe "fmt-name caption text extraction" do
   let(:doc) { Metanorma::Iso::Document::Root.from_xml(File.read(xml_path)) }
   let(:renderer) { Metanorma::Html::BaseRenderer.allocate }
 
-  def find_with_fmt_name(node, seen = {})
-    return nil if seen[node.object_id]
+  def find_with_fmt_name(node, seen = {}.compare_by_identity)
+    return nil if seen[node]
 
-    seen[node.object_id] = true
+    seen[node] = true
     return node if node.class.respond_to?(:attributes) &&
       node.class.attributes.key?(:fmt_name) &&
       Array(node.fmt_name).first
@@ -47,6 +47,6 @@ RSpec.describe "fmt-name caption text extraction" do
 
   it "no longer strips tags with regular expressions" do
     src = File.read(File.expand_path("../../../../lib/metanorma/html/base_renderer.rb", __dir__))
-    expect(src).not_to include('gsub(/<[^>]')
+    expect(src).not_to include("gsub(/<[^>]")
   end
 end
