@@ -98,6 +98,12 @@ module ContentParity
     end
   end
 
+  def inline_text_without_popups(body)
+    copy = body.dup
+    copy.css(".fn-popup").each(&:remove)
+    copy.text
+  end
+
   def count_kind(body, selector)
     return 0 unless selector
 
@@ -118,7 +124,7 @@ module ContentParity
   def compare(legacy_html, new_html)
     lbody = content_body(legacy_html)
     nbody = content_body(new_html)
-    new_flat = normalize(nbody.text)
+    new_flat = normalize(inline_text_without_popups(nbody))
     new_norm_blocks = text_blocks(nbody).map { |b| normalize(b["text"]) }
 
     lblocks = text_blocks(lbody)

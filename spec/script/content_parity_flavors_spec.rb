@@ -31,6 +31,20 @@ RSpec.describe "content parity, new HTML vs legacy isodoc" do
     JSON.parse(out.lines.last)
   end
 
+  it "loses no text content for the iso fixture document" do
+    xml = File.expand_path("../fixtures/iso/is/document-en.presentation.xml",
+                           __dir__)
+    script = File.expand_path("../../script/content_parity.rb", __dir__)
+    code = <<~RUBY
+      load #{script.inspect}
+      puts JSON.generate(ContentParity.run_case("iso", "fixture", xml: #{xml.inspect}))
+    RUBY
+    out, = Open3.capture2("bundle", "exec", "ruby", "-e", code)
+    result = JSON.parse(out.lines.last)
+    expect(result["status"]).to eq("compared"), result["error"].to_s
+    expect(result["missing_blocks"]).to be_empty
+  end
+
   %w[iso iec cc generic itu ogc jis plateau].each do |flavor|
     it "loses no text content for the #{flavor} sample document" do
       sample = File.join(ContentParity::FIXTURE_DIR, "sample.adoc")
