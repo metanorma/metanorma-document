@@ -1,0 +1,162 @@
+# LADL output (metanorma-ladl worked ISO/IEC profile, 20 labellers) for the tree in label_data_spec.rb.
+---
+- id: level4
+  type: list_item_ordered_level4
+  local: a)
+  global: 
+  value: a
+  direction: ltr
+  global_direction: 
+  labeller: ordered_list_item_level4_labeller
+- id: level3
+  type: list_item_ordered_level3
+  local: i)
+  global: 
+  value: i
+  direction: ltr
+  global_direction: 
+  labeller: ordered_list_item_level3_labeller
+- id: level2
+  type: list_item_ordered_level2
+  local: 1)
+  global: 
+  value: '1'
+  direction: ltr
+  global_direction: 
+  labeller: ordered_list_item_level2_labeller
+- id: level1
+  type: list_item_ordered_level1
+  local: a)
+  global: 
+  value: a
+  direction: ltr
+  global_direction: 
+  labeller: ordered_list_item_level1_labeller
+- id: unordered
+  type: list_item_unordered
+  local: "—"
+  global: 
+  value: '1'
+  direction: ltr
+  global_direction: 
+  labeller: unordered_list_item_labeller
+- id: list
+  type: list
+  local: List 1
+  global: List 1
+  value: '1'
+  direction: ltr
+  global_direction: ltr
+  labeller: list_labeller
+- id: subfigure
+  type: subfigure
+  local: Figure 1 a)
+  global: Figure 1 a)
+  value: a
+  direction: ltr
+  global_direction: ltr
+  labeller: subfigure_labeller
+- id: figure
+  type: figure
+  local: Figure 1
+  global: Figure 1
+  value: '1'
+  direction: ltr
+  global_direction: ltr
+  labeller: figure_labeller
+- id: subclause
+  type: subclause
+  local: '1.1'
+  global: '1.1'
+  value: '1'
+  direction: ltr
+  global_direction: ltr
+  labeller: subclause_labeller
+- id: table
+  type: table
+  local: Table 1
+  global: Table 1
+  value: '1'
+  direction: ltr
+  global_direction: ltr
+  labeller: table_labeller
+- id: note
+  type: note
+  local: NOTE
+  global: Clause 1, NOTE
+  value: '1'
+  direction: ltr
+  global_direction: ltr
+  labeller: note_labeller
+- id: example
+  type: example
+  local: EXAMPLE
+  global: Clause 1, EXAMPLE
+  value: '1'
+  direction: ltr
+  global_direction: ltr
+  labeller: example_labeller
+- id: formula
+  type: formula
+  local: "(1)"
+  global: Formula (1)
+  value: '1'
+  direction: ltr
+  global_direction: ltr
+  labeller: formula_labeller
+- id: clause
+  type: clause
+  local: Clause 1
+  global: Clause 1
+  value: '1'
+  direction: ltr
+  global_direction: ltr
+  labeller: clause_labeller
+- id: annex_clause
+  type: clause
+  local: A.1
+  global: A.1
+  value: '1'
+  direction: ltr
+  global_direction: ltr
+  labeller: annex_clause_labeller
+- id: annex_figure
+  type: figure
+  local: Figure A.1
+  global: Figure A.1
+  value: '1'
+  direction: ltr
+  global_direction: ltr
+  labeller: annex_figure_labeller
+- id: annex_table
+  type: table
+  local: Table A.1
+  global: Table A.1
+  value: '1'
+  direction: ltr
+  global_direction: ltr
+  labeller: annex_table_labeller
+- id: annex_formula
+  type: formula
+  local: "(A.1)"
+  global: Formula (A.1)
+  value: '1'
+  direction: ltr
+  global_direction: ltr
+  labeller: annex_formula_labeller
+- id: annex_list
+  type: list
+  local: List A.1
+  global: List A.1
+  value: '1'
+  direction: ltr
+  global_direction: ltr
+  labeller: annex_list_labeller
+- id: annex
+  type: annex
+  local: Annex A
+  global: Annex A
+  value: A
+  direction: ltr
+  global_direction: ltr
+  labeller: annex_labeller

@@ -8,11 +8,14 @@ module Metanorma
       # place. The profile data format (layered base < flavor < taste)
       # is a later slice; this class only carries the ordered rules.
       class Profile
-        attr_reader :name, :rules
+        attr_reader :name, :rules, :settings
 
-        def initialize(name: "noop", rules: [])
+        # settings is resolved profile data (see LayeredProfile); rules
+        # are the behaviours that act on the model.
+        def initialize(name: "noop", rules: [], settings: {})
           @name = name
           @rules = rules.dup.freeze
+          @settings = settings.freeze
         end
 
         # The profile that changes nothing.

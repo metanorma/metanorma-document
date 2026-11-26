@@ -1,0 +1,23 @@
+PresentationProfile "base" {
+  layer = "base"
+  settings = { date_format = "%Y-%m-%d" footnote_marker = "numeric" footnote_sup = true order = "ab" }
+}
+
+PresentationProfile "iso" {
+  layer = "flavor"
+  flavor = "iso"
+  settings = { date_format = "%d %B %Y" footnote_marker = "alpha" }
+}
+
+PresentationProfile "ieee" {
+  layer = "flavor"
+  flavor = "ieee"
+  settings = { date_format = "%B %d, %Y" }
+}
+
+PresentationProfile "iso_cs" {
+  layer = "taste"
+  taste = "iso_cs"
+  flavor = "iso"
+  settings = { footnote_sup = false order = "z" }
+}
