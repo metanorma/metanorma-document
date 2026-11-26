@@ -919,6 +919,7 @@ level = 1)
 
         text = CGI.unescapeHTML(render_mixed_inline(fmt_name).to_s
                                   .gsub(/<[^>]+>/, ""))
+          .gsub(/<[^>]*>?/, "").delete("<>")
           .tr("\u00a0", " ").gsub(/\s+/, " ").strip
         text.empty? ? nil : text
       end
