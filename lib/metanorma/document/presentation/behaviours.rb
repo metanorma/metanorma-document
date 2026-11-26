@@ -18,11 +18,22 @@ module Metanorma
       #   section_order        comma-separated regions in display order, see
       #                        DisplayOrder (writes displayorder on sections)
       #   contributor_name_order  "given_family" (default) or "family_given"
+      #   bibdata_current      true: mark the document's language and script
+      #                        current="true" in bibdata
+      #   address_precompose   true: make formattedAddress from address parts
+      #   bibdata_labels       language code, or "document": add translated
+      #                        doctype, stage, substage and edition to bibdata
+      #   i18n_class           the label-set class that holds those labels,
+      #                        by name (default: the generic set)
+      #   date_language        language code, or "document": render dates
+      #                        with month names in that language
       module Behaviours
         KEYS = %w[date_format footnote_sup footnote_open footnote_close
-                  footnote_delim_scope contributor_name_order section_order].freeze
+                  footnote_delim_scope contributor_name_order section_order
+                  bibdata_current address_precompose bibdata_labels i18n_class date_language].freeze
         NAME_ORDERS = %w[given_family family_given].freeze
         DELIM_SCOPES = %w[all body].freeze
+        BOOLEANS = [true, false].freeze
 
         module_function
 
@@ -32,7 +43,10 @@ module Metanorma
         def rules_for(settings)
           check(settings)
           rules = []
-          rules << DateFormat.new(format: own_format(settings["date_format"])) if settings["date_format"]
+          rules << DateFormat.new(format: own_format(settings["date_format"]), language: settings["date_language"]) if settings["date_format"]
+          rules << Bibdata::Current.new if settings["bibdata_current"]
+          rules << Bibdata::AddressPrecompose.new if settings["address_precompose"]
+          rules << Bibdata::Labels.new(language: settings["bibdata_labels"], i18n_class: settings["i18n_class"]) if settings["bibdata_labels"]
           rules << FootnoteMarker.new(**footnote_options(settings)) if footnote?(settings)
           rules << DisplayOrder.new(regions: section_regions(settings["section_order"])) if settings["section_order"]
           rules << ContributorNameOrder.new(order: settings["contributor_name_order"]) if settings["contributor_name_order"]
@@ -61,6 +75,15 @@ module Metanorma
             close: settings["footnote_close"].to_s, scope: settings.fetch("footnote_delim_scope", "all") }
         end
 
+        def check_bibdata(settings, bad)
+          %w[bibdata_current address_precompose].each do |k|
+            bad.call(k, "must be true or false") if settings.key?(k) && !BOOLEANS.include?(settings[k])
+          end
+          %w[bibdata_labels date_language i18n_class].each do |k|
+            bad.call(k, "must be a non-empty string") if settings.key?(k) && !(settings[k].is_a?(String) && !settings[k].empty?)
+          end
+        end
+
         def check(settings)
           bad = lambda do |key, msg|
             raise ProfileError.new(msg, instance: nil, property: "settings.#{key}")
@@ -85,6 +108,7 @@ module Metanorma
               bad.call("section_order", "must list regions from #{DisplayOrder::REGIONS.join(', ')}#{detail}")
             end
           end
+          check_bibdata(settings, bad)
           if settings.key?("contributor_name_order") && !NAME_ORDERS.include?(settings["contributor_name_order"])
             bad.call("contributor_name_order", "must be one of #{NAME_ORDERS.join(', ')}")
           end
@@ -98,3 +122,4 @@ require_relative "behaviours/date_format"
 require_relative "behaviours/footnote_marker"
 require_relative "behaviours/contributor_name_order"
 require_relative "behaviours/display_order"
+require_relative "behaviours/bibdata"
