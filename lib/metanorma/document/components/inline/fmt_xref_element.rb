@@ -12,6 +12,7 @@ module Metanorma
           attribute :text, :string, collection: true
           attribute :span, SpanElement, collection: true
           attribute :semx, SemxElement, collection: true
+          attribute :sup, SupElement, collection: true
 
           xml do
             element "fmt-xref"
@@ -21,6 +22,7 @@ module Metanorma
             map_content to: :text
             map_element "span", to: :span
             map_element "semx", to: :semx
+            map_element "sup", to: :sup
           end
         end
       end
