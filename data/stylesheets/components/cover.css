@@ -205,3 +205,6 @@ feedback-statement {
   .title-section:not(:has(.cover-grid)) .cover-title { font-size: 1.6em; }
   .doc-title { font-size: 1.15em; margin: 2em 0 1.2em; }
 }
+
+/* Keep draft identifiers (e.g. "(DRAFT 2016-05-01)") on one line. */
+.cover-doc-id .nowrap { white-space: nowrap; }

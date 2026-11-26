@@ -12,3 +12,9 @@
   width: 2.25em;
   margin-left: -2.25em;
 }
+
+/* Keep the label on the same line as the first paragraph of the item
+   (hanging layout): block paragraphs would otherwise drop below it. */
+.mn-labeled-list > li > .li-label + p {
+  display: inline;
+}

@@ -160,3 +160,5 @@
   font-family: var(--font-sans);
 }
 .exit-reading-btn:hover { background: var(--mn-primary); color: #fff; }
+
+.header-doc-sep { opacity: 0.6; margin: 0 0.15em; }

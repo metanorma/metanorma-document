@@ -28,9 +28,9 @@
   {% endfor %}
 {% else %}
   {% if cover.docnumber_undated %}
-  <p class="cover-doc-id">{{ cover.docnumber_undated | escape }}{% if cover.draftinfo %} {{ cover.draftinfo | escape }}{% endif %}</p>
+  <p class="cover-doc-id">{{ cover.docnumber_undated | escape }}{% if cover.draftinfo %} <span class="nowrap">{{ cover.draftinfo | escape }}</span>{% endif %}</p>
   {% elsif cover.draftinfo %}
-  <p class="cover-doc-id">{{ cover.draftinfo | escape }}</p>
+  <p class="cover-doc-id"><span class="nowrap">{{ cover.draftinfo | escape }}</span></p>
   {% endif %}
 {% endif %}
 {% if cover.edition_display %}
@@ -41,9 +41,9 @@
 {% endif %}
 {% if cover.tc_docnumber.size > 0 %}
   {% if cover.docnumber_undated %}
-  <p class="cover-doc-id">{{ cover.docnumber_undated | escape }}{% if cover.draftinfo %} {{ cover.draftinfo | escape }}{% endif %}</p>
+  <p class="cover-doc-id">{{ cover.docnumber_undated | escape }}{% if cover.draftinfo %} <span class="nowrap">{{ cover.draftinfo | escape }}</span>{% endif %}</p>
   {% elsif cover.draftinfo %}
-  <p class="cover-doc-id">{{ cover.draftinfo | escape }}</p>
+  <p class="cover-doc-id"><span class="nowrap">{{ cover.draftinfo | escape }}</span></p>
   {% endif %}
 {% endif %}
 {% if cover.editorialgroup %}
@@ -71,7 +71,10 @@
   <p class="cover-ics"><strong>ICS:</strong> {{ cover.ics | escape }}</p>
 {% endif %}
 {% if doctype %}
-  <p class="cover-doctype">{{ doctype | escape }}</p>
+  {% assign doctype_label = "" %}
+  {% assign doctype_words = doctype | replace: "-", " " | split: " " %}
+  {% for w in doctype_words %}{% assign cap = w | capitalize %}{% if doctype_label == "" %}{% assign doctype_label = cap %}{% else %}{% assign doctype_label = doctype_label | append: " " | append: cap %}{% endif %}{% endfor %}
+  <p class="cover-doctype">{{ doctype_label | escape }}</p>
 {% endif %}
 {% if cover.ext.subdoctype %}
   <p class="cover-docsubtype">Document subtype: {{ cover.ext.subdoctype | capitalize | escape }}</p>

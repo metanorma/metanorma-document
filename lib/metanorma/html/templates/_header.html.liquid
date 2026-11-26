@@ -3,7 +3,7 @@
     {{ publisher_logos }}
   </div>
   {% if doc_id %}
-  <div class="header-doc-id">{{ doc_id | escape }}</div>
+  <div class="header-doc-id">{% if doc_publisher %}<span class="header-doc-pub">{{ doc_publisher | escape }}</span><span class="header-doc-sep" aria-hidden="true"> &middot; </span>{% endif %}<span class="header-doc-num">{{ doc_id | escape }}</span></div>
   {% endif %}
   <span class="header-doc-title" id="header-doc-title">{{ doc_title | escape }}</span>
   <div class="header-actions">
