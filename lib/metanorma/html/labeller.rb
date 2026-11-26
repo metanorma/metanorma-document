@@ -147,16 +147,6 @@ module Metanorma
           CONTEXT_FOR.key?(type)
         node
       end
-        child_params = if kind == :bibliography_wrapper
-          { depth: depth, annex: annex }
-        else
-          child_params_for(kind, type, depth, annex)
-        end
-        children_of(element, kind).each do |child|
-          node.add_child(project(child, **child_params))
-        end
-        node
-      end
 
       # The element identifier: the model's `id` or its `anchor` (the
       # metanorma sections carry anchors).
