@@ -196,6 +196,10 @@ module Metanorma
         depth.zero? ? "annex_clause" : "annex_clause"
       end
 
+      def bibliography_wrapper?(name)
+        BIBLIOGRAPHY_WRAPPER_NAMES.include?(name)
+      end
+
       def sections_container?(name)
         SECTIONS_CONTAINER_NAMES.include?(name)
       end
