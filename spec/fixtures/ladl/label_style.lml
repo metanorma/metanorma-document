@@ -1,0 +1,125 @@
+// Minimal labeling profile for the metanorma-document labeller specs:
+// literal-English templates so the released ladl gem runs them.
+instance MndSpecLabelStyle < LabelStyle {
+  name = "mnd spec Label Style"
+  definition {
+    Bare numbering scheme for the labeller seam specs: numbered clauses
+    with hierarchical subclauses and lettered annexes.
+  }
+
+  labellers = [
+    "id:clause_labeller",
+    "id:subclause_labeller",
+    "id:annex_labeller",
+    "id:annex_clause_labeller"
+  ]
+
+  sequences = [DecimalNumericSequence, AlphaUpperNumericSequence]
+
+  templates = [
+    ClauseLabelTemplate,
+    ClauseGlobalLabelTemplate,
+    SubclauseLabelTemplate,
+    SubclauseGlobalLabelTemplate,
+    AnnexLabelTemplate,
+    AnnexGlobalLabelTemplate,
+    AnnexClauseLabelTemplate,
+    AnnexClauseGlobalLabelTemplate
+  ]
+
+  contexts = [
+    DocumentContext,
+    ClauseContext,
+    AnnexContext,
+    AnnexClauseContext
+  ]
+}
+
+instance DocumentContext < LabelContext {
+  name = "document"
+}
+
+instance ClauseContext < LabelContext {
+  name = "clause"
+  parent = DocumentContext
+}
+
+instance AnnexContext < LabelContext {
+  name = "annex"
+  parent = DocumentContext
+}
+
+instance AnnexClauseContext < LabelContext {
+  name = "annex_clause"
+  parent = AnnexContext
+}
+
+instance ClauseLabelTemplate < LabelTemplate {
+  pattern = "%n"
+}
+
+instance ClauseGlobalLabelTemplate < LabelTemplate {
+  pattern = "Clause %n"
+}
+
+instance ClauseLabeller < Labeller {
+  id = "clause_labeller"
+  sequence = DecimalNumericSequence
+  context = DocumentContext
+  type = "clause"
+  template = ClauseLabelTemplate
+  global_template = ClauseGlobalLabelTemplate
+}
+
+instance SubclauseLabelTemplate < LabelTemplate {
+  pattern = "%pn.%n"
+}
+
+instance SubclauseGlobalLabelTemplate < LabelTemplate {
+  pattern = "Clause %pn.%n"
+}
+
+instance SubclauseLabeller < Labeller {
+  id = "subclause_labeller"
+  sequence = DecimalNumericSequence
+  context = ClauseContext
+  parent = ClauseLabeller
+  type = "subclause"
+  template = SubclauseLabelTemplate
+  global_template = SubclauseGlobalLabelTemplate
+}
+
+instance AnnexLabelTemplate < LabelTemplate {
+  pattern = "Annex %n"
+}
+
+instance AnnexGlobalLabelTemplate < LabelTemplate {
+  pattern = "Annex %n"
+}
+
+instance AnnexLabeller < Labeller {
+  id = "annex_labeller"
+  sequence = AlphaUpperNumericSequence
+  context = DocumentContext
+  type = "annex"
+  template = AnnexLabelTemplate
+  global_template = AnnexGlobalLabelTemplate
+}
+
+instance AnnexClauseLabelTemplate < LabelTemplate {
+  pattern = "%pn.%n"
+}
+
+instance AnnexClauseGlobalLabelTemplate < LabelTemplate {
+  pattern = "Annex %pn.%n"
+}
+
+instance AnnexClauseLabeller < Labeller {
+  id = "annex_clause_labeller"
+  sequence = DecimalNumericSequence
+  context = AnnexContext
+  parent = AnnexLabeller
+  type = "clause"
+  template = AnnexClauseLabelTemplate
+  global_template = AnnexClauseGlobalLabelTemplate
+}

@@ -140,19 +140,47 @@ module Metanorma
         @renderer_context ||= RendererContext.new(self)
       end
 
-      attr_writer :document, :theme
+      attr_writer :document, :theme, :labeller
 
-      def generate_full_document(document, theme: nil, headless: false, **)
+      # The LADL labeling result for this document, when a labeling
+      # profile is configured (Metanorma::Html::Labeller or nil).
+      attr_reader :labeller
+
+      def generate_full_document(document, theme: nil, headless: false,
+        labeller_profile: nil, labeller_labels: {}, **)
         Metanorma::Html.seed_flavors!
         @document = document
         @theme_override = theme
         @theme = nil
         reset_document_collections
         validate_presentation_xml!
+        @labeller = build_labeller(labeller_profile, labeller_labels)
 
         body = render(@document) || ""
 
         assemble_document(body, headless: headless)
+      end
+
+      private
+
+      # Builds the LADL labeller when a profile is configured. Raises on
+      # profile errors: a broken labeling profile is a configuration
+      # defect and fails the render loudly.
+      def build_labeller(profile_path, labels)
+        profile_path.nil? || profile_path.empty? and return nil
+        Labeller.new(profile_path, labels: labels, root: @document)
+      end
+
+      public
+
+      # Prefixes the LADL label onto an unnumbered title or caption.
+      # No-op when no labeller is configured or the text already starts
+      # with the label (presentation XML carries baked numbering).
+      def prefix_labeller_label(element, text, separator: " ")
+        return text unless labeller
+
+        label = labeller.local_for(element) or return text
+        text.start_with?(label) ? text : "#{label}#{separator}#{text}"
       end
 
       def reset_document_collections
