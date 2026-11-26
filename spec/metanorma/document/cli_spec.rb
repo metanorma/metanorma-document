@@ -93,6 +93,28 @@ RSpec.describe Metanorma::Document::CLI do
       expect(stdout).to include("</html>")
     end
 
+    it "selects the taste theme when a taste name is given with --flavor" do
+      # "iala" parses with the base flavor's model; only the name on the
+      # command line identifies the taste, so it must reach the renderer.
+      allow(described_class).to receive(:canonical_flavor).and_call_original
+      allow(described_class).to receive(:canonical_flavor).with("iala")
+        .and_return("iso")
+      theme = nil
+      allow(Metanorma::Html::Generator).to receive(:generate) do |_doc, **opts|
+        theme = opts[:theme]
+        "<!DOCTYPE html></html>"
+      end
+      capture_stdout { described_class.to_html(["-f", "iala", xml_path]) }
+      expect(theme).to be_a(Metanorma::Html::Theme)
+      expect(theme.accent).to eq(Metanorma::Html::Theme.load("iala").accent)
+      expect(theme.accent).not_to eq(Metanorma::Html::Theme.load("iso").accent)
+    end
+
+    it "leaves the theme to the renderer for a base flavor name" do
+      expect(described_class.taste_theme("iso")).to be_nil
+      expect(described_class.taste_theme(nil)).to be_nil
+    end
+
     it "writes HTML to an output file" do
       Dir.mktmpdir do |dir|
         out = File.join(dir, "out.html")
