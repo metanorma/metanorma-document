@@ -77,7 +77,8 @@ RSpec.describe Metanorma::Document::Presentation::Behaviours do
       profile = profile_for(flavor: "iso", taste: "example_dates")
       expect(profile.settings).to include("footnote_close" => ")", "date_format" => "%-d %B %Y")
       expect(profile_for.settings).to eq("date_format" => "own", "footnote_sup" => true,
-                                         "contributor_name_order" => "given_family")
+                                         "contributor_name_order" => "given_family",
+                                         "section_order" => "preface,scope,normref,terms,definitions,middle,annex,bibliography,indexsect,colophon")
     end
   end
 

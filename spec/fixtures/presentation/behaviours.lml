@@ -1,12 +1,12 @@
 PresentationProfile "base" {
   layer = "base"
-  settings = { date_format = "own" footnote_sup = true contributor_name_order = "given_family" }
+  settings = { date_format = "own" footnote_sup = true contributor_name_order = "given_family" section_order = "preface,scope,normref,terms,definitions,middle,annex,bibliography,indexsect,colophon" }
 }
 
 PresentationProfile "iso" {
   layer = "flavor"
   flavor = "iso"
-  settings = { footnote_close = ")" footnote_delim_scope = "body" }
+  settings = { footnote_close = ")" footnote_delim_scope = "body" section_order = "preface,scope,normref,main,annex,bibliography,indexsect,colophon" }
 }
 
 PresentationProfile "bsi" {
@@ -25,4 +25,10 @@ PresentationProfile "example_dates" {
   layer = "taste"
   taste = "example_dates"
   settings = { date_format = "%-d %B %Y" contributor_name_order = "family_given" }
+}
+
+PresentationProfile "itu" {
+  layer = "flavor"
+  flavor = "itu"
+  settings = { section_order = "boilerplate_clauses,preface,scope,normref,terms,definitions,middle,annex,bibliography,indexsect,colophon" }
 }

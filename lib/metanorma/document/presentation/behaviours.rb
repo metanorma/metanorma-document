@@ -15,10 +15,12 @@ module Metanorma
       #   footnote_close       text after the marker number (default "")
       #   footnote_delim_scope "all" (default) or "body": delimiters only
       #                        outside tables and figures
+      #   section_order        comma-separated regions in display order, see
+      #                        DisplayOrder (writes displayorder on sections)
       #   contributor_name_order  "given_family" (default) or "family_given"
       module Behaviours
         KEYS = %w[date_format footnote_sup footnote_open footnote_close
-                  footnote_delim_scope contributor_name_order].freeze
+                  footnote_delim_scope contributor_name_order section_order].freeze
         NAME_ORDERS = %w[given_family family_given].freeze
         DELIM_SCOPES = %w[all body].freeze
 
@@ -32,6 +34,7 @@ module Metanorma
           rules = []
           rules << DateFormat.new(format: own_format(settings["date_format"])) if settings["date_format"]
           rules << FootnoteMarker.new(**footnote_options(settings)) if footnote?(settings)
+          rules << DisplayOrder.new(regions: section_regions(settings["section_order"])) if settings["section_order"]
           rules << ContributorNameOrder.new(order: settings["contributor_name_order"]) if settings["contributor_name_order"]
           rules
         end
@@ -39,6 +42,10 @@ module Metanorma
         # The same profile with the rules its settings describe.
         def profile(profile)
           Profile.new(name: profile.name, settings: profile.settings, rules: rules_for(profile.settings))
+        end
+
+        def section_regions(value)
+          value.split(",").map(&:strip)
         end
 
         def own_format(value)
@@ -70,6 +77,14 @@ module Metanorma
           if settings.key?("footnote_delim_scope") && !DELIM_SCOPES.include?(settings["footnote_delim_scope"])
             bad.call("footnote_delim_scope", "must be one of #{DELIM_SCOPES.join(', ')}")
           end
+          if settings.key?("section_order")
+            regions = settings["section_order"].is_a?(String) ? section_regions(settings["section_order"]) : []
+            unknown = regions - DisplayOrder::REGIONS
+            if regions.empty? || !unknown.empty?
+              detail = unknown.empty? ? "" : "; unknown: #{unknown.join(', ')}"
+              bad.call("section_order", "must list regions from #{DisplayOrder::REGIONS.join(', ')}#{detail}")
+            end
+          end
           if settings.key?("contributor_name_order") && !NAME_ORDERS.include?(settings["contributor_name_order"])
             bad.call("contributor_name_order", "must be one of #{NAME_ORDERS.join(', ')}")
           end
@@ -82,3 +97,4 @@ end
 require_relative "behaviours/date_format"
 require_relative "behaviours/footnote_marker"
 require_relative "behaviours/contributor_name_order"
+require_relative "behaviours/display_order"
