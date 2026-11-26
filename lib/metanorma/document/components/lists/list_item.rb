@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "../inline/fmt_ladl_label_data"
+
 module Metanorma
   module Document
     module Components
@@ -51,7 +53,10 @@ module Metanorma
           attribute :label, :string
           attribute :json_text, :string
 
+          attribute :fmt_ladl_label_data, Metanorma::Document::Components::Inline::FmtLadlLabelData
+
           xml do
+            map_element "fmt-ladl-label-data", to: :fmt_ladl_label_data
             element "li"
             mixed_content
             map_attribute "id", to: :id

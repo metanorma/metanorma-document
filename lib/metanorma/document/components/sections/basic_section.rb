@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "../inline/fmt_ladl_label_data"
+
 module Metanorma
   module Document
     module Components
@@ -23,6 +25,9 @@ module Metanorma
           # independently of the publication that contains it.
           attribute :update_unit,
                     Metanorma::Document::Components::UpdateUnits::UpdateUnit
+          # Optional persisted LADL label/numbering metadata for this division.
+          attribute :fmt_ladl_label_data,
+                    Metanorma::Document::Components::Inline::FmtLadlLabelData
 
           xml do
             element "basic-section"
@@ -34,6 +39,7 @@ module Metanorma
             map_element "blocks", to: :blocks
             map_element "notes", to: :notes
             map_element "update-unit", to: :update_unit
+            map_element "fmt-ladl-label-data", to: :fmt_ladl_label_data
           end
         end
       end

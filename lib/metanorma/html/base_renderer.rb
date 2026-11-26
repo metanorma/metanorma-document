@@ -91,8 +91,8 @@ module Metanorma
         end
       end
 
-      attr_reader :inline_renderer, :block_renderer, :section_renderer,
-                  :pubid_renderer, :index_term_collector, :footnote_collector
+      attr_reader :inline_renderer, :block_renderer, :section_renderer, :pubid_renderer, :index_term_collector, :footnote_collector, :document
+
       # While a table renders: table-scoped <fn>s collect here and lift
       # into the table's visible footnotes row instead of endnote popups.
       attr_accessor :table_fn_context
@@ -140,11 +140,16 @@ module Metanorma
         @renderer_context ||= RendererContext.new(self)
       end
 
-      attr_writer :document, :theme
+      attr_writer :theme
+
+      def document=(document)
+        @document = document
+        @inline_renderer&.reset_native_xref_index
+      end
 
       def generate_full_document(document, theme: nil, headless: false, **)
         Metanorma::Html.seed_flavors!
-        @document = document
+        self.document = document
         @theme_override = theme
         @theme = nil
         reset_document_collections
@@ -176,7 +181,7 @@ module Metanorma
       # assembly) — for embedding classic-rendered content into a host page.
       def generate_body(document, theme: nil, **)
         Metanorma::Html.seed_flavors!
-        @document = document
+        self.document = document
         @theme_override = theme
         @theme = nil
         reset_document_collections
