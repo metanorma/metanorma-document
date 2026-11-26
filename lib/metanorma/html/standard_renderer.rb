@@ -720,7 +720,7 @@ module Metanorma
       end
 
       def render_term_definitions(term, fmt_definition)
-        return render_ordered_content(fmt_definition) || "" if fmt_definition
+        return render_fmt_definition(fmt_definition) if fmt_definition
 
         parts = []
         safe_attr(term, :p)&.each do |para|
@@ -730,6 +730,18 @@ module Metanorma
           parts << (render_term_definition(definition) || "")
         end
         parts.join
+      end
+
+      # <fmt-definition> is either a standoc ordered element (children walk
+      # in document order) or the generic element whose <semx> wrappers hold
+      # the block content; both must reach the page.
+      def render_fmt_definition(fmt_definition)
+        ordered = render_ordered_content(fmt_definition).to_s
+        return ordered unless ordered.empty?
+
+        Array(safe_attr(fmt_definition, :semx)).map do |semx|
+          render_fmt_definition_semx(semx)
+        end.join
       end
 
       # The <semx> wrapper inside <fmt-definition> carries the definition's
@@ -1011,7 +1023,8 @@ module Metanorma
 
       def render_term_example(example)
         attrs = element_attrs(id: safe_attr(example, :id), class: "example")
-        label = extract_block_label(example, "EXAMPLE")
+        label = fmt_name_text(example) ||
+          extract_block_label(example, "EXAMPLE")
         parts = []
         ex_content_parts = []
         example.p&.each do |para|
@@ -1457,6 +1470,9 @@ module Metanorma
       end
 
       def extract_termnote_label(note)
+        localized = fmt_name_text(note)
+        return localized.sub(/\s*:\z/, "") if localized
+
         names = safe_attr(note, :name)
         if names && !names.empty?
           name = names.is_a?(Array) ? names.first : names

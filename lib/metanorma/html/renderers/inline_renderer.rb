@@ -97,6 +97,8 @@ module Metanorma
             when :element
               parts << if coordinator.block_element?(obj)
                          coordinator.render(obj) || ""
+                       elsif shadowed_stem?(cell, obj)
+                         ""
                        else
                          render_inline_element(obj) || ""
                        end
@@ -118,13 +120,20 @@ module Metanorma
                        when String
                          escape_html(child)
                        else
-                         render_inline_element(child) || ""
+                         shadowed_stem?(node, child) ? "" : render_inline_element(child) || ""
                        end
             end
             parts.join
           else
             render_inline_collections(node)
           end
+        end
+
+        # A presentation <fmt-stem> restates the semantic <stem> that
+        # precedes it; rendering both prints every formula twice.
+        def shadowed_stem?(node, element)
+          element.is_a?(Metanorma::Document::Components::Inline::StemInlineElement) &&
+            node.respond_to?(:fmt_stem) && !Array(node.fmt_stem).empty?
         end
 
         def render_ordered_inline(node)
@@ -136,7 +145,7 @@ module Metanorma
             when :tab
               parts << "  "
             when :element
-              parts << (render_inline_element(obj) || "")
+              parts << (shadowed_stem?(node, obj) ? "" : render_inline_element(obj) || "")
             end
           end
           unless walked
@@ -145,7 +154,7 @@ module Metanorma
                        when String
                          escape_html(child)
                        else
-                         render_inline_element(child) || ""
+                         shadowed_stem?(node, child) ? "" : render_inline_element(child) || ""
                        end
             end
           end
@@ -390,7 +399,9 @@ module Metanorma
             values = safe_attr(node, rule.to)
             next if values.nil?
 
-            Array(values).each { |v| parts << (render_inline_element(v) || "") }
+            Array(values).each do |v|
+              parts << (shadowed_stem?(node, v) ? "" : render_inline_element(v) || "")
+            end
           end
           parts.join
         end
@@ -718,7 +729,7 @@ module Metanorma
                        if coordinator.block_element?(child)
                          coordinator.render(child) || ""
                        else
-                         render_inline_element(child) || ""
+                         shadowed_stem?(node, child) ? "" : render_inline_element(child) || ""
                        end
                      end
           end

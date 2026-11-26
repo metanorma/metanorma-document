@@ -134,6 +134,7 @@ module Metanorma
         def render_admonition_children(...) = @renderer.render_admonition_children(...)
         def render_full_block_children(...) = @renderer.render_full_block_children(...)
         def render_label_paragraph(...) = @renderer.render_label_paragraph(...)
+        def fmt_name_text(...) = @renderer.fmt_name_text(...)
       end
 
       def renderer_context
@@ -911,6 +912,18 @@ level = 1)
       rescue StandardError => e
         record_render_warning("index term dropped: #{e.class}: #{e.message}")
         nil
+      end
+
+      # Plain text of a block's presentation <fmt-name> (the localized
+      # caption label, e.g. "EXEMPLE" or "ATTENTION —"); nil when absent.
+      def fmt_name_text(block)
+        fmt_name = Array(safe_attr(block, :fmt_name)).first
+        return nil if fmt_name.nil?
+
+        text = CGI.unescapeHTML(render_mixed_inline(fmt_name).to_s
+                                  .gsub(/<[^>]+>/, ""))
+          .tr("\u00a0", " ").gsub(/\s+/, " ").strip
+        text.empty? ? nil : text
       end
 
       def extract_block_label(block, default)

@@ -79,7 +79,10 @@ module Metanorma
             return unless key
 
             name = renderer.safe_attr(key, :name)
-            parts << (renderer.render_inline_element(name) || "") if name
+            if name
+              title = renderer.escape_html(Array(renderer.safe_attr(name, :text)).join.strip)
+              parts << "<p class=\"key-title\"><b>#{title}</b></p>" unless title.empty?
+            end
             if renderer.safe_attr(key, :dl)
               parts << (renderer.render_definition_list(key.dl) || "")
             end

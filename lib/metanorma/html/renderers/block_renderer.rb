@@ -509,7 +509,7 @@ module Metanorma
           attrs = element_attrs(id: safe_attr(quote, :id), class: "quote")
           content = quote_children_html(quote)
           attribution_html = if quote.attribution
-                               coordinator.render_mixed_inline(quote.attribution)
+                               quote_attribution_html(quote.attribution)
                              else
                                quote_author_source_attribution(quote)
                              end
@@ -518,6 +518,14 @@ module Metanorma
                           "content" => content,
                           "attribution" => attribution_html,
                         })
+        end
+
+        # <attribution> holds paragraphs, not mixed text: render their
+        # inline content (the rendered "— author, source" line).
+        def quote_attribution_html(attribution)
+          Array(attribution.p).map do |para|
+            coordinator.render_mixed_inline(para)
+          end.join
         end
 
         def quote_children_html(quote)
