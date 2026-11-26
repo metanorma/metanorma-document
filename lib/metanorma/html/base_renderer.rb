@@ -96,6 +96,7 @@ module Metanorma
       # While a table renders: table-scoped <fn>s collect here and lift
       # into the table's visible footnotes row instead of endnote popups.
       attr_accessor :table_fn_context
+      attr_reader :amend_figure_label
       private :inline_renderer, :block_renderer, :section_renderer,
               :pubid_renderer
 
@@ -117,6 +118,7 @@ module Metanorma
 
         def render_paragraph(...) = @renderer.render_paragraph(...)
         def render_inline_element(...) = @renderer.render_inline_element(...)
+        def amend_figure_label = @renderer.amend_figure_label
         def render_unordered_list(...) = @renderer.render_unordered_list(...)
         def render_ordered_list(...) = @renderer.render_ordered_list(...)
         def render_definition_list(...) = @renderer.render_definition_list(...)

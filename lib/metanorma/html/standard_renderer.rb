@@ -534,7 +534,9 @@ module Metanorma
         end
         new_contents = Array(safe_attr(amend, :new_content))
         if new_contents.any?
+          @amend_figure_labels = amend_figure_labels(amend)
           inner = new_contents.map { |nc| render_amend_content(nc, **opts) }.join
+          @amend_figure_labels = nil
           attrs = element_attrs(id: safe_attr(amend, :id),
                                 class: "Quote AmendNewcontent")
           parts << render_liquid("_element.html.liquid", {
@@ -550,10 +552,41 @@ module Metanorma
         parts = []
         %i[paragraphs note ol ul dl figure clause].each do |attr|
           Array(safe_attr(content, attr)).each do |child|
+            @amend_figure_label = @amend_figure_labels&.shift if attr == :figure
             parts << (render_amend_child(child, **opts) || "")
+            @amend_figure_label = nil
           end
         end
         parts.join
+      end
+
+      # Figure added by an amendment: the raw <name> carries no number, and
+      # the numbered caption only exists in the presentation copy of the
+      # amend. The amend's <autonumber type="figure"> gives the first number;
+      # further figures count on from it. Returns the caption prefixes
+      # ("Figure A.1 — ", "Figure A.2 — ").
+      def amend_figure_labels(amend)
+        auto = Array(safe_attr(amend, :auto_number)).find do |a|
+          safe_attr(a, :type) == "figure"
+        end
+        first = auto && safe_attr(auto, :value)
+        return [] if first.to_s.empty?
+
+        count = Array(safe_attr(amend, :new_content)).sum do |nc|
+          Array(safe_attr(nc, :figure)).size
+        end
+        word = figure_label_word
+        Array.new(count) do |i|
+          num = first.to_s.sub(/\d+\z/) { |n| (n.to_i + i).to_s }
+          "#{word} #{num} — "
+        end
+      end
+
+      def figure_label_word
+        require "isodoc"
+        IsoDoc::I18n.new(document_language, "Latn").get["figure"] || "Figure"
+      rescue StandardError, LoadError
+        "Figure"
       end
 
       def render_amend_child(child, **)
