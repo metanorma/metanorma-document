@@ -225,7 +225,7 @@ module Metanorma
         elsif kind == :root
           # The document root carries the preface and the Sections
           # container as scalar members, plus an annex collection.
-          declared_members(element, %i[preface sections annex])
+          declared_members(element, %i[preface sections annex bibliography])
         elsif kind == :section
           section_children(element)
         else
