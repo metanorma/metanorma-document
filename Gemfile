@@ -21,7 +21,7 @@ gem "metanorma-itu", github: "metanorma/metanorma-itu", branch: "main"
 gem "metanorma-mirror", "~> 1.0", github: "metanorma/metanorma-mirror", branch: "main"
 gem "metanorma-ogc", github: "metanorma/metanorma-ogc", branch: "main"
 # TEMPORARY pin: svgmap/imagemap/columnbreak section wiring
-gem "metanorma-standoc", github: "metanorma/metanorma-standoc", branch: "main"
+gem "metanorma-standoc", github: "metanorma/metanorma-standoc", ref: "e4918b4b801de5346220b3a9bdf1dcfdc939a5d9"
 gem "plurimath", "~> 0.11"
 gem "pubid", "~> 2.0"
 

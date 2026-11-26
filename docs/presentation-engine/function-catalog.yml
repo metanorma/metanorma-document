@@ -1,0 +1,1244 @@
+---
+source:
+  isodoc_commit: 033d46c6148594a3649d100a886352c8a0215ab6
+  method: flavor override = method of the same name defined in a flavor's lib/isodoc/**/*.rb
+    file whose name matches presentation|xref|sections|terms or which references PresentationXMLConvert;
+    name-match heuristic, not a semantic diff
+  flavors_scanned:
+  - bipm
+  - bsi
+  - cc
+  - core
+  - csa
+  - csd
+  - en
+  - gb
+  - generic
+  - icc
+  - iec
+  - ieee
+  - ietf
+  - iho
+  - iso
+  - itu
+  - jis
+  - m3aawg
+  - mbxif
+  - mko
+  - mlit
+  - mpfa
+  - nist
+  - ogc
+  - oiml
+  - pdfa
+  - plateau
+  - ribose
+  - snap
+  - standoc
+  - swf
+  - taste
+  - un
+  - vsd
+files:
+- file: annex.rb
+  lines: 101
+  methods:
+  - annex
+  - annex1
+  - annex1_title_fmt
+  - annex1_title_fmt_inline
+  - annex1_title_prefix
+  - annex1_title_prefix_prep
+  - annex1_title_postprocess
+  - annex1_variant_title_postprocess_prep
+  - annex_delim_override
+  - annex_delim
+  kind: declarative
+  rationale: annex title prefix and format templates
+  flavor_overrides:
+    bipm:
+    - annex_delim (presentation_xml_convert.rb)
+    bsi:
+    - annex_delim (presentation_xml_convert.rb)
+    cc:
+    - annex_delim (presentation_xml_convert.rb)
+    csa:
+    - annex_delim (presentation_xml_convert.rb)
+    csd:
+    - annex_delim (presentation_xml_convert.rb)
+    generic:
+    - annex_delim (presentation_xml_convert.rb)
+    ieee:
+    - annex1_title_fmt (presentation_xml_convert.rb)
+    - annex1_title_fmt_inline (presentation_xml_convert.rb)
+    - annex_delim (presentation_xml_convert.rb)
+    iso:
+    - annex (presentation_section.rb)
+    - annex (sections.rb)
+    itu:
+    - annex1 (presentation_section.rb)
+    jis:
+    - annex (presentation_section.rb)
+    - annex1 (presentation_section.rb)
+    - annex_delim (presentation_section.rb)
+    mpfa:
+    - annex1 (presentation_xml_convert.rb)
+    nist:
+    - annex_delim (presentation_xml_convert.rb)
+    ogc:
+    - annex_delim (presentation_sections.rb)
+    ribose:
+    - annex_delim (presentation_xml_convert.rb)
+- file: autonum.rb
+  lines: 229
+  methods:
+  - prefix_name
+  - prefix_name_defaults
+  - prefix_name_prep
+  - prefix_name_labels
+  - prefix_name_postprocess
+  - transfer_id
+  - semx_fmt_dup
+  - gather_all_ids
+  - strip_duplicate_ids
+  - semx
+  - autonum
+  - semx_orig
+  - labelled_autonum
+  - fmt_xref_label
+  - prefix_container_fmt_xref_label
+  - prefix_container_container
+  - empty_xml?
+  - fmt_caption
+  - fmt_caption_label_wrap
+  - fmt_caption2
+  - esc
+  - sem_xml_descendant?
+  - sem_xml_descendant_provision?
+  - sem_xml_descendant_bibitem?
+  - sem_xml_descendant_inline?
+  - sem_xml_descendant_terms?
+  - block?
+  kind: mixed
+  rationale: prefix/label templates are declarative; numbering state is computed (LADL
+    labels cover this)
+  flavor_overrides:
+    bipm:
+    - prefix_name (presentation_xml_convert.rb)
+- file: bibdata.rb
+  lines: 90
+  methods:
+  - bibdata
+  - address_precompose
+  - address_precompose1
+  - bibdata_current
+  - bibdata_i18n
+  - hash_translate
+  - edition_translate
+  - edition_integer?
+  - tag_translate
+  kind: declarative
+  rationale: bibdata field localisation and render order
+  flavor_overrides:
+    bipm:
+    - bibdata_i18n (presentation_biblio.rb)
+    bsi:
+    - bibdata (presentation_bibdata.rb)
+    iec:
+    - bibdata_i18n (presentation_xml_convert.rb)
+    ieee:
+    - bibdata_i18n (presentation_bibdata.rb)
+    iho:
+    - bibdata_i18n (presentation_xml_convert.rb)
+    iso:
+    - bibdata_i18n (presentation_bibdata.rb)
+    - edition_translate (presentation_bibdata.rb)
+    itu:
+    - bibdata_i18n (presentation_bibdata.rb)
+    jis:
+    - bibdata_i18n (presentation_xml_convert.rb)
+    - edition_integer? (presentation_xml_convert.rb)
+    ogc:
+    - bibdata (presentation_xml_convert.rb)
+    - bibdata_i18n (presentation_xml_convert.rb)
+    plateau:
+    - bibdata_i18n (presentation_xml_convert.rb)
+- file: block.rb
+  lines: 254
+  methods:
+  - lower2cap
+  - block_delim
+  - formula
+  - formula1
+  - formula_where
+  - example
+  - example1
+  - note
+  - note_delim
+  - note1
+  - note_label
+  - admonition
+  - admonition1
+  - admonition_options
+  - admonition_label
+  - admonition_icon
+  - admonition_delim
+  - table
+  - table1_caption?
+  - table1
+  - table_css
+  - table_delim
+  - table_long_strings_cleanup
+  - amend
+  - amend1
+  - amend_newcontent
+  - amend_subclause
+  - amend_subclause_title
+  - quote
+  - quote1
+  - quote_attribution
+  - quote_source
+  kind: declarative
+  rationale: formula/example/note labels and delimiters
+  flavor_overrides:
+    bipm:
+    - note1 (presentation_blocks.rb)
+    - note_delim (presentation_blocks.rb)
+    - note_label (presentation_blocks.rb)
+    - table_delim (presentation_blocks.rb)
+    bsi:
+    - admonition1 (presentation_xml_convert.rb)
+    - admonition_delim (presentation_xml_convert.rb)
+    - formula_where (presentation_xml_convert.rb)
+    - note1 (presentation_xml_convert.rb)
+    - table1 (presentation_xml_convert.rb)
+    gb:
+    - example1 (presentation_xml_convert.rb)
+    ieee:
+    - amend1 (presentation_xml_convert.rb)
+    - block_delim (presentation_xml_convert.rb)
+    - example1 (presentation_xml_convert.rb)
+    - note_delim (presentation_xml_convert.rb)
+    iso:
+    - admonition1 (presentation_xml_convert.rb)
+    - admonition_delim (presentation_xml_convert.rb)
+    - amend_subclause (presentation_section.rb)
+    - formula_where (presentation_xml_convert.rb)
+    - note1 (presentation_xml_convert.rb)
+    - table1 (presentation_xml_convert.rb)
+    itu:
+    - note1 (presentation_xml_convert.rb)
+    - note_delim (presentation_xml_convert.rb)
+    - table1 (presentation_xml_convert.rb)
+    jis:
+    - table1 (presentation_table.rb)
+    ogc:
+    - note_delim (presentation_xml_convert.rb)
+    un:
+    - admonition1 (presentation_xml_convert.rb)
+    - note1 (presentation_xml_convert.rb)
+- file: cleanup.rb
+  lines: 23
+  methods:
+  - cleanup
+  - empty_elements_remove
+  kind: algorithmic
+  rationale: tree clean-up passes after rendering
+  flavor_overrides:
+    ieee:
+    - cleanup (presentation_xml_convert.rb)
+- file: concepts.rb
+  lines: 111
+  methods:
+  - concept
+  - concept1
+  - concept_render
+  - concept_dup
+  - concept_dup_cleanup_orig
+  - concept1_style
+  - concept_render_init
+  - concept_render_opts
+  - concept1_linkmention
+  - concept1_ref
+  - concept1_ref_content
+  kind: mixed
+  rationale: concept display style declarative; duplicate resolution is logic
+  flavor_overrides:
+    bsi:
+    - concept (presentation_terms.rb)
+    iec:
+    - concept (presentation_terms.rb)
+    ieee:
+    - concept1 (presentation_concepts.rb)
+    ietf:
+    - concept1 (presentation_xml_convert.rb)
+    iso:
+    - concept (presentation_terms.rb)
+    - concept1 (presentation_terms.rb)
+    - concept1_ref_content (presentation_terms.rb)
+- file: designations.rb
+  lines: 187
+  methods:
+  - related
+  - related1
+  - related1_prep
+  - related_designation1
+  - designation
+  - deprecates
+  - admits
+  - merge_second_preferred
+  - merge_second_preferred1
+  - merge_preferred_eligible?
+  - merge_preferred_eligible_prep
+  - designation1
+  - designation_annotate
+  - designation_expression
+  - designation_expression_boldface
+  - designation_field
+  - designation_grammar
+  - designation_localization
+  - designation_pronunciation
+  - designation_bookmarks
+  kind: declarative
+  rationale: designation prefixes and delimiters from i18n templates
+  flavor_overrides:
+    bsi:
+    - designation_grammar (presentation_terms.rb)
+    - designation_localization (presentation_terms.rb)
+    - designation_pronunciation (presentation_terms.rb)
+    - merge_preferred_eligible? (presentation_terms.rb)
+    - merge_second_preferred (presentation_terms.rb)
+    iec:
+    - related (presentation_terms.rb)
+    - related1 (presentation_terms.rb)
+    ieee:
+    - deprecates (presentation_concepts.rb)
+    - designation_expression_boldface (presentation_concepts.rb)
+    - designation_field (presentation_concepts.rb)
+    - merge_second_preferred (presentation_concepts.rb)
+    - related (presentation_concepts.rb)
+    iso:
+    - related1 (presentation_terms.rb)
+    itu:
+    - designation (presentation_xml_convert.rb)
+    - designation1 (presentation_xml_convert.rb)
+    jis:
+    - admits (presentation_xml_convert.rb)
+    ogc:
+    - admits (presentation_xml_convert.rb)
+    - deprecates (presentation_xml_convert.rb)
+    ribose:
+    - designation_expression_boldface (presentation_xml_convert.rb)
+- file: docid.rb
+  lines: 107
+  methods:
+  - docid_prefixes
+  - pref_ref_code
+  - pref_ref_code_markup
+  - pref_ref_code_parse
+  - bibitem_ref_code
+  - bibitem_ref_code_prep
+  - no_identifier
+  - xml_to_string_skip_fn
+  - bracket_if_num
+  - bracket
+  - unbracket1
+  - unbracket
+  - render_identifier
+  kind: declarative
+  rationale: document identifier prefix and display templates
+  flavor_overrides:
+    bipm:
+    - render_identifier (presentation_biblio.rb)
+    bsi:
+    - bracket_if_num (presentation_biblio.rb)
+    ieee:
+    - bracket_if_num (presentation_bibitem.rb)
+    ietf:
+    - docid_prefixes (presentation_xml_convert.rb)
+    iso:
+    - render_identifier (presentation_xml_convert.rb)
+    itu:
+    - bracket_if_num (presentation_ref.rb)
+    - pref_ref_code (presentation_ref.rb)
+    - unbracket (presentation_ref.rb)
+    nist:
+    - bracket_if_num (presentation_xml_convert.rb)
+- file: docid_semantic.rb
+  lines: 125
+  methods:
+  - std_docid_semantic
+  - std_docid_semantic_parse
+  - pubid_parse
+  - dash_normalize
+  - publisher_replaced?
+  - std_docid_semantic_full
+  - std_docid_span_classes
+  - std_docid_semantic_restore_format
+  - annotate_docid?
+  kind: algorithmic
+  rationale: parsing of document identifiers into semantic parts
+  flavor_overrides:
+    bsi:
+    - annotate_docid? (init.rb)
+    ieee:
+    - annotate_docid? (presentation_ref.rb)
+    - std_docid_span_classes (presentation_ref.rb)
+    iso:
+    - annotate_docid? (presentation_xref.rb)
+    - std_docid_span_classes (presentation_xref.rb)
+- file: erefs.rb
+  lines: 199
+  methods:
+  - citeas
+  - citeas_cleanup
+  - expand_citeas
+  - erefstack1
+  - resolve_eref_connectives
+  - resolve_eref_connectives1
+  - resolve_eref_connectives_split
+  - escape_l10n
+  - resolve_comma_connectives
+  - resolve_comma_connectives1
+  - resolve_to_connectives
+  - eref2link
+  - eref2xref
+  - eref2link1
+  - eref2linkshort
+  - suffix_url
+  - eref_target
+  - eref_url_prep
+  - eref_url
+  kind: mixed
+  rationale: citation text declarative; connective resolution is logic
+  flavor_overrides:
+    ieee:
+    - expand_citeas (presentation_ref.rb)
+    iso:
+    - expand_citeas (presentation_xref.rb)
+    nist:
+    - expand_citeas (presentation_xml_convert.rb)
+- file: erefs_locality.rb
+  lines: 121
+  methods:
+  - eref_localities
+  - eref_localities_conflated
+  - can_conflate_eref_rendering?
+  - eref_locality_stacks
+  - eref_locality_delimiter
+  - eref_locality_stack
+  - eref_locality_stack1
+  - locality_delimiter
+  - eref_localities0
+  - eref_localities1_zh
+  - eref_localities1
+  - eref_locality_populate
+  kind: algorithmic
+  rationale: locality stack conflation and ordering logic
+  flavor_overrides:
+    bipm:
+    - eref_localities1 (presentation_xml_convert.rb)
+    bsi:
+    - eref_localities1 (presentation_inline.rb)
+    - eref_localities1_zh (presentation_inline.rb)
+    - locality_delimiter (presentation_inline.rb)
+    ieee:
+    - eref_localities1 (presentation_ref.rb)
+    - eref_localities_conflated (presentation_ref.rb)
+    - eref_locality_populate (presentation_ref.rb)
+    iso:
+    - can_conflate_eref_rendering? (presentation_xref.rb)
+    - eref_localities1 (presentation_xref.rb)
+    - eref_localities1_zh (presentation_xref.rb)
+    - eref_localities_conflated (presentation_xref.rb)
+    - locality_delimiter (presentation_xref.rb)
+- file: footnotes.rb
+  lines: 256
+  methods:
+  - footnote_collect
+  - footnote_container
+  - fnbody
+  - add_fnbody?
+  - insert_fn_body_ref
+  - fn_ref_label
+  - fn_body_label
+  - fn_label
+  - table_fn
+  - document_footnotes
+  - sort_footnote_sections
+  - non_document_footnotes
+  - table_footnotes
+  - figure_footnotes
+  - filter_document_footnotes
+  - renumber_document_footnotes
+  - renumber_document_footnote
+  - figure_fn
+  - figure_fn_to_dt_dd
+  - figure_key_insert_pt
+  - comments
+  - display_comment_override?
+  - comment_body
+  - comment_bookmarks
+  - comment_bookmarks_locate
+  - comment_to_bookmark_attrs
+  - comment_bookmark_start
+  - comment_bookmark_end
+  - comment_bookmark_start_label
+  - comment_bookmark_end_label
+  - display_comments_global?
+  kind: mixed
+  rationale: marker label is declarative; collection and relocation of footnote bodies
+    is tree logic
+  flavor_overrides:
+    bipm:
+    - document_footnotes (presentation_footnotes.rb)
+    - filter_document_footnotes (presentation_footnotes.rb)
+    - fn_body_label (presentation_footnotes.rb)
+    - fn_ref_label (presentation_footnotes.rb)
+    - renumber_document_footnote (presentation_footnotes.rb)
+    - renumber_document_footnotes (presentation_footnotes.rb)
+    - sort_footnote_sections (presentation_footnotes.rb)
+    - table_fn (presentation_footnotes.rb)
+    - table_footnotes (presentation_footnotes.rb)
+    bsi:
+    - comment_bookmark_end_label (presentation_inline.rb)
+    - comment_bookmark_start_label (presentation_inline.rb)
+    - display_comment_override? (presentation_inline.rb)
+    - figure_fn (presentation_xml_convert.rb)
+    - fn_body_label (presentation_xml_convert.rb)
+    - fn_ref_label (presentation_xml_convert.rb)
+    ieee:
+    - document_footnotes (presentation_xml_convert.rb)
+    iso:
+    - comments (presentation_section.rb)
+    - fn_ref_label (presentation_xml_convert.rb)
+    itu:
+    - fn_body_label (presentation_xml_convert.rb)
+    - fn_ref_label (presentation_xml_convert.rb)
+    jis:
+    - figure_fn (presentation_xml_convert.rb)
+    - fn_body_label (presentation_xml_convert.rb)
+    - fn_ref_label (presentation_xml_convert.rb)
+    - table_fn (presentation_xml_convert.rb)
+    - table_footnotes (presentation_xml_convert.rb)
+- file: ids.rb
+  lines: 143
+  methods:
+  - add_id_text
+  - add_id
+  - id_validate
+  - add_missing_presxml_id
+  - repeat_id_validate1
+  - repeat_id_validate
+  - orig_id_cleanup
+  - idref_validate
+  - idref_validate1
+  - provide_ids
+  - anchor_sanitise
+  - populate_id
+  - add_missing_id
+  - to_ncname
+  - contenthash_id_cleanup
+  - add_new_contenthash_id
+  - xref_new_contenthash_id
+  kind: algorithmic
+  rationale: id generation and uniqueness validation
+  flavor_overrides: {}
+- file: image.rb
+  lines: 198
+  methods:
+  - figure
+  - svg_wrap
+  - svg_scale
+  - svgmap_extract
+  - imageconvert
+  - svg_extract
+  - subfigure_delim
+  - figure_delim
+  - figure_name
+  - figure1
+  - figure_label?
+  - figure_label
+  - figure_key
+  - eps2svg
+  - svg_emf_double
+  - emf_encode
+  - svg_prep
+  - emf_to_svg
+  - eps_to_svg
+  - eps_to_svg_from_node
+  - svg_to_emf
+  - svg_to_emf_from_node
+  - svg_impose_height_attr
+  - svg_load
+  kind: algorithmic
+  rationale: SVG scaling and image metrics/conversion computed from content
+  flavor_overrides:
+    bipm:
+    - figure1 (presentation_blocks.rb)
+    iso:
+    - figure_delim (presentation_xml_convert.rb)
+    - figure_label? (presentation_xml_convert.rb)
+    - figure_name (presentation_xml_convert.rb)
+    - subfigure_delim (presentation_xml_convert.rb)
+    - subfigure_delim (xref_figure.rb)
+    itu:
+    - subfigure_delim (xref.rb)
+    jis:
+    - subfigure_delim (xref.rb)
+- file: index.rb
+  lines: 218
+  methods:
+  - strip_index
+  - index
+  - index1
+  - index_sort_buckets
+  - index1_cleanup
+  - sortable
+  - index_entries_opt
+  - index_entries
+  - index_entries2
+  - index_entries_head
+  - index_entries_see
+  - see_lbl
+  - also_lbl
+  - sort_indexterms
+  - index_fold_case
+  - index_fold_level
+  - index_fold_bucket
+  - index_fold_head
+  - index_merge
+  - extract_indexsee
+  - xml_encode_attr
+  - extract_indexterms
+  - extract_indexterms_init
+  - term_hash_init
+  - index2bookmark
+  kind: algorithmic
+  rationale: index term bucketing and collation sort
+  flavor_overrides:
+    bipm:
+    - index1 (presentation_xml_convert.rb)
+    ietf:
+    - index (presentation_xml_convert.rb)
+- file: inline.rb
+  lines: 228
+  methods:
+  - non_locality_elems
+  - get_linkend
+  - unnest_linkend
+  - xref_empty?
+  - anchor_id_postprocess
+  - xref
+  - eref
+  - redundant_eref
+  - origin
+  - xref1
+  - link
+  - variant
+  - variant1
+  - identifier
+  - date
+  - date1
+  - inline_format
+  - text_transform
+  - text_transform1
+  - change_case
+  - conditional_capitalize
+  - custom_charset
+  - passthrough
+  - passthrough1
+  - extract_custom_charsets
+  - ruby
+  - ruby1
+  - found_matching_variant_sibling
+  kind: mixed
+  rationale: inline rendering rules; linkend resolution is tree logic
+  flavor_overrides:
+    bipm:
+    - eref (presentation_xml_convert.rb)
+    - origin (presentation_xml_convert.rb)
+    ieee:
+    - xref_empty? (presentation_ref.rb)
+    iso:
+    - origin (presentation_origin.rb)
+    itu:
+    - eref (presentation_xml_convert.rb)
+    - link (presentation_xml_convert.rb)
+    - origin (presentation_xml_convert.rb)
+- file: list.rb
+  lines: 119
+  methods:
+  - dl
+  - dl1
+  - ul
+  - ul1
+  - ol
+  - ol_numbering
+  - ol_prep
+  - ol_depth
+  - ol1
+  - ol_label
+  - ol_label_template
+  - ol_label_format
+  - ul_label_list
+  - ul_label_list_from_metadata
+  - ul_label
+  - ul_label_value
+  - list_nesting_depth
+  kind: declarative
+  rationale: list label types and numbering style
+  flavor_overrides:
+    bipm:
+    - ol_label_template (presentation_blocks.rb)
+    - ul_label_list (presentation_blocks.rb)
+    bsi:
+    - ul_label_list (presentation_xml_convert.rb)
+    cc:
+    - ul_label_list (presentation_xml_convert.rb)
+    csa:
+    - ol_label_template (presentation_xml_convert.rb)
+    - ul_label_list (presentation_xml_convert.rb)
+    csd:
+    - ul_label_list (presentation_xml_convert.rb)
+    iec:
+    - ul_label_list (presentation_xml_convert.rb)
+    ieee:
+    - ol_numbering (presentation_xml_convert.rb)
+    - ul_label_list (presentation_xml_convert.rb)
+    ietf:
+    - ol_label_format (presentation_xml_convert.rb)
+    iho:
+    - ul_label_list (presentation_xml_convert.rb)
+    iso:
+    - ol_depth (presentation_xml_convert.rb)
+    - ol_label_template (presentation_xml_convert.rb)
+    - ul_label_list (presentation_xml_convert.rb)
+    itu:
+    - dl (presentation_xml_convert.rb)
+    - ul_label_list (presentation_xml_convert.rb)
+    jis:
+    - dl (presentation_list.rb)
+    - ol_depth (presentation_list.rb)
+    - ul_label_list (presentation_list.rb)
+    - ul_label_value (presentation_list.rb)
+    nist:
+    - ol_label_template (presentation_xml_convert.rb)
+    - ul_label_list (presentation_xml_convert.rb)
+    ogc:
+    - ol_depth (presentation_xml_convert.rb)
+    - ol_label_template (presentation_xml_convert.rb)
+    - ul_label_list (presentation_xml_convert.rb)
+    plateau:
+    - dl (presentation_xml_convert.rb)
+    - ol_depth (presentation_xml_convert.rb)
+    ribose:
+    - ol_label_template (presentation_xml_convert.rb)
+    - ul_label_list (presentation_xml_convert.rb)
+- file: list_to_table.rb
+  lines: 250
+  methods:
+  - list_to_table
+  - list_table_convert
+  - list_table_depth
+  - list_table_build
+  - list_table_name
+  - list_table_colgroup
+  - list_table_normalise_colgroup
+  - list_table_header
+  - list_only_one_title
+  - list_table_th
+  - list_table_col_name
+  - list_at_depth
+  - list_table_body
+  - list_table_row
+  - list_table_leaf_paths
+  - list_table_count_terminals
+  - list_table_count_terminals_recurse
+  - list_table_nonterminal_td
+  - list_table_li_content
+  - list_table_degen_terminal_td
+  - list_table_terminal_td
+  - list_table_calc_start
+  kind: algorithmic
+  rationale: colgroup width normalisation computed from cell counts
+  flavor_overrides: {}
+- file: math.rb
+  lines: 280
+  methods:
+  - mathml
+  - localize_maths
+  - normalise_number
+  - implicit_number_formatter
+  - numberformat_type
+  - numberformat_unclassified_warn
+  - explicit_number_formatter
+  - explicit_number_formatter_cfg
+  - explicit_number_formatter_signif
+  - large_notation_fmt
+  - large_notation_fmt1
+  - num_precision
+  - num_totaldigits
+  - num_totaldigits_compute
+  - num_precision_from_significant
+  - twitter_cldr_localiser_symbols
+  - asciimath_dup
+  - maths_just_numeral
+  - mathml1
+  - stem_dup
+  - mn_to_msup
+  - mathml_number
+  - numeric_mathml?
+  - mathml_style_inherit
+  - mathml_number_to_number
+  kind: algorithmic
+  rationale: number formatting and MathML localisation by computation
+  flavor_overrides:
+    bipm:
+    - localize_maths (presentation_xml_convert.rb)
+    - mathml1 (presentation_xml_convert.rb)
+    - twitter_cldr_localiser_symbols (presentation_xml_convert.rb)
+    ieee:
+    - asciimath_dup (presentation_xml_convert.rb)
+    iso:
+    - twitter_cldr_localiser_symbols (presentation_xml_convert.rb)
+    itu:
+    - twitter_cldr_localiser_symbols (presentation_xml_convert.rb)
+- file: metadata.rb
+  lines: 194
+  methods:
+  - metadata
+  - preprocess_metadata
+  - logo_expand_pres_metadata
+  - logo_size_pres_metadata_incomplete?
+  - localized_strings
+  - localized_strings_prep
+  - attachments_extract
+  - save_attachment
+  - extension_insert
+  - extension_insert_pt
+  - toc_metadata
+  - fonts_metadata
+  - presmeta_insert_pt
+  - presmeta
+  - i18n_tag
+  - i18n_safe
+  - i18n_name
+  - i18n_name1
+  - blank?
+  - trim_hash
+  - trim_hash1
+  kind: mixed
+  rationale: localised strings declarative; logo size handling is computed
+  flavor_overrides:
+    jis:
+    - localized_strings (presentation_xml_convert.rb)
+- file: refs.rb
+  lines: 231
+  methods:
+  - references_render
+  - prep_for_rendering
+  - bibitem
+  - notes_inside_bibitem
+  - add_id_to_display_bib_notes
+  - bibrender_item
+  - bibrender_formattedref
+  - bibrender_relaton
+  - bibitem_notes
+  - bibliography_bibitem_number_skip
+  - bibliography_bibitem_number
+  - bibliography_bibitem_number1
+  - bibliography_bibitem_number_insert_pt
+  - bibliography_bibitem_tag
+  - bibliography_bibitem_tag1
+  - insert_biblio_tag
+  - norm_ref_entry_code
+  - biblio_ref_entry_code
+  - prefix_bracketed_ref
+  - bibnote_extract
+  - date_note_process
+  - ident_fn
+  - implicit_reference
+  - standard?
+  kind: mixed
+  rationale: bibitem display via templates plus ordering and relocation logic
+  flavor_overrides:
+    bipm:
+    - biblio_ref_entry_code (presentation_biblio.rb)
+    - implicit_reference (presentation_biblio.rb)
+    - norm_ref_entry_code (presentation_biblio.rb)
+    bsi:
+    - biblio_ref_entry_code (presentation_biblio.rb)
+    - bibliography_bibitem_tag1 (presentation_biblio.rb)
+    - bibrender_relaton (presentation_biblio.rb)
+    - insert_biblio_tag (presentation_biblio.rb)
+    - norm_ref_entry_code (presentation_biblio.rb)
+    - prefix_bracketed_ref (presentation_biblio.rb)
+    ieee:
+    - bibliography_bibitem_number1 (presentation_bibitem.rb)
+    - bibrender_relaton (presentation_bibitem.rb)
+    - references_render (presentation_bibitem.rb)
+    iho:
+    - biblio_ref_entry_code (presentation_xml_convert.rb)
+    - bibliography_bibitem_tag (presentation_xml_convert.rb)
+    - bibliography_bibitem_tag1 (presentation_xml_convert.rb)
+    - norm_ref_entry_code (presentation_xml_convert.rb)
+    iso:
+    - biblio_ref_entry_code (presentation_xml_convert.rb)
+    - bibliography_bibitem_number_skip (presentation_xml_convert.rb)
+    - bibrender_formattedref (presentation_xml_convert.rb)
+    - date_note_process (presentation_xml_convert.rb)
+    - implicit_reference (presentation_xml_convert.rb)
+    itu:
+    - biblio_ref_entry_code (presentation_ref.rb)
+    - bibliography_bibitem_number1 (presentation_ref.rb)
+    - bibliography_bibitem_number_skip (presentation_ref.rb)
+    - bibrender_formattedref (presentation_ref.rb)
+    - bibrender_relaton (presentation_ref.rb)
+    - norm_ref_entry_code (presentation_ref.rb)
+    jis:
+    - biblio_ref_entry_code (presentation_xml_convert.rb)
+    - norm_ref_entry_code (presentation_xml_convert.rb)
+    nist:
+    - biblio_ref_entry_code (presentation_xml_convert.rb)
+    - bibliography_bibitem_number (presentation_xml_convert.rb)
+    - norm_ref_entry_code (presentation_xml_convert.rb)
+    ogc:
+    - biblio_ref_entry_code (presentation_xml_convert.rb)
+    - bibliography_bibitem_number_skip (presentation_xml_convert.rb)
+    - bibrender_formattedref (presentation_xml_convert.rb)
+    - norm_ref_entry_code (presentation_xml_convert.rb)
+- file: reqt.rb
+  lines: 50
+  methods:
+  - recommendation
+  - requirement
+  - permission
+  - recommendation1
+  - requirement_render_preprocessing
+  - requirement_render
+  - requirement_render1
+  kind: declarative
+  rationale: requirement/recommendation/permission label rendering
+  flavor_overrides: {}
+- file: section.rb
+  lines: 164
+  methods:
+  - clause
+  - unnumbered_clause?
+  - numbered_clause_invalid_context?
+  - clausedelim
+  - clause1
+  - clause1_prep
+  - single_term_clause_retitle
+  - single_term_clause_unnest
+  - skip_display_order?
+  - display_order_at
+  - display_order_xpath
+  - display_order
+  - preface_rearrange
+  - preface_move
+  - preface_move1
+  - rearrange_clauses
+  - toc
+  - toc_refs
+  kind: declarative
+  rationale: clause title delimiters and numbering display
+  flavor_overrides:
+    bipm:
+    - clause (presentation_xml_convert.rb)
+    - clause1 (presentation_xml_convert.rb)
+    bsi:
+    - clause (presentation_xml_convert.rb)
+    - preface_rearrange (presentation_xml_convert.rb)
+    iec:
+    - clause1 (presentation_xml_convert.rb)
+    - rearrange_clauses (presentation_xml_convert.rb)
+    ieee:
+    - preface_rearrange (presentation_xml_convert.rb)
+    iho:
+    - clausedelim (presentation_xml_convert.rb)
+    iso:
+    - clause (presentation_section.rb)
+    - clause1 (presentation_section.rb)
+    itu:
+    - clause1 (presentation_section.rb)
+    - rearrange_clauses (presentation_preface.rb)
+    - unnumbered_clause? (presentation_section.rb)
+    jis:
+    - preface_rearrange (presentation_section.rb)
+    mpfa:
+    - clause1 (presentation_xml_convert.rb)
+    nist:
+    - clause1 (presentation_xml_convert.rb)
+    ogc:
+    - clause1 (presentation_sections.rb)
+    - preface_rearrange (presentation_sections.rb)
+    plateau:
+    - rearrange_clauses (presentation_xml_convert.rb)
+    ribose:
+    - preface_rearrange (presentation_xml_convert.rb)
+- file: section_refs.rb
+  lines: 55
+  methods:
+  - references
+  - reference_names
+  - reference_name
+  - move_norm_ref_to_sections
+  - move_norm_ref_to_sections_insert_pt
+  - hidden_items
+  kind: mixed
+  rationale: reference section naming declarative; norm-ref relocation is tree logic
+  flavor_overrides:
+    bipm:
+    - reference_name (presentation_biblio.rb)
+    ietf:
+    - move_norm_ref_to_sections (presentation_xml_convert.rb)
+    iso:
+    - move_norm_ref_to_sections (presentation_section.rb)
+    - reference_names (xref.rb)
+    itu:
+    - reference_name (presentation_ref.rb)
+    nist:
+    - move_norm_ref_to_sections (presentation_xml_convert.rb)
+    ogc:
+    - reference_name (presentation_xml_convert.rb)
+    - references (presentation_xml_convert.rb)
+    un:
+    - move_norm_ref_to_sections (presentation_xml_convert.rb)
+- file: source.rb
+  lines: 73
+  methods:
+  - source
+  - source_types
+  - fmt_source
+  - tablesource
+  - figuresource
+  - source_join_delim
+  - source1
+  - source1_gather
+  - source1_label
+  - source_modification
+  kind: declarative
+  rationale: source/origin text and join delimiters
+  flavor_overrides:
+    jis:
+    - source1_label (presentation_xml_convert.rb)
+    - source_join_delim (presentation_xml_convert.rb)
+    plateau:
+    - source_join_delim (presentation_xml_convert.rb)
+    - source_types (presentation_xml_convert.rb)
+- file: sourcecode.rb
+  lines: 209
+  methods:
+  - sourcehighlighter_css
+  - custom_css
+  - rouge_css_location
+  - sourcehighlighter
+  - callouts
+  - sourcecode
+  - sourcecode1
+  - fmt_sourcecode
+  - annotations
+  - source_highlight
+  - source_remove_markup
+  - source_remove_annotations
+  - source_restore_markup
+  - source_restore_markup_table
+  - source_restore_callouts
+  - source_restore_callouts_table
+  - reinsert_callout
+  - sourcecode_table_to_elem
+  - source_lex
+  - source_collapse_markup_newlines
+  - source_label
+  kind: algorithmic
+  rationale: syntax highlighting via rouge and callout processing
+  flavor_overrides:
+    ogc:
+    - rouge_css_location (presentation_xml_convert.rb)
+    - source_label (presentation_xml_convert.rb)
+- file: terms.rb
+  lines: 237
+  methods:
+  - target_desgn_elem
+  - termcontainers
+  - termcleanup
+  - termexample
+  - termnote
+  - termnote_delim
+  - termnote1
+  - termnote_label
+  - termdefinition
+  - termdefinition1
+  - multidef
+  - singledef
+  - unwrap_definition
+  - termdomain
+  - termsource
+  - termsource_designation
+  - copy_baselevel_termsource
+  - modification_dup_align
+  - esc_origin
+  - termsource1
+  - termsource_join_delim
+  - termsource_label
+  - termsource_modification
+  - termsource_mod_text_delim
+  - termsource_add_modification_text
+  - termsource_status
+  - term
+  - term1
+  kind: mixed
+  rationale: term/admitted/deprecated text templates declarative; container reorganisation
+    is logic
+  flavor_overrides:
+    bipm:
+    - termsource (presentation_blocks.rb)
+    - termsource_label (presentation_blocks.rb)
+    - termsource_modification (presentation_blocks.rb)
+    bsi:
+    - termnote1 (presentation_terms.rb)
+    - termsource_label (presentation_terms.rb)
+    - termsource_modification (presentation_terms.rb)
+    - termsource_status (presentation_terms.rb)
+    iec:
+    - termdomain (presentation_terms.rb)
+    - termexample (presentation_terms.rb)
+    - termnote_label (presentation_terms.rb)
+    - termsource_label (presentation_terms.rb)
+    - termsource_modification (presentation_terms.rb)
+    ieee:
+    - multidef (presentation_terms.rb)
+    - term (presentation_terms.rb)
+    - termcleanup (presentation_terms.rb)
+    - termcontainers (presentation_terms.rb)
+    - termdomain (presentation_terms.rb)
+    - termnote1 (presentation_terms.rb)
+    - termnote_label (presentation_terms.rb)
+    - termsource_label (presentation_terms.rb)
+    - unwrap_definition (presentation_terms.rb)
+    iho:
+    - term1 (presentation_xml_convert.rb)
+    - termcleanup (presentation_xml_convert.rb)
+    - termsource1 (presentation_xml_convert.rb)
+    - termsource_label (presentation_xml_convert.rb)
+    iso:
+    - termsource_status (presentation_terms.rb)
+    itu:
+    - termnote_delim (presentation_xml_convert.rb)
+    - termsource_label (presentation_xml_convert.rb)
+    jis:
+    - termsource_join_delim (presentation_xml_convert.rb)
+    - termsource_label (presentation_xml_convert.rb)
+    - termsource_mod_text_delim (presentation_xml_convert.rb)
+    - termsource_modification (presentation_xml_convert.rb)
+    nist:
+    - termsource_label (presentation_xml_convert.rb)
+    - termsource_modification (presentation_xml_convert.rb)
+    ogc:
+    - termsource_label (presentation_xml_convert.rb)
+    plateau:
+    - termsource_join_delim (presentation_xml_convert.rb)
+    - termsource_mod_text_delim (presentation_xml_convert.rb)
+    ribose:
+    - termsource_label (presentation_xml_convert.rb)
+- file: title.rb
+  lines: 118
+  methods:
+  - middle_title
+  - middle_title_get_template
+  - middle_title_template
+  - missing_title
+  - floattitle
+  - floattitle1
+  - preceding_floating_titles
+  - clausetitle
+  - cjk_search
+  - cjk_extended_title
+  - preceding_floats
+  - toc_title
+  - toc_title_insert_pt
+  kind: declarative
+  rationale: title templates and delimiters
+  flavor_overrides:
+    bipm:
+    - middle_title (presentation_blocks.rb)
+    bsi:
+    - floattitle (presentation_xml_convert.rb)
+    - middle_title_template (presentation_xml_convert.rb)
+    - preceding_floating_titles (presentation_xml_convert.rb)
+    csa:
+    - middle_title (presentation_xml_convert.rb)
+    iec:
+    - middle_title_template (presentation_xml_convert.rb)
+    ieee:
+    - middle_title_template (presentation_xml_convert.rb)
+    iho:
+    - middle_title (presentation_xml_convert.rb)
+    iso:
+    - middle_title_template (presentation_section.rb)
+    - toc_title (presentation_section.rb)
+    itu:
+    - middle_title (presentation_section.rb)
+    - middle_title_template (presentation_section.rb)
+    - toc_title (presentation_preface.rb)
+    jis:
+    - middle_title (presentation_section.rb)
+    - toc_title_insert_pt (presentation_section.rb)
+    nist:
+    - middle_title (presentation_xml_convert.rb)
+    - toc_title_insert_pt (presentation_xml_convert.rb)
+    ogc:
+    - middle_title (presentation_sections.rb)
+    plateau:
+    - middle_title (presentation_xml_convert.rb)
+    - toc_title_insert_pt (presentation_xml_convert.rb)
+    ribose:
+    - middle_title (presentation_xml_convert.rb)
+    un:
+    - middle_title (presentation_xml_convert.rb)
+    - toc_title (presentation_xml_convert.rb)
+- file: xrefs.rb
+  lines: 228
+  methods:
+  - fmt_ref
+  - fmt_ref_elem
+  - fmt_ref_links
+  - prefix_container
+  - anchor_value
+  - anchor_linkend
+  - anchor_id_postproc
+  - anchor_linkend1
+  - anchor_xref
+  - anchor_xref_short
+  - anchor_xref_full
+  - prefix_container?
+  - combine_xref_locations
+  - combine_conflated_xref_locations
+  - conflate_xref_locations
+  - combine_conflated_xref_locations_container
+  - gather_xref_locations
+  - loc2xref
+  - combine_conn
+  - conn_sub
+  - i18n_chain_boolean
+  - can_conflate_xref_rendering?
+  - capitalise_xref
+  - capitalise_xref1
+  kind: mixed
+  rationale: reference text templates are declarative; target resolution is tree logic
+  flavor_overrides:
+    bsi:
+    - anchor_value (presentation_inline.rb)
+    ieee:
+    - anchor_linkend (presentation_ref.rb)
+    - anchor_linkend1 (presentation_ref.rb)
+    iso:
+    - anchor_linkend1 (presentation_xref.rb)
+    - anchor_value (presentation_xref.rb)
+    - prefix_container (presentation_xref.rb)
+    jis:
+    - anchor_linkend (presentation_xml_convert.rb)
+    plateau:
+    - anchor_linkend (presentation_xml_convert.rb)

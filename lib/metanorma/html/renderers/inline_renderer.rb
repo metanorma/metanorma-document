@@ -489,18 +489,79 @@ module Metanorma
           attrs = element_attrs(href: "##{escape_html(target)}",
                                 id: safe_attr(xref, :id))
           content = render_mixed_inline(xref)
-          # Cross-references carry no computed labels in this pipeline, so
-          # unresolvable targets keep isodoc's literal "[id]" fallback,
-          # emitted ahead of the link text like the native presentation.
-          text = if content.empty?
-                   "[#{escape_html(target.to_s)}]"
+          if content.empty?
+            content = Array(safe_attr(xref, :text)).map { |text| escape_html(text.to_s) }.join
+          end
+          label = native_xref_label(target, local: safe_attr(xref, :format) == "local")
+          text = if !content.empty?
+                   label ? content : "[#{escape_html(target.to_s)}] #{content}"
+                 elsif label
+                   escape_html(label)
                  else
-                   "[#{escape_html(target.to_s)}] #{content}"
+                   "[#{escape_html(target.to_s)}]"
                  end
           render_liquid("_link.html.liquid", {
                           "attrs" => attrs,
                           "content" => text,
                         })
+        end
+
+        def reset_native_xref_index
+          @native_xref_index = nil
+        end
+
+        # Read current metadata from indexed native node references. Rendering
+        # never invokes a labelling processor or changes the document graph.
+        def native_xref_label(target, local: false)
+          return nil unless coordinator.document && target
+
+          node = native_xref_index[target]
+          return nil unless node
+
+          attrs = node.class.attributes
+          data = attrs.key?(:fmt_ladl_label_data) && node.fmt_ladl_label_data
+          if !data && attrs.key?(:fmt_xref_label)
+            label = Array(node.fmt_xref_label).find do |item|
+              item.is_a?(Metanorma::Document::Components::Inline::FmtXrefLabelElement) &&
+                item.fmt_ladl_label_data
+            end
+            data = label&.fmt_ladl_label_data
+          end
+          return nil unless data.is_a?(Metanorma::Document::Components::Inline::FmtLadlLabelData)
+
+          local ? data.local : (data.global || data.local)
+        end
+
+        # Cache even an empty index: legacy unlabelled input must not trigger a
+        # new graph scan for every reference. BaseRenderer resets this per render.
+        # First-match identity and traversal order match the former direct lookup.
+        def native_xref_index
+          return @native_xref_index if @native_xref_index
+
+          index = {}
+          pending = [coordinator.document]
+          seen = {}.compare_by_identity
+          skipped_attributes = %i[bibdata bibliography]
+          until pending.empty?
+            node = pending.pop
+            next unless node.is_a?(Lutaml::Model::Serializable)
+            next if seen[node]
+
+            seen[node] = true
+            next if node.is_a?(Metanorma::Document::Components::Inline::RenderedDisplay)
+
+            attrs = node.class.attributes
+            if attrs.key?(:id)
+              id = node.id
+              index[id] ||= node if id
+            end
+            attrs.each_key do |key|
+              next if skipped_attributes.include?(key)
+
+              Array(node.public_send(key)).reverse_each { |child| pending << child }
+            end
+          end
+          @native_xref_index = index
         end
 
         def render_eref(eref)

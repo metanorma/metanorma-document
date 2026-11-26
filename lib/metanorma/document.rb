@@ -26,6 +26,7 @@ module Metanorma
     autoload :ModelAccess, "metanorma/document/model_access"
     autoload :NativeModels, "metanorma/document/native_models"
     autoload :PlainText, "metanorma/document/plain_text"
+    autoload :Presentation, "metanorma/document/presentation"
     autoload :Relaton, "metanorma/document/relaton"
     autoload :Root, "metanorma/document/root"
     autoload :UpdateUnits, "metanorma/document/update_units"

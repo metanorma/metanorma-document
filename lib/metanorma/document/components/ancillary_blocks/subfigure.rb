@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "../inline/fmt_ladl_label_data"
+
 module Metanorma
   module Document
     module Components
@@ -20,7 +22,13 @@ module Metanorma
           attribute :fmt_xref_label,
                     Metanorma::Document::Components::Inline::FmtXrefLabelElement, collection: true
 
+          attribute :hidden, :boolean
+          attribute :fmt_ladl_label_data,
+                    Metanorma::Document::Components::Inline::FmtLadlLabelData
+
           xml do
+            map_attribute "hidden", to: :hidden
+            map_element "fmt-ladl-label-data", to: :fmt_ladl_label_data
             element "figure"
             map_attribute "id", to: :id
             map_attribute "anchor", to: :anchor

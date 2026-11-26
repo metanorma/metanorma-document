@@ -91,7 +91,7 @@
 <clause id="sec-terms-outer"><title>Terminology</title>
 <terms id="sec-3-7" obligation="normative"><title>Measurement and error terms</title>
 <term id="term-creep"><preferred>creep</preferred><domain>load cells</domain>
-<definition><verbaldefinition>change in load cell output occurring with time while under constant load</verbaldefinition></definition>
+<definition><verbal-definition><p>change in load cell output occurring with time while under constant load</p></verbal-definition></definition>
 </term>
 </terms>
 </clause>
