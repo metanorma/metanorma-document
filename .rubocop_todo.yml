@@ -65,8 +65,15 @@ Metrics/BlockLength:
 # Offense count: 96
 # Re-enabled 2026-07-19 at current max as a regression guard; burn down.
 # Configuration parameters: AllowedMethods, AllowedPatterns, CountRepeatedAttributes, Max.
+# The STS engine trunk (metanorma-document#165) moved from metanorma-iso:
+# its cell/section builders exceed even the raised max; baselined for the
+# adapter waves to burn down.
 Metrics/AbcSize:
   Max: 53
+  Exclude:
+    - 'lib/metanorma/document/sts/transformer/model_builder.rb'
+    - 'lib/metanorma/document/sts/transformer/paragraph_transformer.rb'
+    - 'lib/metanorma/document/sts/transformer/table_transformer.rb'
 
 # Offense count: 3
 # Configuration parameters: CountBlocks, CountModifierForms.
@@ -76,8 +83,13 @@ Metrics/BlockNesting:
 # Offense count: 84
 # Re-enabled 2026-07-19 at current max as a regression guard; burn down.
 # Configuration parameters: AllowedMethods, AllowedPatterns, Max.
+# STS engine trunk baselines: see Metrics/AbcSize above.
 Metrics/CyclomaticComplexity:
   Max: 21
+  Exclude:
+    - 'lib/metanorma/document/sts/transformer/model_builder.rb'
+    - 'lib/metanorma/document/sts/transformer/paragraph_transformer.rb'
+    - 'lib/metanorma/document/sts/transformer/table_transformer.rb'
 
 # Offense count: 149
 # Configuration parameters: CountComments, CountAsOne, AllowedMethods, AllowedPatterns.
@@ -86,14 +98,22 @@ Metrics/MethodLength:
 
 # Offense count: 3
 # Configuration parameters: CountKeywordArgs, MaxOptionalParameters.
+# STS engine trunk baselines: Profile#initialize and ModelBuilder#sec are
+# keyword-explicit API surfaces (metanorma-document#165).
 Metrics/ParameterLists:
   Max: 7
+  Exclude:
+    - 'lib/metanorma/document/sts/profile.rb'
+    - 'lib/metanorma/document/sts/transformer/model_builder.rb'
 
 # Offense count: 68
 # Re-enabled 2026-07-19 at current max as a regression guard; burn down.
 # Configuration parameters: AllowedMethods, AllowedPatterns, Max.
+# STS engine trunk baselines: see Metrics/AbcSize above.
 Metrics/PerceivedComplexity:
   Max: 21
+  Exclude:
+    - 'lib/metanorma/document/sts/transformer/model_builder.rb'
 
 # Offense count: 52
 # Configuration parameters: MinNameLength, AllowNamesEndingInNumbers, AllowedNames, ForbiddenNames.
@@ -106,6 +126,7 @@ Naming/MethodParameterName:
     - 'lib/metanorma/html/iso_renderer.rb'
     - 'lib/metanorma/html/renderers/block_renderer.rb'
     - 'lib/metanorma/html/renderers/inline_renderer.rb'
+    - 'lib/metanorma/document/sts/transformer/model_builder.rb'
     - 'spec/metanorma/html/renderer/footnote_collector_spec.rb'
 
 # Offense count: 4
@@ -205,3 +226,9 @@ Style/ComparableClamp:
     - 'lib/metanorma/html/iso_renderer.rb'
     - 'lib/metanorma/html/renderers/section_renderer.rb'
     - 'lib/metanorma/html/standard_renderer.rb'
+
+# Offense count: 1 (Ruby#doc_id — the STS engine trunk defines it twice;
+# the later definition is the live one. metanorma-document#165.)
+Lint/DuplicateMethods:
+  Exclude:
+    - 'lib/metanorma/document/sts/html_renderer/ruby.rb'

@@ -1,0 +1,231 @@
+# frozen_string_literal: true
+
+module Metanorma
+  module Document
+    module Sts
+      module Transformer
+        # Open/Closed dispatch by typed model class name and by typed
+        # collection attribute. Every map is served through a public
+        # hook method (overridable by registered subclasses), and the
+        # handlers themselves are public extension points — a flavor
+        # subclass may replace any of them. Blocks of a section run in
+        # source order: {SourceOrder} interleaves the typed collections
+        # by the element order recorded at parse time, so a formula
+        # keeps its place before its "where" paragraph and notes stay
+        # after the block they follow.
+        class BlockDispatcher < Base
+          # Typed model class → handler method. Public via
+          # #model_class_dispatch so subclasses can extend/replace it.
+          MODEL_CLASS_DISPATCH = {
+            "IsoClauseSection" => :dispatch_via_section,
+            "ClauseSection" => :dispatch_via_section,
+            "IsoForewordSection" => :dispatch_via_section,
+            "IsoIntroductionSection" => :dispatch_via_section,
+            "IsoTermsSection" => :dispatch_via_section,
+            "DefinitionSection" => :dispatch_via_section,
+            "IsoAnnexSection" => :dispatch_via_section,
+            "ParagraphBlock" => :dispatch_via_paragraph,
+            "ParagraphWithFootnote" => :dispatch_via_paragraph,
+            "UnorderedList" => :dispatch_via_list,
+            "OrderedList" => :dispatch_via_list,
+            "DefinitionList" => :dispatch_via_dl,
+            "TableBlock" => :dispatch_via_table,
+            "FigureBlock" => :dispatch_via_figure,
+            "FormulaBlock" => :dispatch_via_formula,
+            "NoteBlock" => :dispatch_via_note,
+            "ExampleBlock" => :dispatch_via_note,
+            "AdmonitionBlock" => :dispatch_via_note,
+            "QuoteBlock" => :dispatch_via_quote,
+            "SourcecodeBlock" => :dispatch_via_sourcecode,
+            "RequirementModel" => :dispatch_via_requirement,
+            "RecommendationModel" => :dispatch_via_requirement,
+            "PermissionModel" => :dispatch_via_requirement,
+            "StandardReferencesSection" => :dispatch_via_references,
+            "BibliographySection" => :dispatch_via_references,
+          }.freeze
+
+          PRESENTATION_CLASSES = %w[
+            FmtTitleElement FmtXrefLabelElement FmtNameElement FmtStemElement
+            FmtFnLabelElement FmtConceptElement SemxElement LocalizedString
+            LocalizedStrings FmtVal AsciiMath BrElement TabElement Bookmark
+            SpanElement
+          ].freeze
+
+          SECTION_CLASS_NAMES = %w[
+            IsoClauseSection ClauseSection IsoForewordSection
+            IsoIntroductionSection IsoTermsSection DefinitionSection
+            IsoAnnexSection AnnexSection
+          ].freeze
+
+          # Typed attribute → handler method mapping for ContentSection
+          # and IsoTermsSection. These are NOT yielded by
+          # each_mixed_content; they are iterated explicitly to dispatch
+          # tables, lists, notes, etc.
+          TYPED_ATTR_DISPATCH = {
+            paragraphs: :dispatch_via_paragraph,
+            unordered_lists: :dispatch_via_list,
+            ordered_lists: :dispatch_via_list,
+            tables: :dispatch_via_table,
+            requirement: :dispatch_via_requirement,
+            recommendation: :dispatch_via_requirement,
+            permission: :dispatch_via_requirement,
+            figures: :dispatch_via_figure,
+            formulas: :dispatch_via_formula,
+            notes: :dispatch_via_note,
+            examples: :dispatch_via_note,
+            admonitions: :dispatch_via_note,
+            sourcecode_blocks: :dispatch_via_sourcecode,
+            quote_blocks: :dispatch_via_quote,
+            definition_lists: :dispatch_via_dl,
+            definitions: :dispatch_via_section,
+            # IsoTermsSection names its block collections by element
+            # (p, ul, example, admonition, dl) instead of the
+            # ContentSection names above.
+            p: :dispatch_via_paragraph,
+            ul: :dispatch_via_list,
+            example: :dispatch_via_note,
+            admonition: :dispatch_via_note,
+            dl: :dispatch_via_dl,
+          }.freeze
+
+          def dispatch(source_obj)
+            return nil if source_obj.nil? || source_obj.is_a?(String)
+
+            class_name = source_obj.class.name&.split("::")&.last
+            return nil if PRESENTATION_CLASSES.include?(class_name)
+
+            handler = model_class_dispatch[class_name]
+            return nil unless handler
+
+            public_send(handler, source_obj)
+          end
+
+          # ---- Dispatch maps (public hooks; subclasses may replace) --
+
+          def model_class_dispatch
+            MODEL_CLASS_DISPATCH
+          end
+
+          def typed_attr_dispatch
+            TYPED_ATTR_DISPATCH
+          end
+
+          def section_class_names
+            SECTION_CLASS_NAMES
+          end
+
+          # Blocks of a section in source order. Each typed collection
+          # maps to one handler; SourceOrder interleaves the collections
+          # by the element order recorded at parse time; items the parse
+          # did not order follow in attribute order, so nothing is lost.
+          def dispatch_section_blocks(section)
+            results = []
+            SourceOrder.entries(section, typed_attr_dispatch.keys).each do |attr, item|
+              dispatch_block(attr, item, results)
+            end
+            results
+          end
+
+          # Dispatches one typed-collection item into +results+ together
+          # with the sibling blocks MN attaches to it.
+          def dispatch_block(attr, item, results)
+            result = public_send(typed_attr_dispatch.fetch(attr), item)
+            Array(result).each { |r| results << r } if result
+            dispatch_paragraph_siblings(item, results)
+          end
+
+          # ---- Handlers (public extension points) ---------------------
+
+          def dispatch_via_section(obj); section_transformer.transform(obj); end
+          def dispatch_via_paragraph(obj); paragraph_transformer.transform(obj); end
+          def dispatch_via_list(obj); list_transformer.transform(obj); end
+          def dispatch_via_dl(obj); dl_transformer.transform(obj); end
+          def dispatch_via_table(obj); table_transformer.transform(obj); end
+          def dispatch_via_figure(obj); figure_transformer.transform(obj); end
+          def dispatch_via_formula(obj); formula_transformer.transform(obj); end
+
+          # MN binds a note following a list's last item as List.note; the
+          # STS note/example models have no nested-note slot, so those
+          # notes surface as siblings after their carrier.
+          def dispatch_via_note(obj)
+            model = note_transformer.transform(obj)
+            [model, *list_trailing_notes(obj)].compact
+          end
+
+          # A quote renders as <disp-quote>; its unordered/ordered lists
+          # have no disp-quote slot and surface as sibling <list>
+          # elements after it, preserving document order.
+          def dispatch_via_quote(obj)
+            model = quote_transformer.transform(obj)
+            [model, *quote_trailing_lists(obj)].compact
+          end
+
+          def dispatch_via_requirement(obj); requirement_transformer.transform(obj); end
+          def dispatch_via_sourcecode(obj); note_transformer.transform_preformat(obj); end
+          def dispatch_via_references(obj); reference_transformer.transform_section(obj); end
+
+          # MN's typed model attaches "block siblings" as attributes on
+          # the preceding block (ParagraphBlock.note holds notes that
+          # semantically follow the paragraph; TableBlock.note and
+          # List#note hold the same kind of trailing notes for their
+          # carriers). Walk those sibling collections and dispatch each,
+          # preserving document order. Restricted to the block carriers
+          # whose note/example sub-collections have that semantics.
+          def dispatch_paragraph_siblings(item, results)
+            return unless sibling_block?(item)
+
+            SIBLING_ATTRS.each do |attr, handler|
+              next unless item.class.attributes.key?(attr)
+
+              Array(item.public_send(attr)).each do |sibling|
+                result = public_send(handler, sibling)
+                Array(result).each { |r| results << r } if result
+              end
+            end
+          end
+
+          def sibling_block?(item)
+            paragraph_block?(item) || table_block?(item) || list_block?(item)
+          end
+
+          def paragraph_block?(item)
+            item.is_a?(Metanorma::Document::Components::Paragraphs::ParagraphBlock)
+          end
+
+          def table_block?(item)
+            item.is_a?(Metanorma::Document::Components::Tables::TableBlock)
+          end
+
+          def list_block?(item)
+            item.is_a?(Metanorma::Document::Components::Lists::List)
+          end
+
+          SIBLING_ATTRS = { note: :dispatch_via_note,
+                            example: :dispatch_via_note }.freeze
+
+          private
+
+          def list_trailing_notes(obj)
+            %i[ul ol].flat_map do |attr|
+              next [] unless obj.class.attributes.key?(attr)
+
+              Array(obj.public_send(attr)).flat_map do |list|
+                next [] unless list.class.attributes.key?(:note)
+
+                Array(list.note).filter_map { |n| note_transformer.transform(n) }
+              end
+            end
+          end
+
+          def quote_trailing_lists(obj)
+            %i[ul ol].flat_map do |attr|
+              next [] unless obj.class.attributes.key?(attr)
+
+              Array(obj.public_send(attr)).map { |l| list_transformer.transform(l) }
+            end
+          end
+        end
+      end
+    end
+  end
+end
