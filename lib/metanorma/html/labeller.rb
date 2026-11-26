@@ -62,10 +62,12 @@ module Metanorma
         "Metanorma::Standoc::Document::Lists::UnorderedList",
       ].freeze
 
-      ROOT_NAMES = [
-        "Metanorma::Document::Root",
-        "Metanorma::Standoc::Document::Root",
-      ].freeze
+      # Any flavor document root: the class-name convention is that the
+      # document root of a model family is the family's Root class.
+      def document_root?(element)
+        name = element.class.name
+        name == "DocumentRoot" || name.end_with?("::Root")
+      end
 
       # Context associations per projected node type: elements with
       # labeled descendants declare the context that scopes them.
@@ -143,7 +145,7 @@ module Metanorma
         if sections_container?(name)
           return [:sections_container, "document"]
         end
-        if ROOT_NAMES.include?(name)
+        if document_root?(element)
           return [:root, "document"]
         end
         if ANNEX_NAMES.include?(name)
