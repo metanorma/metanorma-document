@@ -4,11 +4,19 @@ publishers:
 publisher_name: 日本産業規格
 logos_light: {}
 logos_dark: {}
-primary: '#000000'
-accent: '#000000'
-gradient: 'linear-gradient(135deg, #000000, #000000)'
-header_background: '#000000'
-cover_background: '#000000'
+# Palette taken from metanorma-jis's own HTML stylesheets
+# (lib/isodoc/jis/html/isodoc.scss, style-iso.scss): #485094 is the heading,
+# link and cover-identity colour, #fff495/#47430c the note block and #e1eef1
+# the example block, #f36f36 the cover warning rule. PLATEAU extends this theme and inherits it.
+primary: '#485094'
+accent: '#F36F36'
+gradient: 'linear-gradient(135deg, #485094, #485094)'
+header_background: '#485094'
+cover_background: '#485094'
+note_bg: '#FFF495'
+note_color: '#47430C'
+example_bg: '#E1EEF1'
+example_color: '#485094'
 font_body: '"Noto Serif CJK JP", "Times New Roman", serif'
 font_sans: '"Noto Serif CJK JP", "Times New Roman", serif'
 font_mono: '"Source Code Pro", monospace'
