@@ -142,10 +142,19 @@ module Metanorma
         end
         # MN 112: "a ContentElement must be associated with a
         # LabelContext object if it has children to be labeled" — the
-        # association applies only to elements with labeled descendants.
-        node.label_context = CONTEXT_FOR[type] if node.children.any? &&
+        # association applies only to elements with LABELED descendants
+        # (nodes whose own type is a labeled one), recursively.
+        node.label_context = CONTEXT_FOR[type] if labeled_descendants?(node) &&
           CONTEXT_FOR.key?(type)
         node
+      end
+
+      # Whether the subtree rooted at this node contains labeled
+      # descendants (nodes whose type is a labeled one).
+      def labeled_descendants?(node)
+        node.children.any? do |child|
+          CONTEXT_FOR.key?(child.type) || labeled_descendants?(child)
+        end
       end
 
       # The element identifier: the model's `id` or its `anchor` (the
