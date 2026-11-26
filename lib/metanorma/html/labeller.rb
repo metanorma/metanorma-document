@@ -136,10 +136,17 @@ module Metanorma
 
       def project(element, depth:, annex:)
         kind, type = classify(element, depth, annex)
-        node = Ladl::ContentElement.new(
-          id: element_id(element), type: type,
-          label_context: CONTEXT_FOR[type],
-        )
+        node = Ladl::ContentElement.new(id: element_id(element), type: type)
+        children_of(element, kind).each do |child|
+          node.add_child(project(child, **child_params_for(kind, type, depth, annex)))
+        end
+        # MN 112: "a ContentElement must be associated with a
+        # LabelContext object if it has children to be labeled" — the
+        # association applies only to elements with labeled descendants.
+        node.label_context = CONTEXT_FOR[type] if node.children.any? &&
+          CONTEXT_FOR.key?(type)
+        node
+      end
         child_params = if kind == :bibliography_wrapper
           { depth: depth, annex: annex }
         else
