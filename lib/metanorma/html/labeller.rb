@@ -36,6 +36,7 @@ module Metanorma
         "Metanorma::Document::Components::Sections::ReferencesSection",
         "Metanorma::Standoc::Document::Sections::ClauseSection",
         "Metanorma::Standoc::Document::Sections::ReferencesSection",
+        "Metanorma::Standoc::Document::Sections::StandardReferencesSection",
       ].freeze
 
       ANNEX_NAMES = [
