@@ -42,6 +42,17 @@ module Metanorma
         "Metanorma::Standoc::Document::Sections::AnnexSection",
       ].freeze
 
+      # Numbered clause-family sections outside the ClauseSection class:
+      # the definitions ("8. DEFINITIONS") and bibliography ("10.
+      # REFERENCES") sections number as clauses in IALA documents.
+      CLAUSE_FAMILY_NAMES = [
+        "Metanorma::Standoc::Document::Sections::DefinitionSection",
+        "Metanorma::Standoc::Document::Sections::BibliographySection",
+        "Metanorma::Standoc::Document::Sections::Introduction",
+        "Metanorma::Standoc::Document::Sections::Acknowledgements",
+        "Metanorma::Standoc::Document::Sections::Abstract",
+      ].freeze
+
       BLOCK_KINDS = {
         "Metanorma::Document::Components::Blocks::NoteBlock" => "note",
         "Metanorma::Document::Components::AncillaryBlocks::ExampleBlock" => "example",
@@ -153,6 +164,10 @@ module Metanorma
         end
         if model_class_array(SECTION_NAMES).any? { |k| element.is_a?(k) }
           return [:section, depth.zero? ? "clause" : "subclause"]
+        end
+        if depth.positive? &&
+            model_class_array(CLAUSE_FAMILY_NAMES).any? { |k| element.is_a?(k) }
+          return [:section, "subclause"]
         end
         if model_class_array(LIST_NAMES).any? { |k| element.is_a?(k) }
           return [:list, "list"]
