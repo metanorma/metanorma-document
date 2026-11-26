@@ -50,6 +50,7 @@ module Metanorma
 
           h = "h#{[[level, 6].min, 1].max}"
           title_text = coordinator.extract_title_text(titles)
+          title_text = coordinator.prefix_labeller_label(section, title_text)
           render_liquid("_heading.html.liquid", "tag" => h, "class_attr" => "",
                                                 "content" => escape_html(title_text))
         end
