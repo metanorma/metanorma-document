@@ -544,8 +544,7 @@ module Metanorma
           author = safe_attr(safe_attr(quote, :author), :text)
           source = safe_attr(quote, :source)
           source_text = if source
-                          rendered = coordinator.render_mixed_inline(source)
-                          rendered.to_s.gsub(/<[^>]+>/, "").strip
+                          coordinator.extract_plain_text(source).to_s.strip
                         end
           parts = [author, source_text].compact.reject(&:empty?)
           return nil if parts.empty?
