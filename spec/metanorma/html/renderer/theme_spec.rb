@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "yaml"
 require "metanorma/html/theme"
 require "fileutils"
 require "tmpdir"
@@ -78,8 +79,11 @@ RSpec.describe Metanorma::Html::Theme do
     context "ISO theme" do
       let(:theme) { described_class.load(:iso) }
 
-      it "has red primary color" do
-        expect(theme.primary).to eq("#b3000c")
+      it "has the primary color from the installed iso gem theme" do
+        iso_theme = File.join(Gem.loaded_specs.fetch("metanorma-iso").full_gem_path,
+                              "lib/metanorma/iso/themes/iso/theme.yaml")
+        expect(theme.primary)
+          .to eq(YAML.safe_load_file(iso_theme).fetch("primary"))
       end
 
       it "has publisher metadata" do

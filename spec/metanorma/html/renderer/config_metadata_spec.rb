@@ -2,6 +2,7 @@
 
 require "spec_helper"
 require "support/flavor_registration"
+require "yaml"
 
 RSpec.describe "Config-driven flavor metadata" do
   let(:xml_path) do
@@ -19,7 +20,10 @@ RSpec.describe "Config-driven flavor metadata" do
   describe "theme auto-resolution" do
     it "resolves ISO theme from IsoDocument" do
       expect(renderer.theme).not_to be_nil
-      expect(renderer.theme.primary).to eq("#b3000c")
+      iso_theme = File.join(Gem.loaded_specs.fetch("metanorma-iso").full_gem_path,
+                              "lib/metanorma/iso/themes/iso/theme.yaml")
+      expect(renderer.theme.primary)
+        .to eq(YAML.safe_load_file(iso_theme).fetch("primary"))
     end
 
     it "resolves publisher metadata from theme config" do
