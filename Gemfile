@@ -16,7 +16,10 @@ gem "isodoc", github: "metanorma/isodoc", branch: "main"
 gem "metanorma-cc"
 gem "metanorma-core", "~> 0.2.7" # published flavor/taste table (metanorma-core#18)
 gem "metanorma-iec", github: "metanorma/metanorma-iec", branch: "main"
-gem "metanorma-iso", github: "metanorma/metanorma-iso", branch: "main"
+# Pinned to the last iso main commit before 457890bc (iso#1891), which makes
+# iso delegate to Metanorma::Document::Sts (metanorma-document 0.5.15, on main
+# but not on integration/mn-1.19). Drop the pin once 1.19 ships it.
+gem "metanorma-iso", github: "metanorma/metanorma-iso", ref: "d1332961beca85d9be07479e5f002d96e3e26f8b"
 gem "metanorma-itu", github: "metanorma/metanorma-itu", branch: "main"
 gem "metanorma-mirror", "~> 1.0", github: "metanorma/metanorma-mirror", branch: "main"
 gem "metanorma-ogc", github: "metanorma/metanorma-ogc", branch: "main"
