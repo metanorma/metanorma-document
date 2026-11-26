@@ -22,11 +22,11 @@ RSpec.describe Metanorma::Html::Labeller do
   let(:annex) do
     standoc_sections::AnnexSection.new(id: "ax")
   end
-  # The standoc document root: the Sections container holds clauses,
-  # the annex collection holds annexes.
+  # The standoc document root: the Sections container is TRANSPARENT
+  # (its clauses flatten into the root's document scope); the annex
+  # collection holds annexes.
   let(:root) do
-    standoc_root = Metanorma::Standoc::Document::Root
-    standoc_root.new(
+    Metanorma::Standoc::Document::Root.new(
       sections: standoc_sections::Sections.new(clause: [sec1]),
       annex: [annex],
     )

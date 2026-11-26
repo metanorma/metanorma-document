@@ -101,6 +101,10 @@ module Metanorma
       SECTIONS_CONTAINER_CHILDREN = %i[introduction clause terms
         definitions references floating_title].freeze
 
+      # The standoc document root members: the preface, the Sections
+      # container, the annex collection, and the bibliography wrapper.
+      ROOT_CHILDREN = %i[preface sections annex bibliography].freeze
+
       attr_reader :result
 
       # @param profile_path [String] path to a LADL `.lml` profile
@@ -129,7 +133,10 @@ module Metanorma
 
       private
 
-      # Projects the document model onto the LADL content tree.
+      # Projects the document model onto the LADL content tree. The
+      # bibliography section parses at the root level but labels as part
+      # of the numbered body flow: its children hoist into the sections
+      # container so they share the body counter.
       def build_content_tree(root)
         project(root, depth: 0, annex: false)
       end
@@ -255,16 +262,36 @@ module Metanorma
       def children_of(element, kind)
         if kind == :bibliography_wrapper
           declared_collections(element, %i[references clause])
+        elsif kind == :root
+          # One document scope = one carrier: the root's own
+          # DocumentContext association scopes every body section, so
+          # the Sections container and the bibliography wrapper are
+          # TRANSPARENT here — their children flatten into the root's
+          # children and number continuously ("1."-"5.", then
+          # "6. REFERENCES").
+          ROOT_CHILDREN.flat_map do |accessor|
+            declared_members(element, [accessor]).flat_map do |child|
+              transparent_children(child)
+            end
+          end
         elsif kind == :sections_container
           declared_collections(element, SECTIONS_CONTAINER_CHILDREN)
-        elsif kind == :root
-          # The document root carries the preface and the Sections
-          # container as scalar members, plus an annex collection.
-          declared_members(element, %i[preface sections annex bibliography])
         elsif kind == :section
           section_children(element)
         else
           []
+        end
+      end
+
+      # Transparent members: the Sections container and the bibliography
+      # wrapper contribute their children instead of themselves.
+      def transparent_children(child)
+        if sections_container?(child.class.name)
+          declared_collections(child, SECTIONS_CONTAINER_CHILDREN)
+        elsif bibliography_wrapper?(child.class.name)
+          Array(child.references)
+        else
+          [child]
         end
       end
 
