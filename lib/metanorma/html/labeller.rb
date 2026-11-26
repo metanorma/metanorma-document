@@ -46,9 +46,15 @@ module Metanorma
       # Numbered clause-family sections outside the ClauseSection class:
       # the definitions ("8. DEFINITIONS") and bibliography ("10.
       # REFERENCES") sections number as clauses in IALA documents.
+      # The bibliography wrapper holds the numbered references section
+      # without consuming a numbering level ("6. REFERENCES" is the
+      # StandardReferencesSection inside it).
+      BIBLIOGRAPHY_WRAPPER_NAMES = [
+        "Metanorma::Standoc::Document::Sections::BibliographySection",
+      ].freeze
+
       CLAUSE_FAMILY_NAMES = [
         "Metanorma::Standoc::Document::Sections::DefinitionSection",
-        "Metanorma::Standoc::Document::Sections::BibliographySection",
         "Metanorma::Standoc::Document::Sections::Introduction",
         "Metanorma::Standoc::Document::Sections::Acknowledgements",
         "Metanorma::Standoc::Document::Sections::Abstract",
@@ -134,7 +140,11 @@ module Metanorma
           id: element_id(element), type: type,
           label_context: CONTEXT_FOR[type],
         )
-        child_params = child_params_for(kind, type, depth, annex)
+        child_params = if kind == :bibliography_wrapper
+          { depth: depth, annex: annex }
+        else
+          child_params_for(kind, type, depth, annex)
+        end
         children_of(element, kind).each do |child|
           node.add_child(project(child, **child_params))
         end
@@ -165,6 +175,9 @@ module Metanorma
         end
         if model_class_array(SECTION_NAMES).any? { |k| element.is_a?(k) }
           return [:section, depth.zero? ? "clause" : "subclause"]
+        end
+        if bibliography_wrapper?(element)
+          return [:bibliography_wrapper, undashed(name)]
         end
         if model_class_array(CLAUSE_FAMILY_NAMES).any? { |k| element.is_a?(k) }
           return [:section, depth.zero? ? "clause" : "subclause"]
@@ -204,6 +217,13 @@ module Metanorma
         end
       end
 
+      # The bibliography wrapper is transparent: its children project at
+      # the wrapper's own depth (the numbered references section does
+      # not gain a level).
+      def child_params_for_wrapper(depth, annex)
+        { depth: depth, annex: annex }
+      end
+
       # Label-relevant model classes: the projected nodes and the
       # labelable assets.
       def relevant_classes
@@ -220,7 +240,9 @@ module Metanorma
       end
 
       def children_of(element, kind)
-        if kind == :sections_container
+        if kind == :bibliography_wrapper
+          declared_collections(element, %i[references clause])
+        elsif kind == :sections_container
           declared_collections(element, SECTIONS_CONTAINER_CHILDREN)
         elsif kind == :root
           # The document root carries the preface and the Sections
