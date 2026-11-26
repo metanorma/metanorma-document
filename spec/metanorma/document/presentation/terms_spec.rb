@@ -5,6 +5,10 @@ require "isodoc"
 require "metanorma-iso"
 require "nokogiri"
 
+# Loading metanorma-iso switches the global lutaml-model XML adapter;
+# put back the one spec_helper chose, or later specs parse differently.
+Lutaml::Model::Config.xml_adapter_type = :nokogiri
+
 RSpec.describe Metanorma::Document::Presentation::Behaviours::Terms do
   let(:presentation) { Metanorma::Document::Presentation }
   let(:ns) { "http://riboseinc.com/isoxml" }
