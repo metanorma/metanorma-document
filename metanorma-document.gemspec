@@ -45,6 +45,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "isodoc-i18n", "~> 1.5"
   spec.add_dependency "liquid", ">= 5.4"
   spec.add_dependency "lutaml-model", "~> 0.8.164"
+  spec.add_dependency "lutaml-lml", "~> 0.3" # presentation profile loader (.lml)
   spec.add_dependency "metanorma-core"
   spec.add_dependency "metanorma-mirror", "~> 1.0"
   spec.add_dependency "mml", "~> 2.4"

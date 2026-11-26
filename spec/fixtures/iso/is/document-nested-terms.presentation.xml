@@ -165,7 +165,7 @@ sourcecode .nt {
 <fmt-title depth="3"><span class="fmt-caption-label"><semx element="autonum" source="term-creep">1</semx></span><span class="fmt-caption-delim"><tab/></span><semx element="title" source="term-creep">creep</semx></fmt-title>
 <fmt-name><span class="fmt-caption-label"><semx element="autonum" source="term-creep">1</semx></span></fmt-name>
 <preferred>creep</preferred><domain>load cells</domain>
-<definition><verbaldefinition>change in load cell output occurring with time while under constant load</verbaldefinition></definition>
+<definition><verbal-definition><p>change in load cell output occurring with time while under constant load</p></verbal-definition></definition>
 </term>
 </terms>
 </clause>
