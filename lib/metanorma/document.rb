@@ -28,6 +28,10 @@ module Metanorma
     autoload :PlainText, "metanorma/document/plain_text"
     autoload :Relaton, "metanorma/document/relaton"
     autoload :Root, "metanorma/document/root"
+    # Shared NISO STS transformer engine (metanorma-document#165):
+    # trunk + publisher profiles; the ISO/OIML flavors register
+    # profiles and delegate here.
+    autoload :Sts, "metanorma/document/sts"
     autoload :UpdateUnits, "metanorma/document/update_units"
     autoload :Version, "metanorma/document/version"
     autoload :VERSION, "metanorma/document/version"
