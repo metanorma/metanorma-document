@@ -26,10 +26,9 @@ RSpec.describe "content parity, new HTML vs legacy isodoc" do
   def run_in_subprocess(flavor, sample)
     script = File.expand_path("../../script/content_parity.rb", __dir__)
     code = <<~RUBY
-      load #{script.inspect}
-      puts JSON.generate(ContentParity.run_case(#{flavor.inspect}, "sample", adoc: #{sample.inspect}))
+      load #{script.inspect}; puts JSON.generate(ContentParity.run_case(#{flavor.inspect}, "sample", adoc: #{sample.inspect}))
     RUBY
-    out, = Open3.capture2("bundle", "exec", "ruby", "-e", code)
+    out, = Open3.capture2(RbConfig.ruby, "-rbundler/setup", "-e", code)
     JSON.parse(out.lines.last)
   end
 
@@ -38,10 +37,9 @@ RSpec.describe "content parity, new HTML vs legacy isodoc" do
                            __dir__)
     script = File.expand_path("../../script/content_parity.rb", __dir__)
     code = <<~RUBY
-      load #{script.inspect}
-      puts JSON.generate(ContentParity.run_case("iso", "fixture", xml: #{xml.inspect}))
+      load #{script.inspect}; puts JSON.generate(ContentParity.run_case("iso", "fixture", xml: #{xml.inspect}))
     RUBY
-    out, = Open3.capture2("bundle", "exec", "ruby", "-e", code)
+    out, = Open3.capture2(RbConfig.ruby, "-rbundler/setup", "-e", code)
     result = JSON.parse(out.lines.last)
     expect(result["status"]).to eq("compared"), result["error"].to_s
     expect(result["missing_blocks"]).to be_empty
