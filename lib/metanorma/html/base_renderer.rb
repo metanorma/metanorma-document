@@ -917,9 +917,7 @@ level = 1)
         fmt_name = Array(safe_attr(block, :fmt_name)).first
         return nil if fmt_name.nil?
 
-        text = CGI.unescapeHTML(render_mixed_inline(fmt_name).to_s
-                                  .gsub(/<[^>]+>/, ""))
-          .gsub(/<[^>]*>?/, "").delete("<>")
+        text = extract_plain_text(fmt_name, strip: false).to_s
           .tr("\u00a0", " ").gsub(/\s+/, " ").strip
         text.empty? ? nil : text
       end

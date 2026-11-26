@@ -608,8 +608,7 @@ module Metanorma
           fmt = safe_attr(fn, :fmt_fn_label)
           return nil unless fmt
 
-          html = render_mixed_inline(fmt).to_s
-          text = html.gsub(/<[^>]+>/, "").strip
+          text = coordinator.extract_plain_text(fmt).to_s.strip
           text.empty? ? nil : text
         end
 

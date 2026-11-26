@@ -45,7 +45,7 @@ module Metanorma
           latexmath: [[/\\pm\b/, "±"], [/\\mp\b/, "∓"]],
         }.freeze
 
-        def extract_plain_text(node)
+        def extract_plain_text(node, strip: true)
           return node.to_s if node.is_a?(String)
           return extract_text_value(node).to_s unless node.is_a?(Lutaml::Model::Serializable)
 
@@ -54,16 +54,18 @@ module Metanorma
           stem = stem_text(node)
           return stem unless stem.nil?
 
-          parts = ordered_content_parts(node)
+          parts = ordered_content_parts(node, strip: strip)
           if parts.join.strip.empty?
             t = safe_attr(node, :text)
             parts << (t.is_a?(Array) ? t.join : t.to_s) if t
           end
 
-          parts.join.strip.gsub(" ", " ")
+          joined = parts.join
+          joined = joined.strip if strip
+          joined.gsub(" ", " ")
         end
 
-        def ordered_content_parts(node)
+        def ordered_content_parts(node, strip: true)
           return [] unless node.element_order.is_a?(Array)
 
           xml_mapping = node.class.mappings_for(:xml, node.lutaml_register)
@@ -102,7 +104,7 @@ module Metanorma
                       else
                         coll
                       end
-                text = extract_plain_text(obj)
+                text = extract_plain_text(obj, strip: strip)
                 parts << (text.empty? ? " " : text)
               elsif el.name == "span"
                 parts << " "
