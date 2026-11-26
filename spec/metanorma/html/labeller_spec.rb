@@ -9,43 +9,27 @@ RSpec.describe Metanorma::Html::Labeller do
   end
 
   let(:components) { Metanorma::Document::Components }
-
-  # Annex-named stub section: the ladl adapter maps the class-name
-  # suffix to the annex type (the flavor annex model pattern).
-  annex_section_class = Class.new do
-    attr_reader :anchor, :children
-
-    def initialize(anchor, children = [])
-      @anchor = anchor
-      @children = children
-    end
-  end
-  Object.const_set("LabellerSpecAnnexSection", annex_section_class)
-
-  # Document root stub: the adapter maps the exact class name
-  # DocumentRoot to the document type (opening the DocumentContext).
-  root_class = Class.new do
-    attr_reader :children
-
-    def initialize(children = [])
-      @children = children
-    end
-  end
-  Object.const_set("DocumentRoot", root_class)
+  let(:standoc_sections) { Metanorma::Standoc::Document::Sections }
 
   let(:sec1) do
     components::Sections::HierarchicalSection.new(
-      anchor: "sec1",
+      id: "sec1",
       subsections: [
-        components::Sections::HierarchicalSection.new(anchor: "sec1a"),
+        components::Sections::HierarchicalSection.new(id: "sec1a"),
       ],
     )
   end
   let(:annex) do
-    LabellerSpecAnnexSection.new("ax")
+    standoc_sections::AnnexSection.new(id: "ax")
   end
+  # The standoc document root: the Sections container holds clauses,
+  # the annex collection holds annexes.
   let(:root) do
-    DocumentRoot.new([sec1, annex])
+    standoc_root = Metanorma::Standoc::Document::Root
+    standoc_root.new(
+      sections: standoc_sections::Sections.new(clause: [sec1]),
+      annex: [annex],
+    )
   end
 
   subject(:labeller) { described_class.new(profile, root: root) }
@@ -73,10 +57,11 @@ RSpec.describe Metanorma::Html::BaseRenderer do
     File.expand_path("../../fixtures/ladl/label_style.lml", __dir__)
   end
 
-  def titled_section(anchor, title_text)
-    components = Metanorma::Document::Components
+  let(:components) { Metanorma::Document::Components }
+
+  def titled_section(id, title_text)
     components::Sections::HierarchicalSection.new(
-      anchor: anchor,
+      id: id,
       title: components::TextElements::TextElement.new(content: title_text),
     )
   end
@@ -85,18 +70,16 @@ RSpec.describe Metanorma::Html::BaseRenderer do
 
   it "prefixes unnumbered titles with the labeller label" do
     section = titled_section("sec1", "Normative references")
-    renderer.labeller = Metanorma::Html::Labeller.new(
-      profile, root: DocumentRoot.new([section])
-    )
+    root = Metanorma::Standoc::Document::Sections::Sections.new(clause: [section])
+    renderer.labeller = Metanorma::Html::Labeller.new(profile, root: root)
     expect(renderer.prefix_labeller_label(section, "Normative references"))
       .to eq("1 Normative references")
   end
 
   it "does not double-prefix already-numbered titles" do
     section = titled_section("sec1", "1 Normative references")
-    renderer.labeller = Metanorma::Html::Labeller.new(
-      profile, root: DocumentRoot.new([section])
-    )
+    root = Metanorma::Standoc::Document::Sections::Sections.new(clause: [section])
+    renderer.labeller = Metanorma::Html::Labeller.new(profile, root: root)
     expect(renderer.prefix_labeller_label(section, "1 Normative references"))
       .to eq("1 Normative references")
   end
