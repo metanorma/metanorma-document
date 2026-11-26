@@ -12,8 +12,19 @@ load File.expand_path("../../script/content_parity.rb", __dir__)
 # known_losses lists the text blocks that are currently absent from the new
 # output. The spec fails on any additional loss, so the list can only shrink.
 RSpec.describe "content parity, new HTML vs legacy isodoc" do
+  # The Gemfile pins standoc and iso to main; the fixes below live on
+  # integration/mn-1.19 and reach main only after the 1.19 release, when
+  # these entries must be removed.
   def known_losses
-    {}
+    {
+      # standoc#1433: term "3.1." numbering
+      "cc" => ["3.1."],
+      "generic" => ["3.1."],
+      # iso#1889: ITU title ("Recommendation ITU-T 1000"); standoc#1433: "3.1."
+      "itu" => ["Recommendation ITU-T 1000", "3.1. sample term:"],
+      # standoc#1433: alternative-term rendering
+      "ogc" => ["other term ALTERNATIVE"]
+    }
   end
 
   # Flavor gems share global state (isodoc classes, i18n), so as in the
