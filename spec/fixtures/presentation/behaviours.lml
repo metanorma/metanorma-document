@@ -1,12 +1,12 @@
 PresentationProfile "base" {
   layer = "base"
-  settings = { date_format = "own" footnote_sup = true contributor_name_order = "given_family" section_order = "preface,scope,normref,terms,definitions,middle,annex,bibliography,indexsect,colophon" bibdata_current = true address_precompose = true }
+  settings = { date_format = "own" footnote_sup = true contributor_name_order = "given_family" section_order = "preface,scope,normref,terms,definitions,middle,annex,bibliography,indexsect,colophon" bibdata_current = true address_precompose = true term_labels = true term_label_delim = "." term_label_name = true term_designations = true term_definitions = true term_annotations = true term_sources = true term_source_locality = true }
 }
 
 PresentationProfile "iso" {
   layer = "flavor"
   flavor = "iso"
-  settings = { footnote_close = ")" footnote_delim_scope = "body" bibdata_labels = "document" i18n_class = "IsoDoc::Iso::I18n" section_order = "preface,scope,normref,main,annex,bibliography,indexsect,colophon" }
+  settings = { footnote_close = ")" footnote_delim_scope = "body" bibdata_labels = "document" i18n_class = "IsoDoc::Iso::I18n" term_label_delim = "" term_label_name = false term_source_locality = false section_order = "preface,scope,normref,main,annex,bibliography,indexsect,colophon" }
 }
 
 PresentationProfile "bsi" {
