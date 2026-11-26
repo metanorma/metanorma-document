@@ -9,15 +9,17 @@ load File.expand_path("../../script/content_parity.rb", __dir__)
 # is present in the new output. Flavors whose gem is not installed are
 # skipped (the script reports them as source-failed).
 #
-# KNOWN_LOSSES lists the text blocks that are currently absent from the new
+# known_losses lists the text blocks that are currently absent from the new
 # output. The spec fails on any additional loss, so the list can only shrink.
 RSpec.describe "content parity, new HTML vs legacy isodoc" do
-  KNOWN_LOSSES = {
-    "cc" => ["3.1."],
-    "generic" => ["3.1."],
-    "itu" => ["Recommendation ITU-T 1000", "3.1. sample term:"],
-    "ogc" => ["other term ALTERNATIVE"],
-  }.freeze
+  def known_losses
+    {
+      "cc" => ["3.1."],
+      "generic" => ["3.1."],
+      "itu" => ["Recommendation ITU-T 1000", "3.1. sample term:"],
+      "ogc" => ["other term ALTERNATIVE"],
+    }
+  end
 
   # Flavor gems share global state (isodoc classes, i18n), so as in the
   # script's own --all mode each flavor is rendered in a fresh process.
@@ -56,7 +58,7 @@ RSpec.describe "content parity, new HTML vs legacy isodoc" do
       expect(result["status"]).to eq("compared"), result["error"].to_s
       expect(result["missing_headings"]).to be_empty
       lost = result["missing_blocks"].map { |b| b["text"] }
-      expect(lost - KNOWN_LOSSES.fetch(flavor, [])).to be_empty
+      expect(lost - known_losses.fetch(flavor, [])).to be_empty
     end
   end
 end
