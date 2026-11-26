@@ -167,6 +167,9 @@ module Metanorma
         if sections_container?(name)
           return [:sections_container, "document"]
         end
+        if bibliography_wrapper?(name)
+          return [:bibliography_wrapper, undashed(name)]
+        end
         if document_root?(element)
           return [:root, "document"]
         end
