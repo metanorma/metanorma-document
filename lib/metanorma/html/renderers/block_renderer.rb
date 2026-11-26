@@ -333,6 +333,24 @@ module Metanorma
           label.empty? ? nil : label
         end
 
+        # Key (legend) block: title, definition list and paragraphs, as
+        # rendered for a figure key. Needed for keys that sit directly in a
+        # table cell, which have no figure to carry them.
+        def render_key(key)
+          parts = []
+          name = safe_attr(key, :name)
+          if name
+            title = escape_html(Array(safe_attr(name, :text)).join.strip)
+            parts << "<p class=\"key-title\"><b>#{title}</b></p>" unless title.empty?
+          end
+          dl = safe_attr(key, :dl)
+          parts << (render_definition_list(dl) || "") if dl
+          Array(safe_attr(key, :p)).each do |para|
+            parts << (coordinator.render_paragraph(para) || "")
+          end
+          parts.join
+        end
+
         def render_definition_list(dl, **_opts)
           # Collection-valued `dl` attributes (figure, example, dd, ...)
           # arrive as Arrays; render each list in order.

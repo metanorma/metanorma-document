@@ -430,6 +430,8 @@ module Metanorma
                       :render_definition_list
       register_render Metanorma::Document::Components::AncillaryBlocks::FigureBlock,
                       :render_figure
+      register_render Metanorma::Document::Components::AncillaryBlocks::KeyElement,
+                      :render_key
       register_render Metanorma::Document::Components::Blocks::NoteBlock,
                       :render_note
       register_render Metanorma::Document::Components::AncillaryBlocks::ExampleBlock,
@@ -727,6 +729,11 @@ module Metanorma
         @block_renderer.render_ordered_list(ol, **)
       end
 
+      # A <key> block (variable legend) outside a figure, e.g. in a table cell.
+      def render_key(key, **)
+        @block_renderer.render_key(key)
+      end
+
       # collection-tolerant: dl attributes are declared collection:
       # true on the models (ExampleBlock, NoteBlock), so the parse
       # hands an Array through; lutaml-model 0.8.177 stopped hiding
@@ -861,6 +868,7 @@ level = 1)
         Metanorma::Document::Components::Lists::OrderedList => true,
         Metanorma::Document::Components::Lists::DefinitionList => true,
         Metanorma::Document::Components::AncillaryBlocks::FigureBlock => true,
+        Metanorma::Document::Components::AncillaryBlocks::KeyElement => true,
         Metanorma::Document::Components::Blocks::NoteBlock => true,
         Metanorma::Document::Components::AncillaryBlocks::ExampleBlock => true,
         Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock => true,
