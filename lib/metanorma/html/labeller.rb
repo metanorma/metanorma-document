@@ -165,9 +165,8 @@ module Metanorma
         if model_class_array(SECTION_NAMES).any? { |k| element.is_a?(k) }
           return [:section, depth.zero? ? "clause" : "subclause"]
         end
-        if depth.positive? &&
-            model_class_array(CLAUSE_FAMILY_NAMES).any? { |k| element.is_a?(k) }
-          return [:section, "subclause"]
+        if model_class_array(CLAUSE_FAMILY_NAMES).any? { |k| element.is_a?(k) }
+          return [:section, depth.zero? ? "clause" : "subclause"]
         end
         if model_class_array(LIST_NAMES).any? { |k| element.is_a?(k) }
           return [:list, "list"]
