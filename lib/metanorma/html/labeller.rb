@@ -111,13 +111,13 @@ module Metanorma
       # The local label for a model element (looked up by its id), or
       # nil when the element is unlabeled.
       def local_for(element)
-        label = @result.labels_by_element_id[element.id]
+        label = @result.labels_by_element_id[element_id(element)]
         label && label.value
       end
 
       # The global cross-reference label for a model element, or nil.
       def global_for(element)
-        label = @result.labels_by_element_id[element.id]
+        label = @result.labels_by_element_id[element_id(element)]
         label && label.global_value
       end
 
