@@ -153,6 +153,11 @@ taste_inventory:
     publisher: Enosema Foundation
     abbreviation: EFS
     source: data/enosema/config.yaml
+  evs:
+    base: iso
+    publisher: Estonian Centre for Standardisation and Accreditation
+    abbreviation: EVS
+    source: data/evs/config.yaml
   iala:
     base: iho
     publisher: International Organization for Marine Aids to Navigation
@@ -396,6 +401,16 @@ rows:
     theme: enosema
     base: iso
     publisher: Enosema Foundation
+    status: parity_pending
+    gates:
+    - base renderer taste selection/adoption
+    - legacy comparison
+    - browser review
+  evs:
+    kind: taste
+    theme: evs
+    base: iso
+    publisher: Estonian Centre for Standardisation and Accreditation
     status: parity_pending
     gates:
     - base renderer taste selection/adoption

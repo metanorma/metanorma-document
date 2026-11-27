@@ -799,20 +799,33 @@ module Metanorma
         walk_ordered(semx) do |type, obj|
           next unless type == :element
 
-          parts << case obj
-                   when Metanorma::Document::Components::Paragraphs::ParagraphBlock
-                     render_paragraph(obj)
-                   when Metanorma::Standoc::Document::Terms::TermNote
-                     render_term_note(obj)
-                   when Metanorma::Document::Components::Lists::DefinitionList
-                     render_definition_list(obj)
-                   when Metanorma::Document::Components::Lists::OrderedList
-                     render_ordered_list(obj)
-                   when Metanorma::Document::Components::Lists::UnorderedList
-                     render_unordered_list(obj)
-                   end
+          parts << render_fmt_definition_child(obj)
+        end
+        # Without retained element order (walk_ordered yields nothing),
+        # fall back to the typed collections in a fixed block order.
+        if parts.compact.empty?
+          %i[p termnote dl ol ul].each do |attr|
+            Array(safe_attr(semx, attr)).each do |obj|
+              parts << render_fmt_definition_child(obj)
+            end
+          end
         end
         parts.compact.join
+      end
+
+      def render_fmt_definition_child(obj)
+        case obj
+        when Metanorma::Document::Components::Paragraphs::ParagraphBlock
+          render_paragraph(obj)
+        when Metanorma::Standoc::Document::Terms::TermNote
+          render_term_note(obj)
+        when Metanorma::Document::Components::Lists::DefinitionList
+          render_definition_list(obj)
+        when Metanorma::Document::Components::Lists::OrderedList
+          render_ordered_list(obj)
+        when Metanorma::Document::Components::Lists::UnorderedList
+          render_unordered_list(obj)
+        end
       end
 
       def render_term_note_parts(term)
