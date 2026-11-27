@@ -104,7 +104,7 @@ module Metanorma
       }.freeze
 
       SECTIONS_CONTAINER_CHILDREN = %i[introduction clause terms
-        definitions references floating_title].freeze
+                                       definitions references floating_title].freeze
 
       # The standoc document root members: the preface, the Sections
       # container, the annex collection, and the bibliography wrapper.
@@ -120,7 +120,7 @@ module Metanorma
       #   convention for the preface introduction: IALA guideline
       #   deposits number it as the first body clause, ISO/IEC deposits
       #   leave it unnumbered
-      def initialize(profile_path, labels: {}, root:,
+      def initialize(profile_path, root:, labels: {},
                      numbered_preface_introduction: false)
         # Only consumers configuring a labeling profile need ladl; it
         # stays undeclared (see the gemspec census's soft-require rule).
@@ -140,13 +140,13 @@ module Metanorma
       # nil when the element is unlabeled.
       def local_for(element)
         label = @result.labels_by_element_id[element_id(element)]
-        label && label.value
+        label&.value
       end
 
       # The global cross-reference label for a model element, or nil.
       def global_for(element)
         label = @result.labels_by_element_id[element_id(element)]
-        label && label.global_value
+        label&.global_value
       end
 
       private
@@ -214,7 +214,7 @@ module Metanorma
         # The document-control (revision-history) clause is not numbered
         # content: deposits render it outside the numbered flow, or omit
         # it entirely. It contributes nothing to the numbering tree.
-        if revision_block?(element, name)
+        if revision_block?(element)
           return [:revision_block, "document_control"]
         end
         if model_class_array(SECTION_NAMES).any? { |k| element.is_a?(k) }
@@ -229,6 +229,7 @@ module Metanorma
         if model_class_array(LIST_NAMES).any? { |k| element.is_a?(k) }
           return [:list, "list"]
         end
+
         BLOCK_KINDS.each do |block_name, type|
           klass = self.class.model_class(block_name)
           return [:block, type] if klass && element.is_a?(klass)
@@ -236,16 +237,24 @@ module Metanorma
         annex ? [:section, annex_section_type(depth)] : [:other, undashed(name)]
       end
 
-      def annex_section_type(depth)
-        depth.zero? ? "annex_clause" : "annex_clause"
+      def annex_section_type(_depth)
+        "annex_clause"
       end
 
       def bibliography_wrapper?(name)
         BIBLIOGRAPHY_WRAPPER_NAMES.include?(name)
       end
 
-      def revision_block?(element, name)
-        return false unless name == STANDOC_CLAUSE_SECTION
+      # Typed class check against a lazily resolved class-name constant:
+      # the model family may be absent (the standoc models exist only
+      # when a flavor document is being labeled).
+      def class_is?(element, class_name)
+        klass = self.class.model_class(class_name)
+        klass ? element.instance_of?(klass) : false
+      end
+
+      def revision_block?(element)
+        return false unless class_is?(element, STANDOC_CLAUSE_SECTION)
 
         element.type == "revision"
       end
@@ -258,7 +267,7 @@ module Metanorma
         names.filter_map { |n| self.class.model_class(n) }
       end
 
-      def child_params_for(kind, type, depth, annex)
+      def child_params_for(_kind, type, depth, annex)
         case type
         when "document"
           { depth: 0, annex: false }
@@ -281,12 +290,10 @@ module Metanorma
       # Label-relevant model classes: the projected nodes and the
       # labelable assets.
       def relevant_classes
-        @relevant_classes ||= (
-          model_class_array(SECTION_NAMES) +
+        @relevant_classes ||= model_class_array(SECTION_NAMES) +
           model_class_array(ANNEX_NAMES) +
           model_class_array(LIST_NAMES) +
           BLOCK_KINDS.keys.filter_map { |n| self.class.model_class(n) }
-        )
       end
 
       def relevant?(element)
@@ -294,11 +301,10 @@ module Metanorma
       end
 
       def children_of(element, kind)
-        if kind == :bibliography_wrapper
+        case kind
+        when :bibliography_wrapper
           declared_collections(element, %i[references clause])
-        elsif kind == :revision_block
-          []
-        elsif kind == :root
+        when :root
           # One document scope = one carrier: the root's own
           # DocumentContext association scopes every body section, so
           # the Sections container and the bibliography wrapper are
@@ -310,9 +316,9 @@ module Metanorma
               transparent_children(child)
             end
           end
-        elsif kind == :sections_container
+        when :sections_container
           declared_collections(element, SECTIONS_CONTAINER_CHILDREN)
-        elsif kind == :section
+        when :section
           section_children(element)
         else
           []
@@ -337,7 +343,7 @@ module Metanorma
 
       def hoisted_preface_introduction(child)
         return [] unless @numbered_preface_introduction
-        return [] unless child.class.name == STANDOC_PREFACE
+        return [] unless class_is?(child, STANDOC_PREFACE)
 
         introduction = child.introduction
         return [] if introduction.nil?
@@ -353,7 +359,11 @@ module Metanorma
           next [] unless element.class.attributes.key?(accessor)
 
           v = element.public_send(accessor)
-          v.nil? ? [] : (v.is_a?(Array) ? v : [v])
+          if v.nil?
+            []
+          else
+            (v.is_a?(Array) ? v : [v])
+          end
         end
       end
 

@@ -140,11 +140,11 @@ module Metanorma
         @renderer_context ||= RendererContext.new(self)
       end
 
-      attr_writer :document, :theme, :labeller
+      attr_writer :document, :theme
 
       # The LADL labeling result for this document, when a labeling
       # profile is configured (Metanorma::Html::Labeller or nil).
-      attr_reader :labeller
+      attr_accessor :labeller
 
       def generate_full_document(document, theme: nil, headless: false,
         labeller_profile: nil, labeller_labels: {}, **)
