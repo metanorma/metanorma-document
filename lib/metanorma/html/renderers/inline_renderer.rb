@@ -108,6 +108,28 @@ module Metanorma
           parts.join
         end
 
+        # Heading/fmt-name variant: whitespace-only text nodes between
+        # number segments (pretty-printed presentation XML) must not leak
+        # into rendered titles as spaced numbers ("0 . 3").
+        def render_title_inline(node)
+          if node.is_a?(Lutaml::Model::Serializable) && node.element_order && !node.element_order.empty?
+            render_ordered_title_inline(node)
+          elsif node.is_a?(Lutaml::Model::Serializable)
+            parts = []
+            node.each_mixed_content do |child|
+              parts << case child
+                       when String
+                         child.strip.empty? ? "" : escape_html(child)
+                       else
+                         render_inline_element(child) || ""
+                       end
+            end
+            parts.join
+          else
+            render_mixed_inline(node)
+          end
+        end
+
         def render_mixed_inline(node)
           if node.is_a?(Lutaml::Model::Serializable) && node.element_order && !node.element_order.empty?
             render_ordered_inline(node)
@@ -125,6 +147,25 @@ module Metanorma
           else
             render_inline_collections(node)
           end
+        end
+
+        def render_ordered_title_inline(node)
+          parts = []
+          walked = walk_ordered(node) do |type, obj|
+            case type
+            when :text
+              parts << (obj.strip.empty? ? "" : escape_html(obj))
+            when :tab
+              parts << "  "
+            when :element
+              parts << (render_inline_element(obj) || "")
+            end
+            walked
+          end
+          unless walked
+            parts << (render_title_inline(node) || "")
+          end
+          parts.join
         end
 
         def render_ordered_inline(node)

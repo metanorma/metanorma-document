@@ -42,3 +42,28 @@ RSpec.describe Metanorma::Html::StandardRenderer do
     end
   end
 end
+
+RSpec.describe Metanorma::Html::StandardRenderer do
+  let(:xml_path) do
+    File.expand_path("../../../fixtures/iso/is/document-en.presentation.xml",
+                     __dir__)
+  end
+  let(:xml) { File.read(xml_path) }
+  let(:doc) { Metanorma::Iso::Document::Root.from_xml(xml) }
+  let(:html) { Metanorma::Html::Generator.generate(doc) }
+  let(:page) { Nokogiri::HTML(html) }
+
+  describe "section number rendering" do
+    it "renders heading numbers without inter-segment spaces" do
+      headings = page.css("main h1, main h2, main h3, main h4").map(&:text)
+      spaced = headings.select { |t| t.match?(/\d\s+\.\s*\d/) }
+      expect(spaced).to be_empty
+    end
+
+    it "renders numbered headings with glued numbers" do
+      numbered = page.css("main h2, main h3")
+                    .map(&:text).select { |t| t.match?(/\d\.\d/) }
+      expect(numbered.length).to be > 0
+    end
+  end
+end

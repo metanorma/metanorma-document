@@ -579,7 +579,7 @@ module Metanorma
           heading << %(<span class="obligation">(#{escape_html(obligation)})</span><br />)
         end
         title = safe_attr(clause, :fmt_title) || safe_attr(clause, :title)
-        heading << render_mixed_inline(title).to_s if title
+        heading << render_title_inline(title).to_s if title
 
         body = Array(clause.blocks).filter_map do |node|
           next if is_title_element?(node, clause)

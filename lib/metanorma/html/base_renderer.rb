@@ -690,6 +690,10 @@ module Metanorma
         @inline_renderer.render_mixed_inline(node)
       end
 
+      def render_title_inline(node)
+        @inline_renderer.render_title_inline(node)
+      end
+
       def render_cell_content(cell) = @inline_renderer.render_cell_content(cell)
       def render_em(el) = @inline_renderer.render_em(el)
       def render_strong(el) = @inline_renderer.render_strong(el)

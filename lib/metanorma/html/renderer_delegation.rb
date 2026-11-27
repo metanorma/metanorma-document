@@ -15,6 +15,7 @@ module Metanorma
       def extract_block_label(...) = @renderer.extract_block_label(...)
       def extract_plain_text(...) = @renderer.extract_plain_text(...)
       def render_mixed_inline(...) = @renderer.render_mixed_inline(...)
+      def render_title_inline(...) = @renderer.render_title_inline(...)
       def render_liquid(...) = @renderer.render_liquid(...)
     end
   end
