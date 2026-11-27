@@ -50,6 +50,21 @@ RSpec.describe Metanorma::Html::Labeller do
   it "returns nil for unknown elements" do
     expect(labeller.local_for(components::Sections::BasicSection.new)).to be_nil
   end
+
+  # The document-control (revision-history) clause is outside the
+  # numbered flow: deposits render it unnumbered or omit it entirely.
+  it "does not number the document-control revision clause" do
+    revision = standoc_sections::ClauseSection.new(
+      id: "rev", type: "revision",
+      title: components::TextElements::TextElement.new(content: "Document revision"),
+    )
+    clause = standoc_sections::ClauseSection.new(id: "c1")
+    body = standoc_sections::Sections.new(clause: [revision, clause])
+    root = Metanorma::Standoc::Document::Root.new(sections: body)
+    labeller = described_class.new(profile, root: root)
+    expect(labeller.local_for(revision)).to be_nil
+    expect(labeller.local_for(clause)).to eq("1")
+  end
 end
 
 RSpec.describe Metanorma::Html::BaseRenderer do

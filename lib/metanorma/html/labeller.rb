@@ -60,6 +60,9 @@ module Metanorma
         "Metanorma::Standoc::Document::Sections::Abstract",
       ].freeze
 
+      STANDOC_CLAUSE_SECTION =
+        "Metanorma::Standoc::Document::Sections::ClauseSection"
+
       BLOCK_KINDS = {
         "Metanorma::Document::Components::Blocks::NoteBlock" => "note",
         "Metanorma::Document::Components::AncillaryBlocks::ExampleBlock" => "example",
@@ -189,6 +192,12 @@ module Metanorma
         if ANNEX_NAMES.include?(name)
           return [:section, "annex"]
         end
+        # The document-control (revision-history) clause is not numbered
+        # content: deposits render it outside the numbered flow, or omit
+        # it entirely. It contributes nothing to the numbering tree.
+        if revision_block?(element, name)
+          return [:revision_block, "document_control"]
+        end
         if model_class_array(SECTION_NAMES).any? { |k| element.is_a?(k) }
           return [:section, depth.zero? ? "clause" : "subclause"]
         end
@@ -214,6 +223,12 @@ module Metanorma
 
       def bibliography_wrapper?(name)
         BIBLIOGRAPHY_WRAPPER_NAMES.include?(name)
+      end
+
+      def revision_block?(element, name)
+        return false unless name == STANDOC_CLAUSE_SECTION
+
+        element.type == "revision"
       end
 
       def sections_container?(name)
@@ -262,6 +277,8 @@ module Metanorma
       def children_of(element, kind)
         if kind == :bibliography_wrapper
           declared_collections(element, %i[references clause])
+        elsif kind == :revision_block
+          []
         elsif kind == :root
           # One document scope = one carrier: the root's own
           # DocumentContext association scopes every body section, so
