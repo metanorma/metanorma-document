@@ -1,0 +1,11 @@
+source "https://rubygems.org"
+
+# Bundle for roundtrip_samples.yml: pins the RELEASED flavor gems whose
+# Document::Root models the harness resolves through FLAVOR_MODEL_MAP.
+# The repo's own Gemfile pins the flavors at git main, where the models
+# land with the 1.19 integration merges; released gems carry them now
+# (metanorma-iso 3.5.30+, metanorma-iec 2.9.2+ verified).
+gem "metanorma-cli", "~> 1.18"
+gem "metanorma-document", path: "."
+gem "metanorma-iso", "~> 3.5.30"
+gem "metanorma-iec", "~> 2.9.2"

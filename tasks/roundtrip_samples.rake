@@ -111,6 +111,13 @@ module RoundtripSamples
     write_consolidated(summary)
     print_consolidated(summary)
 
+    if summary["total_files"].to_i.positive? &&
+        summary["total_no_model"].to_i == summary["total_files"].to_i
+      abort "HOLLOW ROUNDTRIP: all #{summary['total_files']} files skipped as " \
+            "no_model — the bundle resolves no flavor document models. Check " \
+            "Gemfile.roundtrip pins the released flavor gems carrying Document::Root."
+    end
+
     exit(1) if summary["total_failed"].positive? || summary["total_errors"].positive?
   end
 

@@ -84,10 +84,15 @@ jobs:
           ruby-version: '3.4'
           bundler-cache: true
 
+      - name: Install the roundtrip bundle
+        run: |
+          bundle config set gemfile Gemfile.roundtrip
+          bundle install --jobs 4
+
       - name: Run roundtrip for ${{ matrix.repo }}
         run: |
           mkdir -p tmp/roundtrip_reports
-          bundle exec rake "roundtrip:site[https://metanorma.github.io/mn-samples-${{ matrix.repo }},${{ matrix.repo }}]"
+          BUNDLE_GEMFILE=Gemfile.roundtrip bundle exec rake "roundtrip:site[https://metanorma.github.io/mn-samples-${{ matrix.repo }},${{ matrix.repo }}]"
 
       - name: Upload report
         uses: actions/upload-artifact@v4
@@ -118,8 +123,13 @@ jobs:
           ruby-version: '3.4'
           bundler-cache: true
 
+      - name: Install the roundtrip bundle
+        run: |
+          bundle config set gemfile Gemfile.roundtrip
+          bundle install --jobs 4
+
       - name: Consolidate reports
-        run: bundle exec rake "roundtrip:consolidate[tmp/roundtrip_reports]"
+        run: BUNDLE_GEMFILE=Gemfile.roundtrip bundle exec rake "roundtrip:consolidate[tmp/roundtrip_reports]"
 
       - name: Upload consolidated report
         uses: actions/upload-artifact@v4
