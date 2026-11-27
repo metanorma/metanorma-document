@@ -124,6 +124,7 @@ module Metanorma
                      numbered_preface_introduction: false)
         require "ladl"
         @numbered_preface_introduction = numbered_preface_introduction
+        @hoisted_ids = {}
         profile = Ladl.load_profile(profile_path)
         content = build_content_tree(root)
         @result = Ladl::Runtime::Engine.new(profile, labels: labels).label(content)
@@ -200,6 +201,10 @@ module Metanorma
         if ANNEX_NAMES.include?(name)
           return [:section, "annex"]
         end
+        # The hoisted preface introduction numbers as a body clause: the
+        # Preface attribute types it as a plain ContentSection, so the
+        # declaration is recorded when it is hoisted.
+        return [:section, "clause"] if @hoisted_ids[element_id(element)]
         # The document-control (revision-history) clause is not numbered
         # content: deposits render it outside the numbered flow, or omit
         # it entirely. It contributes nothing to the numbering tree.
@@ -329,7 +334,10 @@ module Metanorma
         return [] unless child.class.name == STANDOC_PREFACE
 
         introduction = child.introduction
-        introduction.nil? ? [] : [introduction]
+        return [] if introduction.nil?
+
+        @hoisted_ids[element_id(introduction)] = true
+        [introduction]
       end
 
       # Declared members, scalar or collection: each contributes its
