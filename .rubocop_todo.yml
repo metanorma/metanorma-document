@@ -190,6 +190,7 @@ RSpec/LeakyConstantDeclaration:
 # Offense count: 5
 RSpec/MultipleDescribes:
   Exclude:
+    - 'spec/metanorma/html/labeller_spec.rb'
     - 'spec/metanorma/document_spec.rb'
     - 'spec/metanorma/html/flavor_registry_spec.rb'
     - 'spec/metanorma/mirror/handlers/remaining_handlers_spec.rb'

@@ -4,6 +4,8 @@ require "spec_helper"
 require "metanorma/html/labeller"
 
 RSpec.describe Metanorma::Html::Labeller do
+  subject(:labeller) { described_class.new(profile, root: root) }
+
   let(:profile) do
     File.expand_path("../../fixtures/ladl/label_style.lml", __dir__)
   end
@@ -32,8 +34,6 @@ RSpec.describe Metanorma::Html::Labeller do
     )
   end
 
-  subject(:labeller) { described_class.new(profile, root: root) }
-
   it "labels clauses hierarchically" do
     expect(labeller.local_for(sec1)).to eq("1")
     expect(labeller.local_for(sec1.subsections.first)).to eq("1.1")
@@ -56,7 +56,7 @@ RSpec.describe Metanorma::Html::Labeller do
   it "does not number the document-control revision clause" do
     revision = standoc_sections::ClauseSection.new(
       id: "rev", type: "revision",
-      title: components::TextElements::TextElement.new(content: "Document revision"),
+      title: components::TextElements::TextElement.new(content: "Document revision")
     )
     clause = standoc_sections::ClauseSection.new(id: "c1")
     body = standoc_sections::Sections.new(clause: [revision, clause])
@@ -82,13 +82,15 @@ RSpec.describe Metanorma::Html::Labeller do
     expect(unlabeled.local_for(clause)).to eq("1")
 
     numbered = described_class.new(profile, root: root,
-      numbered_preface_introduction: true)
+                                            numbered_preface_introduction: true)
     expect(numbered.local_for(introduction)).to eq("1")
     expect(numbered.local_for(clause)).to eq("2")
   end
 end
 
 RSpec.describe Metanorma::Html::BaseRenderer do
+  subject(:renderer) { described_class.new }
+
   let(:profile) do
     File.expand_path("../../fixtures/ladl/label_style.lml", __dir__)
   end
@@ -101,8 +103,6 @@ RSpec.describe Metanorma::Html::BaseRenderer do
       title: components::TextElements::TextElement.new(content: title_text),
     )
   end
-
-  subject(:renderer) { described_class.new }
 
   it "prefixes unnumbered titles with the labeller label" do
     section = titled_section("sec1", "Normative references")
