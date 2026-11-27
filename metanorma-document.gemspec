@@ -58,4 +58,8 @@ Gem::Specification.new do |spec|
   # bibdata, Plurimath formulas) is a model-layer capability.
   spec.add_dependency "glossarist", "~> 2.14"
   spec.add_dependency "plurimath", "~> 0.11.14"
+  # STS engine (metanorma-document#165): the shared ISO/OIML STS
+  # transformer trunk emits sts-ruby models (Sts::NisoSts::Standard)
+  # as its output type — a declared runtime dependency, like mml.
+  spec.add_dependency "sts", "~> 0.6.15"
 end

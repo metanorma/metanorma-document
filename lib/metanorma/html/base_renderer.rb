@@ -90,12 +90,10 @@ module Metanorma
           Object.const_defined?(type_class) ? Object.const_get(type_class) : nil
         end
       end
-
-      attr_reader :inline_renderer, :block_renderer, :section_renderer,
-                  :pubid_renderer, :index_term_collector, :footnote_collector
       # While a table renders: table-scoped <fn>s collect here and lift
       # into the table's visible footnotes row instead of endnote popups.
       attr_accessor :table_fn_context
+      attr_reader :inline_renderer, :block_renderer, :section_renderer, :pubid_renderer, :index_term_collector, :footnote_collector, :amend_figure_label
       private :inline_renderer, :block_renderer, :section_renderer,
               :pubid_renderer
 
@@ -117,6 +115,7 @@ module Metanorma
 
         def render_paragraph(...) = @renderer.render_paragraph(...)
         def render_inline_element(...) = @renderer.render_inline_element(...)
+        def amend_figure_label = @renderer.amend_figure_label
         def render_unordered_list(...) = @renderer.render_unordered_list(...)
         def render_ordered_list(...) = @renderer.render_ordered_list(...)
         def render_definition_list(...) = @renderer.render_definition_list(...)
@@ -430,6 +429,8 @@ module Metanorma
                       :render_definition_list
       register_render Metanorma::Document::Components::AncillaryBlocks::FigureBlock,
                       :render_figure
+      register_render Metanorma::Document::Components::AncillaryBlocks::KeyElement,
+                      :render_key
       register_render Metanorma::Document::Components::Blocks::NoteBlock,
                       :render_note
       register_render Metanorma::Document::Components::AncillaryBlocks::ExampleBlock,
@@ -727,6 +728,11 @@ module Metanorma
         @block_renderer.render_ordered_list(ol, **)
       end
 
+      # A <key> block (variable legend) outside a figure, e.g. in a table cell.
+      def render_key(key, **)
+        @block_renderer.render_key(key)
+      end
+
       # collection-tolerant: dl attributes are declared collection:
       # true on the models (ExampleBlock, NoteBlock), so the parse
       # hands an Array through; lutaml-model 0.8.177 stopped hiding
@@ -861,6 +867,7 @@ level = 1)
         Metanorma::Document::Components::Lists::OrderedList => true,
         Metanorma::Document::Components::Lists::DefinitionList => true,
         Metanorma::Document::Components::AncillaryBlocks::FigureBlock => true,
+        Metanorma::Document::Components::AncillaryBlocks::KeyElement => true,
         Metanorma::Document::Components::Blocks::NoteBlock => true,
         Metanorma::Document::Components::AncillaryBlocks::ExampleBlock => true,
         Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock => true,
