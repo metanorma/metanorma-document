@@ -1511,7 +1511,9 @@ module Metanorma
 
       def extract_termnote_label(note)
         localized = fmt_name_text(note)
-        return localized.sub(/\s*:\z/, "") if localized
+        if localized
+          return localized.end_with?(":") ? localized.delete_suffix(":").rstrip : localized
+        end
 
         names = safe_attr(note, :name)
         if names && !names.empty?
