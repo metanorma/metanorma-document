@@ -35,23 +35,25 @@ module RoundtripSamples
 
   HTTP_TIMEOUT = 30
 
-  # Maps mn-samples-* repo name to the model class name for
-  # round-tripping. Resolved lazily: the flavor trees moved to their
-  # gems (Phase 5), and this task must not require every flavor gem at
-  # load time — missing constants resolve to nil ("no_model").
+  # Maps mn-samples-* repo name to [gem to require, model class] for
+  # round-tripping. The gem require happens at resolution time, not load
+  # time: a missing gem (or missing model) resolves to nil ("no_model").
   # OIML moved to the metanorma-oiml gem — its roundtrip lives there.
+  # flavor => [gem to require, document model class]. The gem require is
+  # needed because the rake process loads only metanorma-document: without
+  # it the model constant resolves to nil and every file reports no_model.
   FLAVOR_MODEL_MAP = {
-    "iso"     => "Metanorma::Iso::Document::Root",
-    "iec"     => "Metanorma::Iec::Document::Root",
-    "ieee"    => "Metanorma::Ieee::Document::Root",
-    "iho"     => "Metanorma::Iho::Document::Root",
-    "cc"      => "Metanorma::Cc::Document::Root",
-    "bipm"    => "Metanorma::Bipm::Document::Root",
-    "itu"     => "Metanorma::Itu::Document::Root",
-    "ogc"     => "Metanorma::Ogc::Document::Root",
-    "ribose"  => "Metanorma::Ribose::Document::Root",
-    "ietf"    => "Metanorma::Ietf::Document::Root",
-    "csa"     => "Metanorma::Csa::Document::Root",
+    "iso"     => ["metanorma-iso",  "Metanorma::Iso::Document::Root"],
+    "iec"     => ["metanorma-iec",  "Metanorma::Iec::Document::Root"],
+    "ieee"    => ["metanorma-ieee", "Metanorma::Ieee::Document::Root"],
+    "iho"     => ["metanorma-iho",  "Metanorma::Iho::Document::Root"],
+    "cc"      => ["metanorma-cc",   "Metanorma::Cc::Document::Root"],
+    "bipm"    => ["metanorma-bipm", "Metanorma::Bipm::Document::Root"],
+    "itu"     => ["metanorma-itu",  "Metanorma::Itu::Document::Root"],
+    "ogc"     => ["metanorma-ogc",  "Metanorma::Ogc::Document::Root"],
+    "ribose"  => ["metanorma-ribose", "Metanorma::Ribose::Document::Root"],
+    "ietf"    => ["metanorma-ietf", "Metanorma::Ietf::Document::Root"],
+    "csa"     => ["metanorma-csa",  "Metanorma::Csa::Document::Root"],
     "un"      => nil,
   }.freeze
 
@@ -61,8 +63,14 @@ module RoundtripSamples
   # Flavor gems load on demand; a missing gem resolves to nil
   # ("no_model"), never a load-time NameError.
   def resolve_flavor_model(repo_name)
-    name = FLAVOR_MODEL_MAP[repo_name]
-    name && safe_const(name)
+    entry = FLAVOR_MODEL_MAP[repo_name]
+    return unless entry
+
+    gem_require, const_name = entry
+    require gem_require
+    safe_const(const_name)
+  rescue LoadError
+    nil
   end
 
   def safe_const(name)
