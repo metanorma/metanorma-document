@@ -301,8 +301,14 @@ module Metanorma
           # Routes a child to the matching typed-collection attribute on
           # the container. NisoSts stores text on a different attribute
           # per class (Paragraph#text, TbxIsoTml::Bold/Italic#value,
-          # everything else has #content). Sub/Sup only declare content,
-          # so non-string children degrade to their #to_s form.
+          # everything else has #content). Content-only containers (Sub/
+          # Sup/Monospace) take string children only: model children are
+          # skipped, because Lutaml::Model::Serializable#to_s falls back
+          # to Object#to_s (#inspect) and would leak a non-deterministic
+          # object address into the published XML. The pre-delegation
+          # flow dropped structured children there too — footnote
+          # markers are rendered by the fn pipeline, not the semx
+          # mirrors (golden parity).
           def attach_inline_child(container, child)
             case container
             when ::Sts::NisoSts::Paragraph
@@ -310,7 +316,7 @@ module Metanorma
             when ::Sts::TbxIsoTml::Bold, ::Sts::TbxIsoTml::Italic
               attach_to_rich_inline(container, child)
             else
-              container.content child.to_s
+              container.content child if child.is_a?(String)
             end
           end
 
@@ -362,7 +368,7 @@ module Metanorma
             when ::Sts::NisoSts::ExtLink then container.ext_link child
             when ::Sts::NisoSts::Fn then container.fn child
             else
-              container.text child.to_s
+              container.text child if child.is_a?(String)
             end
           end
 
