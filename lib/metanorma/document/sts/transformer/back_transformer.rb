@@ -83,6 +83,7 @@ module Metanorma
               when ::Sts::NisoSts::List then app.list item
               when ::Sts::NisoSts::Figure then app.fig item
               when ::Sts::TbxIsoTml::TableWrap then app.table_wrap item
+              when ::Sts::NisoSts::SectionArray then app.array item
               when ::Sts::NisoSts::NonNormativeNote then app.non_normative_note item
               when ::Sts::NisoSts::NonNormativeExample then app.non_normative_example item
               when ::Sts::NisoSts::Preformat then app.preformat item

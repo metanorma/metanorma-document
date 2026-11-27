@@ -43,13 +43,16 @@ module Metanorma
           end
 
           # The identity an in-text citation needs to reproduce a normative
-          # reference as <std>: designation, URN and dated/undated type.
+          # reference as <std>: designation, URN (nil when the bibitem has
+          # none) and dated/undated type. A reference without a URN still
+          # cites as <std>: guidelines 10.1.7 mark up every mention as in
+          # the normative references, and 10.1.6 forbids a bibr xref to a
+          # norm-refs entry.
           def reference_identity(bibitem)
             identifier = extract_docidentifier(bibitem)
-            urn = extract_urn(bibitem)
-            return nil unless identifier && urn
+            return nil unless identifier
 
-            { identifier: identifier, urn: urn,
+            { identifier: identifier, urn: extract_urn(bibitem),
               type: std_type_for(identifier) }
           end
 

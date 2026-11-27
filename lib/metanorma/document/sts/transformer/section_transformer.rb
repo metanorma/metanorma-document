@@ -34,6 +34,7 @@ module Metanorma
               when ::Sts::NisoSts::List then target.list item
               when ::Sts::NisoSts::Figure then target.fig item
               when ::Sts::TbxIsoTml::TableWrap then target.table_wrap item
+              when ::Sts::NisoSts::SectionArray then target.array item
               when ::Sts::NisoSts::NonNormativeNote then target.non_normative_note item
               when ::Sts::NisoSts::NonNormativeExample then target.non_normative_example item
               when ::Sts::NisoSts::DisplayFormula then target.disp_formula item
