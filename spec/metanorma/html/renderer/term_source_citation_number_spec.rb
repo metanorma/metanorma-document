@@ -29,8 +29,8 @@ RSpec.describe "HTML renderer term source citation number" do
   end
 
   it "keeps the number of the cited reference" do
-    expect(xml).to include('<sup>[7]</sup></fmt-xref>')
-    sources = page.css("p.term-source").map { |p| p.text }
+    expect(xml).to include("<sup>[7]</sup></fmt-xref>")
+    sources = page.css("p.term-source").map(&:text)
     expect(sources.first).to include("[7]")
   end
 end

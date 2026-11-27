@@ -23,7 +23,7 @@ RSpec.describe "content parity, new HTML vs legacy isodoc" do
       # iso#1889: ITU title ("Recommendation ITU-T 1000"); standoc#1433: "3.1."
       "itu" => ["Recommendation ITU-T 1000", "3.1. sample term:"],
       # standoc#1433: alternative-term rendering
-      "ogc" => ["other term ALTERNATIVE"]
+      "ogc" => ["other term ALTERNATIVE"],
     }
   end
 

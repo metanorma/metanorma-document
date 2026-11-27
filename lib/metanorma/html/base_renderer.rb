@@ -90,13 +90,10 @@ module Metanorma
           Object.const_defined?(type_class) ? Object.const_get(type_class) : nil
         end
       end
-
-      attr_reader :inline_renderer, :block_renderer, :section_renderer,
-                  :pubid_renderer, :index_term_collector, :footnote_collector
       # While a table renders: table-scoped <fn>s collect here and lift
       # into the table's visible footnotes row instead of endnote popups.
       attr_accessor :table_fn_context
-      attr_reader :amend_figure_label
+      attr_reader :inline_renderer, :block_renderer, :section_renderer, :pubid_renderer, :index_term_collector, :footnote_collector, :amend_figure_label
       private :inline_renderer, :block_renderer, :section_renderer,
               :pubid_renderer
 

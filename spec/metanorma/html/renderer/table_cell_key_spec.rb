@@ -13,7 +13,7 @@ RSpec.describe "HTML renderer table cell key" do
                      __dir__)
   end
   let(:legend) do
-    '<key><name>Key</name><dl><dt>ZQ</dt><dd><p>Legend entry text</p></dd></dl></key>'
+    "<key><name>Key</name><dl><dt>ZQ</dt><dd><p>Legend entry text</p></dd></dl></key>"
   end
   let(:page) do
     xml = File.read(path)

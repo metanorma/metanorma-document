@@ -31,6 +31,8 @@ require "fileutils"
 require "open3"
 
 module ContentParity
+  DOT_ENTRIES = %w[. ..].freeze
+
   FLAVORS = %w[bipm cc gb generic iec ieee ietf iho iso itu jis m3aawg ogc
                oiml plateau ribose un nist bsi].freeze
 
@@ -173,7 +175,7 @@ module ContentParity
         # Metanorma drops run artifacts (.xml.abort, .html.err.html, ...)
         # beside the input; remove only what this run created.
         (Dir.glob(".*", File::FNM_DOTMATCH) + Dir.glob("*") - before)
-          .each { |f| FileUtils.rm_rf(f) unless %w[. ..].include?(f) }
+          .each { |f| FileUtils.rm_rf(f) unless DOT_ENTRIES.include?(f) }
       end
     end
   end

@@ -21,7 +21,7 @@ RSpec.describe "Config-driven flavor metadata" do
     it "resolves ISO theme from IsoDocument" do
       expect(renderer.theme).not_to be_nil
       iso_theme = File.join(Gem.loaded_specs.fetch("metanorma-iso").full_gem_path,
-                              "lib/metanorma/iso/themes/iso/theme.yaml")
+                            "lib/metanorma/iso/themes/iso/theme.yaml")
       expect(renderer.theme.primary)
         .to eq(YAML.safe_load_file(iso_theme).fetch("primary"))
     end
