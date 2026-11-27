@@ -162,11 +162,19 @@ module ContentParity
     require "asciidoctor"
     require "metanorma-#{flavor}"
     Dir.chdir(File.dirname(adoc_path)) do
-      xml = Asciidoctor.convert(File.read(adoc_path), backend: flavor.to_sym,
-                                                      safe: :safe,
-                                                      header_footer: true)
-      ::IsoDoc.const_get(class_name(flavor))::PresentationXMLConvert
-        .new({}).convert("sample", xml, true)
+      before = Dir.glob(".*", File::FNM_DOTMATCH) + Dir.glob("*")
+      begin
+        xml = Asciidoctor.convert(File.read(adoc_path), backend: flavor.to_sym,
+                                                        safe: :safe,
+                                                        header_footer: true)
+        ::IsoDoc.const_get(class_name(flavor))::PresentationXMLConvert
+          .new({}).convert("sample", xml, true)
+      ensure
+        # Metanorma drops run artifacts (.xml.abort, .html.err.html, ...)
+        # beside the input; remove only what this run created.
+        (Dir.glob(".*", File::FNM_DOTMATCH) + Dir.glob("*") - before)
+          .each { |f| FileUtils.rm_rf(f) unless %w[. ..].include?(f) }
+      end
     end
   end
 

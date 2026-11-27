@@ -340,7 +340,7 @@ module Metanorma
           parts = []
           name = safe_attr(key, :name)
           if name
-            title = escape_html(Array(safe_attr(name, :text)).join.strip)
+            title = (render_inline_element(name) || "").strip
             parts << "<p class=\"key-title\"><b>#{title}</b></p>" unless title.empty?
           end
           dl = safe_attr(key, :dl)
