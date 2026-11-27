@@ -65,6 +65,27 @@ RSpec.describe Metanorma::Html::Labeller do
     expect(labeller.local_for(revision)).to be_nil
     expect(labeller.local_for(clause)).to eq("1")
   end
+
+  # Flavor convention: IALA guideline deposits number the preface
+  # introduction as the first body clause; ISO/IEC deposits leave it
+  # unnumbered (the default).
+  it "numbers the preface introduction only when the convention declares it" do
+    introduction = standoc_sections::Introduction.new(id: "intro")
+    preface = standoc_sections::Preface.new(introduction: introduction)
+    clause = standoc_sections::ClauseSection.new(id: "c1")
+    root = Metanorma::Standoc::Document::Root.new(
+      preface: preface,
+      sections: standoc_sections::Sections.new(clause: [clause]),
+    )
+    unlabeled = described_class.new(profile, root: root)
+    expect(unlabeled.local_for(introduction)).to be_nil
+    expect(unlabeled.local_for(clause)).to eq("1")
+
+    numbered = described_class.new(profile, root: root,
+      numbered_preface_introduction: true)
+    expect(numbered.local_for(introduction)).to eq("1")
+    expect(numbered.local_for(clause)).to eq("2")
+  end
 end
 
 RSpec.describe Metanorma::Html::BaseRenderer do

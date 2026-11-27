@@ -63,6 +63,8 @@ module Metanorma
       STANDOC_CLAUSE_SECTION =
         "Metanorma::Standoc::Document::Sections::ClauseSection"
 
+      STANDOC_PREFACE = "Metanorma::Standoc::Document::Sections::Preface"
+
       BLOCK_KINDS = {
         "Metanorma::Document::Components::Blocks::NoteBlock" => "note",
         "Metanorma::Document::Components::AncillaryBlocks::ExampleBlock" => "example",
@@ -114,8 +116,14 @@ module Metanorma
       # @param labels [Hash{String => String}] label vocabulary for the
       #   profile's `{key}` tokens (the host document's i18n table)
       # @param root [Object] the parsed document model root
-      def initialize(profile_path, labels: {}, root:)
+      # @param numbered_preface_introduction [Boolean] the flavor
+      #   convention for the preface introduction: IALA guideline
+      #   deposits number it as the first body clause, ISO/IEC deposits
+      #   leave it unnumbered
+      def initialize(profile_path, labels: {}, root:,
+                     numbered_preface_introduction: false)
         require "ladl"
+        @numbered_preface_introduction = numbered_preface_introduction
         profile = Ladl.load_profile(profile_path)
         content = build_content_tree(root)
         @result = Ladl::Runtime::Engine.new(profile, labels: labels).label(content)
@@ -301,15 +309,27 @@ module Metanorma
       end
 
       # Transparent members: the Sections container and the bibliography
-      # wrapper contribute their children instead of themselves.
+      # wrapper contribute their children instead of themselves; a
+      # numbered preface introduction is hoisted out of the preface into
+      # the document's numbered flow, ahead of it.
       def transparent_children(child)
-        if sections_container?(child.class.name)
-          declared_collections(child, SECTIONS_CONTAINER_CHILDREN)
-        elsif bibliography_wrapper?(child.class.name)
-          Array(child.references)
-        else
-          [child]
+        name = child.class.name
+        if sections_container?(name)
+          return declared_collections(child, SECTIONS_CONTAINER_CHILDREN)
         end
+        if bibliography_wrapper?(name)
+          return Array(child.references)
+        end
+
+        hoisted_preface_introduction(child) + [child]
+      end
+
+      def hoisted_preface_introduction(child)
+        return [] unless @numbered_preface_introduction
+        return [] unless child.class.name == STANDOC_PREFACE
+
+        introduction = child.introduction
+        introduction.nil? ? [] : [introduction]
       end
 
       # Declared members, scalar or collection: each contributes its
