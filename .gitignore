@@ -31,3 +31,7 @@ spec/tmp/
 # IDE
 .idea/
 node_modules/
+
+# metanorma run artifacts
+spec/fixtures/content-parity/.xml.abort
+spec/fixtures/content-parity/.html.err.html
