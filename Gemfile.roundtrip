@@ -9,3 +9,9 @@ gem "metanorma-cli", "~> 1.18"
 gem "metanorma-document", path: "."
 gem "metanorma-iso", "~> 3.5.30"
 gem "metanorma-iec", "~> 2.9.2"
+
+# The repo Rakefile requires rspec/core/rake_task and rubocop/rake_task,
+# and the roundtrip comparisons run through Canon::Comparison.
+gem "rspec"
+gem "rubocop"
+gem "canon"
