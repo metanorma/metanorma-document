@@ -582,11 +582,18 @@ module Metanorma
         end
       end
 
+      # The word for "Figure" in the languages the native isodoc pipeline
+      # ships (values copied from its i18n tables); this gem must not
+      # depend on isodoc itself.
+      FIGURE_WORDS = {
+        "en" => "Figure", "fr" => "Figure", "de" => "Abbildung",
+        "es" => "Figura", "ru" => "Рисунок", "ja" => "図",
+        "ar" => "شكل", "zh" => "图"
+      }.freeze
+
       def figure_label_word
-        require "isodoc"
-        IsoDoc::I18n.new(document_language, "Latn").get["figure"] || "Figure"
-      rescue StandardError, LoadError
-        "Figure"
+        FIGURE_WORDS.fetch(document_language.to_s.split(/[-_]/).first.to_s.downcase,
+                           "Figure")
       end
 
       def render_amend_child(child, **)
