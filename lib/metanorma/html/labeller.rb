@@ -122,7 +122,13 @@ module Metanorma
       #   leave it unnumbered
       def initialize(profile_path, labels: {}, root:,
                      numbered_preface_introduction: false)
-        require "ladl"
+        # Only consumers configuring a labeling profile need ladl; it
+        # stays undeclared (see the gemspec census's soft-require rule).
+        begin
+          require "ladl" # soft-require: LoadError-guarded optional integration
+        rescue LoadError
+          raise "the labeling profile needs the ladl gem; add it to your bundle"
+        end
         @numbered_preface_introduction = numbered_preface_introduction
         @hoisted_ids = {}
         profile = Ladl.load_profile(profile_path)

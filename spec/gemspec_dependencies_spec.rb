@@ -13,7 +13,8 @@ require "spec_helper"
 # exempt. A require commented `# soft-require` is a LoadError-guarded
 # optional integration: absence must not break the gem, so it stays
 # undeclared (declaring it would drag the optional gem into every
-# consumer).
+# consumer) — the optional render-time labeling dependency is required
+# lazily inside Metanorma::Html::Labeller and marked there.
 RSpec.describe "the gemspec declares every load-time require" do
   subject(:undeclared_requires) do
     requires = Hash.new { |h, k| h[k] = [] }
