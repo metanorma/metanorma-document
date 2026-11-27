@@ -73,7 +73,7 @@
 {% if doctype %}
   {% assign doctype_label = "" %}
   {% assign doctype_words = doctype | replace: "-", " " | split: " " %}
-  {% for w in doctype_words %}{% assign cap = w | capitalize %}{% if doctype_label == "" %}{% assign doctype_label = cap %}{% else %}{% assign doctype_label = doctype_label | append: " " | append: cap %}{% endif %}{% endfor %}
+  {% for w in doctype_words %}{% assign head = w | slice: 0 | upcase %}{% assign tail = w | slice: 1, 1000 %}{% assign cap = head | append: tail %}{% if doctype_label == "" %}{% assign doctype_label = cap %}{% else %}{% assign doctype_label = doctype_label | append: " " | append: cap %}{% endif %}{% endfor %}
   <p class="cover-doctype">{{ doctype_label | escape }}</p>
 {% endif %}
 {% if cover.ext.subdoctype %}

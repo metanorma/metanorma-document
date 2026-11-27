@@ -31,6 +31,8 @@ require "fileutils"
 require "open3"
 
 module ContentParity
+  DOT_ENTRIES = %w[. ..].freeze
+
   FLAVORS = %w[bipm cc gb generic iec ieee ietf iho iso itu jis m3aawg ogc
                oiml plateau ribose un nist bsi].freeze
 
@@ -98,6 +100,12 @@ module ContentParity
     end
   end
 
+  def inline_text_without_popups(body)
+    copy = body.dup
+    copy.css(".fn-popup").each(&:remove)
+    copy.text
+  end
+
   def count_kind(body, selector)
     return 0 unless selector
 
@@ -118,7 +126,7 @@ module ContentParity
   def compare(legacy_html, new_html)
     lbody = content_body(legacy_html)
     nbody = content_body(new_html)
-    new_flat = normalize(nbody.text)
+    new_flat = normalize(inline_text_without_popups(nbody))
     new_norm_blocks = text_blocks(nbody).map { |b| normalize(b["text"]) }
 
     lblocks = text_blocks(lbody)
@@ -156,11 +164,19 @@ module ContentParity
     require "asciidoctor"
     require "metanorma-#{flavor}"
     Dir.chdir(File.dirname(adoc_path)) do
-      xml = Asciidoctor.convert(File.read(adoc_path), backend: flavor.to_sym,
-                                                      safe: :safe,
-                                                      header_footer: true)
-      ::IsoDoc.const_get(class_name(flavor))::PresentationXMLConvert
-        .new({}).convert("sample", xml, true)
+      before = Dir.glob(".*", File::FNM_DOTMATCH) + Dir.glob("*")
+      begin
+        xml = Asciidoctor.convert(File.read(adoc_path), backend: flavor.to_sym,
+                                                        safe: :safe,
+                                                        header_footer: true)
+        ::IsoDoc.const_get(class_name(flavor))::PresentationXMLConvert
+          .new({}).convert("sample", xml, true)
+      ensure
+        # Metanorma drops run artifacts (.xml.abort, .html.err.html, ...)
+        # beside the input; remove only what this run created.
+        (Dir.glob(".*", File::FNM_DOTMATCH) + Dir.glob("*") - before)
+          .each { |f| FileUtils.rm_rf(f) unless DOT_ENTRIES.include?(f) }
+      end
     end
   end
 

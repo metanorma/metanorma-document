@@ -14,7 +14,7 @@ module Metanorma
             id: id,
             type: type,
             label_html: renderer.escape_html(
-              renderer.fmt_name_text(admonition)&.sub(/\s*[—–-]\z/, "") ||
+              renderer.fmt_name_text(admonition) ||
                 type.capitalize,
             ),
             content_html: content_html,

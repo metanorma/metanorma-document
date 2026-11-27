@@ -1,0 +1,11 @@
+extends: iso
+publishers:
+- EVS
+publisher_name: Estonian Centre for Standardisation and Accreditation
+logos_light:
+  EVS: logo.svg
+logos_dark: {}
+accent: '#184E9E'
+cover_template: cover.html.liquid
+intro_template: intro.html.liquid
+boilerplate_placement: intro
