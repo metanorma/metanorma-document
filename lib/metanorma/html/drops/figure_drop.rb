@@ -38,7 +38,12 @@ module Metanorma
           caption_html = if fig_name || renderer.safe_attr(figure, :name)
                            el = renderer.safe_attr(figure,
                                                    :fmt_name) || figure.name
-                           renderer.render_inline_element(el)
+                           html = renderer.render_inline_element(el)
+                           label = renderer.amend_figure_label
+                           if label && !renderer.safe_attr(figure, :fmt_name)
+                             html = "#{renderer.escape_html(label)}#{html}"
+                           end
+                           html
                          end
 
           sub_figures_parts = []
@@ -79,7 +84,10 @@ module Metanorma
             return unless key
 
             name = renderer.safe_attr(key, :name)
-            parts << (renderer.render_inline_element(name) || "") if name
+            if name
+              title = (renderer.render_inline_element(name) || "").strip
+              parts << "<p class=\"key-title\"><b>#{title}</b></p>" unless title.empty?
+            end
             if renderer.safe_attr(key, :dl)
               parts << (renderer.render_definition_list(key.dl) || "")
             end

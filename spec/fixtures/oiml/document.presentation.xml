@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metanorma xmlns="https://www.metanorma.org/ns/standoc" type="presentation" flavor="iso">
+  <bibdata type="standard">
+    <title language="en" type="main">OIML routing example</title>
+    <docidentifier type="ISO" primary="true">OIML D 1:2026</docidentifier>
+    <contributor><role type="author"/><organization>
+      <name>International Organization of Legal Metrology</name>
+      <abbreviation>OIML</abbreviation>
+    </organization></contributor>
+    <language>en</language><script>Latn</script>
+  </bibdata>
+  <preface>
+    <clause type="toc" id="contents" displayorder="1">
+      <fmt-title depth="1">Contents</fmt-title>
+    </clause>
+    <foreword id="foreword" displayorder="2">
+      <fmt-title depth="1">Foreword</fmt-title>
+      <p>OIML preface content.</p>
+    </foreword>
+  </preface>
+  <sections>
+    <terms id="terms" obligation="normative" displayorder="3">
+      <fmt-title depth="1">Terms and definitions</fmt-title>
+      <term id="sample-term">
+        <fmt-name>1.1</fmt-name>
+        <preferred><expression><name>sample term</name></expression></preferred>
+        <fmt-preferred><p><strong>sample term</strong></p></fmt-preferred>
+        <definition><verbal-definition><p>A sample definition.</p></verbal-definition></definition>
+      </term>
+    </terms>
+  </sections>
+</metanorma>

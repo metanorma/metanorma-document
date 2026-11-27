@@ -12,3 +12,27 @@ logos_dark: {}
 cover_template: cover.html.liquid
 intro_template: intro.html.liquid
 boilerplate_placement: intro
+# Palette taken from the WMO taste's own HTML stylesheet and design notes
+# (metanorma-taste data/wmo/htmlstyle.scss, DESIGN.adoc): heading blue
+# #2F5496 carries chrome and headings, cover green rgb(34,154,59) is the
+# publication field, and the four band chips are the corporate accents.
+primary: '#2F5496'
+primary_dark: '#25457E'
+primary_light: '#EEF2F9'
+accent: '#229A3B'
+accent_deep: '#187830'
+accent_light: '#E9F5EC'
+gradient: 'linear-gradient(135deg, #25457E 0%, #2F5496 100%)'
+header_background: '#2F5496'
+cover_background: 'linear-gradient(160deg, #229A3B 0%, #229A3B 55%, #187830 100%)'
+cover_before_bg: 'background: none'
+cover_after_bg: 'height: 4px; background: linear-gradient(90deg, #26B8D7, #66C544, #F89C0E, #2056AE)'
+cover_separator_color: 'rgba(255,255,255,0.35)'
+progress_bar_color: '#229A3B'
+footer_border_color: '#229A3B'
+note_border: '#229A3B'
+note_bg: '#E9F5EC'
+note_color: '#187830'
+example_border: '#2F5496'
+example_bg: '#EEF2F9'
+example_color: '#2F5496'

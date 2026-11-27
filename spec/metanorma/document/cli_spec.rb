@@ -71,12 +71,48 @@ RSpec.describe Metanorma::Document::CLI do
         )
     end
 
+    %w[oiml oiml-cs].each do |taste|
+      it "renders #{taste} preface and terms through its base model" do
+        path = File.expand_path("../../fixtures/oiml/document.presentation.xml",
+                                __dir__)
+        html = capture_stdout { described_class.to_html(["-f", taste, path]) }
+        body = Nokogiri::HTML(html).at_css(".main-section").text
+
+        expect(body).to include("Contents", "OIML preface content.",
+                                "Terms and definitions", "sample term")
+        expect(html).to include(Metanorma::Html::Theme.load(taste).publisher_name)
+        expect(Metanorma::Core::Flavors.table.canonical(taste).name).to eq(:iso)
+      end
+    end
+
     it "renders standalone HTML to stdout" do
       stdout = capture_stdout do
         described_class.to_html(["-f", "iso", xml_path])
       end
       expect(stdout).to include("<!DOCTYPE html>")
       expect(stdout).to include("</html>")
+    end
+
+    it "selects the taste theme when a taste name is given with --flavor" do
+      # "iala" parses with the base flavor's model; only the name on the
+      # command line identifies the taste, so it must reach the renderer.
+      allow(described_class).to receive(:canonical_flavor).and_call_original
+      allow(described_class).to receive(:canonical_flavor).with("iala")
+        .and_return("iso")
+      theme = nil
+      allow(Metanorma::Html::Generator).to receive(:generate) do |_doc, **opts|
+        theme = opts[:theme]
+        "<!DOCTYPE html></html>"
+      end
+      capture_stdout { described_class.to_html(["-f", "iala", xml_path]) }
+      expect(theme).to be_a(Metanorma::Html::Theme)
+      expect(theme.accent).to eq(Metanorma::Html::Theme.load("iala").accent)
+      expect(theme.accent).not_to eq(Metanorma::Html::Theme.load("iso").accent)
+    end
+
+    it "leaves the theme to the renderer for a base flavor name" do
+      expect(described_class.taste_theme("iso")).to be_nil
+      expect(described_class.taste_theme(nil)).to be_nil
     end
 
     it "writes HTML to an output file" do

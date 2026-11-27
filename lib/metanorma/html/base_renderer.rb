@@ -90,12 +90,10 @@ module Metanorma
           Object.const_defined?(type_class) ? Object.const_get(type_class) : nil
         end
       end
-
-      attr_reader :inline_renderer, :block_renderer, :section_renderer,
-                  :pubid_renderer, :index_term_collector, :footnote_collector
       # While a table renders: table-scoped <fn>s collect here and lift
       # into the table's visible footnotes row instead of endnote popups.
       attr_accessor :table_fn_context
+      attr_reader :inline_renderer, :block_renderer, :section_renderer, :pubid_renderer, :index_term_collector, :footnote_collector, :amend_figure_label
       private :inline_renderer, :block_renderer, :section_renderer,
               :pubid_renderer
 
@@ -117,6 +115,7 @@ module Metanorma
 
         def render_paragraph(...) = @renderer.render_paragraph(...)
         def render_inline_element(...) = @renderer.render_inline_element(...)
+        def amend_figure_label = @renderer.amend_figure_label
         def render_unordered_list(...) = @renderer.render_unordered_list(...)
         def render_ordered_list(...) = @renderer.render_ordered_list(...)
         def render_definition_list(...) = @renderer.render_definition_list(...)
@@ -134,6 +133,7 @@ module Metanorma
         def render_admonition_children(...) = @renderer.render_admonition_children(...)
         def render_full_block_children(...) = @renderer.render_full_block_children(...)
         def render_label_paragraph(...) = @renderer.render_label_paragraph(...)
+        def fmt_name_text(...) = @renderer.fmt_name_text(...)
       end
 
       def renderer_context
@@ -323,15 +323,12 @@ module Metanorma
         doc_id = extract_primary_doc_id
         pub_logos = build_publisher_logos
         pub_name = flavor_publisher_name
-        display_id = if pub_name && doc_id && !doc_id.start_with?(pub_name)
-                       "#{pub_name} #{doc_id}"
-                     else
-                       doc_id
-                     end
+        doc_publisher = pub_name if pub_name && doc_id && !doc_id.start_with?(pub_name)
 
         render_liquid("_header.html.liquid", {
                         "publisher_logos" => pub_logos,
-                        "doc_id" => display_id,
+                        "doc_publisher" => doc_publisher,
+                        "doc_id" => doc_id,
                         "doc_title" => header_title_text,
                       })
       end
@@ -460,6 +457,8 @@ module Metanorma
                       :render_definition_list
       register_render Metanorma::Document::Components::AncillaryBlocks::FigureBlock,
                       :render_figure
+      register_render Metanorma::Document::Components::AncillaryBlocks::KeyElement,
+                      :render_key
       register_render Metanorma::Document::Components::Blocks::NoteBlock,
                       :render_note
       register_render Metanorma::Document::Components::AncillaryBlocks::ExampleBlock,
@@ -622,10 +621,11 @@ module Metanorma
                       :render_noop
       register_render Metanorma::Document::Components::Inline::VariantTitleElement,
                       :render_noop
-      # fmt-xref-label carries the cross-reference link label; render it
-      # through when it appears in block context.
+      # fmt-xref-label carries the text a cross-reference to its parent
+      # displays ("Clause 1", "Annex A"); it is link-target metadata, not
+      # body content, so it must not print after the heading.
       register_render Metanorma::Document::Components::Inline::FmtXrefLabelElement,
-                      :render_block_inline_content
+                      :render_noop
       # Annotation boundary markers fence an annotated region; they carry
       # no renderable content of their own at block dispatch.
       register_render Metanorma::Document::Components::Inline::FmtAnnotationStartElement,
@@ -754,6 +754,11 @@ module Metanorma
       def render_ordered_list(ol,
 **)
         @block_renderer.render_ordered_list(ol, **)
+      end
+
+      # A <key> block (variable legend) outside a figure, e.g. in a table cell.
+      def render_key(key, **)
+        @block_renderer.render_key(key)
       end
 
       # collection-tolerant: dl attributes are declared collection:
@@ -890,6 +895,7 @@ level = 1)
         Metanorma::Document::Components::Lists::OrderedList => true,
         Metanorma::Document::Components::Lists::DefinitionList => true,
         Metanorma::Document::Components::AncillaryBlocks::FigureBlock => true,
+        Metanorma::Document::Components::AncillaryBlocks::KeyElement => true,
         Metanorma::Document::Components::Blocks::NoteBlock => true,
         Metanorma::Document::Components::AncillaryBlocks::ExampleBlock => true,
         Metanorma::Document::Components::AncillaryBlocks::SourcecodeBlock => true,
@@ -938,6 +944,17 @@ level = 1)
       rescue StandardError => e
         record_render_warning("index term dropped: #{e.class}: #{e.message}")
         nil
+      end
+
+      # Plain text of a block's presentation <fmt-name> (the localized
+      # caption label, e.g. "EXEMPLE" or "ATTENTION —"); nil when absent.
+      def fmt_name_text(block)
+        fmt_name = Array(safe_attr(block, :fmt_name)).first
+        return nil if fmt_name.nil?
+
+        text = extract_plain_text(fmt_name, strip: false).to_s
+          .tr("\u00a0", " ").gsub(/\s+/, " ").strip
+        text.empty? ? nil : text
       end
 
       def extract_block_label(block, default)

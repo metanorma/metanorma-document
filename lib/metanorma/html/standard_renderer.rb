@@ -534,7 +534,9 @@ module Metanorma
         end
         new_contents = Array(safe_attr(amend, :new_content))
         if new_contents.any?
+          @amend_figure_labels = amend_figure_labels(amend)
           inner = new_contents.map { |nc| render_amend_content(nc, **opts) }.join
+          @amend_figure_labels = nil
           attrs = element_attrs(id: safe_attr(amend, :id),
                                 class: "Quote AmendNewcontent")
           parts << render_liquid("_element.html.liquid", {
@@ -550,10 +552,48 @@ module Metanorma
         parts = []
         %i[paragraphs note ol ul dl figure clause].each do |attr|
           Array(safe_attr(content, attr)).each do |child|
+            @amend_figure_label = @amend_figure_labels&.shift if attr == :figure
             parts << (render_amend_child(child, **opts) || "")
+            @amend_figure_label = nil
           end
         end
         parts.join
+      end
+
+      # Figure added by an amendment: the raw <name> carries no number, and
+      # the numbered caption only exists in the presentation copy of the
+      # amend. The amend's <autonumber type="figure"> gives the first number;
+      # further figures count on from it. Returns the caption prefixes
+      # ("Figure A.1 — ", "Figure A.2 — ").
+      def amend_figure_labels(amend)
+        auto = Array(safe_attr(amend, :auto_number)).find do |a|
+          safe_attr(a, :type) == "figure"
+        end
+        first = auto && safe_attr(auto, :value)
+        return [] if first.to_s.empty?
+
+        count = Array(safe_attr(amend, :new_content)).sum do |nc|
+          Array(safe_attr(nc, :figure)).size
+        end
+        word = figure_label_word
+        Array.new(count) do |i|
+          num = first.to_s.sub(/\d+\z/) { |n| (n.to_i + i).to_s }
+          "#{word} #{num} — "
+        end
+      end
+
+      # The word for "Figure" in the languages the native isodoc pipeline
+      # ships (values copied from its i18n tables); this gem must not
+      # depend on isodoc itself.
+      FIGURE_WORDS = {
+        "en" => "Figure", "fr" => "Figure", "de" => "Abbildung",
+        "es" => "Figura", "ru" => "Рисунок", "ja" => "図",
+        "ar" => "شكل", "zh" => "图"
+      }.freeze
+
+      def figure_label_word
+        FIGURE_WORDS.fetch(document_language.to_s.split(/[-_]/).first.to_s.downcase,
+                           "Figure")
       end
 
       def render_amend_child(child, **)
@@ -699,7 +739,14 @@ module Metanorma
           end
         else
           fmt_list.each do |element|
-            element.p&.each { |para| parts << (render_paragraph(para) || "") }
+            paragraphs = Array(element.p)
+            paragraphs.each { |para| parts << (render_paragraph(para) || "") }
+            next unless paragraphs.empty?
+
+            inline = Array(safe_attr(element, :semx)).map do |semx|
+              render_inline_element(semx) || ""
+            end.join
+            parts << "<p>#{inline}</p>" unless inline.empty?
           end
         end
         parts.join
@@ -720,7 +767,7 @@ module Metanorma
       end
 
       def render_term_definitions(term, fmt_definition)
-        return render_ordered_content(fmt_definition) || "" if fmt_definition
+        return render_fmt_definition(fmt_definition) if fmt_definition
 
         parts = []
         safe_attr(term, :p)&.each do |para|
@@ -732,6 +779,18 @@ module Metanorma
         parts.join
       end
 
+      # <fmt-definition> is either a standoc ordered element (children walk
+      # in document order) or the generic element whose <semx> wrappers hold
+      # the block content; both must reach the page.
+      def render_fmt_definition(fmt_definition)
+        ordered = render_ordered_content(fmt_definition).to_s
+        return ordered unless ordered.empty?
+
+        Array(safe_attr(fmt_definition, :semx)).map do |semx|
+          render_fmt_definition_semx(semx)
+        end.join
+      end
+
       # The <semx> wrapper inside <fmt-definition> carries the definition's
       # block content one level down (standoc FmtDefinitionSemx); render
       # its children in document order.
@@ -740,20 +799,33 @@ module Metanorma
         walk_ordered(semx) do |type, obj|
           next unless type == :element
 
-          parts << case obj
-                   when Metanorma::Document::Components::Paragraphs::ParagraphBlock
-                     render_paragraph(obj)
-                   when Metanorma::Standoc::Document::Terms::TermNote
-                     render_term_note(obj)
-                   when Metanorma::Document::Components::Lists::DefinitionList
-                     render_definition_list(obj)
-                   when Metanorma::Document::Components::Lists::OrderedList
-                     render_ordered_list(obj)
-                   when Metanorma::Document::Components::Lists::UnorderedList
-                     render_unordered_list(obj)
-                   end
+          parts << render_fmt_definition_child(obj)
+        end
+        # Without retained element order (walk_ordered yields nothing),
+        # fall back to the typed collections in a fixed block order.
+        if parts.compact.empty?
+          %i[p termnote dl ol ul].each do |attr|
+            Array(safe_attr(semx, attr)).each do |obj|
+              parts << render_fmt_definition_child(obj)
+            end
+          end
         end
         parts.compact.join
+      end
+
+      def render_fmt_definition_child(obj)
+        case obj
+        when Metanorma::Document::Components::Paragraphs::ParagraphBlock
+          render_paragraph(obj)
+        when Metanorma::Standoc::Document::Terms::TermNote
+          render_term_note(obj)
+        when Metanorma::Document::Components::Lists::DefinitionList
+          render_definition_list(obj)
+        when Metanorma::Document::Components::Lists::OrderedList
+          render_ordered_list(obj)
+        when Metanorma::Document::Components::Lists::UnorderedList
+          render_unordered_list(obj)
+        end
       end
 
       def render_term_note_parts(term)
@@ -1011,7 +1083,8 @@ module Metanorma
 
       def render_term_example(example)
         attrs = element_attrs(id: safe_attr(example, :id), class: "example")
-        label = extract_block_label(example, "EXAMPLE")
+        label = fmt_name_text(example) ||
+          extract_block_label(example, "EXAMPLE")
         parts = []
         ex_content_parts = []
         example.p&.each do |para|
@@ -1024,7 +1097,7 @@ module Metanorma
                                })
         example.ul&.each { |ul| parts << (render_unordered_list(ul) || "") }
         example.ol&.each { |ol| parts << (render_ordered_list(ol) || "") }
-        example.dl&.then { |dl| parts << (render_definition_list(dl) || "") }
+        example.dl&.each { |dl| parts << (render_definition_list(dl) || "") }
         render_liquid("_element.html.liquid", {
                         "tag" => "div",
                         "extra_attrs" => attrs,
@@ -1457,6 +1530,11 @@ module Metanorma
       end
 
       def extract_termnote_label(note)
+        localized = fmt_name_text(note)
+        if localized
+          return localized.end_with?(":") ? localized.delete_suffix(":").rstrip : localized
+        end
+
         names = safe_attr(note, :name)
         if names && !names.empty?
           name = names.is_a?(Array) ? names.first : names

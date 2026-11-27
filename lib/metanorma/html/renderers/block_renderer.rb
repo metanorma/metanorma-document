@@ -333,7 +333,31 @@ module Metanorma
           label.empty? ? nil : label
         end
 
+        # Key (legend) block: title, definition list and paragraphs, as
+        # rendered for a figure key. Needed for keys that sit directly in a
+        # table cell, which have no figure to carry them.
+        def render_key(key)
+          parts = []
+          name = safe_attr(key, :name)
+          if name
+            title = (coordinator.render_inline_element(name) || "").strip
+            parts << "<p class=\"key-title\"><b>#{title}</b></p>" unless title.empty?
+          end
+          dl = safe_attr(key, :dl)
+          parts << (render_definition_list(dl) || "") if dl
+          Array(safe_attr(key, :p)).each do |para|
+            parts << (coordinator.render_paragraph(para) || "")
+          end
+          parts.join
+        end
+
         def render_definition_list(dl, **_opts)
+          # Collection-valued `dl` attributes (figure, example, dd, ...)
+          # arrive as Arrays; render each list in order.
+          if dl.is_a?(Array)
+            parts = dl.filter_map { |item| render_definition_list(item) }
+            return parts.empty? ? nil : parts.join
+          end
           return nil if coordinator.skip_coverpage_node?(dl)
 
           attrs = element_attrs(id: safe_attr(dl, :id))
@@ -503,7 +527,7 @@ module Metanorma
           attrs = element_attrs(id: safe_attr(quote, :id), class: "quote")
           content = quote_children_html(quote)
           attribution_html = if quote.attribution
-                               coordinator.render_mixed_inline(quote.attribution)
+                               quote_attribution_html(quote.attribution)
                              else
                                quote_author_source_attribution(quote)
                              end
@@ -512,6 +536,14 @@ module Metanorma
                           "content" => content,
                           "attribution" => attribution_html,
                         })
+        end
+
+        # <attribution> holds paragraphs, not mixed text: render their
+        # inline content (the rendered "— author, source" line).
+        def quote_attribution_html(attribution)
+          Array(attribution.p).map do |para|
+            coordinator.render_mixed_inline(para)
+          end.join
         end
 
         def quote_children_html(quote)
@@ -530,8 +562,7 @@ module Metanorma
           author = safe_attr(safe_attr(quote, :author), :text)
           source = safe_attr(quote, :source)
           source_text = if source
-                          rendered = coordinator.render_mixed_inline(source)
-                          rendered.to_s.gsub(/<[^>]+>/, "").strip
+                          coordinator.extract_plain_text(source).to_s.strip
                         end
           parts = [author, source_text].compact.reject(&:empty?)
           return nil if parts.empty?

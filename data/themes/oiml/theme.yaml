@@ -8,3 +8,32 @@ logos_dark: {}
 cover_template: cover.html.liquid
 intro_template: intro.html.liquid
 boilerplate_placement: intro
+# Palette taken from OIML's own HTML theme in metanorma-oiml
+# (lib/metanorma/oiml/sts/html_renderer/assets/theme.css): OIML blue
+# #004996 (also the fill of the logo in metanorma-taste data/oiml), its
+# dark #013a78 and soft tint #e7eff9, and the warm gold #d4a017 used for
+# example/aside borders. Values marked "derived" are not in those sources.
+primary: '#004996'
+primary_dark: '#013A78'
+primary_light: '#E7EFF9'
+accent: '#004996'
+accent_deep: '#013A78'
+accent_light: '#E7EFF9'
+warm: '#D4A017'
+warm_light: '#FBF5E3' # derived: light tint of #D4A017
+gradient: 'linear-gradient(135deg, #013A78 0%, #004996 100%)' # derived from the two blues
+header_background: '#004996'
+cover_background: 'linear-gradient(160deg, #013A78 0%, #004996 100%)' # derived
+cover_before_bg: 'background: none'
+cover_after_bg: 'height: 3px; background: linear-gradient(90deg, transparent, #004996, #D4A017, transparent)' # derived
+cover_separator_color: 'rgba(255,255,255,0.35)'
+progress_bar_color: '#004996'
+footer_border_color: '#004996'
+note_border: '#004996'
+note_bg: '#E7EFF9'
+note_color: '#004996'
+example_border: '#D4A017'
+example_bg: '#E7EFF9'
+example_color: '#013A78'
+admonition_border: '#D4A017'
+admonition_color: '#013A78'

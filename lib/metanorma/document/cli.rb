@@ -3,6 +3,7 @@
 require "optparse"
 require "json"
 require "fileutils"
+require "metanorma-core"
 
 module Metanorma
   module Document
@@ -281,12 +282,30 @@ module Metanorma
 
       def self.execute_to_html(options)
         # Metanorma::Html is autoloaded from metanorma/document.
-        # Reuse the mirror pipeline's flavor inference/model dispatch so
-        # to-html and to-mirror parse documents identically.
+        # Resolve tastes before the mirror parser's class-name lookup:
+        # a taste uses its base model while retaining its own HTML theme.
         step = Mirror::Output::Pipeline::Steps::ParseXml.new
-        flavor = canonical_flavor(options.flavor || step.infer_flavor(options.xml_path))
+        requested = options.flavor || step.infer_flavor(options.xml_path)
+        flavor = canonical_flavor(requested).to_s
         doc = step.flavor_class(flavor).from_xml(File.read(options.xml_path))
-        write_output(Html::Generator.generate(doc, headless: options.headless), options.output)
+        theme = taste_theme(requested)
+        html = Html::Generator.generate(doc, headless: options.headless,
+                                             theme: theme)
+        write_output(html, options.output)
+      end
+
+      # An explicit taste name ("iala", "wmo") selects the taste's own
+      # theme. The model class is the base flavor's, and the renderer
+      # otherwise picks a taste theme only from the bibdata publisher
+      # abbreviation, so the name given on the command line would be
+      # lost once canonical_flavor maps it to the base ("iho"). Returns
+      # nil for base flavors, names without a theme, and no flavor.
+      def self.taste_theme(name)
+        return nil unless name && canonical_flavor(name) != name.to_s
+
+        Html::Theme.load(name)
+      rescue ArgumentError
+        nil
       end
 
       # Tastes carry no model classes of their own: the mirror pipeline's

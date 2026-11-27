@@ -9,7 +9,8 @@ module Metanorma
 
         def self.from_model(example, renderer:)
           id = renderer.safe_attr(example, :id)
-          label = renderer.extract_block_label(example, "EXAMPLE")
+          label = renderer.fmt_name_text(example) ||
+            renderer.extract_block_label(example, "EXAMPLE")
 
           content_html = renderer.render_full_block_children(
             example,

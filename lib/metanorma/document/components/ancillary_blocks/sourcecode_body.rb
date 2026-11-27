@@ -28,9 +28,16 @@ module Metanorma
           # text need the decoded form — without it they double-escape
           # (`&amp;lt;`) or hand-roll fragile gsub chains. Comments in
           # the listing stay literal ("<!-- ... -->").
+          #
+          # Callout markers (`<callout target="...">1</callout>`) are
+          # elements inside the listing; they are shown as the literal
+          # `<1>` marker, as the legacy isodoc output does.
           def decoded_content
-            CGI.unescapeHTML(Array(content).join)
+            raw = Array(content).join.gsub(CALLOUT) { "&lt;#{$1}&gt;" }
+            CGI.unescapeHTML(raw)
           end
+
+          CALLOUT = %r{<callout\b[^>]*>(.*?)</callout>}m
         end
       end
     end
