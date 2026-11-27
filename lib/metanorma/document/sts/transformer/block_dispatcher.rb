@@ -140,7 +140,7 @@ module Metanorma
           def dispatch_via_paragraph(obj); paragraph_transformer.transform(obj); end
           def dispatch_via_list(obj); list_transformer.transform(obj); end
           def dispatch_via_dl(obj); dl_transformer.transform(obj); end
-          def dispatch_via_table(obj); table_transformer.transform(obj); end
+          def dispatch_via_table(obj); table_transformer.transform_block(obj); end
           def dispatch_via_figure(obj); figure_transformer.transform(obj); end
           def dispatch_via_formula(obj); formula_transformer.transform(obj); end
 

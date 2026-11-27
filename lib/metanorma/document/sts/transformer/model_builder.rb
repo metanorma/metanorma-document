@@ -219,11 +219,13 @@ module Metanorma
             end
           end
 
-          def disp_quote(id: nil, paragraph: [], attribution: nil)
-            ::Sts::NisoSts::DispQuote.new do |q|
+          def disp_quote(id: nil, paragraph: [], attrib: nil)
+            QuoteTransformer::DispQuoteWithAttrib.new do |q|
               q.id = id if id
-              q.attribution = attribution if attribution
+              # The model is ordered: setter call order is the output order,
+              # and <attrib> follows the paragraphs.
               Array(paragraph).each { |p| q.paragraphs p }
+              q.attrib = Array(attrib) if attrib
             end
           end
 

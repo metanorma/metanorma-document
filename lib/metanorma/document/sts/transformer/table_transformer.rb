@@ -25,6 +25,19 @@ module Metanorma
             ::Sts::TbxIsoTml::TableWrap.new(attrs)
           end
 
+          # A body table in document flow. An informal table has neither
+          # label nor title, so it is captured as a bare <table> inside
+          # <array> (guidelines 6.2.1), not as a <table-wrap> (6.2.2).
+          # Returns a SectionArray for an informal table, else a TableWrap.
+          def transform_block(source_table)
+            return transform(source_table) if table_label(source_table) || table_caption(source_table)
+
+            table = build_table(source_table)
+            return transform(source_table) unless table
+
+            ::Sts::NisoSts::SectionArray.new(id: source_id_of(source_table), table: table)
+          end
+
           # Requirement-tree note/example attributes visited in order.
           REQ_EXTRA_KINDS = %i[example note].freeze
 

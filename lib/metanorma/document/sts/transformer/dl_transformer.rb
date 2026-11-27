@@ -49,14 +49,17 @@ module Metanorma
           # what the target declares and keeps the rest as text.
           def build_term(dt_element)
             term_text = RenderedTextExtractor.text_of(dt_element)
-            return nil if term_text.nil? || term_text.empty?
-
             entries = paragraph_transformer.entries_for(dt_element)
+            # A term given only by a formula (stem:[w]::) has no text but
+            # does have inline entries: it is the formula, not an absent
+            # term. An absent term nils the def-item's <term> (xsi:nil with
+            # no xsi namespace declared), so only a truly empty dt is nil.
+            return nil if (term_text.nil? || term_text.empty?) && entries.empty?
+
             ::Sts::NisoSts::Term.new do |term|
               if entries.empty?
                 # The walk and the text extraction disagree at the
-                # edges: the extracted text is the floor, so an
-                # empty <term/> never ships.
+                # edges: the extracted text is the floor.
                 term.text term_text
               else
                 inline_transformer.apply_inline_entries(entries, term)

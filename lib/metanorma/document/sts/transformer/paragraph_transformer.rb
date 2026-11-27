@@ -243,7 +243,9 @@ module Metanorma
               yield(:sup, node, build_inline_container(node, ::Sts::NisoSts::Sup))
             when "TtElement", "MonospaceElement"
               yield(:tt, node, build_inline_container(node, ::Sts::NisoSts::Monospace))
-            when "StemInlineElement", "StemBlockElement"
+            when "StemInlineElement", "StemBlockElement", "StemElement"
+              # StemElement is the stem a definition term carries (a dt's
+              # only child); it is not one of the inline stem classes.
               yield(:stem, node, nil)
             when "AsciimathElement"
               nil
@@ -541,10 +543,9 @@ module Metanorma
           end
 
           # <xref> for a bibliography or other target; for a normative
-          # reference whose URN identity is known, an inline <std> (NISO STS
-          # idiom: guidelines 10.1.7 and 10.2) followed by the citation's
-          # locality as paragraph text. No bibr xref may target a norm-refs
-          # entry (guidelines 10.1.6).
+          # reference, an inline <std> (NISO STS idiom: guidelines 10.1.7
+          # and 10.2) followed by the citation's locality as paragraph text.
+          # No bibr xref may target a norm-refs entry (guidelines 10.1.6).
           def build_citation_entries(node, inline_std:)
             x = build_xref(node)
             return [] unless x
@@ -562,7 +563,8 @@ module Metanorma
           # locality after its designation (", Clause 5"), or nil. <std-ref>
           # carries the designation as the reference names it; <std-id>
           # carries the reference's own URN, the link that guidelines 10.1.7
-          # matches against the norm-refs <std-id>. The locality stays
+          # matches against the norm-refs <std-id>, and is omitted when the
+          # reference has none. The locality stays
           # outside <std>: the sts model serializes a <std>'s mixed text
           # before its child elements, which would reorder "Designation,
           # Clause 5" to ", Clause 5Designation".
@@ -582,14 +584,17 @@ module Metanorma
             locality = nil if locality.to_s.empty?
 
             type = identity[:type]
-            std = ReferenceTransformer::ReferenceStandardWithId.new(
+            attrs = {
               type: type,
               std_ref: [::Sts::NisoSts::StandardRef.new(type: type, value: std_ref)],
-              std_id_element: [::Sts::NisoSts::StdId.new(
+            }
+            if identity[:urn]
+              attrs[:std_id_element] = [::Sts::NisoSts::StdId.new(
                 std_id_link_type: "urn", std_id_type: type,
                 content: identity[:urn]
-              )],
-            )
+              )]
+            end
+            std = ReferenceTransformer::ReferenceStandardWithId.new(attrs)
             [std, locality]
           end
 
