@@ -19,7 +19,12 @@ RSpec.describe "Config-driven flavor metadata" do
   describe "theme auto-resolution" do
     it "resolves ISO theme from IsoDocument" do
       expect(renderer.theme).not_to be_nil
-      expect(renderer.theme.primary).to eq("#b3000c")
+      # Auto-resolution must agree with an explicit load; the color
+      # value itself belongs to the flavor (metanorma-iso owns the
+      # registry theme and moved the default to the Directives house
+      # style).
+      expect(renderer.theme.primary)
+        .to eq(Metanorma::Html::Theme.load(:iso).primary)
     end
 
     it "resolves publisher metadata from theme config" do
