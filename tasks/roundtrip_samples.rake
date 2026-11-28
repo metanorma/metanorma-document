@@ -54,7 +54,12 @@ module RoundtripSamples
     "ribose"  => ["metanorma-ribose", "Metanorma::Ribose::Document::Root"],
     "ietf"    => ["metanorma-ietf", "Metanorma::Ietf::Document::Root"],
     "csa"     => ["metanorma-csa",  "Metanorma::Csa::Document::Root"],
-    "un"      => nil,
+    # standoc is the base flavor and iala/un are tastes on the base: they
+    # consume the root Document model from this gem directly — no
+    # per-flavor model exists or is needed.
+    "iala"    => [nil, "Metanorma::Document::Root"],
+    "standoc" => [nil, "Metanorma::Document::Root"],
+    "un"      => [nil, "Metanorma::Document::Root"],
   }.freeze
 
   module_function
@@ -67,7 +72,7 @@ module RoundtripSamples
     return unless entry
 
     gem_require, const_name = entry
-    require gem_require
+    require gem_require if gem_require
     safe_const(const_name)
   rescue LoadError
     nil
