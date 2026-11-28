@@ -472,7 +472,7 @@ module Metanorma
           def build_fn_paragraph_text(mn_p, fn_element, first:)
             text = RenderedTextExtractor.text_of(mn_p)
             label = fn_element.reference if fn_element.is_a?(Metanorma::Document::Components::Inline::FnElement)
-            text = "#{label})#{text}" if first && label && !label.to_s.empty? && !text.empty?
+            text = "#{label}) #{text}" if first && label && !label.to_s.empty? && !text.empty?
             ::Sts::NisoSts::Paragraph.new(text: [text])
           end
 
@@ -624,12 +624,19 @@ module Metanorma
             explicit = text_of(node)
             return explicit unless explicit.empty?
 
-            raw = node.target.to_s
-            case raw
-            when /\Asec-(.+)\z/, /\Afig-(.+)\z/, /\Atable-(.+)\z/, /\Afn-(.+)\z/
+            # Prefer the remapped engine id: it carries the kind prefix
+            # (sec_A, fig_2, tab1, annB). Bare consumer anchors (_tab1)
+            # pass through unchanged by the registry, so strip their
+            # underscore markers and decompose the same way instead of
+            # leaking the raw id as visible text.
+            raw = rid.to_s.empty? ? node.target.to_s : rid.to_s
+            stripped = raw.sub(/\A_+/, "")
+            case stripped
+            when /\Asec[-_](.+)\z/, /\Afig[-_](.+)\z/, /\Atable[-_](.+)\z/, /\Afn[-_](.+)\z/,
+                 /\Aann([A-Z]|\d+)\z/, /\Afig(\d+)\z/, /\Atab(\d+)\z/, /\Aformula(\d+)\z/
               "#{Regexp.last_match(1)} "
             else
-              explicit.empty? ? rid : explicit
+              explicit.empty? ? stripped : explicit
             end
           end
 
