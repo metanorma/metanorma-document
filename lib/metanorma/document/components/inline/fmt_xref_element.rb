@@ -6,12 +6,10 @@ module Metanorma
       module Inline
         class FmtXrefElement < Lutaml::Model::Serializable
           include RenderedDisplay
+          include Inline::Vocabulary
 
           attribute :target, :string
           attribute :type, :string
-          attribute :text, :string, collection: true
-          attribute :span, SpanElement, collection: true
-          attribute :semx, SemxElement, collection: true
 
           xml do
             element "fmt-xref"
@@ -19,8 +17,7 @@ module Metanorma
             map_attribute "target", to: :target
             map_attribute "type", to: :type
             map_content to: :text
-            map_element "span", to: :span
-            map_element "semx", to: :semx
+            VocabularyXmlMapping.apply_inline_mappings(self)
           end
         end
       end

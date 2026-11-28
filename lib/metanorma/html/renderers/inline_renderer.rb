@@ -432,7 +432,7 @@ module Metanorma
 
         def render_semx_content(element, **_opts)
           parts = []
-          display_attrs = %i[text fmt_xref fmt_link fmt_concept span strong em sup p semx
+          display_attrs = %i[text fmt_xref fmt_eref fmt_origin fmt_link fmt_concept span strong em sup p semx
                              asciimath math sub_child tt_child br_child tab_child
                              stem_child figure_child formula_child sourcecode_child
                              fn_child refterm fmt_preferred ol ul]
@@ -546,6 +546,15 @@ module Metanorma
           elsif citeas
             escape_html(citeas)
           end
+        end
+
+        # The rendered citation twins (fmt-eref/fmt-origin): the
+        # bibliographic reference left as citation text in presentation
+        # XML — no URL or bib entry to link to, so native output shows
+        # the citation text itself (its citeas when the element is
+        # empty).
+        def render_fmt_eref(eref)
+          render_eref(eref)
         end
 
         def render_fn(fn)

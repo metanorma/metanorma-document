@@ -537,6 +537,10 @@ module Metanorma
                              :render_semx_inline
       register_inline_render Metanorma::Document::Components::Inline::FmtXrefElement,
                              :render_fmt_xref
+      register_inline_render Metanorma::Document::Components::Inline::FmtErefElement,
+                             :render_fmt_eref
+      register_inline_render Metanorma::Document::Components::Inline::FmtOriginElement,
+                             :render_fmt_eref
       register_inline_render Metanorma::Document::Components::Inline::FmtStemElement,
                              :render_fmt_stem
       register_inline_render Metanorma::Document::Components::Inline::CommaElement,
@@ -710,6 +714,7 @@ module Metanorma
       def render_refterm(el) = @inline_renderer.render_refterm(el)
       def render_fmt_preferred_inline(el) = @inline_renderer.render_fmt_preferred_inline(el)
       def render_fmt_xref(el) = @inline_renderer.render_fmt_xref(el)
+      def render_fmt_eref(el) = @inline_renderer.render_fmt_eref(el)
       def render_comma(*) = @inline_renderer.render_comma
       def render_input(el) = @inline_renderer.render_input(el)
       def render_select(el) = @inline_renderer.render_select(el)
