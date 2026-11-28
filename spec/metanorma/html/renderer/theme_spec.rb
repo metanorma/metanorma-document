@@ -78,8 +78,12 @@ RSpec.describe Metanorma::Html::Theme do
     context "ISO theme" do
       let(:theme) { described_class.load(:iso) }
 
-      it "has red primary color" do
-        expect(theme.primary).to eq("#b3000c")
+      it "parses a typed primary color" do
+        # The value itself belongs to the flavor: metanorma-iso owns the
+        # registry theme and moved the default to the ISO/IEC Directives
+        # house style (the previous default is its iso-legacy theme), so
+        # assert the typed field, not a color.
+        expect(theme.primary).to match(/\A#[0-9a-fA-F]{6}\z/)
       end
 
       it "has publisher metadata" do
