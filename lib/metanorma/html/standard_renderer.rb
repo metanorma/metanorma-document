@@ -376,8 +376,14 @@ module Metanorma
 
       def render_requirement(req, **_opts)
         parts = []
-        label = req.respond_to?(:fmt_name) && req.fmt_name ? render(req.fmt_name) : reqt_label(req)
-        parts << %(<div class="reqt"><p class="reqt-label">#{escape_html(label.to_s)}</p>)
+        # fmt-name renders as trusted HTML (its own markup); the
+        # computed fallback label is plain text and needs escaping.
+        label_html = if req.respond_to?(:fmt_name) && req.fmt_name
+                       render(req.fmt_name).to_s
+                     else
+                       escape_html(reqt_label(req).to_s)
+                     end
+        parts << %(<div class="reqt"><p class="reqt-label">#{label_html}</p>)
 
         if req.respond_to?(:fmt_provision) && req.fmt_provision
           parts << requirement_fmt_provision_html(req)

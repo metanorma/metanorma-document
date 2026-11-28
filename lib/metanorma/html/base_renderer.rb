@@ -630,6 +630,11 @@ module Metanorma
       # through when it appears in block context.
       register_render Metanorma::Document::Components::Inline::FmtXrefLabelElement,
                       :render_block_inline_content
+      # fmt-name carries the block's label ("Recommendation 5", "Table
+      # 1", "IMPORTANT"); render it through when it appears in block
+      # context (requirement labels render it directly).
+      register_render Metanorma::Document::Components::Inline::FmtNameElement,
+                      :render_block_inline_content
       # Annotation boundary markers fence an annotated region; they carry
       # no renderable content of their own at block dispatch.
       register_render Metanorma::Document::Components::Inline::FmtAnnotationStartElement,
