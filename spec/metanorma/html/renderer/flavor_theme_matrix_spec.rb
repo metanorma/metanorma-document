@@ -92,6 +92,24 @@ RSpec.describe "HTML flavor/taste theme matrix" do
     end
   end
 
+  it "claims a render theme only while its theme files are preserved" do
+    # A pruned or renamed theme (55a1fce: csand/m3d/mpfa/mpfd/vg) must
+    # lose its "theme" key in the same change, or the render legs raise
+    # "Unknown HTML theme" for a directory that no longer exists.
+    missing = rows.filter_map do |name, row|
+      theme = row["theme"] or next
+
+      preserved = File.file?(File.join(Metanorma::Html::Theme::THEMES_DIR,
+                                       theme, "theme.yaml")) ||
+        File.file?(File.join(Metanorma::Html::Theme::THEMES_DIR, "#{theme}.yaml"))
+      next if preserved
+
+      "#{name} -> #{theme}"
+    end
+    expect(missing).to(eq([]),
+                       "rows claim themes that are not preserved: #{missing.join(', ')}")
+  end
+
   it "covers every measured model registration and taste, including aliases" do
     registrations = manifest.fetch("source_inventory").values
       .flat_map { |source| source.fetch("model_registrations") }
