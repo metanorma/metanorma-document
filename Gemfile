@@ -16,12 +16,14 @@ gem "isodoc", github: "metanorma/isodoc", branch: "main"
 # TEMPORARY pin: the Html::Labeller labels: kwarg ships on main (ladl#7);
 # flip to "~> 0.2" when released
 gem "ladl", github: "metanorma/ladl", branch: "main"
-# TEMPORARY pin: ladl's gemspec declares fluent-min ~> 0.1, which is
-# git-only until its rubygems publish (metanorma/fluent-min). Without
-# this line every fresh bundle fails resolution ("fluent-min ~> 0.1
-# could not be found", 2026-11-28 CI breakage). Drop both pins once
-# fluent-min 0.1.0 publishes.
-gem "fluent-min", github: "metanorma/fluent-min", branch: "main"
+# TEMPORARY pins: ladl@main now declares rhoella ~> 0.1 (the renamed
+# fluent-min), which is git-only until its rubygems publish
+# (metanorma/fluent-min carries rhoella.gemspec at main). Without a
+# rhoella pin every fresh bundle fails resolution ("rhoella ~> 0.1
+# could not be found", 2026-11-28 CI breakage). Drop the rhoella pin
+# (and the ladl branch pin per its own comment) once rhoella 0.1.0
+# publishes.
+gem "rhoella", github: "metanorma/fluent-min", branch: "main"
 gem "metanorma-cc"
 gem "metanorma-core", "~> 0.2.7" # published flavor/taste table (metanorma-core#18)
 gem "metanorma-iec", github: "metanorma/metanorma-iec", branch: "main"
