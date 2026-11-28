@@ -8,6 +8,8 @@ module Metanorma
           @coordinator = coordinator
         end
 
+        # The block is inspected (not just forwarded), so the parameter
+        # stays named: anonymous & forwarding cannot reference block.
         def walk_ordered(node, allow_filter: nil, &block)
           return false unless node.is_a?(Lutaml::Model::Serializable)
           unless node.element_order.is_a?(Array) && !node.element_order.empty?
@@ -29,10 +31,10 @@ module Metanorma
 
             if el.text?
               text = el.text_content
-              yield :text, text if text && block_given?
+              yield :text, text if text && block
             elsif el.element?
               if el.name == "tab"
-                yield :tab, nil if block_given?
+                yield :tab, nil if block
                 next
               end
 
@@ -49,7 +51,7 @@ module Metanorma
                     else
                       coll
                     end
-              yield :element, obj if obj && block_given?
+              yield :element, obj if obj && block
             end
           end
           true
