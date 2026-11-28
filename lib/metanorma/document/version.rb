@@ -2,7 +2,7 @@
 
 module Metanorma
   module Document
-    VERSION = "0.5.16"
+    VERSION = "0.5.17"
     Version = VERSION
   end
 end
