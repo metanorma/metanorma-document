@@ -153,6 +153,11 @@ taste_inventory:
     publisher: Enosema Foundation
     abbreviation: EFS
     source: data/enosema/config.yaml
+  evs:
+    base: iso
+    publisher: Estonian Centre for Standardisation and Accreditation
+    abbreviation: EVS
+    source: data/evs/config.yaml
   iala:
     base: iho
     publisher: International Organization for Marine Aids to Navigation
@@ -305,8 +310,8 @@ rows:
     - browser review
   mpfa:
     kind: flavor
-    theme: mpfa
     status: parity_pending
+    reason: Deprecated flavor per the flavor map; theme pruned (55a1fce, 2026-11-27)
     gates:
     - flavor model/renderer adoption
     - legacy comparison
@@ -398,6 +403,17 @@ rows:
     publisher: Enosema Foundation
     status: parity_pending
     gates:
+    - base renderer taste selection/adoption
+    - legacy comparison
+    - browser review
+  evs:
+    kind: taste
+    base: iso
+    publisher: Estonian Centre for Standardisation and Accreditation
+    status: parity_pending
+    reason: Taste shipped in metanorma-taste 1.1.19; no HTML theme authored in data/themes yet
+    gates:
+    - theme authoring (extends iso)
     - base renderer taste selection/adoption
     - legacy comparison
     - browser review
@@ -502,30 +518,30 @@ rows:
     - canonical flavor parity
   m3d:
     kind: alias
-    theme: m3d
     target: m3aawg
     status: parity_pending
+    reason: Renamed to m3aawg; m3aawg carries the renderable theme, m3d theme pruned (55a1fce, 2026-11-27)
     gates:
     - canonical flavor parity
   mpfd:
     kind: alias
-    theme: mpfd
     target: mpfa
     status: parity_pending
+    reason: Alias of deprecated mpfa; theme pruned (55a1fce, 2026-11-27)
     gates:
     - canonical flavor parity
   csand:
     kind: alias
-    theme: csand
     target: csa
     status: parity_pending
+    reason: Superseded by csa (fuller assets and templates live there); theme pruned (55a1fce, 2026-11-27)
     gates:
     - canonical flavor parity
   vg:
     kind: alias
-    theme: vg
     target: vsd
     status: parity_pending
+    reason: Deprecated flavor per the flavor map; theme pruned (55a1fce, 2026-11-27)
     gates:
     - canonical flavor parity
   mko:
