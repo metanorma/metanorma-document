@@ -43,17 +43,20 @@ module RoundtripSamples
   # needed because the rake process loads only metanorma-document: without
   # it the model constant resolves to nil and every file reports no_model.
   FLAVOR_MODEL_MAP = {
-    "iso"     => ["metanorma-iso",  "Metanorma::Iso::Document::Root"],
-    "iec"     => ["metanorma-iec",  "Metanorma::Iec::Document::Root"],
-    "ieee"    => ["metanorma-ieee", "Metanorma::Ieee::Document::Root"],
-    "iho"     => ["metanorma-iho",  "Metanorma::Iho::Document::Root"],
-    "cc"      => ["metanorma-cc",   "Metanorma::Cc::Document::Root"],
-    "bipm"    => ["metanorma-bipm", "Metanorma::Bipm::Document::Root"],
-    "itu"     => ["metanorma-itu",  "Metanorma::Itu::Document::Root"],
-    "ogc"     => ["metanorma-ogc",  "Metanorma::Ogc::Document::Root"],
-    "ribose"  => ["metanorma-ribose", "Metanorma::Ribose::Document::Root"],
-    "ietf"    => ["metanorma-ietf", "Metanorma::Ietf::Document::Root"],
-    "csa"     => ["metanorma-csa",  "Metanorma::Csa::Document::Root"],
+    # The flavor model classes: Metanorma::<Flavor>::Document (aliased as
+    # Metanorma::<Flavor>Document in the flavor gems). Verified loadable:
+    # metanorma-iso 3.5.32, metanorma-iec 2.9.3.
+    "iso"     => ["metanorma-iso",  "Metanorma::Iso::Document"],
+    "iec"     => ["metanorma-iec",  "Metanorma::Iec::Document"],
+    "iho"     => ["metanorma-iho",  "Metanorma::Iho::Document"],
+    "itu"     => ["metanorma-itu",  "Metanorma::Itu::Document"],
+    "ogc"     => ["metanorma-ogc",  "Metanorma::Ogc::Document"],
+    "bipm"    => ["metanorma-bipm", "Metanorma::Bipm::Document"],
+    "ribose"  => ["metanorma-ribose", "Metanorma::Ribose::Document"],
+    "ietf"    => ["metanorma-ietf", "Metanorma::Ietf::Document"],
+    "cc"      => ["metanorma-cc",   "Metanorma::Cc::Document"],
+    "ieee"    => ["metanorma-ieee", "Metanorma::Ieee::Document"],
+    "csa"     => ["metanorma-csa",  "Metanorma::Csa::Document"],
     # standoc is the base flavor and iala/un are tastes on the base: they
     # consume the root Document model from this gem directly — no
     # per-flavor model exists or is needed.
