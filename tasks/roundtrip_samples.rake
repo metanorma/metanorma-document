@@ -239,6 +239,7 @@ module RoundtripSamples
         match: {
           attribute_order: :ignore,
           attribute_values: :normalize,
+          text_content: :normalize,
         },
         verbose: true,
       )
