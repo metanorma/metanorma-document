@@ -8,9 +8,11 @@ module Metanorma
           @coordinator = coordinator
         end
 
-        def walk_ordered(node, allow_filter: nil)
+        def walk_ordered(node, allow_filter: nil, &block)
           return false unless node.is_a?(Lutaml::Model::Serializable)
-          return false unless node.element_order.is_a?(Array) && !node.element_order.empty?
+          unless node.element_order.is_a?(Array) && !node.element_order.empty?
+            return walk_declared_order(node, allow_filter, &block)
+          end
 
           xml_mapping = node.class.mappings_for(:xml, node.lutaml_register)
           return false unless xml_mapping
@@ -48,6 +50,39 @@ module Metanorma
                       coll
                     end
               yield :element, obj if obj && block_given?
+            end
+          end
+          true
+        end
+
+        # Models that declare neither mixed nor ordered content capture no
+        # element_order (lutaml-model records document order only for
+        # mixed/ordered mappings) — the term <fmt-definition> container
+        # and its <semx> slice, requirement components. Their declared
+        # element-mapping order is the document order the parse filled,
+        # so walk the mapping instead of silently returning nothing.
+        def walk_declared_order(node, allow_filter, &block)
+          xml_mapping = node.class.mappings_for(:xml, node.lutaml_register)
+          return false unless xml_mapping
+
+          content_rule = xml_mapping.content_mapping
+          if content_rule && block
+            Array(safe_attr(node, content_rule.to)).each do |text|
+              yield :text, text if text.is_a?(String)
+            end
+          end
+
+          return true unless block
+
+          xml_mapping.mapping_elements_hash.each_value do |rules|
+            Array(rules).each do |rule|
+              next if allow_filter && !allow_filter.include?(rule.to)
+
+              Array(safe_attr(node, rule.to)).each do |child|
+                next unless child.is_a?(Lutaml::Model::Serializable)
+
+                yield :element, child
+              end
             end
           end
           true
